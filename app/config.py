@@ -26,6 +26,7 @@ ProviderName = Literal[
     "deepseek",
     "openrouter",
     "together",
+    "mistral",
     "ollama",
     "openai_compatible",
     "fake",
@@ -101,6 +102,7 @@ class Settings(BaseSettings):
     deepseek_api_key: SecretStr | None = None
     openrouter_api_key: SecretStr | None = None
     together_api_key: SecretStr | None = None
+    mistral_api_key: SecretStr | None = None
 
     # --- Turn limits --------------------------------------------------------
     turn_deadline_seconds: float = Field(default=90.0, gt=0)

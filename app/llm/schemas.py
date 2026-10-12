@@ -105,6 +105,8 @@ class LLMErrorCategory(StrEnum):
     RATE_LIMITED = "rate_limited"
     # A daily/billing quota is used up: retrying soon will not help.
     QUOTA_EXHAUSTED = "quota_exhausted"
+    # The provider's moderation rejected the input or output.
+    CONTENT_FILTERED = "content_filtered"
     OVERLOADED = "overloaded"
     SERVER_ERROR = "server_error"
     TIMEOUT = "timeout"

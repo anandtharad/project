@@ -11,7 +11,11 @@ from typing import Any
 import httpx2
 import pytest
 
-from app.llm.providers.openai_provider import KEYLESS_PLACEHOLDER, OpenAICompatibleLLMClient
+from app.llm.providers.openai_provider import (
+    KEYLESS_PLACEHOLDER,
+    OpenAICompatibleLLMClient,
+    effort_extra_body,
+)
 from app.llm.schemas import (
     ChatMessage,
     ChatRole,
@@ -28,7 +32,7 @@ Handler = Callable[[httpx2.Request], httpx2.Response]
 
 
 def completion_json(
-    content: str | None = "What's been weighing on you?", **message: Any
+    content: Any = "What's been weighing on you?", **message: Any
 ) -> dict[str, Any]:
     return {
         "id": "chatcmpl-1",
@@ -102,7 +106,7 @@ def make_request(model: str = "gpt-6-luna", **params: Any) -> GenerationRequest:
 
 async def test_openai_request_shape() -> None:
     recorder = Recorder()
-    client = make_client(recorder, system_role="developer", send_reasoning_effort=True)
+    client = make_client(recorder, system_role="developer", effort_style="reasoning_effort")
     await client.generate(make_request(effort="low"))
     assert str(recorder.requests[-1].url) == "https://api.openai.com/v1/chat/completions"
     body = recorder.body
@@ -122,7 +126,6 @@ async def test_compatible_request_shape() -> None:
         provider="qwen",
         base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
         max_tokens_param="max_tokens",
-        send_reasoning_effort=False,
     )
     await client.generate(make_request("qwen-plus", effort="high", temperature=0.4))
     sent = recorder.requests[-1]
@@ -263,3 +266,141 @@ async def test_connection_and_timeout_errors() -> None:
     with pytest.raises(LLMError) as timeout:
         await make_client(slow).generate(make_request())
     assert timeout.value.category is LLMErrorCategory.TIMEOUT
+
+
+async def test_custom_headers_env_cannot_override_the_configured_key(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The SDK applies OPENAI_CUSTOM_HEADERS after auth headers; an
+    # Authorization line there must not replace the provider's own key.
+    monkeypatch.setenv("OPENAI_CUSTOM_HEADERS", "Authorization: Bearer sk-real-openai")
+    recorder = Recorder()
+    client = make_client(
+        recorder, provider="xai", api_key="xai-key", base_url="https://api.x.ai/v1"
+    )
+    await client.generate(make_request("grok-4.3"))
+    assert recorder.headers["authorization"] == "Bearer xai-key"
+    assert "sk-real-openai" not in str(recorder.headers)
+
+
+def test_enable_thinking_extra_body_mapping() -> None:
+    assert effort_extra_body(None, "enable_thinking") is None
+    assert effort_extra_body("high", "reasoning_effort") is None
+    assert effort_extra_body("none", "enable_thinking") == {"enable_thinking": False}
+    assert effort_extra_body("low", "enable_thinking") == {
+        "enable_thinking": True,
+        "thinking_budget": 1024,
+    }
+
+
+async def test_qwen_thinking_controls_travel_as_top_level_fields() -> None:
+    recorder = Recorder()
+    client = make_client(
+        recorder,
+        provider="qwen",
+        base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+        effort_style="enable_thinking",
+    )
+    await client.generate(make_request("qwen-plus", effort="none"))
+    body = recorder.body
+    assert body["enable_thinking"] is False
+    assert "reasoning_effort" not in body
+    assert body["messages"][0]["role"] == "system"
+
+
+async def test_list_content_keeps_only_text_parts() -> None:
+    body = completion_json(
+        [
+            {"type": "thinking", "thinking": [{"type": "text", "text": "PRIVATE"}]},
+            {"type": "text", "text": "I'm here with you."},
+        ]
+    )
+    body["choices"][0]["finish_reason"] = "model_length"
+    response = await make_client(Recorder(httpx2.Response(200, json=body))).generate(
+        make_request("mistral-large-latest")
+    )
+    assert response.content == "I'm here with you."
+    assert response.finish_reason is FinishReason.MAX_TOKENS
+
+
+async def test_error_body_with_200_status_is_invalid_response() -> None:
+    body = {"error": {"message": "upstream failed", "code": 502}}
+    with pytest.raises(LLMError) as info:
+        await make_client(Recorder(httpx2.Response(200, json=body))).generate(make_request())
+    assert info.value.category is LLMErrorCategory.RESPONSE_INVALID
+
+
+def coded_error(status: int, code: str, message: str) -> Handler:
+    def handler(_: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(
+            status, json={"error": {"message": message, "type": "x", "code": code}}
+        )
+
+    return handler
+
+
+@pytest.mark.parametrize(
+    ("status", "code", "message", "category"),
+    [
+        (
+            400,
+            "data_inspection_failed",
+            "Input data may contain inappropriate content.",
+            LLMErrorCategory.CONTENT_FILTERED,
+        ),
+        (
+            400,
+            "Arrearage",
+            "Access denied, please make sure your account is in good standing.",
+            LLMErrorCategory.PERMISSION,
+        ),
+        (400, "invalid_api_key", "Incorrect API key provided.", LLMErrorCategory.AUTHENTICATION),
+        (
+            429,
+            "insufficient_quota",
+            "You exceeded your current quota, please check your plan and billing details.",
+            LLMErrorCategory.QUOTA_EXHAUSTED,
+        ),
+        (
+            429,
+            "insufficient_quota",
+            "Free allocated quota exceeded.",
+            LLMErrorCategory.QUOTA_EXHAUSTED,
+        ),
+        (
+            429,
+            "insufficient_quota",
+            "Allocated quota exceeded, please increase your quota limit.",
+            LLMErrorCategory.RATE_LIMITED,
+        ),
+        (
+            500,
+            "RequestTimeOut",
+            "Request timed out, please try again later.",
+            LLMErrorCategory.TIMEOUT,
+        ),
+    ],
+)
+async def test_provider_specific_error_codes(
+    status: int, code: str, message: str, category: LLMErrorCategory
+) -> None:
+    with pytest.raises(LLMError) as info:
+        await make_client(coded_error(status, code, message)).generate(make_request())
+    assert info.value.category is category
+
+
+async def test_xai_string_error_body_with_api_key_message_is_auth() -> None:
+    def handler(_: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(
+            400,
+            json={
+                "code": "Client specified an invalid argument",
+                "error": "Incorrect API key provided: xa***",
+            },
+        )
+
+    with pytest.raises(LLMError) as info:
+        await make_client(handler, provider="xai", base_url="https://api.x.ai/v1").generate(
+            make_request("grok-4.3")
+        )
+    assert info.value.category is LLMErrorCategory.AUTHENTICATION

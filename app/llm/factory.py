@@ -70,7 +70,11 @@ def build_llm_client(settings: Settings, resolved: ResolvedProvider) -> LLMClien
             max_retries=settings.generation_max_retries,
             system_role=preset.system_role,
             max_tokens_param=preset.max_tokens_param,
-            send_reasoning_effort=preset.effort_param == "reasoning_effort",
+            effort_style=(
+                preset.effort_param
+                if preset.effort_param in ("reasoning_effort", "enable_thinking")
+                else "none"
+            ),
             send_openai_headers=preset.send_openai_headers,
         )
     raise ProviderConfigError(

@@ -13,6 +13,7 @@ from app.llm.providers.registry import (
     PRESETS,
     AdapterKind,
     ProviderConfigError,
+    clamp_effort,
     resolve_provider,
 )
 from tests.helpers import make_settings
@@ -30,6 +31,7 @@ def settings_for(provider: str, **overrides: Any) -> Any:
         "deepseek_api_key": "ds-test",
         "openrouter_api_key": "or-test",
         "together_api_key": "tg-test",
+        "mistral_api_key": "ms-test",
     }
     values: dict[str, Any] = {"generation_provider": provider, **keys}
     if provider == "openai_compatible":
@@ -45,7 +47,11 @@ def test_every_provider_name_has_a_preset() -> None:
 def test_presets_are_internally_consistent() -> None:
     for preset in PRESETS.values():
         if preset.kind is AdapterKind.OPENAI_COMPATIBLE:
-            assert preset.effort_param in ("reasoning_effort", "unsupported"), preset.name
+            assert preset.effort_param in (
+                "reasoning_effort",
+                "enable_thinking",
+                "unsupported",
+            ), preset.name
             assert preset.extra == "openai"
         else:
             assert preset.effort_param == "adapter", preset.name
@@ -153,3 +159,30 @@ def test_missing_sdk_gives_install_hint(monkeypatch: pytest.MonkeyPatch) -> None
     settings = settings_for("groq")
     with pytest.raises(ProviderConfigError, match="uv sync --extra groq"):
         build_llm_client(settings, resolve_provider(settings))
+
+
+@pytest.mark.parametrize(
+    ("effort", "allowed", "expected"),
+    [
+        ("max", ("none", "low", "medium", "high"), "high"),
+        ("xhigh", ("none", "low", "medium", "high"), "high"),
+        ("medium", ("none", "low", "high", "max"), "low"),
+        ("low", ("none", "high"), "none"),
+        ("medium", ("none", "high"), "high"),
+        ("high", ("none", "low", "medium", "high"), "high"),
+    ],
+)
+def test_clamp_effort(effort: str, allowed: tuple[str, ...], expected: str) -> None:
+    assert clamp_effort(effort, allowed) == expected  # type: ignore[arg-type]
+
+
+def test_xai_effort_is_clamped_with_warning() -> None:
+    resolved = resolve_provider(settings_for("xai", generation_effort="max"))
+    assert resolved.effort == "high"
+    assert resolved.warnings
+
+
+def test_presets_requiring_explicit_models() -> None:
+    for name in ("deepseek", "openrouter", "together", "ollama"):
+        with pytest.raises(ProviderConfigError, match="GENERATION_MODEL"):
+            resolve_provider(settings_for(name))

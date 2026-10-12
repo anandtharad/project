@@ -27,6 +27,7 @@ from app.llm.schemas import (
 _FINISH_REASONS: dict[str, FinishReason] = {
     "stop": FinishReason.STOP,
     "length": FinishReason.MAX_TOKENS,
+    "model_length": FinishReason.MAX_TOKENS,  # Mistral
     "content_filter": FinishReason.REFUSAL,
 }
 
@@ -60,6 +61,24 @@ def build_messages(
     ]
 
 
+def _content_text(content: Any) -> str:
+    """Reply text from `message.content`.
+
+    The SDKs do not validate responses, so compatible servers can return a
+    list of typed parts (e.g. Mistral thinking chunks); only "text" parts are
+    kept, never "thinking" parts.
+    """
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        return "".join(
+            str(part.get("text", ""))
+            for part in content
+            if isinstance(part, dict) and part.get("type") == "text"
+        )
+    return ""
+
+
 def normalize_chat_completion(
     response: ChatCompletionLike,
     *,
@@ -73,7 +92,7 @@ def normalize_chat_completion(
     choice = response.choices[0]
     message = choice.message
     refusal = getattr(message, "refusal", None)
-    raw_text = message.content or ""
+    raw_text = _content_text(message.content)
     # Reasoning returned in separate fields (`reasoning`, `reasoning_content`)
     # is never read; inline <think> blocks are stripped defensively.
     text, reasoning_removed = strip_reasoning(raw_text)
@@ -133,6 +152,8 @@ def classify_sdk_error(exc: Exception, sdk: ModuleType) -> LLMError:
     status: int = exc.status_code
     headers = exc.response.headers
     request_id = headers.get("x-request-id") or headers.get("request-id")
+    code = str(getattr(exc, "code", None) or "").lower()
+    text = str(exc.message).lower()
 
     def error(
         category: LLMErrorCategory, message: str, *, retry_after: float | None = None
@@ -146,8 +167,21 @@ def classify_sdk_error(exc: Exception, sdk: ModuleType) -> LLMError:
         )
 
     # Some compatible providers (e.g. xAI) report an invalid key as a 400.
-    if status == 401 or (status == 400 and "api key" in str(exc.message).lower()):
+    if status == 401 or (status == 400 and "api key" in text):
         return error(LLMErrorCategory.AUTHENTICATION, "Provider rejected the credentials.")
+    # Provider moderation reported as an error (e.g. DashScope 400
+    # data_inspection_failed) rather than as a finish reason.
+    if code in ("data_inspection_failed", "datainspectionfailed"):
+        return error(LLMErrorCategory.CONTENT_FILTERED, "Provider moderation blocked the content.")
+    if code == "arrearage":
+        return error(LLMErrorCategory.PERMISSION, "Provider account is not in good standing.")
+    # "insufficient_quota" means billing/free quota exhausted when the message
+    # points at the plan or free allocation; DashScope also uses it for a
+    # transient tokens-per-minute limit ("Allocated quota exceeded").
+    if code == "insufficient_quota" and (
+        "billing" in text or "free allocated quota" in text or "check your plan" in text
+    ):
+        return error(LLMErrorCategory.QUOTA_EXHAUSTED, "Provider quota exhausted.")
     if status in (402, 403):
         return error(LLMErrorCategory.PERMISSION, "Provider denied the request.")
     if status == 404:
@@ -158,7 +192,7 @@ def classify_sdk_error(exc: Exception, sdk: ModuleType) -> LLMError:
             "Provider rate limit exceeded.",
             retry_after=_retry_after(headers),
         )
-    if status in (408, 504):
+    if status in (408, 504) or code in ("requesttimeout", "request_timeout"):
         return error(LLMErrorCategory.TIMEOUT, "Provider request timed out.")
     # 498: Groq flex-tier capacity exceeded (custom status, not retried by the SDK).
     if status in (498, 503, 529):

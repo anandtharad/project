@@ -17,11 +17,16 @@ a custom endpoint). Verified against openai 3.29.0 (httpx2 transport):
   `reasoning_content`) land in `message.model_extra` and are never read;
   inline <think> blocks are stripped defensively.
 
+Thinking controls differ: OpenAI-style `reasoning_effort`, or DashScope's
+`enable_thinking` (+ `thinking_budget`) sent as extra body fields.
+
 Credential safety: with `api_key=None` the SDK falls back to OPENAI_API_KEY
-and would send it to whatever base_url is configured, and it forwards
-OPENAI_ORG_ID / OPENAI_PROJECT_ID / OPENAI_CUSTOM_HEADERS to any endpoint.
-This adapter always passes an explicit key and, for non-OpenAI endpoints,
-omits those headers.
+and would send it to whatever base_url is configured; it forwards
+OPENAI_ORG_ID / OPENAI_PROJECT_ID / OPENAI_CUSTOM_HEADERS to any endpoint;
+and an `Authorization` line in OPENAI_CUSTOM_HEADERS overrides even an
+explicit key. This adapter always passes an explicit key, pins the
+Authorization header to it, and for non-OpenAI endpoints omits the other
+OpenAI-only headers.
 """
 
 from __future__ import annotations
@@ -29,18 +34,19 @@ from __future__ import annotations
 import os
 import time
 from collections.abc import Mapping
-from typing import Literal, cast
+from typing import Any, Literal, cast
 
 import httpx2
 import openai
 from openai import omit
+from openai.types.chat import ChatCompletionMessageParam
 
 from app.llm.providers.chat_completions import (
     build_messages,
     classify_sdk_error,
     normalize_chat_completion,
 )
-from app.llm.schemas import GenerationRequest, GenerationResponse
+from app.llm.schemas import Effort, GenerationRequest, GenerationResponse
 
 # Placeholder for keyless local servers (e.g. Ollama). Never None: a None key
 # would make the SDK pick up OPENAI_API_KEY from the environment.
@@ -49,15 +55,41 @@ KEYLESS_PLACEHOLDER = "not-needed"
 _OPENAI_ONLY_HEADERS = ("OpenAI-Organization", "OpenAI-Project")
 
 
-def openai_only_header_omissions() -> dict[str, openai.Omit]:
-    """Header removals that keep OpenAI account headers off third-party endpoints."""
+def build_default_headers(api_key: str, *, send_openai_headers: bool) -> dict[str, Any]:
+    """Headers that pin authentication to `api_key` and, for non-OpenAI
+    endpoints, remove OpenAI account headers taken from the environment."""
+    headers: dict[str, Any] = {"Authorization": f"Bearer {api_key}"}
+    if send_openai_headers:
+        return headers
     names = list(_OPENAI_ONLY_HEADERS)
     # Parsed the same way the SDK parses it: newline-separated "Name: value".
     for line in os.environ.get("OPENAI_CUSTOM_HEADERS", "").split("\n"):
         name, sep, _ = line.partition(":")
-        if sep and name.strip():
+        if sep and name.strip() and name.strip().lower() != "authorization":
             names.append(name.strip())
-    return {name: openai.Omit() for name in names}
+    headers.update({name: openai.Omit() for name in names})
+    return headers
+
+
+# DashScope thinking budgets (tokens) when thinking is enabled via effort.
+_THINKING_BUDGETS: dict[Effort, int] = {
+    "low": 1024,
+    "medium": 4096,
+    "high": 8192,
+    "xhigh": 16384,
+    "max": 32768,
+}
+
+
+def effort_extra_body(
+    effort: Effort | None, style: Literal["none", "reasoning_effort", "enable_thinking"]
+) -> dict[str, Any] | None:
+    """Provider-specific thinking fields that travel in `extra_body`."""
+    if effort is None or style != "enable_thinking":
+        return None
+    if effort == "none":
+        return {"enable_thinking": False}
+    return {"enable_thinking": True, "thinking_budget": _THINKING_BUDGETS[effort]}
 
 
 class OpenAICompatibleLLMClient:
@@ -70,13 +102,14 @@ class OpenAICompatibleLLMClient:
         max_retries: int = 2,
         system_role: Literal["system", "developer"] = "system",
         max_tokens_param: Literal["max_completion_tokens", "max_tokens"] = "max_completion_tokens",
-        send_reasoning_effort: bool = False,
+        effort_style: Literal["none", "reasoning_effort", "enable_thinking"] = "none",
         send_openai_headers: bool = False,
         http_client: httpx2.AsyncClient | None = None,
     ) -> None:
-        default_headers = {} if send_openai_headers else openai_only_header_omissions()
+        key = api_key or KEYLESS_PLACEHOLDER
+        default_headers = build_default_headers(key, send_openai_headers=send_openai_headers)
         self._client = openai.AsyncOpenAI(
-            api_key=api_key or KEYLESS_PLACEHOLDER,
+            api_key=key,
             base_url=base_url,
             max_retries=max_retries,
             # Omit sentinels remove headers at runtime; the hint only says str.
@@ -86,7 +119,7 @@ class OpenAICompatibleLLMClient:
         self._provider = provider
         self._system_role = system_role
         self._max_tokens_param = max_tokens_param
-        self._send_reasoning_effort = send_reasoning_effort
+        self._effort_style = effort_style
 
     @property
     def provider(self) -> str:
@@ -102,15 +135,19 @@ class OpenAICompatibleLLMClient:
         try:
             response = await self._client.chat.completions.create(
                 model=request.model,
-                messages=build_messages(  # type: ignore[arg-type]
-                    request.system, request.messages, system_role=self._system_role
+                messages=cast(
+                    "list[ChatCompletionMessageParam]",
+                    build_messages(request.system, request.messages, system_role=self._system_role),
                 ),
                 max_completion_tokens=request.max_output_tokens if use_completion_tokens else omit,
                 max_tokens=omit if use_completion_tokens else request.max_output_tokens,
                 reasoning_effort=(
-                    params.effort if self._send_reasoning_effort and params.effort else omit
+                    params.effort
+                    if self._effort_style == "reasoning_effort" and params.effort
+                    else omit
                 ),
                 temperature=params.temperature if params.temperature is not None else omit,
+                extra_body=effort_extra_body(params.effort, self._effort_style),
                 timeout=request.timeout_seconds,
             )
         except openai.OpenAIError as exc:

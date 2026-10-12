@@ -53,9 +53,12 @@ class ProviderPreset:
     system_role: Literal["system", "developer"] = "system"
     max_tokens_param: Literal["max_completion_tokens", "max_tokens"] = "max_completion_tokens"
     # How GENERATION_EFFORT is expressed: "reasoning_effort" (OpenAI-style
-    # field), or "unsupported" (ignored with a startup warning). Native
-    # adapters (anthropic, groq, gemini) map effort themselves: "adapter".
-    effort_param: Literal["adapter", "reasoning_effort", "unsupported"] = "adapter"
+    # field), "enable_thinking" (DashScope: enable_thinking + thinking_budget),
+    # or "unsupported" (ignored with a startup warning). Native adapters
+    # (anthropic, groq, gemini) map effort themselves: "adapter".
+    effort_param: Literal["adapter", "reasoning_effort", "enable_thinking", "unsupported"] = (
+        "adapter"
+    )
     # Effort values the endpoint accepts (reasoning_effort presets only);
     # others are clamped to the nearest accepted value.
     effort_values: tuple[Effort, ...] = ("none", "low", "medium", "high", "xhigh", "max")
@@ -147,52 +150,84 @@ PRESETS: dict[str, ProviderPreset] = {
             name="qwen",
             kind=AdapterKind.OPENAI_COMPATIBLE,
             extra="openai",
+            # Hybrid model with thinking OFF by default, so non-streaming
+            # calls are safe. (qwen3.5+ models think by default, and the
+            # open-source Qwen3 models only stream while thinking.)
             default_model="qwen-plus",
+            # Singapore (international) endpoint; keys are region-bound, so
+            # override GENERATION_BASE_URL for Beijing/US workspaces.
             base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
             api_key_setting="dashscope_api_key",
             docs_url="https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope",
-            effort_param="unsupported",
+            # Covers reasoning + answer; DashScope deprecated max_tokens.
+            max_tokens_param="max_completion_tokens",
+            effort_param="enable_thinking",
         ),
         ProviderPreset(
             name="deepseek",
             kind=AdapterKind.OPENAI_COMPATIBLE,
             extra="openai",
-            default_model="deepseek-chat",
+            # DeepSeek renamed its models twice in 2026 (deepseek-chat was
+            # discontinued); set GENERATION_MODEL explicitly.
+            default_model=None,
             base_url="https://api.deepseek.com",
             api_key_setting="deepseek_api_key",
             docs_url="https://api-docs.deepseek.com/",
-            effort_param="unsupported",
+            max_tokens_param="max_tokens",
+            effort_param="reasoning_effort",
+            effort_values=("none", "low", "high", "max"),
         ),
         ProviderPreset(
             name="openrouter",
             kind=AdapterKind.OPENAI_COMPATIBLE,
             extra="openai",
-            default_model=None,
+            default_model=None,  # vendor/model ids, e.g. openai/gpt-oss-120b
             base_url="https://openrouter.ai/api/v1",
             api_key_setting="openrouter_api_key",
             docs_url="https://openrouter.ai/docs/quickstart",
+            max_tokens_param="max_tokens",
+            # OpenRouter's reasoning control is its own `reasoning` object.
             effort_param="unsupported",
         ),
         ProviderPreset(
             name="together",
             kind=AdapterKind.OPENAI_COMPATIBLE,
             extra="openai",
-            default_model=None,
-            base_url="https://api.together.xyz/v1",
+            default_model=None,  # org/model ids, e.g. openai/gpt-oss-120b
+            base_url="https://api.together.ai/v1",
             api_key_setting="together_api_key",
             docs_url="https://docs.together.ai/docs/openai-api-compatibility",
+            max_tokens_param="max_tokens",
             effort_param="unsupported",
+        ),
+        ProviderPreset(
+            name="mistral",
+            kind=AdapterKind.OPENAI_COMPATIBLE,
+            extra="openai",
+            # Mistral documents the OpenAI SDK path (migration guide); its
+            # request schema rejects unknown fields, and this adapter only
+            # sends model, messages, max_tokens, temperature, reasoning_effort.
+            default_model="mistral-large-latest",
+            base_url="https://api.mistral.ai/v1",
+            api_key_setting="mistral_api_key",
+            docs_url="https://docs.mistral.ai/",
+            max_tokens_param="max_tokens",
+            effort_param="reasoning_effort",
+            effort_values=("none", "high"),
         ),
         ProviderPreset(
             name="ollama",
             kind=AdapterKind.OPENAI_COMPATIBLE,
             extra="openai",
-            default_model=None,
+            default_model=None,  # whatever model you have pulled
             base_url="http://localhost:11434/v1",
             api_key_setting=None,
             docs_url="https://docs.ollama.com/api/openai-compatibility",
             requires_api_key=False,
-            effort_param="unsupported",
+            # Ollama's OpenAI layer has no max_completion_tokens.
+            max_tokens_param="max_tokens",
+            effort_param="reasoning_effort",
+            effort_values=("none", "low", "medium", "high", "max"),
         ),
         ProviderPreset(
             name="openai_compatible",
@@ -203,6 +238,8 @@ PRESETS: dict[str, ProviderPreset] = {
             api_key_setting=None,
             docs_url="https://platform.openai.com/docs/api-reference/chat",
             requires_api_key=False,
+            # The most widely accepted field across compatible servers.
+            max_tokens_param="max_tokens",
             effort_param="unsupported",
         ),
         ProviderPreset(

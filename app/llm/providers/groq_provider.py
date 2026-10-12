@@ -20,10 +20,11 @@ Verified against groq 1.7.0 and Groq's docs (models, reasoning, errors):
 from __future__ import annotations
 
 import time
-from typing import Literal
+from typing import Literal, cast
 
 import groq
 from groq import omit
+from groq.types.chat import ChatCompletionMessageParam
 
 from app.llm.providers.chat_completions import (
     build_messages,
@@ -103,7 +104,10 @@ class GroqLLMClient:
         try:
             response = await self._client.chat.completions.create(
                 model=request.model,
-                messages=build_messages(request.system, request.messages),  # type: ignore[arg-type]
+                messages=cast(
+                    "list[ChatCompletionMessageParam]",
+                    build_messages(request.system, request.messages),
+                ),
                 max_completion_tokens=request.max_output_tokens,
                 temperature=(
                     request.params.temperature if request.params.temperature is not None else omit
