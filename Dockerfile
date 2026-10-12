@@ -14,7 +14,8 @@ WORKDIR /app
 
 # Dependencies first (cached layer), production dependencies only.
 COPY pyproject.toml uv.lock .python-version ./
-RUN uv sync --frozen --no-dev --no-install-project
+# All provider SDK extras; narrow with e.g. --extra groq to slim the image.
+RUN uv sync --frozen --no-dev --no-install-project --all-extras
 
 COPY alembic.ini ./
 COPY migrations ./migrations

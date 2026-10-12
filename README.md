@@ -53,7 +53,7 @@ Written reference: [docs/api.md](docs/api.md).
 ## Local development (app on the host)
 
 ```bash
-uv sync                                   # creates .venv from uv.lock
+uv sync --all-extras                      # creates .venv from uv.lock (all provider SDKs)
 cp .env.example .env                      # then edit as above
 docker compose up -d db                   # or point DATABASE_URL at your own PostgreSQL 16
 uv run alembic upgrade head
