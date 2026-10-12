@@ -11,10 +11,25 @@ from enum import StrEnum
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, SecretStr, model_validator
+from pydantic import AliasChoices, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 Effort = Literal["low", "medium", "high", "xhigh", "max"]
+
+ProviderName = Literal[
+    "anthropic",
+    "openai",
+    "groq",
+    "gemini",
+    "xai",
+    "qwen",
+    "deepseek",
+    "openrouter",
+    "together",
+    "ollama",
+    "openai_compatible",
+    "fake",
+]
 
 
 class AppEnv(StrEnum):
@@ -49,19 +64,42 @@ class Settings(BaseSettings):
     dev_auth_tokens: SecretStr | None = None
 
     # --- Generative LLM -----------------------------------------------------
-    generation_provider: Literal["anthropic", "fake"] = "anthropic"
-    generation_model: str = "claude-opus-5-5"
-    # Optional: when unset, the Anthropic SDK resolves credentials itself
-    # (ANTHROPIC_API_KEY, ANTHROPIC_AUTH_TOKEN, or an `ant auth login` profile).
+    # Provider presets (default model, base URL, key variable) live in
+    # app/llm/providers/registry.py; unset values below fall back to them.
+    generation_provider: ProviderName = "anthropic"
+    generation_model: str | None = None
+    # Overrides the preset's endpoint; required for "openai_compatible".
+    generation_base_url: str | None = None
+    # Applies to whichever provider is selected. When unset, the provider's own
+    # key setting below is used (e.g. GROQ_API_KEY for "groq").
     generation_api_key: SecretStr | None = None
     generation_timeout_seconds: float = Field(default=45.0, gt=0)
     generation_max_retries: int = Field(default=2, ge=0, le=5)
-    generation_effort: Effort | None = "low"
+    # Reasoning/thinking depth. Unset = the provider preset's default (only
+    # Anthropic sets one). Each adapter maps it to its provider's parameter;
+    # models without reasoning controls reject it, so leave it unset for them.
+    generation_effort: Effort | None = None
     # Leave unset for models that reject sampling parameters (e.g. claude-opus-5-5).
-    generation_temperature: float | None = Field(default=None, ge=0.0, le=1.0)
-    # "default": server-side refusal fallback chosen by the provider per refusal category.
+    generation_temperature: float | None = Field(default=None, ge=0.0, le=2.0)
+    # Anthropic only. "default": server-side refusal fallback chosen by the
+    # provider per refusal category.
     generation_refusal_fallback: Literal["default", "off"] = "default"
     max_output_tokens: int = Field(default=16_000, ge=256, le=128_000)
+
+    # --- Provider API keys (read from the environment or .env) ----------------
+    # Only the selected provider's key is used. The Anthropic SDK can also
+    # resolve ANTHROPIC_AUTH_TOKEN or an `ant auth login` profile by itself.
+    anthropic_api_key: SecretStr | None = None
+    openai_api_key: SecretStr | None = None
+    groq_api_key: SecretStr | None = None
+    gemini_api_key: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("gemini_api_key", "google_api_key")
+    )
+    xai_api_key: SecretStr | None = None
+    dashscope_api_key: SecretStr | None = None
+    deepseek_api_key: SecretStr | None = None
+    openrouter_api_key: SecretStr | None = None
+    together_api_key: SecretStr | None = None
 
     # --- Turn limits --------------------------------------------------------
     turn_deadline_seconds: float = Field(default=90.0, gt=0)
@@ -89,6 +127,13 @@ class Settings(BaseSettings):
         # valid messages are not rejected as too large.
         if self.max_request_bytes < self.max_input_characters * 6 + 1024:
             raise ValueError("MAX_REQUEST_BYTES is too small for MAX_INPUT_CHARACTERS")
+        if self.generation_provider == "openai_compatible" and not (
+            self.generation_base_url and self.generation_model
+        ):
+            raise ValueError(
+                "GENERATION_PROVIDER=openai_compatible requires GENERATION_BASE_URL "
+                "and GENERATION_MODEL"
+            )
         if self.app_env is AppEnv.PRODUCTION:
             if self.auth_mode == "dev":
                 raise ValueError(

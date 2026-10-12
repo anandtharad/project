@@ -12,11 +12,23 @@ dependencies = [
     "sqlalchemy[asyncio]",
     "asyncpg",
     "alembic",
-    "anthropic",
 ]
+
+[project.optional-dependencies]
+# Provider SDKs are optional; install the ones you use (uv sync --extra groq)
+# or all of them (uv sync --all-extras). The app reports a clear error if the
+# configured provider's SDK is missing.
+anthropic = ["anthropic"]
+openai = ["openai"]
+groq = ["groq"]
+gemini = ["google-genai"]
 
 [dependency-groups]
 dev = [
+    "anthropic",
+    "openai",
+    "groq",
+    "google-genai",
     "pytest",
     "pytest-asyncio",
     "httpx",

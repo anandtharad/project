@@ -25,7 +25,7 @@ from dataclasses import dataclass
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.config import Settings
+from app.config import Effort, Settings
 from app.context.builder import ContextBuilder
 from app.errors import AppError, ErrorCategory
 from app.llm.base import LLMClient
@@ -64,6 +64,8 @@ class TurnOrchestrator:
         self,
         *,
         settings: Settings,
+        model: str,
+        effort: Effort | None,
         store: TurnStore,
         llm: LLMClient,
         prompt: PromptTemplate,
@@ -71,6 +73,8 @@ class TurnOrchestrator:
         validator: ResponseValidator,
     ) -> None:
         self._settings = settings
+        self._model = model
+        self._effort = effort
         self._store = store
         self._llm = llm
         self._prompt = prompt
@@ -106,13 +110,13 @@ class TurnOrchestrator:
         context = self._context_builder.build(system=self._system_prompt, history=begun.history)
         trace.mark(TurnStage.CONTEXT_BUILT)
         request = GenerationRequest(
-            model=self._settings.generation_model,
+            model=self._model,
             system=context.system,
             messages=context.messages,
             max_output_tokens=self._settings.max_output_tokens,
             timeout_seconds=self._settings.generation_timeout_seconds,
             params=GenerationParams(
-                effort=self._settings.generation_effort,
+                effort=self._effort,
                 temperature=self._settings.generation_temperature,
             ),
             trace=TraceMetadata(
@@ -154,6 +158,7 @@ class TurnOrchestrator:
                 "finish_reason": response.finish_reason.value,
                 "raw_finish_reason": response.raw_finish_reason,
                 "fallback_used": response.fallback_used,
+                "reasoning_removed": response.reasoning_removed,
                 "provider_request_id": response.provider_request_id,
                 "usage": response.usage.model_dump(),
                 "latency_ms": round(response.latency_ms, 2),

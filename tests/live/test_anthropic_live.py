@@ -15,6 +15,7 @@ import pytest
 
 from app.config import Settings
 from app.llm.factory import build_llm_client
+from app.llm.providers.registry import ResolvedProvider, resolve_provider
 from app.llm.schemas import (
     ChatMessage,
     ChatRole,
@@ -32,15 +33,17 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-def live_request(settings: Settings, messages: list[ChatMessage]) -> GenerationRequest:
+def live_request(
+    settings: Settings, resolved: ResolvedProvider, messages: list[ChatMessage]
+) -> GenerationRequest:
     return GenerationRequest(
-        model=settings.generation_model,
+        model=resolved.model,
         system=PromptRegistry().get("companion_system", settings.companion_prompt_version).render(),
         messages=messages,
         max_output_tokens=settings.max_output_tokens,
         timeout_seconds=settings.generation_timeout_seconds,
         params=GenerationParams(
-            effort=settings.generation_effort, temperature=settings.generation_temperature
+            effort=resolved.effort, temperature=settings.generation_temperature
         ),
         trace=TraceMetadata(trace_id="live-test", purpose=GenerationPurpose.CONVERSATION),
     )
@@ -48,11 +51,13 @@ def live_request(settings: Settings, messages: list[ChatMessage]) -> GenerationR
 
 async def test_live_single_turn_produces_valid_reply() -> None:
     settings = Settings(generation_provider="anthropic")
-    client = build_llm_client(settings)
+    resolved = resolve_provider(settings)
+    client = build_llm_client(settings, resolved)
     try:
         response = await client.generate(
             live_request(
                 settings,
+                resolved,
                 [ChatMessage(role=ChatRole.USER, content="I've been feeling overwhelmed lately.")],
             )
         )
@@ -70,11 +75,13 @@ async def test_live_single_turn_produces_valid_reply() -> None:
 
 async def test_live_multi_turn_context_is_used() -> None:
     settings = Settings(generation_provider="anthropic")
-    client = build_llm_client(settings)
+    resolved = resolve_provider(settings)
+    client = build_llm_client(settings, resolved)
     try:
         response = await client.generate(
             live_request(
                 settings,
+                resolved,
                 [
                     ChatMessage(role=ChatRole.USER, content="My dog Biscuit has been unwell."),
                     ChatMessage(role=ChatRole.ASSISTANT, content="I'm sorry to hear that."),

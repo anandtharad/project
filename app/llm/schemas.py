@@ -92,6 +92,9 @@ class GenerationResponse(BaseModel):
     provider_request_id: str | None = None
     latency_ms: float
     fallback_used: bool = False
+    # True when inline reasoning (<think> blocks) had to be stripped from the
+    # reply text; recorded so leaking models/configs can be identified.
+    reasoning_removed: bool = False
 
 
 class LLMErrorCategory(StrEnum):

@@ -9,7 +9,8 @@ from tests.helpers import make_settings
 
 def test_defaults_are_valid() -> None:
     settings = Settings(_env_file=None)
-    assert settings.generation_model == "claude-opus-5-5"
+    assert settings.generation_provider == "anthropic"
+    assert settings.generation_model is None  # resolved from the provider preset
     assert settings.stale_turn_seconds > settings.turn_deadline_seconds
 
 

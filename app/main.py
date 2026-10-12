@@ -19,6 +19,7 @@ from app.context.builder import ContextBuilder
 from app.db.session import create_engine, create_session_factory
 from app.llm.base import LLMClient
 from app.llm.factory import build_llm_client
+from app.llm.providers.registry import resolve_provider
 from app.observability import configure_logging, log_event
 from app.orchestration.engine import TurnOrchestrator
 from app.orchestration.persistence import TurnStore
@@ -46,12 +47,13 @@ def create_app(settings: Settings | None = None, *, llm_client: LLMClient | None
     prompt = PromptRegistry().get(COMPANION_PROMPT_ID, settings.companion_prompt_version)
     dev_tokens = settings.dev_token_map()
     head = migration_head()
+    resolved = resolve_provider(settings)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         engine = create_engine(settings)
         session_factory = create_session_factory(engine)
-        llm = llm_client or build_llm_client(settings)
+        llm = llm_client or build_llm_client(settings, resolved)
         app.state.settings = settings
         app.state.engine = engine
         app.state.session_factory = session_factory
@@ -59,8 +61,11 @@ def create_app(settings: Settings | None = None, *, llm_client: LLMClient | None
         app.state.prompt = prompt
         app.state.dev_tokens = dev_tokens
         app.state.migration_head = head
+        app.state.resolved_provider = resolved
         app.state.orchestrator = TurnOrchestrator(
             settings=settings,
+            model=resolved.model,
+            effort=resolved.effort,
             store=TurnStore(
                 session_factory,
                 stale_turn_seconds=settings.stale_turn_seconds,
@@ -79,7 +84,7 @@ def create_app(settings: Settings | None = None, *, llm_client: LLMClient | None
             "app.started",
             env=settings.app_env.value,
             llm_provider=llm.provider,
-            model=settings.generation_model,
+            model=resolved.model,
             prompt=prompt.key,
             migration_head=head,
         )
