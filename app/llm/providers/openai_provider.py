@@ -82,14 +82,23 @@ _THINKING_BUDGETS: dict[Effort, int] = {
 
 
 def effort_extra_body(
-    effort: Effort | None, style: Literal["none", "reasoning_effort", "enable_thinking"]
+    effort: Effort | None,
+    style: Literal["none", "reasoning_effort", "enable_thinking"],
+    max_output_tokens: int | None = None,
 ) -> dict[str, Any] | None:
-    """Provider-specific thinking fields that travel in `extra_body`."""
+    """Provider-specific thinking fields that travel in `extra_body`.
+
+    DashScope's max_completion_tokens covers reasoning plus answer, so the
+    thinking budget is kept below it to leave room for the reply.
+    """
     if effort is None or style != "enable_thinking":
         return None
     if effort == "none":
         return {"enable_thinking": False}
-    return {"enable_thinking": True, "thinking_budget": _THINKING_BUDGETS[effort]}
+    budget = _THINKING_BUDGETS[effort]
+    if max_output_tokens:
+        budget = min(budget, max(256, max_output_tokens - 1024))
+    return {"enable_thinking": True, "thinking_budget": budget}
 
 
 class OpenAICompatibleLLMClient:
@@ -147,7 +156,9 @@ class OpenAICompatibleLLMClient:
                     else omit
                 ),
                 temperature=params.temperature if params.temperature is not None else omit,
-                extra_body=effort_extra_body(params.effort, self._effort_style),
+                extra_body=effort_extra_body(
+                    params.effort, self._effort_style, request.max_output_tokens
+                ),
                 timeout=request.timeout_seconds,
             )
         except openai.OpenAIError as exc:

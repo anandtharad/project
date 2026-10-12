@@ -28,8 +28,9 @@ from app.orchestration.validation import ResponseValidator
 from app.prompting import PromptRegistry
 
 pytestmark = pytest.mark.skipif(
-    os.environ.get("RUN_LIVE_LLM_TESTS") != "1",
-    reason="live provider tests are opt-in: set RUN_LIVE_LLM_TESTS=1 and provider credentials",
+    os.environ.get("RUN_LIVE_LLM_TESTS") != "1"
+    or not (os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN")),
+    reason="live provider tests are opt-in: set RUN_LIVE_LLM_TESTS=1 and ANTHROPIC_API_KEY",
 )
 
 
@@ -50,7 +51,12 @@ def live_request(
 
 
 async def test_live_single_turn_produces_valid_reply() -> None:
-    settings = Settings(generation_provider="anthropic")
+    settings = Settings(
+        _env_file=None,
+        generation_provider="anthropic",
+        generation_api_key=None,
+        generation_base_url=None,
+    )
     resolved = resolve_provider(settings)
     client = build_llm_client(settings, resolved)
     try:
@@ -74,7 +80,12 @@ async def test_live_single_turn_produces_valid_reply() -> None:
 
 
 async def test_live_multi_turn_context_is_used() -> None:
-    settings = Settings(generation_provider="anthropic")
+    settings = Settings(
+        _env_file=None,
+        generation_provider="anthropic",
+        generation_api_key=None,
+        generation_base_url=None,
+    )
     resolved = resolve_provider(settings)
     client = build_llm_client(settings, resolved)
     try:

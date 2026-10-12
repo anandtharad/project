@@ -32,6 +32,7 @@ def build_llm_client(settings: Settings, resolved: ResolvedProvider) -> LLMClien
             raise _missing_sdk(resolved, exc) from exc
         return AnthropicLLMClient(
             api_key=resolved.api_key,
+            base_url=resolved.base_url,
             max_retries=settings.generation_max_retries,
             refusal_fallback=settings.generation_refusal_fallback,
         )

@@ -26,6 +26,33 @@ from tests.helpers import ScriptedLLMClient, make_settings, running_app
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
+# Environment variables that Settings or the provider SDKs read implicitly.
+# Tests must not depend on the developer's shell, so these are cleared
+# (live tests opt out: they need the real provider key).
+_ISOLATED_ENV_PREFIXES = ("GENERATION_", "OPENAI_", "ANTHROPIC_", "GROQ_", "GOOGLE_GENAI_")
+_ISOLATED_ENV_NAMES = {
+    "MAX_OUTPUT_TOKENS",
+    "MAX_CONTEXT_TOKENS",
+    "GEMINI_API_KEY",
+    "GOOGLE_API_KEY",
+    "GOOGLE_GEMINI_BASE_URL",
+    "XAI_API_KEY",
+    "DASHSCOPE_API_KEY",
+    "DEEPSEEK_API_KEY",
+    "OPENROUTER_API_KEY",
+    "TOGETHER_API_KEY",
+    "MISTRAL_API_KEY",
+}
+
+
+@pytest.fixture(autouse=True)
+def _isolate_environment(request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch) -> None:
+    if request.node.get_closest_marker("live"):
+        return
+    for name in list(os.environ):
+        if name in _ISOLATED_ENV_NAMES or name.startswith(_ISOLATED_ENV_PREFIXES):
+            monkeypatch.delenv(name, raising=False)
+
 
 def alembic_config(url: str) -> AlembicConfig:
     config = AlembicConfig(str(PROJECT_ROOT / "alembic.ini"))

@@ -75,8 +75,10 @@ class TurnOrchestrator:
     ) -> None:
         self._settings = settings
         self._model = model
-        self._effort = effort
         self._max_output_tokens = max_output_tokens
+        # Built once so invalid generation settings fail at startup, never
+        # mid-turn after the user message is already persisted.
+        self._params = GenerationParams(effort=effort, temperature=settings.generation_temperature)
         self._store = store
         self._llm = llm
         self._prompt = prompt
@@ -117,10 +119,7 @@ class TurnOrchestrator:
             messages=context.messages,
             max_output_tokens=self._max_output_tokens,
             timeout_seconds=self._settings.generation_timeout_seconds,
-            params=GenerationParams(
-                effort=self._effort,
-                temperature=self._settings.generation_temperature,
-            ),
+            params=self._params,
             trace=TraceMetadata(
                 trace_id=trace_id,
                 purpose=GenerationPurpose.CONVERSATION,

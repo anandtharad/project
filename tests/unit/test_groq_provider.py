@@ -7,6 +7,7 @@ contract (groq SDK 1.7.0 source + Groq docs). Live behavior: tests/live.
 from __future__ import annotations
 
 import json
+import logging
 from collections.abc import Callable
 from typing import Any
 
@@ -309,3 +310,20 @@ async def test_sdk_retries_transient_errors_but_not_498() -> None:
     with pytest.raises(LLMError):
         await make_client(capacity, max_retries=2).generate(make_request())
     assert len(capacity_calls) == 1
+
+
+async def test_sdk_debug_logging_never_records_message_content(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    from app.observability import configure_logging
+
+    configure_logging("DEBUG")
+    # configure_logging replaces the root handlers; re-attach pytest's capture.
+    logging.getLogger().addHandler(caplog.handler)
+    caplog.set_level(logging.DEBUG)
+    logging.getLogger("app.test").debug("capture-sentinel")
+    await make_client(Recorder()).generate(make_request())
+    joined = "\n".join(record.getMessage() for record in caplog.records)
+    assert "capture-sentinel" in joined  # proves DEBUG records are being captured
+    assert "I had a rough day." not in joined
+    assert "SYSTEM PROMPT" not in joined

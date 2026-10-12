@@ -38,7 +38,8 @@ class GenerationParams(BaseModel):
     effort: Effort | None = None
     # Not every model accepts sampling parameters; leave unset unless the
     # configured model supports it.
-    temperature: float | None = Field(default=None, ge=0.0, le=1.0)
+    # Range accepted by most providers; Anthropic (0-1) is checked at startup.
+    temperature: float | None = Field(default=None, ge=0.0, le=2.0)
 
 
 class TraceMetadata(BaseModel):

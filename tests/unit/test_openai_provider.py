@@ -229,6 +229,7 @@ def error_handler(status: int, headers: dict[str, str] | None = None) -> Handler
         (401, LLMErrorCategory.AUTHENTICATION),
         (403, LLMErrorCategory.PERMISSION),
         (404, LLMErrorCategory.NOT_FOUND),
+        (409, LLMErrorCategory.SERVER_ERROR),
         (422, LLMErrorCategory.INVALID_REQUEST),
         (429, LLMErrorCategory.RATE_LIMITED),
         (500, LLMErrorCategory.SERVER_ERROR),
@@ -404,3 +405,10 @@ async def test_xai_string_error_body_with_api_key_message_is_auth() -> None:
             make_request("grok-4.3")
         )
     assert info.value.category is LLMErrorCategory.AUTHENTICATION
+
+
+def test_thinking_budget_leaves_room_for_the_reply() -> None:
+    body = effort_extra_body("high", "enable_thinking", max_output_tokens=4096)
+    assert body == {"enable_thinking": True, "thinking_budget": 3072}
+    small = effort_extra_body("max", "enable_thinking", max_output_tokens=1000)
+    assert small == {"enable_thinking": True, "thinking_budget": 256}

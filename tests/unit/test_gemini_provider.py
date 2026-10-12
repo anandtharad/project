@@ -313,3 +313,22 @@ async def test_vertex_env_cannot_switch_backend(monkeypatch: pytest.MonkeyPatch)
     recorder = Recorder()
     await make_client(recorder).generate(make_request())
     assert recorder.requests[-1].url.host == "generativelanguage.googleapis.com"
+
+
+async def test_sdk_does_not_retry_rate_limits() -> None:
+    calls: list[int] = []
+
+    def limited(_: httpx.Request) -> httpx.Response:
+        calls.append(1)
+        return httpx.Response(429, json=error_body(429, "RESOURCE_EXHAUSTED", "slow down"))
+
+    with pytest.raises(LLMError) as info:
+        await make_client(limited, max_retries=2).generate(make_request())
+    assert info.value.category is LLMErrorCategory.RATE_LIMITED
+    assert len(calls) == 1
+
+
+def test_gemini_25_budget_is_clamped_below_output_limit() -> None:
+    config = thinking_config("gemini-2.5-flash", "max", max_output_tokens=8192)
+    assert config is not None and config.thinking_budget == 7168
+    assert thinking_config("gemini-2.5-flash", "none", max_output_tokens=8192).thinking_budget == 0  # type: ignore[union-attr]

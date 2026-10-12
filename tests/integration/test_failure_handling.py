@@ -206,3 +206,15 @@ async def test_unknown_conversation_is_rejected_before_model_call(
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "conversation_not_found"
     assert llm.requests == []
+
+
+async def test_temperature_above_one_completes_turns(database_url: str, clean_db: None) -> None:
+    """Regression: a valid provider temperature (0-2) must not crash mid-turn
+    after the user message is persisted (it used to fail params validation)."""
+    llm = ScriptedLLMClient()
+    settings = make_settings(database_url=database_url, generation_temperature=1.3)
+    async with running_app(settings, llm) as (_, client):
+        cid = await create_conversation(client, ALICE)
+        response = await send(client, cid, "Hello")
+        assert response.status_code == 201, response.text
+        assert llm.requests[-1].params.temperature == 1.3

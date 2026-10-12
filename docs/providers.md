@@ -34,9 +34,24 @@ Install SDKs with `uv sync --all-extras`, or only what you need
 (`uv sync --extra groq`). If the selected provider's SDK is missing, startup
 fails with the exact install command.
 
-`GENERATION_EFFORT` takes `none | low | medium | high | xhigh | max`. A value a
-provider does not accept is clamped to the nearest accepted value, and the
-service logs a `config.warning` at startup.
+`GENERATION_EFFORT` takes `none | low | medium | high | xhigh | max`, or `off`
+to send no effort parameter at all (for models without reasoning controls).
+A value a provider or model does not accept is clamped to the nearest accepted
+value, and the service logs a `config.warning` at startup (for example `none`
+becomes `low` on `grok-4.7`, which cannot turn reasoning off).
+
+When `GENERATION_EFFORT` is unset, the anthropic, openai, groq and gemini
+presets use `low`, but only for models whose controls are known: the
+preset's default model, Groq's gpt-oss and qwen families, and Gemini 2.5/3.x.
+Other models get no effort parameter unless you set one.
+
+Startup checks (fail fast with a clear message):
+- `GENERATION_TEMPERATURE` above 1 with Anthropic (it accepts 0-1).
+- `GENERATION_TEMPERATURE` with OpenAI reasoning effort other than `none`
+  (reasoning models reject it); use `GENERATION_EFFORT=none`, or `off` for
+  non-reasoning models.
+- `GENERATION_API_KEY` and the provider's own key both set to different
+  values, so a stale key is never sent to the wrong provider.
 
 ## Groq (free tier)
 

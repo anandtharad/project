@@ -45,8 +45,18 @@ def configure_logging(level: str) -> None:
     root = logging.getLogger()
     root.handlers = [handler]
     root.setLevel(level.upper())
-    # SDK/HTTP client debug logs can include request bodies.
-    for noisy in ("httpx", "httpx2", "httpcore", "anthropic"):
+    # SDK/HTTP client debug logs include request bodies (system prompt and
+    # user messages), so they are capped at WARNING even when LOG_LEVEL=DEBUG.
+    for noisy in (
+        "httpx",
+        "httpx2",
+        "httpcore",
+        "anthropic",
+        "openai",
+        "groq",
+        "google_genai",
+        "google.genai",
+    ):
         logging.getLogger(noisy).setLevel(max(logging.WARNING, root.level))
 
 

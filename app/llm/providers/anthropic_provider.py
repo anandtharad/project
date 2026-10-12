@@ -57,13 +57,16 @@ class AnthropicLLMClient:
         self,
         *,
         api_key: str | None = None,
+        base_url: str | None = None,
         max_retries: int = 2,
         refusal_fallback: Literal["default", "off"] = "default",
         client: anthropic.AsyncAnthropic | None = None,
     ) -> None:
         if client is None:
-            # api_key=None lets the SDK resolve credentials from its standard sources.
-            client = anthropic.AsyncAnthropic(api_key=api_key, max_retries=max_retries)
+            # None lets the SDK resolve credentials / endpoint from its standard sources.
+            client = anthropic.AsyncAnthropic(
+                api_key=api_key, base_url=base_url, max_retries=max_retries
+            )
         self._client = client
         self._refusal_fallback = refusal_fallback
 

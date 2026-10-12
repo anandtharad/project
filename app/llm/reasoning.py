@@ -12,16 +12,22 @@ from __future__ import annotations
 import re
 
 _CLOSED_BLOCK = re.compile(r"<think>.*?</think>", re.IGNORECASE | re.DOTALL)
+# After closed blocks are removed, a remaining </think> is an orphan: the
+# chat template injected the opening tag into the prompt (R1-style models
+# served without a reasoning parser), so everything before it is reasoning.
+_ORPHAN_CLOSE = re.compile(r"\A.*</think>", re.IGNORECASE | re.DOTALL)
 _UNCLOSED_TAIL = re.compile(r"<think>.*\Z", re.IGNORECASE | re.DOTALL)
 
 
 def strip_reasoning(text: str) -> tuple[str, bool]:
     """Return (text without reasoning blocks, whether anything was removed).
 
-    An unclosed `<think>` (output cut off mid-reasoning) removes everything
-    after it, so a truncated reasoning trace can never be shown as a reply.
+    An orphan `</think>` removes everything before it, and an unclosed
+    `<think>` (output cut off mid-reasoning) removes everything after it, so
+    a reasoning trace can never be shown as a reply.
     """
     cleaned = _CLOSED_BLOCK.sub("", text)
+    cleaned = _ORPHAN_CLOSE.sub("", cleaned)
     cleaned = _UNCLOSED_TAIL.sub("", cleaned)
     removed = cleaned != text
     return (cleaned.strip() if removed else text), removed

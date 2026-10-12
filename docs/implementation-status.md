@@ -31,6 +31,15 @@ speech-to-text and text-to-speech are separate.
 | Credential-leak protections (OpenAI SDK env fallbacks) | Done; tested |
 | **Live calls to any provider** | **Unverified**: this environment's egress policy blocks provider APIs (`api.groq.com` included, even after the network setting was changed). A gated live Groq suite is ready |
 
+An adversarial review of the multi-provider changes (4 reviewers, each
+checked by an independent skeptic) confirmed 21 of 37 reported issues. All
+of them are fixed and covered by tests, including:
+- a temperature above 1 that passed startup but failed every turn;
+- reasoning leaking through an orphan `</think>` tag;
+- SDK debug logs recording request bodies;
+- a stale `GENERATION_API_KEY` being sent to another provider;
+- preset default effort being applied to models that reject it.
+
 Provider contracts were verified against each official SDK's installed
 source plus official documentation. Many docs pages were only reachable
 through search summaries; facts that depend on them (current model IDs,
@@ -76,13 +85,15 @@ unmodified here.
 
 | Suite | Result |
 |---|---|
-| unit | 66 passed |
-| integration | 37 passed |
+| unit | 226 passed |
+| integration | 38 passed |
 | security | 43 passed |
-| live | 2 skipped (opt-in; no credentials available) |
-| **total** | **146 passed, 2 skipped** |
+| live | 8 skipped (opt-in; provider APIs unreachable from this environment) |
+| **total** | **307 passed, 8 skipped** |
 
-Without `TEST_DATABASE_URL`: 66 passed, 82 skipped, each with an explicit reason.
+Without `TEST_DATABASE_URL`, the database-backed tests skip, each with an
+explicit reason. Tests clear provider-related environment variables, so the
+developer's shell cannot change their outcome.
 `ruff check`, `ruff format --check`, and `mypy --strict` (app, scripts, tests)
 are clean.
 

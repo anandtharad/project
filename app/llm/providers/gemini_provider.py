@@ -83,7 +83,9 @@ def model_generation(model: str) -> Literal["2.5", "3", "other"]:
     return "other"
 
 
-def thinking_config(model: str, effort: Effort | None) -> types.ThinkingConfig | None:
+def thinking_config(
+    model: str, effort: Effort | None, max_output_tokens: int | None = None
+) -> types.ThinkingConfig | None:
     if effort is None:
         return None
     generation = model_generation(model)
@@ -94,6 +96,9 @@ def thinking_config(model: str, effort: Effort | None) -> types.ThinkingConfig |
         return types.ThinkingConfig(thinking_level=level)
     if generation == "2.5":
         budget = _BUDGETS[effort]
+        if budget and max_output_tokens:
+            # Thinking shares the output limit; leave room for the reply.
+            budget = min(budget, max(256, max_output_tokens - 1024))
         if budget == 0 and "pro" in model.lower():
             budget = 128  # 2.5 Pro cannot disable thinking; 128 is its minimum.
         return types.ThinkingConfig(thinking_budget=budget)
@@ -118,8 +123,13 @@ class GeminiLLMClient:
             vertexai=False,
             http_options=types.HttpOptions(base_url=base_url, httpx_async_client=self._http),
         )
+        # 429 is excluded: the SDK ignores RetryInfo delays and would retry
+        # exhausted daily quotas; rate limits surface with their delay instead.
         self._retry = types.HttpRetryOptions(
-            attempts=max_retries + 1, initial_delay=0.5, max_delay=8.0
+            attempts=max_retries + 1,
+            initial_delay=0.5,
+            max_delay=8.0,
+            http_status_codes=[408, 500, 502, 503, 504],
         )
 
     @property
@@ -143,7 +153,9 @@ class GeminiLLMClient:
             system_instruction=request.system,
             max_output_tokens=request.max_output_tokens,
             temperature=request.params.temperature,
-            thinking_config=thinking_config(request.model, request.params.effort),
+            thinking_config=thinking_config(
+                request.model, request.params.effort, request.max_output_tokens
+            ),
             http_options=types.HttpOptions(
                 timeout=int(request.timeout_seconds * 1000), retry_options=self._retry
             ),

@@ -76,11 +76,14 @@ class Settings(BaseSettings):
     generation_api_key: SecretStr | None = None
     generation_timeout_seconds: float = Field(default=45.0, gt=0)
     generation_max_retries: int = Field(default=2, ge=0, le=5)
-    # Reasoning/thinking depth. Unset = the provider preset's default (only
-    # Anthropic sets one). Each adapter maps it to its provider's parameter;
-    # models without reasoning controls reject it, so leave it unset for them.
-    generation_effort: Effort | None = None
+    # Reasoning/thinking depth, mapped by each adapter to its provider's own
+    # control. Unset = the preset default, which the anthropic, openai, groq
+    # and gemini presets set to "low" for models whose controls are known.
+    # "off" sends no effort parameter at all (for models without reasoning
+    # controls).
+    generation_effort: Effort | Literal["off"] | None = None
     # Leave unset for models that reject sampling parameters (e.g. claude-opus-5-5).
+    # Anthropic accepts 0-1; OpenAI reasoning models only with effort "none".
     generation_temperature: float | None = Field(default=None, ge=0.0, le=2.0)
     # Anthropic only. "default": server-side refusal fallback chosen by the
     # provider per refusal category.

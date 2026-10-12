@@ -203,6 +203,12 @@ def classify_sdk_error(exc: Exception, sdk: ModuleType) -> LLMError:
         )
     if status >= 500:
         return error(LLMErrorCategory.SERVER_ERROR, "Provider server error.")
+    if status == 409:  # transient conflict; the SDKs retry it too
+        return error(
+            LLMErrorCategory.SERVER_ERROR,
+            "Provider reported a transient conflict.",
+            retry_after=_retry_after(headers),
+        )
     if status in (400, 413, 422):
         return error(LLMErrorCategory.INVALID_REQUEST, "Provider rejected the request.")
     return error(LLMErrorCategory.UNKNOWN, f"Provider returned HTTP {status}.")

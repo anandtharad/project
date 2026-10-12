@@ -30,9 +30,21 @@ from app.llm.schemas import (
 from app.orchestration.validation import ResponseValidator
 from app.prompting import PromptRegistry
 
+
+def _groq_key() -> str | None:
+    """GROQ_API_KEY from the environment, or from the project's .env file."""
+    if os.environ.get("GROQ_API_KEY"):
+        return os.environ["GROQ_API_KEY"]
+    secret = Settings().groq_api_key
+    return secret.get_secret_value() if secret else None
+
+
+GROQ_KEY = _groq_key() if os.environ.get("RUN_LIVE_LLM_TESTS") == "1" else None
+
 pytestmark = pytest.mark.skipif(
-    os.environ.get("RUN_LIVE_LLM_TESTS") != "1",
-    reason="live provider tests are opt-in: set RUN_LIVE_LLM_TESTS=1 and GROQ_API_KEY",
+    GROQ_KEY is None,
+    reason="live provider tests are opt-in: set RUN_LIVE_LLM_TESTS=1 and GROQ_API_KEY "
+    "(environment or .env)",
 )
 
 DEFAULT_MODELS = "openai/gpt-oss-120b,openai/gpt-oss-20b,qwen/qwen3.8-27b"
@@ -40,7 +52,19 @@ MODELS = [m.strip() for m in os.environ.get("LIVE_GROQ_MODELS", DEFAULT_MODELS).
 
 
 async def generate(model: str, messages: list[ChatMessage]) -> GenerationResponse:
-    settings = Settings(generation_provider="groq", generation_model=model)
+    # Isolated from .env and GENERATION_* variables, so a key or endpoint meant
+    # for another provider can never be sent to Groq.
+    settings = Settings(
+        _env_file=None,
+        generation_provider="groq",
+        generation_model=model,
+        generation_api_key=None,
+        generation_base_url=None,
+        generation_effort=None,
+        max_output_tokens=None,
+        max_context_tokens=None,
+        groq_api_key=GROQ_KEY,
+    )
     resolved = resolve_provider(settings)
     client = build_llm_client(settings, resolved)
     request = GenerationRequest(

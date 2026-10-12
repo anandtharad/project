@@ -89,7 +89,9 @@ def test_overrides_win_over_preset() -> None:
 
 def test_provider_key_and_generic_key_precedence() -> None:
     assert resolve_provider(settings_for("groq")).api_key == "gsk-test"
-    generic = resolve_provider(settings_for("groq", generation_api_key="generic"))
+    generic = resolve_provider(
+        make_settings(generation_provider="groq", generation_api_key="generic")
+    )
     assert generic.api_key == "generic"
 
 
@@ -186,3 +188,79 @@ def test_presets_requiring_explicit_models() -> None:
     for name in ("deepseek", "openrouter", "together", "ollama"):
         with pytest.raises(ProviderConfigError, match="GENERATION_MODEL"):
             resolve_provider(settings_for(name))
+
+
+def test_effort_off_omits_the_parameter() -> None:
+    assert resolve_provider(settings_for("groq", generation_effort="off")).effort is None
+
+
+@pytest.mark.parametrize(
+    ("provider", "model", "expected"),
+    [
+        ("anthropic", None, "low"),
+        ("anthropic", "claude-haiku-4-5", None),
+        ("openai", None, "low"),
+        ("openai", "gpt-4.1-mini", None),
+        ("groq", None, "low"),
+        ("groq", "openai/gpt-oss-20b", "low"),
+        ("groq", "qwen/qwen3.8-27b", "low"),
+        ("groq", "llama-3.1-8b-instant", None),
+        ("gemini", "gemini-3.8-flash", "low"),
+    ],
+)
+def test_default_effort_only_for_models_with_known_controls(
+    provider: str, model: str | None, expected: str | None
+) -> None:
+    overrides = {"generation_model": model} if model else {}
+    assert resolve_provider(settings_for(provider, **overrides)).effort == expected
+
+
+def test_anthropic_rejects_temperature_above_one_at_startup() -> None:
+    with pytest.raises(ProviderConfigError, match="between 0 and 1"):
+        resolve_provider(settings_for("anthropic", generation_temperature=1.3))
+
+
+def test_openai_temperature_requires_effort_none() -> None:
+    with pytest.raises(ProviderConfigError, match="GENERATION_EFFORT=none"):
+        resolve_provider(settings_for("openai", generation_temperature=0.7))
+    ok = resolve_provider(
+        settings_for("openai", generation_temperature=0.7, generation_effort="none")
+    )
+    assert ok.effort == "none"
+    assert (
+        resolve_provider(
+            settings_for("openai", generation_model="gpt-4.1-mini", generation_temperature=0.7)
+        ).effort
+        is None
+    )
+
+
+def test_temperature_up_to_two_allowed_for_other_providers() -> None:
+    assert resolve_provider(settings_for("groq", generation_temperature=1.6)).model
+
+
+def test_conflicting_generic_and_provider_keys_fail_fast() -> None:
+    with pytest.raises(ProviderConfigError, match="GROQ_API_KEY"):
+        resolve_provider(settings_for("groq", generation_api_key="sk-ant-stale"))
+    same = resolve_provider(settings_for("groq", generation_api_key="gsk-test"))
+    assert same.api_key == "gsk-test"
+
+
+def test_model_specific_effort_values() -> None:
+    resolved = resolve_provider(
+        settings_for("xai", generation_model="grok-4.7", generation_effort="none")
+    )
+    assert resolved.effort == "low"
+    assert resolved.warnings
+    assert (
+        resolve_provider(
+            settings_for("xai", generation_model="grok-4.3", generation_effort="none")
+        ).effort
+        == "none"
+    )
+
+
+def test_factory_passes_base_url_to_anthropic() -> None:
+    settings = settings_for("anthropic", generation_base_url="https://gateway.example/anthropic")
+    client = build_llm_client(settings, resolve_provider(settings))
+    assert str(client._client.base_url).startswith("https://gateway.example/anthropic")  # type: ignore[attr-defined]

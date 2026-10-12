@@ -62,6 +62,9 @@ class ProviderPreset:
     # Effort values the endpoint accepts (reasoning_effort presets only);
     # others are clamped to the nearest accepted value.
     effort_values: tuple[Effort, ...] = ("none", "low", "medium", "high", "xhigh", "max")
+    # Model-name prefixes the preset's default_effort applies to (models whose
+    # reasoning controls are known). Empty = only the preset's default model.
+    default_effort_models: tuple[str, ...] = ()
     # OpenAI-only headers (organization, project, OPENAI_CUSTOM_HEADERS) are
     # stripped for every other endpoint so they never leak to third parties.
     send_openai_headers: bool = False
@@ -112,6 +115,7 @@ PRESETS: dict[str, ProviderPreset] = {
             api_key_setting="groq_api_key",
             docs_url="https://console.groq.com/docs/models",
             default_effort="low",
+            default_effort_models=("openai/gpt-oss", "qwen/"),
             # Sized for the free tier (about 8K tokens/minute per model):
             # a turn must fit comfortably inside one minute's budget.
             default_max_output_tokens=2048,
@@ -128,6 +132,8 @@ PRESETS: dict[str, ProviderPreset] = {
             api_key_setting="gemini_api_key",
             docs_url="https://ai.google.dev/gemini-api/docs/text-generation",
             default_effort="low",
+            # The adapter only sends thinking controls to Gemini 2.5 / 3.x.
+            default_effort_models=("gemini-",),
             # Thinking tokens may count toward the output limit.
             default_max_output_tokens=8192,
         ),
@@ -280,6 +286,37 @@ class ResolvedProvider:
 
 _EFFORT_ORDER: tuple[Effort, ...] = ("none", "low", "medium", "high", "xhigh", "max")
 
+# Models documented to reject some effort values their provider otherwise
+# accepts (matched by name prefix): reasoning cannot be turned off on these.
+_MODEL_EFFORT_VALUES: dict[str, tuple[Effort, ...]] = {
+    "grok-4.7": ("low", "medium", "high"),
+    "gpt-6-astra": ("low", "medium", "high", "xhigh", "max"),
+    "gpt-6.1-sol": ("low", "medium", "high", "xhigh", "max"),
+}
+
+
+def _accepted_efforts(preset: ProviderPreset, model: str) -> tuple[Effort, ...]:
+    for prefix, values in _MODEL_EFFORT_VALUES.items():
+        if model.startswith(prefix):
+            return tuple(v for v in values if v in preset.effort_values) or values
+    return preset.effort_values
+
+
+def _resolve_effort(settings: Settings, preset: ProviderPreset, model: str) -> Effort | None:
+    configured = settings.generation_effort
+    if configured == "off":
+        return None
+    if configured is not None:
+        return configured
+    if preset.default_effort is None:
+        return None
+    applies = (
+        any(model.startswith(prefix) for prefix in preset.default_effort_models)
+        if preset.default_effort_models
+        else model == preset.default_model
+    )
+    return preset.default_effort if applies else None
+
 
 def clamp_effort(effort: Effort, allowed: tuple[Effort, ...]) -> Effort:
     """The accepted value closest to `effort`, preferring the lower one on ties."""
@@ -309,13 +346,40 @@ def resolve_provider(settings: Settings) -> ResolvedProvider:
         raise ProviderConfigError(
             f"Provider {preset.name!r} needs an API key: set {key_var} or GENERATION_API_KEY"
         )
-    effort = settings.generation_effort or preset.default_effort
+    if (
+        settings.generation_api_key is not None
+        and preset.api_key_setting is not None
+        and getattr(settings, preset.api_key_setting) is not None
+        and getattr(settings, preset.api_key_setting).get_secret_value()
+        != settings.generation_api_key.get_secret_value()
+    ):
+        # Fail before any key leaves the process: a stale GENERATION_API_KEY
+        # from another provider would otherwise be sent to this endpoint.
+        raise ProviderConfigError(
+            f"Both GENERATION_API_KEY and {preset.api_key_setting.upper()} are set to "
+            "different values; remove one"
+        )
+
+    effort = _resolve_effort(settings, preset, model)
     warnings: list[str] = []
+
+    temperature = settings.generation_temperature
+    if temperature is not None:
+        if preset.kind is AdapterKind.ANTHROPIC and temperature > 1.0:
+            raise ProviderConfigError(
+                "GENERATION_TEMPERATURE must be between 0 and 1 for Anthropic"
+            )
+        if preset.name == "openai" and effort not in (None, "none"):
+            raise ProviderConfigError(
+                "OpenAI reasoning models reject GENERATION_TEMPERATURE unless "
+                "GENERATION_EFFORT=none (or GENERATION_EFFORT=off for non-reasoning models)"
+            )
+
     if effort is not None and preset.effort_param == "unsupported":
         warnings.append(f"GENERATION_EFFORT is not supported for provider {preset.name!r}; ignored")
         effort = None
     elif effort is not None and preset.effort_param == "reasoning_effort":
-        clamped = clamp_effort(effort, preset.effort_values)
+        clamped = clamp_effort(effort, _accepted_efforts(preset, model))
         if clamped != effort:
             warnings.append(
                 f"GENERATION_EFFORT={effort!r} is not accepted by {preset.name!r}; "
