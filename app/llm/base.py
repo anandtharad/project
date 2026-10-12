@@ -12,8 +12,9 @@ class LLMClient(Protocol):
     `GenerationResponse` otherwise; a response may still be unusable (refusal,
     truncation), which the response validator decides.
 
-    Structured generation (`generate_structured`) is added in Phase 2 together
-    with its first consumer (state extraction).
+    Structured output: when `request.response_schema` is set, the reply
+    content is JSON text intended to match that schema (see `ResponseSchema`)
+    and `GenerationResponse.structured_mode` says how it was obtained.
     """
 
     @property

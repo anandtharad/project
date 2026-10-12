@@ -7,7 +7,7 @@ application only sees these types.
 from __future__ import annotations
 
 from enum import StrEnum
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -30,6 +30,7 @@ class GenerationPurpose(StrEnum):
     """Why a generation is requested; each purpose has its own settings."""
 
     CONVERSATION = "conversation"
+    STATE_EXTRACTION = "state_extraction"
 
 
 class GenerationParams(BaseModel):
@@ -50,6 +51,33 @@ class TraceMetadata(BaseModel):
     conversation_id: str | None = None
 
 
+class ResponseSchema(BaseModel):
+    """Requests a JSON reply that matches `json_schema` (structured output).
+
+    Adapters use the provider's native structured output when the preset and
+    model support it, otherwise they append the schema to the system prompt
+    and ask for JSON only. Either way the reply `content` is JSON text that
+    the caller must still validate: no mode guarantees semantic correctness.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    name: str = Field(pattern=r"^[A-Za-z0-9_-]{1,64}$")
+    # A strict-compatible subset: every object lists all properties as
+    # required and sets additionalProperties to false.
+    json_schema: dict[str, Any]
+    # Ask for constrained decoding where the provider offers it.
+    strict: bool = True
+
+
+class StructuredMode(StrEnum):
+    """How a structured reply was obtained."""
+
+    NATIVE_STRICT = "native_strict"  # provider-enforced schema (constrained decoding)
+    NATIVE = "native"  # provider JSON mode / best-effort schema
+    PROMPTED = "prompted"  # schema in the instruction only
+
+
 class GenerationRequest(BaseModel):
     model_config = ConfigDict(frozen=True)
 
@@ -60,6 +88,7 @@ class GenerationRequest(BaseModel):
     timeout_seconds: float = Field(gt=0)
     params: GenerationParams = GenerationParams()
     trace: TraceMetadata
+    response_schema: ResponseSchema | None = None
 
 
 class FinishReason(StrEnum):
@@ -96,6 +125,8 @@ class GenerationResponse(BaseModel):
     # True when inline reasoning (<think> blocks) had to be stripped from the
     # reply text; recorded so leaking models/configs can be identified.
     reasoning_removed: bool = False
+    # Set only when the request carried a response_schema.
+    structured_mode: StructuredMode | None = None
 
 
 class LLMErrorCategory(StrEnum):
