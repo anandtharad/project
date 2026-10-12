@@ -29,7 +29,7 @@ speech-to-text and text-to-speech are separate.
 | Groq adapter | Done; offline-tested through the real `groq` SDK |
 | Gemini adapter | Done; offline-tested through the real `google-genai` SDK |
 | Credential-leak protections (OpenAI SDK env fallbacks) | Done; tested |
-| **Live Groq calls** | **Verified** on 2026-10-12: `tests/live/test_groq_live.py` passed 6/6 on the user's Windows machine (Python 3.12.3) for `openai/gpt-oss-120b`, `openai/gpt-oss-20b` and `qwen/qwen3.8-27b` |
+| **Live Groq calls** | **Verified** on 2026-10-12: `tests/live/test_groq_live.py` passed 6/6 on the user's Windows machine (Python 3.12.3) for `openai/gpt-oss-120b`, `openai/gpt-oss-20b` and `qwen/qwen3.8-27b`, and a manual multi-turn chat through the API and PostgreSQL worked |
 | Live calls to other providers | **Unverified**: no keys. This cloud environment's egress policy also blocks provider APIs |
 
 An adversarial review of the multi-provider changes (4 reviewers, each
@@ -122,9 +122,11 @@ are clean.
   `include_reasoning=false` for gpt-oss, `reasoning_format="hidden"` for
   qwen), replies normalize and pass validation with no reasoning text, usage
   and the request ID (`x_groq.id`) are recorded, and multi-turn context is
-  used. Still offline-only: error classification for real Groq errors (401,
-  429, 5xx), and a full turn through the HTTP API and PostgreSQL with Groq.
-  The live tests call the adapter directly.
+  used. The user then ran the full stack on Windows (compose PostgreSQL,
+  `alembic upgrade head` and `uvicorn` on the host, `scripts/chat.py`) and
+  held a working multi-turn chat through the HTTP API with Groq replies
+  persisted. Still offline-only: error classification for real Groq errors
+  (401, 429, 5xx).
 - **Anthropic Messages API:** the adapter is written against the official
   `anthropic` 1.13.0 SDK's type signatures and tested through the real SDK
   with a mocked HTTP transport: exact request JSON, beta header, response
