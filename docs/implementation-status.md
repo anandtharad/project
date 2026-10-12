@@ -15,6 +15,28 @@ Last updated: 2026-10-12. Spec: COMPANION-TECH-SPEC-001 v2.1.
 | 6: Evaluation and observability | Not started (structured logging and provenance already exist) |
 | 7: Fine-tuning preparation | Not started |
 
+## Multi-provider LLM support (added on request)
+
+Added at the user's request after Phase 1, to make the generative LLM
+swappable across providers (spec FR-004, §5.2 model comparison). Text only;
+speech-to-text and text-to-speech are separate.
+
+| Item | Status |
+|---|---|
+| Provider presets and resolution (12 providers + stub) | Done; unit-tested |
+| Anthropic adapter | Done; offline-tested |
+| OpenAI / OpenAI-compatible adapter (OpenAI, xAI, Qwen, DeepSeek, OpenRouter, Together, Mistral, Ollama, custom) | Done; offline-tested through the real `openai` SDK |
+| Groq adapter | Done; offline-tested through the real `groq` SDK |
+| Gemini adapter | Done; offline-tested through the real `google-genai` SDK |
+| Credential-leak protections (OpenAI SDK env fallbacks) | Done; tested |
+| **Live calls to any provider** | **Unverified**: this environment's egress policy blocks provider APIs (`api.groq.com` included, even after the network setting was changed). A gated live Groq suite is ready |
+
+Provider contracts were verified against each official SDK's installed
+source plus official documentation. Many docs pages were only reachable
+through search summaries; facts that depend on them (current model IDs,
+free-tier limits, some error codes) are marked as such in
+[providers.md](providers.md) and must be confirmed with a live run.
+
 ## Repository inspection (spec §0.1)
 
 The repository was empty (no commits) at the start. There was no existing

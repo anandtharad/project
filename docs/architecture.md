@@ -90,34 +90,56 @@ finish reason, fallback use, provider request ID, token usage, latency,
 generation parameters, context-budget stats and the trace ID. Every reply is
 traceable to its exact model, prompt and settings.
 
-## LLM adapter
+## LLM adapters
 
 `LLMClient` (`app/llm/base.py`) is a typed protocol over provider-neutral
 `GenerationRequest`/`GenerationResponse` (`app/llm/schemas.py`). Provider SDK
 objects never leave `app/llm/providers/`.
 
-`AnthropicLLMClient` uses the official `anthropic` SDK (1.13) Messages API.
-These details were verified against the SDK's installed type signatures:
-- `output_config={"effort": …}` controls thinking depth. Current models think
-  adaptively, so there is no thinking budget. Only `text` blocks are surfaced.
-- `temperature`/`top_p`/`top_k` are gone from SDK 1.x and rejected by Opus
-  4.7+. A configured temperature is forwarded via `extra_body` only for older
-  models.
-- `fallbacks="default"` plus the `server-side-fallback-2026-07-01` beta lets
-  the provider retry on another model when the requested one declines for
-  policy reasons. The model that actually served the reply is recorded in
-  `model_id`, with `fallback_used`. Set `GENERATION_REFUSAL_FALLBACK=off` to
-  disable it.
-- A `refusal` or `max_tokens` finish is never stored as a reply. The
-  validator rejects it.
+**Presets and resolution.** `registry.py` defines one preset per supported
+provider: adapter kind, endpoint, API-key setting, default model, output and
+context limits, and request shape. At startup, `resolve_provider(settings)`
+merges the preset with `GENERATION_*` overrides. Configuration errors (no
+key, no model, missing SDK extra) fail startup with a message naming the
+variable or install command. The orchestrator uses the resolved model,
+effort and limits. See [providers.md](providers.md) for the full table.
 
-**Retries.** The SDK retries connection errors, 408/409/429 and 5xx with
-backoff that honors `retry-after`, up to `GENERATION_MAX_RETRIES`. It does
-not retry invalid or authentication requests. Each attempt is bounded by
-`GENERATION_TIMEOUT_SECONDS`, and the whole call by the remaining turn
-deadline. Retries cannot duplicate turns, because the turn is completed at
-most once per `attempt_id`, and the database allows at most one reply per
-user message.
+**Adapters**, each verified against its official SDK source and docs:
+- `anthropic_provider.py` (`anthropic` SDK): `output_config.effort`; optional
+  server-side refusal fallback; the served model is recorded.
+- `openai_provider.py` (`openai` SDK): OpenAI and every OpenAI-compatible
+  preset (xAI, Qwen, DeepSeek, OpenRouter, Together, Mistral, Ollama,
+  custom). Per-preset system role, max-tokens field, and effort style
+  (`reasoning_effort`, DashScope `enable_thinking`, or none). It pins
+  credentials so `OPENAI_*` environment variables cannot leak to third
+  parties.
+- `groq_provider.py` (`groq` SDK): per-model-family reasoning controls (gpt-oss
+  `include_reasoning=false`; qwen `reasoning_format=hidden`).
+- `gemini_provider.py` (`google-genai` SDK): explicit timeout and retries (the
+  SDK sets neither), `thinking_level`/`thinking_budget`, thought parts
+  dropped, blocked prompts reported as refusals.
+- `chat_completions.py`: shared normalization and error classification for
+  the two Chat Completions SDKs (`openai`, `groq`).
+
+**Reasoning never reaches users.** Separate reasoning fields (`reasoning`,
+`reasoning_content`, Gemini thought parts, Mistral thinking chunks) are never
+read. Inline `<think>` blocks are stripped by `app/llm/reasoning.py`, and
+`reasoning_removed` is recorded in provenance. A refusal, truncation, or
+empty reply is never stored; the response validator rejects it.
+
+**Errors** normalize to `LLMErrorCategory`: authentication (including
+providers that report a bad key as HTTP 400), permission, not found,
+rate limited (with retry-after), quota exhausted (non-retryable), content
+filtered (provider moderation), overloaded, server error, timeout,
+connection, invalid request, invalid response.
+
+**Retries.** The `anthropic`, `openai` and `groq` SDKs retry transient
+errors themselves, honoring `retry-after`, up to `GENERATION_MAX_RETRIES`.
+The Gemini adapter configures the same bound explicitly. Each attempt is
+limited by `GENERATION_TIMEOUT_SECONDS`, and the whole call by the remaining
+turn deadline. Retries cannot duplicate turns: a turn completes at most once
+per `attempt_id`, and the database allows at most one reply per user
+message.
 
 `FakeLLMClient` is a labeled development stub. It never echoes content and
 is refused in production.

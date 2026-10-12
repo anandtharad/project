@@ -15,12 +15,17 @@ persisted assistant turn. It has idempotent retries, one in-flight turn per
 conversation, bounded timeouts, controlled provider failures, and model and
 prompt provenance on every reply.
 
+The LLM is swappable: Anthropic, OpenAI, Groq, Google Gemini, xAI (Grok),
+Qwen (Alibaba Model Studio), DeepSeek, OpenRouter, Together, Mistral, Ollama,
+or any OpenAI-compatible endpoint. See [docs/providers.md](docs/providers.md).
+
 ## Requirements
 
 - Python 3.12 and [uv](https://docs.astral.sh/uv/) 0.11+
 - Docker with Compose v2.24+ (or a local PostgreSQL 16)
-- An Anthropic API key for real replies. Without one, set
-  `GENERATION_PROVIDER=fake` for a labeled stub that calls no model.
+- An API key for the LLM provider you choose (for example `GROQ_API_KEY`).
+  Without one, set `GENERATION_PROVIDER=fake` for a labeled stub that calls
+  no model.
 
 ## Quick start (Docker Compose)
 
@@ -28,7 +33,8 @@ prompt provenance on every reply.
 cp .env.example .env
 # Edit .env:
 #   DEV_AUTH_TOKENS=alice:<long random token>
-#   GENERATION_API_KEY=<your Anthropic key>   (or GENERATION_PROVIDER=fake)
+#   GENERATION_PROVIDER=groq        (or anthropic, openai, gemini, xai, qwen, ...)
+#   GROQ_API_KEY=<your key>         (the key variable for your provider)
 docker compose up --build
 ```
 
@@ -70,8 +76,9 @@ uv run pytest tests/unit                  # no external dependencies
 export TEST_DATABASE_URL=postgresql+asyncpg://companion:companion@localhost:5432/companion
 uv run pytest                             # unit + integration + security
 
-# Live provider tests: opt-in, real API calls and cost.
-RUN_LIVE_LLM_TESTS=1 ANTHROPIC_API_KEY=... uv run pytest tests/live -v
+# Live provider tests: opt-in, real API calls (Groq: 6 small free-tier calls).
+RUN_LIVE_LLM_TESTS=1 GROQ_API_KEY=... uv run pytest tests/live/test_groq_live.py -v
+RUN_LIVE_LLM_TESTS=1 ANTHROPIC_API_KEY=... uv run pytest tests/live/test_anthropic_live.py -v
 
 uv run ruff check . && uv run ruff format --check . && uv run mypy app scripts tests
 ```
@@ -89,11 +96,11 @@ is the source of truth. Important ones:
 |---|---|
 | `DATABASE_URL` | `postgresql+asyncpg://…` |
 | `DEV_AUTH_TOKENS` | `handle:token,…` development bearer tokens (not production auth) |
-| `GENERATION_PROVIDER` | `anthropic` or `fake` (development stub) |
-| `GENERATION_MODEL` | defaults to `claude-opus-5-5` |
-| `GENERATION_API_KEY` | optional; otherwise the SDK uses `ANTHROPIC_API_KEY` or an `ant auth login` profile |
-| `GENERATION_EFFORT` | `low`…`max` thinking effort, default `low` for chat (to be tuned by evaluation) |
-| `GENERATION_REFUSAL_FALLBACK` | `default` enables the provider's server-side fallback when the model declines; `off` disables it |
+| `GENERATION_PROVIDER` | `anthropic`, `openai`, `groq`, `gemini`, `xai`, `qwen`, `deepseek`, `openrouter`, `together`, `mistral`, `ollama`, `openai_compatible`, or `fake` (development stub) |
+| `GENERATION_MODEL` | optional; defaults to the provider preset's model |
+| `GROQ_API_KEY`, `OPENAI_API_KEY`, `GEMINI_API_KEY`, … | the selected provider's key ([full list](docs/providers.md)); `GENERATION_API_KEY` overrides it |
+| `GENERATION_EFFORT` | `none`…`max` reasoning/thinking depth, mapped per provider; unset = provider default |
+| `MAX_OUTPUT_TOKENS`, `MAX_CONTEXT_TOKENS` | optional; provider defaults (Groq's are sized for its free tier) |
 | `TURN_DEADLINE_SECONDS` / `STALE_TURN_SECONDS` | overall turn budget / when a pending turn counts as abandoned |
 | `MAX_INPUT_CHARACTERS`, `MAX_REQUEST_BYTES` | input limits enforced before any model call |
 
@@ -114,7 +121,8 @@ in place. To change behavior, add a new version file, run
 app/
   api/            HTTP: routes, dev auth, error contract, middleware
   orchestration/  turn lifecycle, transactional turn store, response validation
-  llm/            provider-neutral schemas + Anthropic and stub providers
+  llm/            provider-neutral schemas, provider presets, and adapters
+                  (Anthropic, OpenAI-compatible, Groq, Gemini, dev stub)
   context/        context assembly with a history budget
   db/             SQLAlchemy models, engine, ownership-scoped queries
   prompting.py    versioned prompt registry
@@ -127,6 +135,7 @@ docs/             architecture, API, threat model, implementation status
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [LLM providers](docs/providers.md)
 - [API reference](docs/api.md)
 - [Threat model and privacy notes](docs/threat-model.md)
 - [Implementation status and known limitations](docs/implementation-status.md)

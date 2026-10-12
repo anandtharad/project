@@ -28,7 +28,9 @@ covers what exists today and is revisited at each phase.
 | Prompt injection (indirect: memory/RAG) | N/A: no memory or retrieval yet | Phases 3/4 must treat memory and documents as untrusted data sections |
 | Unsafe output handling | Output is stored and returned as plain text, never executed or rendered by the server; refusals, truncations, empty and over-long replies are rejected | **No safety-policy output validation yet (Phase 5)**; clients must escape output when rendering |
 | Sensitive information in logs | Logs carry IDs, categories, timings and token counts, never content; exception messages and tracebacks are not logged or returned; enforced by a test | Log retention and shipping not configured |
-| API key exposure | Key held as `SecretStr` (not in reprs or logs), server-side only, never returned; `.env` gitignored; `.env.example` has placeholders only | Key rotation procedure: rotate in the provider console, update the secret, restart; no secret manager integration yet |
+| API key exposure | Keys held as `SecretStr` (not in reprs or logs) and masked in `ResolvedProvider` reprs; server-side only, never returned; `.env` gitignored; `.env.example` has placeholders only; only the selected provider's key is sent, only to its endpoint | Key rotation procedure: rotate in the provider console, update the secret, restart; no secret manager integration yet |
+| Credential leakage via SDK environment fallbacks | The `openai` SDK would send `OPENAI_API_KEY` to third-party base URLs and forward `OPENAI_ORG_ID`/`OPENAI_PROJECT_ID`/`OPENAI_CUSTOM_HEADERS` (whose `Authorization` line overrides explicit keys). The adapter passes explicit keys and base URLs, pins `Authorization`, and strips OpenAI-only headers for other endpoints. The Gemini client pins `vertexai=False`. Tests cover each case | Other SDK env variables (e.g. `GROQ_BASE_URL`) are operator configuration |
+| SSRF via configurable endpoint | `GENERATION_BASE_URL` is operator-only configuration (environment), never user input | Do not expose provider/base-URL selection to end users |
 | Denial of service | Body limit (413, checked on declared and streamed bytes); input character limit before any model call; one in-flight turn per conversation; bounded turn deadline; DB statement timeout | **No per-user rate limiting yet**: one user can create many conversations and run turns in parallel across them |
 | Retry / cost amplification | SDK retries bounded (`GENERATION_MAX_RETRIES`) and only for transient errors; total time bounded by the turn deadline; idempotent replays never call the model; at most one reply per user message (DB-enforced) | Per-user cost budget / quotas (later phase) |
 | Malicious or oversized input | Strict schema (unknown fields rejected, string type enforced), NUL rejected, length limits, UUID path validation | — |
@@ -42,9 +44,13 @@ covers what exists today and is revisited at each phase.
   metadata (model, prompt version, token usage, provider request ID). No
   inferred attributes, profiles or memories are stored in Phase 1.
 - **Third-party processing:** conversation content (system prompt plus recent
-  history) is sent to the configured LLM provider (Anthropic) on every turn.
-  Review the provider's commercial terms, data retention and training
-  policies before handling real user data. Server-side refusal fallback
+  history) is sent to the configured LLM provider on every turn: Anthropic,
+  OpenAI, Groq, Google, xAI, Alibaba Cloud, DeepSeek, OpenRouter (and the
+  upstream provider it routes to), Together, or Mistral; with Ollama it stays
+  on your own server.
+  Review that provider's commercial terms, data retention, data residency and
+  training policies before handling real user data. Free tiers (e.g. Groq,
+  Gemini) can have different data-use terms from paid tiers. Server-side refusal fallback
   (`GENERATION_REFUSAL_FALLBACK=default`) may route a declined request to
   another Anthropic model under the same terms.
 - **Retention and deletion:** **not implemented yet.** Conversations and
