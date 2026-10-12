@@ -51,7 +51,7 @@ curl -s -X POST localhost:8000/v1/conversations/$CID/messages \
   -d '{"content": "I have been feeling overwhelmed lately.", "idempotency_key": "msg-1"}'
 ```
 
-Or chat interactively: `uv run python scripts/chat.py --token $TOKEN`.
+Or chat interactively: `uv run python scripts/chat.py --token <your dev token>`.
 
 Interactive API docs (non-production only): `http://127.0.0.1:8000/docs`.
 Written reference: [docs/api.md](docs/api.md).
@@ -68,23 +68,64 @@ uv run uvicorn app.main:create_app --factory --reload
 
 ## Tests and checks
 
+The helper script works the same on Windows, macOS and Linux, so you never
+need `export` or `$env:` syntax:
+
 ```bash
-uv run pytest tests/unit                  # no external dependencies
-
-# Integration + security tests need PostgreSQL. The role must be allowed to
-# CREATE DATABASE; each run creates and drops its own throwaway database.
-export TEST_DATABASE_URL=postgresql+asyncpg://companion:companion@localhost:5432/companion
-uv run pytest                             # unit + integration + security
-
-# Live provider tests: opt-in, real API calls (Groq: 6 small free-tier calls).
-RUN_LIVE_LLM_TESTS=1 GROQ_API_KEY=... uv run pytest tests/live/test_groq_live.py -v
-RUN_LIVE_LLM_TESTS=1 ANTHROPIC_API_KEY=... uv run pytest tests/live/test_anthropic_live.py -v
-
-uv run ruff check . && uv run ruff format --check . && uv run mypy app scripts tests
+uv run python scripts/dev.py doctor        # check Python, .env, keys (masked), SDKs, Docker, database
+uv run python scripts/dev.py unit          # offline unit tests, no keys or database needed
+docker compose up -d db                    # start PostgreSQL for the full suite
+uv run python scripts/dev.py test          # unit + integration + security tests
+uv run python scripts/dev.py groq-models   # models your Groq key can use
+uv run python scripts/dev.py live-groq     # live Groq tests: 6 small free-tier calls
+uv run python scripts/dev.py live-groq --models openai/gpt-oss-20b
 ```
 
-Without `TEST_DATABASE_URL`, database-backed tests are skipped with an
-explicit reason rather than silently passing.
+`test` uses the compose database by default. Set `TEST_DATABASE_URL` to use a
+different one; the role must be allowed to CREATE DATABASE. Keys are read
+from `.env` or the environment and are never printed.
+
+Lint and types: `uv run ruff check .`, `uv run ruff format --check .`,
+`uv run mypy app scripts tests`.
+
+## Windows
+
+Everything runs natively in PowerShell, with no WSL needed.
+
+1. Install [Git](https://git-scm.com/download/win), Python 3.12
+   ([python.org](https://www.python.org/downloads/)), and
+   [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+2. Install uv, either way works:
+   `powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"`
+   or `py -m pip install uv`. Then open a new terminal.
+3. Clone the repo and set up:
+   ```powershell
+   git clone https://github.com/anandtharad/project.git
+   cd project
+   git checkout claude/wonderful-ride-qnd48q
+   uv sync --all-extras
+   Copy-Item .env.example .env
+   notepad .env        # set GROQ_API_KEY=... and DEV_AUTH_TOKENS=me:some-long-token
+   ```
+4. Run the helper commands above, for example
+   `uv run python scripts/dev.py doctor`.
+
+Windows notes:
+- `.env` can be saved in any encoding Windows tools produce (UTF-8, UTF-8
+  with BOM, or the UTF-16 that `echo ... > .env` writes in Windows
+  PowerShell). The app detects it.
+- In Windows PowerShell, `curl` is an alias for `Invoke-WebRequest`. Use
+  `curl.exe` or `Invoke-RestMethod http://localhost:8000/ready`, or just
+  `uv run python scripts/dev.py doctor`.
+- If PostgreSQL is already installed locally and uses port 5432, start the
+  compose database on another port and point the tests at it:
+  ```powershell
+  $env:POSTGRES_PORT = "55432"
+  docker compose up -d db
+  $env:TEST_DATABASE_URL = "postgresql+asyncpg://companion:companion@localhost:55432/companion"
+  ```
+- Multi-line commands use a backtick (`` ` ``) instead of `\`, or put the
+  whole command on one line.
 
 ## Configuration
 

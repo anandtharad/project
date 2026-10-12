@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
-from app.config import Settings
+from app.config import Settings, detect_env_file_encoding
 from tests.helpers import make_settings
 
 
@@ -44,3 +46,30 @@ def test_secrets_are_not_in_repr() -> None:
     settings = make_settings(generation_api_key="sk-ant-secret-value")
     assert "sk-ant-secret-value" not in repr(settings)
     assert "token-alice" not in repr(settings)
+
+
+@pytest.mark.parametrize(
+    ("raw", "encoding"),
+    [
+        # PowerShell 5.1 `echo ... > .env` writes UTF-16 LE with a BOM.
+        ("GROQ_API_KEY=abc\r\nGENERATION_PROVIDER=groq\r\n".encode("utf-16"), "utf-16"),
+        # Notepad / Set-Content -Encoding utf8 may add a UTF-8 BOM.
+        (b"\xef\xbb\xbfGROQ_API_KEY=abc\r\nGENERATION_PROVIDER=groq\r\n", "utf-8-sig"),
+        (b"GROQ_API_KEY=abc\nGENERATION_PROVIDER=groq\n", "utf-8-sig"),
+    ],
+)
+def test_env_file_written_by_windows_tools_is_read(
+    tmp_path: Path, raw: bytes, encoding: str
+) -> None:
+    env_file = tmp_path / ".env"
+    env_file.write_bytes(raw)
+    assert detect_env_file_encoding(env_file) == encoding
+    settings = Settings(_env_file=env_file)
+    assert settings.generation_provider == "groq"
+    assert settings.groq_api_key is not None
+    assert settings.groq_api_key.get_secret_value() == "abc"
+
+
+def test_missing_env_file_is_fine(tmp_path: Path) -> None:
+    assert detect_env_file_encoding(tmp_path / "absent.env") is None
+    assert detect_env_file_encoding(None) is None

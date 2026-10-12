@@ -9,7 +9,8 @@ from __future__ import annotations
 
 from enum import StrEnum
 from functools import lru_cache
-from typing import Literal
+from pathlib import Path
+from typing import Any, Literal
 
 from pydantic import AliasChoices, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -31,6 +32,25 @@ ProviderName = Literal[
     "openai_compatible",
     "fake",
 ]
+
+
+def detect_env_file_encoding(env_file: object) -> str | None:
+    """Encoding of a .env file, from its byte-order mark.
+
+    Windows tools save text in several encodings: PowerShell 5.1's
+    `echo ... > .env` writes UTF-16, and some editors add a UTF-8 BOM.
+    Reading those as plain UTF-8 fails or corrupts the first key.
+    """
+    if not isinstance(env_file, (str, Path)):
+        return None
+    try:
+        with open(env_file, "rb") as fh:
+            head = fh.read(4)
+    except OSError:
+        return None
+    if head.startswith((b"\xff\xfe", b"\xfe\xff")):
+        return "utf-16"
+    return "utf-8-sig"  # plain UTF-8, with or without a BOM
 
 
 class AppEnv(StrEnum):
@@ -124,6 +144,12 @@ class Settings(BaseSettings):
 
     # --- Diagnostics --------------------------------------------------------
     expose_timing_metadata: bool = True
+
+    def __init__(self, **values: Any) -> None:
+        if values.get("_env_file_encoding") is None:
+            env_file = values.get("_env_file", type(self).model_config.get("env_file"))
+            values["_env_file_encoding"] = detect_env_file_encoding(env_file)
+        super().__init__(**values)
 
     @model_validator(mode="after")
     def _check_consistency(self) -> Settings:
