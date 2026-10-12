@@ -103,6 +103,8 @@ class LLMErrorCategory(StrEnum):
     PERMISSION = "permission"
     NOT_FOUND = "not_found"
     RATE_LIMITED = "rate_limited"
+    # A daily/billing quota is used up: retrying soon will not help.
+    QUOTA_EXHAUSTED = "quota_exhausted"
     OVERLOADED = "overloaded"
     SERVER_ERROR = "server_error"
     TIMEOUT = "timeout"

@@ -45,6 +45,18 @@ def build_llm_client(settings: Settings, resolved: ResolvedProvider) -> LLMClien
             base_url=resolved.base_url,
             max_retries=settings.generation_max_retries,
         )
+    if kind is AdapterKind.GEMINI:
+        try:
+            from app.llm.providers.gemini_provider import GeminiLLMClient
+        except ImportError as exc:
+            raise _missing_sdk(resolved, exc) from exc
+        if not resolved.api_key:  # guaranteed by resolve_provider; keeps typing honest
+            raise ProviderConfigError("Provider 'gemini' needs GEMINI_API_KEY")
+        return GeminiLLMClient(
+            api_key=resolved.api_key,
+            base_url=resolved.base_url,
+            max_retries=settings.generation_max_retries,
+        )
     if kind is AdapterKind.OPENAI_COMPATIBLE:
         try:
             from app.llm.providers.openai_provider import OpenAICompatibleLLMClient

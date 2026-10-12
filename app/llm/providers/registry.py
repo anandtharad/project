@@ -56,6 +56,9 @@ class ProviderPreset:
     # field), or "unsupported" (ignored with a startup warning). Native
     # adapters (anthropic, groq, gemini) map effort themselves: "adapter".
     effort_param: Literal["adapter", "reasoning_effort", "unsupported"] = "adapter"
+    # Effort values the endpoint accepts (reasoning_effort presets only);
+    # others are clamped to the nearest accepted value.
+    effort_values: tuple[Effort, ...] = ("none", "low", "medium", "high", "xhigh", "max")
     # OpenAI-only headers (organization, project, OPENAI_CUSTOM_HEADERS) are
     # stripped for every other endpoint so they never leak to third parties.
     send_openai_headers: bool = False
@@ -115,20 +118,30 @@ PRESETS: dict[str, ProviderPreset] = {
             name="gemini",
             kind=AdapterKind.GEMINI,
             extra="gemini",
-            default_model="gemini-2.5-flash",
+            # Current Flash model reported on the free tier; gemini-2.5-* is
+            # legacy. Alternatives: gemini-3.8-flash, gemini-3.1-flash-lite.
+            default_model="gemini-3.6-flash",
             base_url=None,
             api_key_setting="gemini_api_key",
             docs_url="https://ai.google.dev/gemini-api/docs/text-generation",
+            default_effort="low",
+            # Thinking tokens may count toward the output limit.
+            default_max_output_tokens=8192,
         ),
         ProviderPreset(
             name="xai",
             kind=AdapterKind.OPENAI_COMPATIBLE,
             extra="openai",
-            default_model="grok-4",
+            # Cheapest current Grok; accepts reasoning_effort "none".
+            # Retired Grok slugs are served by it. Flagship: grok-4.7.
+            default_model="grok-4.3",
             base_url="https://api.x.ai/v1",
             api_key_setting="xai_api_key",
             docs_url="https://docs.x.ai/docs/guides/chat",
-            effort_param="unsupported",
+            effort_param="reasoning_effort",
+            # xAI rejects OpenAI-only values ("minimal", "max"); "xhigh" only on
+            # some models, so it is clamped to "high".
+            effort_values=("none", "low", "medium", "high"),
         ),
         ProviderPreset(
             name="qwen",
@@ -228,6 +241,19 @@ class ResolvedProvider:
         )
 
 
+_EFFORT_ORDER: tuple[Effort, ...] = ("none", "low", "medium", "high", "xhigh", "max")
+
+
+def clamp_effort(effort: Effort, allowed: tuple[Effort, ...]) -> Effort:
+    """The accepted value closest to `effort`, preferring the lower one on ties."""
+    if effort in allowed:
+        return effort
+    target = _EFFORT_ORDER.index(effort)
+    return min(
+        allowed, key=lambda e: (abs(_EFFORT_ORDER.index(e) - target), _EFFORT_ORDER.index(e))
+    )
+
+
 def resolve_provider(settings: Settings) -> ResolvedProvider:
     preset = PRESETS[settings.generation_provider]
     model = settings.generation_model or preset.default_model
@@ -251,6 +277,14 @@ def resolve_provider(settings: Settings) -> ResolvedProvider:
     if effort is not None and preset.effort_param == "unsupported":
         warnings.append(f"GENERATION_EFFORT is not supported for provider {preset.name!r}; ignored")
         effort = None
+    elif effort is not None and preset.effort_param == "reasoning_effort":
+        clamped = clamp_effort(effort, preset.effort_values)
+        if clamped != effort:
+            warnings.append(
+                f"GENERATION_EFFORT={effort!r} is not accepted by {preset.name!r}; "
+                f"using {clamped!r}"
+            )
+        effort = clamped
     return ResolvedProvider(
         preset=preset,
         model=model,

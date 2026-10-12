@@ -145,7 +145,8 @@ def classify_sdk_error(exc: Exception, sdk: ModuleType) -> LLMError:
             provider_request_id=request_id,
         )
 
-    if status == 401:
+    # Some compatible providers (e.g. xAI) report an invalid key as a 400.
+    if status == 401 or (status == 400 and "api key" in str(exc.message).lower()):
         return error(LLMErrorCategory.AUTHENTICATION, "Provider rejected the credentials.")
     if status in (402, 403):
         return error(LLMErrorCategory.PERMISSION, "Provider denied the request.")
