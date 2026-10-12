@@ -7,7 +7,7 @@ Last updated: 2026-10-12. Spec: COMPANION-TECH-SPEC-001 v2.1.
 | Phase | Status |
 |---|---|
 | 0: Foundation | **Done** |
-| 1: Basic conversation | **Done** (live LLM integration unverified, see below) |
+| 1: Basic conversation | **Done** (live LLM calls verified with Groq; other providers unverified, see below) |
 | 2: State and Jev | Not started. **Blocked**: official Jev docs unreachable (see Blockers) |
 | 3: Memory | Not started |
 | 4: RAG | Not started |
@@ -29,7 +29,8 @@ speech-to-text and text-to-speech are separate.
 | Groq adapter | Done; offline-tested through the real `groq` SDK |
 | Gemini adapter | Done; offline-tested through the real `google-genai` SDK |
 | Credential-leak protections (OpenAI SDK env fallbacks) | Done; tested |
-| **Live calls to any provider** | **Unverified**: this environment's egress policy blocks provider APIs (`api.groq.com` included, even after the network setting was changed). A gated live Groq suite is ready |
+| **Live Groq calls** | **Verified** on 2026-10-12: `tests/live/test_groq_live.py` passed 6/6 on the user's Windows machine (Python 3.12.3) for `openai/gpt-oss-120b`, `openai/gpt-oss-20b` and `qwen/qwen3.8-27b` |
+| Live calls to other providers | **Unverified**: no keys. This cloud environment's egress policy also blocks provider APIs |
 
 An adversarial review of the multi-provider changes (4 reviewers, each
 checked by an independent skeptic) confirmed 21 of 37 reported issues. All
@@ -74,7 +75,7 @@ unmodified here.
 |---|---|---|
 | Multi-turn context is preserved | Met (test double) | `test_multi_turn_context_is_preserved_in_order` asserts the exact ordered history sent to the model |
 | Message ordering is correct | Met | per-conversation sequence under row lock; unique `(conversation_id, sequence)`; ordering and pagination tests |
-| Response addresses the user's actual message | **Unverified live** | prompt designed for it; `tests/live` checks context use (`Biscuit` recall), but no API key was available here. Quality is measured in Phase 6 |
+| Response addresses the user's actual message | Met for context use (live, Groq) | `tests/live/test_groq_live.py` passed on all three Groq free-tier models: replies pass validation and recall earlier context (`Biscuit`). Conversational quality is measured in Phase 6 |
 | Duplicate requests do not duplicate completed turns | Met | DB-enforced idempotency; replay, in-flight duplicate, and parallel-burst tests |
 | Provider failures are controlled | Met | failure-matrix tests: timeout, rate limit, connection, auth, invalid request, refusal, truncation, empty, over-long, persistence failure |
 | Model and prompt versions are recorded | Met | `provider`, `model_id` (served model), `prompt_id`, `prompt_version` columns plus `generation_metadata` (prompt checksum, params, usage, request ID, trace ID) |
@@ -114,6 +115,16 @@ are clean.
 
 ## Verified vs unverified integrations
 
+- **Groq (live):** verified on 2026-10-12 with real free-tier calls from the
+  user's Windows machine; 6/6 live tests passed for `openai/gpt-oss-120b`,
+  `openai/gpt-oss-20b` and `qwen/qwen3.8-27b`. That confirms Groq accepts the
+  exact request shape (`max_completion_tokens`, `reasoning_effort`,
+  `include_reasoning=false` for gpt-oss, `reasoning_format="hidden"` for
+  qwen), replies normalize and pass validation with no reasoning text, usage
+  and the request ID (`x_groq.id`) are recorded, and multi-turn context is
+  used. Still offline-only: error classification for real Groq errors (401,
+  429, 5xx), and a full turn through the HTTP API and PostgreSQL with Groq.
+  The live tests call the adapter directly.
 - **Anthropic Messages API:** the adapter is written against the official
   `anthropic` 1.13.0 SDK's type signatures and tested through the real SDK
   with a mocked HTTP transport: exact request JSON, beta header, response

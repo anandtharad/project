@@ -121,10 +121,12 @@ against official documentation and the installed SDK source. Many official
 docs pages were only reachable through search summaries from this
 environment; the contract notes record which facts that affects.
 
-**No live call has been made to any provider from this environment.** The
-egress policy blocks provider APIs. A gated live suite exists for Groq. It
-runs the same way on Windows, macOS and Linux and reads `GROQ_API_KEY` from
-`.env` or the environment:
+**Groq is verified live** (2026-10-12): the gated live suite passed 6/6 on
+the user's machine for `openai/gpt-oss-120b`, `openai/gpt-oss-20b` and
+`qwen/qwen3.8-27b`. **Other providers have not had a live call** (no keys;
+this cloud environment's egress policy also blocks provider APIs). The live
+suite runs the same way on Windows, macOS and Linux and reads `GROQ_API_KEY`
+from `.env` or the environment:
 
 ```bash
 uv run python scripts/dev.py live-groq
