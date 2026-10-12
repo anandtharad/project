@@ -1,3 +1,5 @@
 {
-  "companion_system@1.0.0": "a145cb71ebb3a67a9d0dbef0e7a2b970b4ffe3d436dddf965ba0e37b3a08248e"
+  "companion_system@1.0.0": "a145cb71ebb3a67a9d0dbef0e7a2b970b4ffe3d436dddf965ba0e37b3a08248e",
+  "companion_system@1.1.0": "b4e21ccf80b659d30a3cbcdd8d27674523ffd6e30dc1b02eac2ab4ba4274f985",
+  "state_extraction@1.0.0": "aa29006d5339beb5d40bb7dabc062be4b7c6af80785d8c123397983c0c42e673"
 }

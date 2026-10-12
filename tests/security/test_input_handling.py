@@ -10,8 +10,14 @@ import httpx
 import pytest
 
 from app.observability import JsonFormatter
-from app.prompting import PromptRegistry
-from tests.helpers import ALICE, ScriptedLLMClient, create_conversation, list_messages, send
+from tests.helpers import (
+    ALICE,
+    ScriptedLLMClient,
+    create_conversation,
+    default_system_prompt,
+    list_messages,
+    send,
+)
 
 
 @pytest.mark.parametrize(
@@ -89,7 +95,7 @@ async def test_injection_attempts_stay_in_user_role(
     cid = await create_conversation(client, ALICE)
     await send(client, cid, attack)
     request = llm.requests[-1]
-    assert request.system == PromptRegistry().get("companion_system", "1.0.0").render()
+    assert request.system == default_system_prompt()
     assert attack not in request.system
     assert [(m.role.value, m.content) for m in request.messages] == [("user", attack)]
 

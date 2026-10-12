@@ -17,17 +17,26 @@ from app.api.middleware import BodySizeLimitMiddleware, TraceMiddleware
 from app.config import AppEnv, Settings, get_settings
 from app.context.builder import ContextBuilder
 from app.db.session import create_engine, create_session_factory
+from app.decisions.factory import build_decision_service
+from app.decisions.questions import QUESTIONS, verify_locked
+from app.decisions.service import DecisionBackend
 from app.llm.base import LLMClient
 from app.llm.factory import build_llm_client
-from app.llm.providers.registry import resolve_provider
+from app.llm.providers.registry import ResolvedProvider, resolve_provider
+from app.llm.schemas import GenerationParams
 from app.observability import configure_logging, log_event
 from app.orchestration.engine import TurnOrchestrator
 from app.orchestration.persistence import TurnStore
 from app.orchestration.validation import ResponseValidator
-from app.prompting import PromptRegistry
+from app.prompting import PromptRegistry, PromptTemplate
+from app.state.extractor import StateExtractor
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 COMPANION_PROMPT_ID = "companion_system"
+STATE_PROMPT_ID = "state_extraction"
+# Groq's free tier limits requests and tokens per model, so state extraction
+# uses a different (smaller, faster) model than replies by default.
+_DEFAULT_STATE_MODELS = {"groq": "openai/gpt-oss-20b"}
 
 logger = logging.getLogger("app")
 
@@ -40,11 +49,42 @@ def migration_head() -> str:
     return head
 
 
-def create_app(settings: Settings | None = None, *, llm_client: LLMClient | None = None) -> FastAPI:
+def state_extraction_model(settings: Settings, resolved: ResolvedProvider) -> str:
+    if settings.state_extraction_model:
+        return settings.state_extraction_model
+    if settings.generation_model is None:
+        return _DEFAULT_STATE_MODELS.get(settings.generation_provider, resolved.model)
+    return resolved.model
+
+
+def build_state_extractor(
+    settings: Settings, resolved: ResolvedProvider, llm: LLMClient, prompt: PromptTemplate
+) -> StateExtractor | None:
+    if not settings.state_extraction_enabled:
+        return None
+    return StateExtractor(
+        llm=llm,
+        model=state_extraction_model(settings, resolved),
+        prompt=prompt,
+        params=GenerationParams(effort=resolved.effort),
+        max_output_tokens=settings.state_extraction_max_output_tokens,
+        timeout_seconds=settings.state_extraction_timeout_seconds,
+    )
+
+
+def create_app(
+    settings: Settings | None = None,
+    *,
+    llm_client: LLMClient | None = None,
+    decision_backend: DecisionBackend | None = None,
+) -> FastAPI:
     settings = settings or get_settings()
     configure_logging(settings.log_level)
     # Fail fast on configuration/prompt problems before accepting traffic.
-    prompt = PromptRegistry().get(COMPANION_PROMPT_ID, settings.companion_prompt_version)
+    registry = PromptRegistry()
+    prompt = registry.get(COMPANION_PROMPT_ID, settings.companion_prompt_version)
+    state_prompt = registry.get(STATE_PROMPT_ID, settings.state_prompt_version)
+    verify_locked(QUESTIONS)
     dev_tokens = settings.dev_token_map()
     head = migration_head()
     resolved = resolve_provider(settings)
@@ -54,6 +94,8 @@ def create_app(settings: Settings | None = None, *, llm_client: LLMClient | None
         engine = create_engine(settings)
         session_factory = create_session_factory(engine)
         llm = llm_client or build_llm_client(settings, resolved)
+        decisions = build_decision_service(settings, backend=decision_backend)
+        state_extractor = build_state_extractor(settings, resolved, llm, state_prompt)
         app.state.settings = settings
         app.state.engine = engine
         app.state.session_factory = session_factory
@@ -79,6 +121,8 @@ def create_app(settings: Settings | None = None, *, llm_client: LLMClient | None
                 max_history_messages=settings.history_max_messages,
             ),
             validator=ResponseValidator(max_characters=settings.max_response_characters),
+            decisions=decisions,
+            state_extractor=state_extractor,
         )
         log_event(
             logger,
@@ -88,12 +132,15 @@ def create_app(settings: Settings | None = None, *, llm_client: LLMClient | None
             model=resolved.model,
             prompt=prompt.key,
             migration_head=head,
+            decision_provider=settings.decision_provider,
+            state_model=state_extractor.model if state_extractor else None,
         )
         for warning in resolved.warnings:
             log_event(logger, "config.warning", level=logging.WARNING, detail=warning)
         try:
             yield
         finally:
+            await decisions.aclose()
             await llm.aclose()
             await engine.dispose()
 

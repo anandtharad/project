@@ -1,7 +1,9 @@
 """Relational schema (SQLAlchemy 2.x declarative models).
 
-Phase 1 tables only: users, conversations, messages. Later phases add their
-own tables through new migrations.
+Phase 1: users, conversations, messages. Phase 2: conversation_states (one
+versioned state per conversation) and turn_decisions (one row per decision
+question per completed turn). Later phases add their own tables through new
+migrations.
 """
 
 from __future__ import annotations
@@ -12,8 +14,10 @@ from enum import StrEnum
 from typing import Any
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     DateTime,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -136,3 +140,63 @@ class Message(Base):
     prompt_id: Mapped[str | None] = mapped_column(String(128))
     prompt_version: Mapped[str | None] = mapped_column(String(32))
     generation_metadata: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+
+
+class ConversationStateRecord(Base):
+    """The latest conversation state. `state_version` increases by one on
+    every accepted write; a write based on an older version is rejected."""
+
+    __tablename__ = "conversation_states"
+    __table_args__ = (CheckConstraint("state_version > 0", name="state_version_positive"),)
+
+    conversation_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("conversations.id", ondelete="CASCADE"), primary_key=True
+    )
+    schema_version: Mapped[int] = mapped_column(Integer)
+    state: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    state_version: Mapped[int] = mapped_column(Integer)
+    # The user message whose completed turn produced this state.
+    source_message_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("messages.id", ondelete="SET NULL")
+    )
+    # How it was produced: extraction model, prompt, structured-output mode.
+    extraction: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class TurnDecision(Base):
+    """One decision result (spec §7.6), stored with the completed turn."""
+
+    __tablename__ = "turn_decisions"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_message_id", "question_id", name="uq_turn_decisions_message_question"
+        ),
+        CheckConstraint("kind IN ('choice', 'score', 'noul')", name="kind_valid"),
+        CheckConstraint(
+            "validation_status IN ('valid', 'invalid', 'missing')", name="validation_status_valid"
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    conversation_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("conversations.id", ondelete="CASCADE"), index=True
+    )
+    user_message_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("messages.id", ondelete="CASCADE")
+    )
+    question_id: Mapped[str] = mapped_column(String(64))
+    question_version: Mapped[str] = mapped_column(String(32))
+    kind: Mapped[str] = mapped_column(String(16))
+    # A choice label or a number (score level / noul probability).
+    value: Mapped[Any] = mapped_column(JSONB)
+    returned_value: Mapped[Any | None] = mapped_column(JSONB)
+    probabilities: Mapped[dict[str, float] | None] = mapped_column(JSONB)
+    confidence: Mapped[float | None] = mapped_column(Float)
+    provider: Mapped[str] = mapped_column(String(16))
+    model_id: Mapped[str | None] = mapped_column(String(128))
+    latency_ms: Mapped[float | None] = mapped_column(Float)
+    validation_status: Mapped[str] = mapped_column(String(16))
+    fallback: Mapped[bool] = mapped_column(Boolean)
+    fallback_reason: Mapped[str | None] = mapped_column(String(32))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

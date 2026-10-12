@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from collections import deque
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
@@ -13,14 +14,19 @@ import httpx
 from fastapi import FastAPI
 
 from app.config import Settings
+from app.decisions.backend import BackendAnswers, DecisionBackendError
+from app.decisions.schemas import DecisionProvider, QuestionSpec
+from app.decisions.service import DecisionBackend
 from app.llm.schemas import (
     FinishReason,
+    GenerationPurpose,
     GenerationRequest,
     GenerationResponse,
     LLMError,
     TokenUsage,
 )
 from app.main import create_app
+from app.prompting import PromptRegistry
 
 ALICE = {"Authorization": "Bearer token-alice"}
 BOB = {"Authorization": "Bearer token-bob"}
@@ -74,17 +80,35 @@ Step = (
 )
 
 
+EMPTY_EXTRACTION = json.dumps(
+    {
+        "topic": "",
+        "subtopics": [],
+        "user_goal": {"value": "", "provenance": "unknown"},
+        "emotional_context": {"value": "", "provenance": "unknown"},
+        "open_questions": [],
+        "recently_discussed": [],
+    }
+)
+
+
 class ScriptedLLMClient:
     """Deterministic LLM test double.
 
-    Each call consumes the next queued step; with an empty queue it replies
-    "reply to: <last user message>" so tests can trace which context was used.
-    Every request is recorded.
+    Each conversation call consumes the next queued step; with an empty queue
+    it replies "reply to: <last user message>" so tests can trace which
+    context was used. Every request is recorded.
+
+    State-extraction calls are recorded separately in `state_requests` and
+    consume `queue_state` steps; by default they return an empty state, so
+    scripted conversation replies are unaffected.
     """
 
     def __init__(self) -> None:
         self.requests: list[GenerationRequest] = []
+        self.state_requests: list[GenerationRequest] = []
         self._steps: deque[Step] = deque()
+        self._state_steps: deque[Step] = deque()
 
     @property
     def provider(self) -> str:
@@ -96,13 +120,21 @@ class ScriptedLLMClient:
     def queue(self, *steps: Step) -> None:
         self._steps.extend(steps)
 
+    def queue_state(self, *steps: Step) -> None:
+        self._state_steps.extend(steps)
+
     async def generate(self, request: GenerationRequest) -> GenerationResponse:
-        self.requests.append(request)
-        step: Step = (
-            self._steps.popleft()
-            if self._steps
-            else f"reply to: {request.messages[-1].content.split(chr(10))[-1]}"
-        )
+        step: Step
+        if request.trace.purpose is GenerationPurpose.STATE_EXTRACTION:
+            self.state_requests.append(request)
+            step = self._state_steps.popleft() if self._state_steps else EMPTY_EXTRACTION
+        else:
+            self.requests.append(request)
+            step = (
+                self._steps.popleft()
+                if self._steps
+                else f"reply to: {request.messages[-1].content.split(chr(10))[-1]}"
+            )
         if isinstance(step, LLMError):
             raise step
         if isinstance(step, GenerationResponse):
@@ -127,9 +159,9 @@ def blocking_step(release: asyncio.Event, entered: asyncio.Event | None = None) 
 
 @asynccontextmanager
 async def running_app(
-    settings: Settings, llm: ScriptedLLMClient
+    settings: Settings, llm: ScriptedLLMClient, decision_backend: DecisionBackend | None = None
 ) -> AsyncIterator[tuple[FastAPI, httpx.AsyncClient]]:
-    app = create_app(settings, llm_client=llm)
+    app = create_app(settings, llm_client=llm, decision_backend=decision_backend)
     async with app.router.lifespan_context(app):
         transport = httpx.ASGITransport(app=app, raise_app_exceptions=False)
         async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
@@ -165,3 +197,51 @@ async def list_messages(
     assert response.status_code == 200, response.text
     messages: list[dict[str, Any]] = response.json()["messages"]
     return messages
+
+
+def default_system_prompt() -> str:
+    """The reply system prompt when no policy constrains the approach."""
+    prompt = PromptRegistry().get("companion_system", "1.1.0")
+    return prompt.render(response_guidance=prompt.fragment("open"))
+
+
+class ScriptedDecisionBackend:
+    """Decision backend test double: returns fixed answers or raises."""
+
+    provider: DecisionProvider = "laya"
+    model = "english"
+
+    def __init__(
+        self,
+        answers: dict[str, dict[str, Any]] | None = None,
+        *,
+        error: DecisionBackendError | None = None,
+    ) -> None:
+        self.answers = answers or {}
+        self.error = error
+        self.calls: list[dict[str, Any]] = []
+
+    async def ask(self, state: Any, questions: list[QuestionSpec]) -> BackendAnswers:
+        self.calls.append(dict(state))
+        if self.error is not None:
+            raise self.error
+        return BackendAnswers(
+            model_id="laya-test",
+            answers=self.answers,
+            latency_ms=5.0,
+            request_id=None,
+            input_tokens=10,
+        )
+
+    async def aclose(self) -> None:
+        return None
+
+
+def choice(question: QuestionSpec, label: str, confidence: float = 0.9) -> dict[str, Any]:
+    others = (1.0 - 0.9) / (len(question.options) - 1)
+    return {
+        "type": "choice",
+        "choice": label,
+        "confidence": confidence,
+        "probabilities": {o: (0.9 if o == label else others) for o in question.options},
+    }

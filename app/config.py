@@ -127,6 +127,16 @@ class Settings(BaseSettings):
     together_api_key: SecretStr | None = None
     mistral_api_key: SecretStr | None = None
 
+    # --- Conversation state (spec §8) ---------------------------------------
+    # One structured LLM call before each reply updates the conversation state.
+    state_extraction_enabled: bool = True
+    # Unset = the generation model, except on Groq, where openai/gpt-oss-20b
+    # is used so extraction draws on a separate free-tier rate limit.
+    state_extraction_model: str | None = None
+    state_extraction_timeout_seconds: float = Field(default=10.0, gt=0, le=60)
+    state_extraction_max_output_tokens: int = Field(default=1024, ge=256, le=8192)
+    state_prompt_version: str = "1.0.0"
+
     # --- Decisions (spec §7) -------------------------------------------------
     # "jev": TypeSafe's hosted API. "laya": a self-hosted Laya server
     # (laya-serve) speaking the same protocol. "off": documented fallbacks only.
@@ -162,7 +172,7 @@ class Settings(BaseSettings):
     max_response_characters: int = Field(default=8_000, ge=100)
 
     # --- Prompts ------------------------------------------------------------
-    companion_prompt_version: str = "1.0.0"
+    companion_prompt_version: str = "1.1.0"
 
     # --- Diagnostics --------------------------------------------------------
     expose_timing_metadata: bool = True

@@ -61,6 +61,6 @@ async def test_ready_when_migrated(client: httpx.AsyncClient) -> None:
             "database": "ok",
             "migrations": "ok",
             "llm_provider": "scripted",
-            "prompt": "companion_system@1.0.0",
+            "prompt": "companion_system@1.1.0",
         },
     }

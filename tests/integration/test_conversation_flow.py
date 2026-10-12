@@ -12,7 +12,14 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from app.db.models import Message
 from app.llm.schemas import ChatRole, GenerationPurpose
 from app.prompting import PromptRegistry
-from tests.helpers import ALICE, ScriptedLLMClient, create_conversation, list_messages, send
+from tests.helpers import (
+    ALICE,
+    ScriptedLLMClient,
+    create_conversation,
+    default_system_prompt,
+    list_messages,
+    send,
+)
 
 
 async def test_create_and_get_conversation(client: httpx.AsyncClient) -> None:
@@ -57,7 +64,7 @@ async def test_multi_turn_context_is_preserved_in_order(
         (ChatRole.USER, user_turns[2]),
     ]
     # The system prompt is the versioned prompt, separate from user content.
-    expected_system = PromptRegistry().get("companion_system", "1.0.0").render()
+    expected_system = default_system_prompt()
     assert all(r.system == expected_system for r in llm.requests)
     assert all(r.trace.purpose is GenerationPurpose.CONVERSATION for r in llm.requests)
 
@@ -113,13 +120,13 @@ async def test_model_and_prompt_versions_are_recorded(
     response = await send(client, cid, "Record my provenance")
     assistant_id = uuid.UUID(response.json()["assistant_message_id"])
 
-    prompt = PromptRegistry().get("companion_system", "1.0.0")
+    prompt = PromptRegistry().get("companion_system", "1.1.0")
     async with db_engine.connect() as conn:
         row = (await conn.execute(select(Message).where(Message.id == assistant_id))).one()
     assert row.provider == "scripted"
     assert row.model_id == "scripted-model"
     assert row.prompt_id == "companion_system"
-    assert row.prompt_version == "1.0.0"
+    assert row.prompt_version == "1.1.0"
     assert row.reply_to_message_id == uuid.UUID(response.json()["user_message_id"])
     metadata = row.generation_metadata
     assert metadata["prompt_checksum"] == prompt.checksum

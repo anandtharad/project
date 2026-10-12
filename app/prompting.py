@@ -12,7 +12,7 @@ from __future__ import annotations
 import hashlib
 import json
 import tomllib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from string import Template
 
@@ -24,8 +24,13 @@ class PromptError(Exception):
     pass
 
 
-def template_checksum(template: str) -> str:
-    return hashlib.sha256(template.encode("utf-8")).hexdigest()
+def template_checksum(template: str, fragments: dict[str, str] | None = None) -> str:
+    payload = template
+    if fragments:
+        # Fragments are part of the released prompt. Prompts without any keep
+        # the template-only checksum they were locked with.
+        payload += "\n\x00fragments\x00" + json.dumps(fragments, sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -36,10 +41,19 @@ class PromptTemplate:
     variables: tuple[str, ...]
     changelog: tuple[str, ...]
     template: str
+    # Named text blocks the application selects at runtime (for example one
+    # per response strategy). Versioned and locked with the template.
+    fragments: dict[str, str] = field(default_factory=dict)
 
     @property
     def checksum(self) -> str:
-        return template_checksum(self.template)
+        return template_checksum(self.template, self.fragments)
+
+    def fragment(self, name: str) -> str:
+        try:
+            return self.fragments[name].strip()
+        except KeyError:
+            raise PromptError(f"{self.key}: unknown fragment {name!r}") from None
 
     @property
     def key(self) -> str:
@@ -74,6 +88,7 @@ def load_prompt_file(path: Path) -> PromptTemplate:
             variables=tuple(str(v) for v in data["variables"]),
             changelog=tuple(str(c) for c in data["changelog"]),
             template=str(data["template"]),
+            fragments={str(k): str(v) for k, v in data.get("fragments", {}).items()},
         )
     except KeyError as exc:
         raise PromptError(f"{path}: missing field {exc}") from exc

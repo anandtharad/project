@@ -8,7 +8,13 @@ database transaction or lock is held while generating:
    attempt ID, and load recent history.
 2. `complete`: lock the conversation row again, verify this attempt still
    owns the pending turn, allocate the next sequence for the assistant
-   message, and mark the turn `completed` - atomically.
+   message, mark the turn `completed`, and store the turn's decisions and
+   updated conversation state - atomically.
+
+Conversation state uses optimistic concurrency: `begin` reads the state and
+its version; `complete` writes the new state only if the stored version is
+still the one read (under the conversation row lock), so a stale write never
+overwrites a newer state. A rejected write leaves the reply intact.
 
 Concurrency rules (one in-flight turn per conversation):
 - Ordering comes from a per-conversation sequence counter updated only under
@@ -25,18 +31,29 @@ from __future__ import annotations
 
 import hashlib
 import uuid
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Any
 
+from pydantic import ValidationError
 from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.db import repositories as repo
-from app.db.models import Conversation, Message, MessageRole, TurnStatus
+from app.db.models import (
+    Conversation,
+    ConversationStateRecord,
+    Message,
+    MessageRole,
+    TurnDecision,
+    TurnStatus,
+)
+from app.decisions.schemas import DecisionResult
 from app.errors import AppError, ErrorCategory, conversation_not_found
 from app.llm.schemas import ChatMessage, ChatRole
+from app.state.schemas import STATE_SCHEMA_VERSION, ConversationState, StoredState
 
 
 class TurnAttemptLost(Exception):
@@ -72,6 +89,9 @@ class CompletedTurn:
     assistant_content: str
     created_at: datetime
     replayed: bool = False
+    # Version of the stored state after this turn; None when the write was
+    # rejected as stale, not requested, or on replay.
+    state_version: int | None = None
 
 
 @dataclass(frozen=True)
@@ -80,6 +100,15 @@ class StartedTurn:
     user_message_id: uuid.UUID
     attempt_id: uuid.UUID
     history: list[ChatMessage]
+    state: StoredState | None = None
+
+
+@dataclass(frozen=True)
+class StateWrite:
+    state: ConversationState
+    # The version read at `begin` (0 when there was no state yet).
+    expected_version: int
+    extraction: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -218,7 +247,22 @@ class TurnStore:
             user_message_id=message.id,
             attempt_id=message.attempt_id,
             history=history,
+            state=await self._load_state(session, conversation.id),
         )
+
+    async def _load_state(
+        self, session: AsyncSession, conversation_id: uuid.UUID
+    ) -> StoredState | None:
+        record = await session.get(ConversationStateRecord, conversation_id)
+        if record is None:
+            return None
+        try:
+            state = ConversationState.model_validate(record.state)
+        except ValidationError:
+            # An unreadable state (e.g. an older schema) is not fatal: the turn
+            # proceeds without it and the next write replaces it.
+            state = ConversationState()
+        return StoredState(state=state, version=record.state_version, updated_at=record.updated_at)
 
     def _is_stale(self, message: Message, db_now: datetime) -> bool:
         started = message.attempt_started_at
@@ -232,6 +276,8 @@ class TurnStore:
         attempt_id: uuid.UUID,
         content: str,
         provenance: AssistantProvenance,
+        state_write: StateWrite | None = None,
+        decisions: Sequence[DecisionResult] = (),
     ) -> CompletedTurn:
         async with self._sessions() as session, session.begin():
             conversation = await session.get(Conversation, conversation_id, with_for_update=True)
@@ -262,6 +308,14 @@ class TurnStore:
             user_message.turn_status = TurnStatus.COMPLETED
             user_message.failure_category = None
             session.add(assistant)
+            session.add_all(
+                _decision_row(conversation.id, user_message.id, result) for result in decisions
+            )
+            state_version = (
+                await self._write_state(session, conversation.id, user_message.id, state_write)
+                if state_write is not None
+                else None
+            )
             await session.flush()
             return CompletedTurn(
                 conversation_id=conversation.id,
@@ -269,7 +323,41 @@ class TurnStore:
                 assistant_message_id=assistant.id,
                 assistant_content=assistant.content,
                 created_at=assistant.created_at,
+                state_version=state_version,
             )
+
+    async def _write_state(
+        self,
+        session: AsyncSession,
+        conversation_id: uuid.UUID,
+        source_message_id: uuid.UUID,
+        write: StateWrite,
+    ) -> int | None:
+        """Called under the conversation row lock. Returns the new version, or
+        None when the write is stale (another turn stored a newer state)."""
+        record = await session.get(ConversationStateRecord, conversation_id, with_for_update=True)
+        current = record.state_version if record is not None else 0
+        if current != write.expected_version:
+            return None
+        data = write.state.model_dump(mode="json")
+        if record is None:
+            record = ConversationStateRecord(
+                conversation_id=conversation_id,
+                schema_version=STATE_SCHEMA_VERSION,
+                state=data,
+                state_version=1,
+                source_message_id=source_message_id,
+                extraction=write.extraction,
+            )
+            session.add(record)
+        else:
+            record.schema_version = STATE_SCHEMA_VERSION
+            record.state = data
+            record.state_version = current + 1
+            record.source_message_id = source_message_id
+            record.extraction = write.extraction
+            record.updated_at = func.now()
+        return current + 1
 
     async def fail(
         self, *, user_message_id: uuid.UUID, attempt_id: uuid.UUID, category: str
@@ -284,3 +372,26 @@ class TurnStore:
                 )
                 .values(turn_status=TurnStatus.FAILED, failure_category=category)
             )
+
+
+def _decision_row(
+    conversation_id: uuid.UUID, user_message_id: uuid.UUID, result: DecisionResult
+) -> TurnDecision:
+    return TurnDecision(
+        id=result.decision_id,
+        conversation_id=conversation_id,
+        user_message_id=user_message_id,
+        question_id=result.question_id,
+        question_version=result.question_version,
+        kind=result.kind,
+        value=result.value,
+        returned_value=result.returned_value,
+        probabilities=result.probabilities,
+        confidence=result.confidence,
+        provider=result.provider,
+        model_id=result.model_id,
+        latency_ms=result.latency_ms,
+        validation_status=result.validation_status.value,
+        fallback=result.fallback,
+        fallback_reason=result.fallback_reason.value if result.fallback_reason else None,
+    )
