@@ -39,12 +39,16 @@ def _groq_key() -> str | None:
     return secret.get_secret_value() if secret else None
 
 
-GROQ_KEY = _groq_key() if os.environ.get("RUN_LIVE_LLM_TESTS") == "1" else None
+_OPTED_IN = os.environ.get("RUN_LIVE_LLM_TESTS") == "1"
+GROQ_KEY = _groq_key() if _OPTED_IN else None
 
 pytestmark = pytest.mark.skipif(
     GROQ_KEY is None,
-    reason="live provider tests are opt-in: set RUN_LIVE_LLM_TESTS=1 and GROQ_API_KEY "
-    "(environment or .env)",
+    reason=(
+        "GROQ_API_KEY not found in the environment or .env"
+        if _OPTED_IN
+        else "opt-in: run 'uv run python scripts/dev.py live-groq' (sets RUN_LIVE_LLM_TESTS=1)"
+    ),
 )
 
 DEFAULT_MODELS = "openai/gpt-oss-120b,openai/gpt-oss-20b,qwen/qwen3.8-27b"
