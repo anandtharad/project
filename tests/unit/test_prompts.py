@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib.util
 import json
 import shutil
 from pathlib import Path
@@ -13,6 +14,7 @@ from app.prompting import (
     PromptRegistry,
     discover_prompts,
     load_lock,
+    load_prompt_file,
 )
 
 
@@ -102,3 +104,33 @@ def test_render_requires_exact_variables(tmp_path: Path) -> None:
         prompt.render()
     with pytest.raises(PromptError):
         prompt.render(name="Sam", extra="x")
+
+
+@pytest.mark.parametrize("encoding", ["utf-8-sig", "utf-16"])
+def test_prompt_files_saved_by_windows_tools_load_unchanged(tmp_path: Path, encoding: str) -> None:
+    original = discover_prompts()[0]
+    source = PROMPTS_DIR / original.id / f"{original.version}.toml"
+    copy = tmp_path / original.id / source.name
+    copy.parent.mkdir()
+    copy.write_bytes(source.read_text(encoding="utf-8").encode(encoding))
+    assert load_prompt_file(copy).checksum == original.checksum
+
+
+def test_unparseable_prompt_file_is_named_in_the_error(tmp_path: Path) -> None:
+    broken = tmp_path / "9.9.9.toml"
+    broken.write_text("id = ", encoding="utf-8")
+    with pytest.raises(PromptError, match=r"9\.9\.9\.toml"):
+        load_prompt_file(broken)
+
+
+def test_lock_script_leaves_the_lock_file_untouched_when_nothing_is_new() -> None:
+    spec = importlib.util.spec_from_file_location(
+        "lock_prompts", PROMPTS_DIR.parent / "scripts" / "lock_prompts.py"
+    )
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    lock_file = PROMPTS_DIR / LOCK_FILE_NAME
+    before = lock_file.stat().st_mtime_ns
+    assert module.main() == 0
+    assert lock_file.stat().st_mtime_ns == before

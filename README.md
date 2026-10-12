@@ -111,19 +111,24 @@ Everything runs natively in PowerShell, with no WSL needed.
    `uv run python scripts/dev.py doctor`.
 
 Windows notes:
-- `.env` can be saved in any encoding Windows tools produce (UTF-8, UTF-8
-  with BOM, or the UTF-16 that `echo ... > .env` writes in Windows
-  PowerShell). The app detects it.
+- Edit `.env` with Notepad (UTF-8). Do not create it with `echo ... > .env`
+  in Windows PowerShell 5.1: that writes UTF-16, which the app reads but
+  `docker compose` cannot parse. `dev.py doctor` warns about it; convert with
+  `$c = Get-Content .env; [IO.File]::WriteAllLines("$PWD\.env", $c)`.
 - In Windows PowerShell, `curl` is an alias for `Invoke-WebRequest`. Use
   `curl.exe` or `Invoke-RestMethod http://localhost:8000/ready`, or just
   `uv run python scripts/dev.py doctor`.
-- If PostgreSQL is already installed locally and uses port 5432, start the
-  compose database on another port and point the tests at it:
-  ```powershell
-  $env:POSTGRES_PORT = "55432"
-  docker compose up -d db
-  $env:TEST_DATABASE_URL = "postgresql+asyncpg://companion:companion@localhost:55432/companion"
+- If PostgreSQL is already installed locally and uses port 5432, move the
+  compose database to another port. Put both lines in `.env`, so compose,
+  `alembic` and `uvicorn` all use it in every terminal:
   ```
+  POSTGRES_PORT=55432
+  DATABASE_URL=postgresql+asyncpg://companion:companion@localhost:55432/companion
+  ```
+  The test commands read `TEST_DATABASE_URL` from the environment only:
+  `$env:TEST_DATABASE_URL = "postgresql+asyncpg://companion:companion@localhost:55432/companion"`.
+- A `$env:NAME = "value"` setting lasts for the whole PowerShell window.
+  Clear one with `Remove-Item Env:NAME`.
 - Multi-line commands use a backtick (`` ` ``) instead of `\`, or put the
   whole command on one line.
 

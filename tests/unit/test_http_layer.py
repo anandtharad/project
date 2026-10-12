@@ -7,6 +7,7 @@ from collections.abc import AsyncIterator
 import httpx
 import pytest
 
+from app.api.middleware import _innermost_location
 from tests.helpers import ALICE, ScriptedLLMClient, make_settings, running_app
 
 
@@ -92,3 +93,11 @@ async def test_openapi_available_outside_production(client: httpx.AsyncClient) -
     assert response.status_code == 200
     paths = response.json()["paths"]
     assert "/v1/conversations/{conversation_id}/messages" in paths
+
+
+def test_error_location_is_a_bare_file_name_for_windows_paths() -> None:
+    code = compile("raise RuntimeError('boom')", r"C:\anand\project\app\boom.py", "exec")
+    try:
+        exec(code)  # noqa: S102 - fixed code object with a Windows-style file name
+    except RuntimeError as exc:
+        assert _innermost_location(exc) == "boom.py:1"

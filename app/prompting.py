@@ -55,9 +55,17 @@ class PromptTemplate:
         return Template(self.template).substitute(values).strip()
 
 
+def _read_text(path: Path) -> str:
+    raw = path.read_bytes()
+    # Windows tools may save with a UTF-8 BOM, or as UTF-16 (PowerShell 5.1 redirection).
+    return raw.decode("utf-16" if raw.startswith((b"\xff\xfe", b"\xfe\xff")) else "utf-8-sig")
+
+
 def load_prompt_file(path: Path) -> PromptTemplate:
-    with path.open("rb") as fh:
-        data = tomllib.load(fh)
+    try:
+        data = tomllib.loads(_read_text(path))
+    except (UnicodeDecodeError, tomllib.TOMLDecodeError) as exc:
+        raise PromptError(f"{path.name}: {exc}") from exc
     try:
         prompt = PromptTemplate(
             id=str(data["id"]),

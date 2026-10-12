@@ -7,6 +7,7 @@ import logging
 import re
 import time
 import uuid
+from pathlib import PureWindowsPath
 
 from starlette.datastructures import MutableHeaders
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
@@ -48,7 +49,8 @@ def _innermost_location(exc: BaseException) -> str | None:
         return None
     while tb.tb_next is not None:
         tb = tb.tb_next
-    return f"{tb.tb_frame.f_code.co_filename.rsplit('/', 1)[-1]}:{tb.tb_lineno}"
+    # PureWindowsPath splits on both separators, so this is a bare file name on any OS.
+    return f"{PureWindowsPath(tb.tb_frame.f_code.co_filename).name}:{tb.tb_lineno}"
 
 
 class TraceMiddleware:

@@ -63,7 +63,13 @@ def doctor(_: argparse.Namespace) -> int:
     ok &= sys.version_info >= (3, 12)
     env_file = ROOT / ".env"
     if env_file.exists():
-        print(f".env        found, encoding {detect_env_file_encoding(env_file)}")
+        encoding = detect_env_file_encoding(env_file)
+        print(f".env        found, encoding {encoding}")
+        if encoding == "utf-16":
+            # The app reads it, but docker compose cannot parse a UTF-16 .env.
+            print("  warning   docker compose cannot read a UTF-16 .env. Convert it to UTF-8 with:")
+            print('            $c = Get-Content .env; [IO.File]::WriteAllLines("$PWD\\.env", $c)')
+            ok = False
     else:
         print(".env        not found (copy .env.example to .env)")
     try:
@@ -117,7 +123,8 @@ def test(args: argparse.Namespace) -> int:
     if not _database_reachable(url):
         print("Database not reachable. Start it with:  docker compose up -d db")
         return 1
-    return _pytest(["-q", *args.pytest_args], {"TEST_DATABASE_URL": url})
+    # RUN_LIVE_LLM_TESTS=0: a $env: value left over in PowerShell must not add live calls.
+    return _pytest(["-q", *args.pytest_args], {"TEST_DATABASE_URL": url, "RUN_LIVE_LLM_TESTS": "0"})
 
 
 def groq_models(_: argparse.Namespace) -> int:

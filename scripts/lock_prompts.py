@@ -28,9 +28,11 @@ def main() -> int:
         elif existing != prompt.checksum:
             print(f"ERROR: {prompt.key} was modified after release; bump its version.")
             return 1
-    (PROMPTS_DIR / LOCK_FILE_NAME).write_text(
-        json.dumps(dict(sorted(lock.items())), indent=2) + "\n", encoding="utf-8"
-    )
+    if added:
+        # newline="\n": keep LF on Windows so git does not see a rewritten file.
+        (PROMPTS_DIR / LOCK_FILE_NAME).write_text(
+            json.dumps(dict(sorted(lock.items())), indent=2) + "\n", encoding="utf-8", newline="\n"
+        )
     print("Locked:", ", ".join(added) if added else "nothing new")
     return 0
 

@@ -3,6 +3,8 @@
 Usage:
     uv run python scripts/chat.py --token <dev token> [--url http://localhost:8000]
 
+Quit with Ctrl-D (Ctrl-Z then Enter on Windows) or Ctrl-C.
+
 Each message is sent with a fresh idempotency key, so a network retry of the
 same message never creates a duplicate turn.
 """
@@ -10,6 +12,7 @@ same message never creates a duplicate turn.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import uuid
 
@@ -30,12 +33,16 @@ def main() -> int:
             created = client.post("/v1/conversations")
             created.raise_for_status()
             conversation_id = created.json()["conversation_id"]
-        print(f"conversation {conversation_id} - Ctrl-D to quit\n")
+        quit_keys = "Ctrl-Z then Enter" if os.name == "nt" else "Ctrl-D"
+        print(f"conversation {conversation_id} - {quit_keys} (or Ctrl-C) to quit\n")
         while True:
             try:
                 text = input("you> ").strip()
-            except EOFError:
+            except (EOFError, KeyboardInterrupt):
                 print()
+                return 0
+            # A stray ^D (Windows) or ^Z line is a quit attempt, not a message.
+            if text in ("\x04", "\x1a"):
                 return 0
             if not text:
                 continue
