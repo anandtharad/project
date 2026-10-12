@@ -1,0 +1,45 @@
+from __future__ import annotations
+
+import pytest
+from pydantic import ValidationError
+
+from app.config import Settings
+from tests.helpers import make_settings
+
+
+def test_defaults_are_valid() -> None:
+    settings = Settings(_env_file=None)
+    assert settings.generation_model == "claude-opus-5-5"
+    assert settings.stale_turn_seconds > settings.turn_deadline_seconds
+
+
+def test_production_refuses_dev_auth() -> None:
+    with pytest.raises(ValidationError, match="production authentication is not implemented"):
+        make_settings(app_env="production", generation_provider="anthropic")
+
+
+def test_stale_turn_must_exceed_deadline() -> None:
+    with pytest.raises(ValidationError, match="STALE_TURN_SECONDS"):
+        make_settings(turn_deadline_seconds=60, stale_turn_seconds=30)
+
+
+def test_request_byte_limit_must_cover_character_limit() -> None:
+    with pytest.raises(ValidationError, match="MAX_REQUEST_BYTES"):
+        make_settings(max_input_characters=20_000, max_request_bytes=2048)
+
+
+def test_dev_token_parsing() -> None:
+    settings = make_settings(dev_auth_tokens=" alice:tok-a , bob:tok-b ,")
+    assert settings.dev_token_map() == {"tok-a": "alice", "tok-b": "bob"}
+    assert make_settings(dev_auth_tokens=None).dev_token_map() == {}
+
+
+def test_malformed_dev_tokens_rejected() -> None:
+    with pytest.raises(ValueError, match="handle:token"):
+        make_settings(dev_auth_tokens="alice").dev_token_map()
+
+
+def test_secrets_are_not_in_repr() -> None:
+    settings = make_settings(generation_api_key="sk-ant-secret-value")
+    assert "sk-ant-secret-value" not in repr(settings)
+    assert "token-alice" not in repr(settings)

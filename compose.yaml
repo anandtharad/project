@@ -1,0 +1,49 @@
+# Local development stack: PostgreSQL (with pgvector, used from Phase 3),
+# a one-shot migration job, and the API.
+name: companion-ai
+
+x-app-env: &app-env
+  DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-companion}:${POSTGRES_PASSWORD:-companion}@db:5432/${POSTGRES_DB:-companion}
+
+services:
+  db:
+    image: pgvector/pgvector:0.8.7-pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-companion}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-companion}
+      POSTGRES_DB: ${POSTGRES_DB:-companion}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    build: .
+    command: ["alembic", "upgrade", "head"]
+    env_file:
+      - path: .env
+        required: false
+    environment: *app-env
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    build: .
+    env_file:
+      - path: .env
+        required: false
+    environment: *app-env
+    ports:
+      - "127.0.0.1:${APP_PORT:-8000}:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  pgdata:
