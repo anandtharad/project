@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Literal
 
 from app.config import Effort, ProviderName, Settings
 
@@ -43,6 +44,21 @@ class ProviderPreset:
     default_effort: Effort | None = None
     # Whether a key is mandatory (local servers such as Ollama need none).
     requires_api_key: bool = True
+    # Defaults for MAX_OUTPUT_TOKENS / MAX_CONTEXT_TOKENS when those are unset.
+    # Output tokens include hidden reasoning tokens on reasoning models.
+    default_max_output_tokens: int = 4096
+    default_max_context_tokens: int = 16_000
+    # --- openai_compatible request shape ---
+    # OpenAI wants the instruction as "developer"; compatible servers use "system".
+    system_role: Literal["system", "developer"] = "system"
+    max_tokens_param: Literal["max_completion_tokens", "max_tokens"] = "max_completion_tokens"
+    # How GENERATION_EFFORT is expressed: "reasoning_effort" (OpenAI-style
+    # field), or "unsupported" (ignored with a startup warning). Native
+    # adapters (anthropic, groq, gemini) map effort themselves: "adapter".
+    effort_param: Literal["adapter", "reasoning_effort", "unsupported"] = "adapter"
+    # OpenAI-only headers (organization, project, OPENAI_CUSTOM_HEADERS) are
+    # stripped for every other endpoint so they never leak to third parties.
+    send_openai_headers: bool = False
 
 
 PRESETS: dict[str, ProviderPreset] = {
@@ -59,24 +75,41 @@ PRESETS: dict[str, ProviderPreset] = {
             default_effort="low",
             # The SDK can also resolve ANTHROPIC_AUTH_TOKEN or a CLI profile.
             requires_api_key=False,
+            # Thinking counts toward output tokens on current Claude models.
+            default_max_output_tokens=16_000,
+            default_max_context_tokens=32_000,
         ),
         ProviderPreset(
             name="openai",
             kind=AdapterKind.OPENAI_COMPATIBLE,
             extra="openai",
-            default_model="gpt-5-mini",
+            default_model="gpt-6-luna",
+            # Explicit, so OPENAI_BASE_URL in the environment cannot redirect it.
             base_url="https://api.openai.com/v1",
             api_key_setting="openai_api_key",
             docs_url="https://platform.openai.com/docs/api-reference/chat",
+            default_effort="low",
+            default_max_output_tokens=8192,
+            system_role="developer",
+            effort_param="reasoning_effort",
+            send_openai_headers=True,
         ),
         ProviderPreset(
             name="groq",
             kind=AdapterKind.GROQ,
             extra="groq",
-            default_model="llama-3.3-70b-versatile",
+            # Production model; Groq's named replacement for the retired Llama,
+            # Qwen3-32B and Kimi models. Alternatives on the free tier:
+            # openai/gpt-oss-20b (faster) and qwen/qwen3.8-27b (preview).
+            default_model="openai/gpt-oss-120b",
             base_url=None,
             api_key_setting="groq_api_key",
             docs_url="https://console.groq.com/docs/models",
+            default_effort="low",
+            # Sized for the free tier (about 8K tokens/minute per model):
+            # a turn must fit comfortably inside one minute's budget.
+            default_max_output_tokens=2048,
+            default_max_context_tokens=4000,
         ),
         ProviderPreset(
             name="gemini",
@@ -95,6 +128,7 @@ PRESETS: dict[str, ProviderPreset] = {
             base_url="https://api.x.ai/v1",
             api_key_setting="xai_api_key",
             docs_url="https://docs.x.ai/docs/guides/chat",
+            effort_param="unsupported",
         ),
         ProviderPreset(
             name="qwen",
@@ -104,6 +138,7 @@ PRESETS: dict[str, ProviderPreset] = {
             base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
             api_key_setting="dashscope_api_key",
             docs_url="https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope",
+            effort_param="unsupported",
         ),
         ProviderPreset(
             name="deepseek",
@@ -113,6 +148,7 @@ PRESETS: dict[str, ProviderPreset] = {
             base_url="https://api.deepseek.com",
             api_key_setting="deepseek_api_key",
             docs_url="https://api-docs.deepseek.com/",
+            effort_param="unsupported",
         ),
         ProviderPreset(
             name="openrouter",
@@ -122,6 +158,7 @@ PRESETS: dict[str, ProviderPreset] = {
             base_url="https://openrouter.ai/api/v1",
             api_key_setting="openrouter_api_key",
             docs_url="https://openrouter.ai/docs/quickstart",
+            effort_param="unsupported",
         ),
         ProviderPreset(
             name="together",
@@ -131,6 +168,7 @@ PRESETS: dict[str, ProviderPreset] = {
             base_url="https://api.together.xyz/v1",
             api_key_setting="together_api_key",
             docs_url="https://docs.together.ai/docs/openai-api-compatibility",
+            effort_param="unsupported",
         ),
         ProviderPreset(
             name="ollama",
@@ -141,6 +179,7 @@ PRESETS: dict[str, ProviderPreset] = {
             api_key_setting=None,
             docs_url="https://docs.ollama.com/api/openai-compatibility",
             requires_api_key=False,
+            effort_param="unsupported",
         ),
         ProviderPreset(
             name="openai_compatible",
@@ -151,6 +190,7 @@ PRESETS: dict[str, ProviderPreset] = {
             api_key_setting=None,
             docs_url="https://platform.openai.com/docs/api-reference/chat",
             requires_api_key=False,
+            effort_param="unsupported",
         ),
         ProviderPreset(
             name="fake",
@@ -175,8 +215,11 @@ class ResolvedProvider:
     preset: ProviderPreset
     model: str
     base_url: str | None
+    max_output_tokens: int
+    max_context_tokens: int
     api_key: str | None = None
     effort: Effort | None = None
+    warnings: tuple[str, ...] = ()
 
     def __repr__(self) -> str:  # never expose the key
         return (
@@ -203,10 +246,18 @@ def resolve_provider(settings: Settings) -> ResolvedProvider:
         raise ProviderConfigError(
             f"Provider {preset.name!r} needs an API key: set {key_var} or GENERATION_API_KEY"
         )
+    effort = settings.generation_effort or preset.default_effort
+    warnings: list[str] = []
+    if effort is not None and preset.effort_param == "unsupported":
+        warnings.append(f"GENERATION_EFFORT is not supported for provider {preset.name!r}; ignored")
+        effort = None
     return ResolvedProvider(
         preset=preset,
         model=model,
         base_url=settings.generation_base_url or preset.base_url,
+        max_output_tokens=settings.max_output_tokens or preset.default_max_output_tokens,
+        max_context_tokens=settings.max_context_tokens or preset.default_max_context_tokens,
         api_key=api_key,
-        effort=settings.generation_effort or preset.default_effort,
+        effort=effort,
+        warnings=tuple(warnings),
     )

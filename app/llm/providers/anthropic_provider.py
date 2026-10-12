@@ -79,8 +79,11 @@ class AnthropicLLMClient:
             {"role": "user" if m.role is ChatRole.USER else "assistant", "content": m.content}
             for m in request.messages
         ]
+        effort = request.params.effort
+        # Current Claude models always think adaptively; "none" maps to the
+        # lowest effort level they accept.
         output_config: BetaOutputConfigParam | None = (
-            {"effort": request.params.effort} if request.params.effort else None
+            {"effort": "low" if effort == "none" else effort} if effort else None
         )
         use_fallback = self._refusal_fallback == "default"
         started = time.perf_counter()

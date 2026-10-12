@@ -66,6 +66,7 @@ class TurnOrchestrator:
         settings: Settings,
         model: str,
         effort: Effort | None,
+        max_output_tokens: int,
         store: TurnStore,
         llm: LLMClient,
         prompt: PromptTemplate,
@@ -75,6 +76,7 @@ class TurnOrchestrator:
         self._settings = settings
         self._model = model
         self._effort = effort
+        self._max_output_tokens = max_output_tokens
         self._store = store
         self._llm = llm
         self._prompt = prompt
@@ -113,7 +115,7 @@ class TurnOrchestrator:
             model=self._model,
             system=context.system,
             messages=context.messages,
-            max_output_tokens=self._settings.max_output_tokens,
+            max_output_tokens=self._max_output_tokens,
             timeout_seconds=self._settings.generation_timeout_seconds,
             params=GenerationParams(
                 effort=self._effort,

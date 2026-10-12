@@ -11,7 +11,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-Effort = Literal["low", "medium", "high", "xhigh", "max"]
+Effort = Literal["none", "low", "medium", "high", "xhigh", "max"]
 
 
 class ChatRole(StrEnum):

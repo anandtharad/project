@@ -66,6 +66,7 @@ def create_app(settings: Settings | None = None, *, llm_client: LLMClient | None
             settings=settings,
             model=resolved.model,
             effort=resolved.effort,
+            max_output_tokens=resolved.max_output_tokens,
             store=TurnStore(
                 session_factory,
                 stale_turn_seconds=settings.stale_turn_seconds,
@@ -74,7 +75,7 @@ def create_app(settings: Settings | None = None, *, llm_client: LLMClient | None
             llm=llm,
             prompt=prompt,
             context_builder=ContextBuilder(
-                max_context_tokens=settings.max_context_tokens,
+                max_context_tokens=resolved.max_context_tokens,
                 max_history_messages=settings.history_max_messages,
             ),
             validator=ResponseValidator(max_characters=settings.max_response_characters),
@@ -88,6 +89,8 @@ def create_app(settings: Settings | None = None, *, llm_client: LLMClient | None
             prompt=prompt.key,
             migration_head=head,
         )
+        for warning in resolved.warnings:
+            log_event(logger, "config.warning", level=logging.WARNING, detail=warning)
         try:
             yield
         finally:

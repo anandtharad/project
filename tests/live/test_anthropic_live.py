@@ -40,7 +40,7 @@ def live_request(
         model=resolved.model,
         system=PromptRegistry().get("companion_system", settings.companion_prompt_version).render(),
         messages=messages,
-        max_output_tokens=settings.max_output_tokens,
+        max_output_tokens=resolved.max_output_tokens,
         timeout_seconds=settings.generation_timeout_seconds,
         params=GenerationParams(
             effort=resolved.effort, temperature=settings.generation_temperature

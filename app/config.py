@@ -14,7 +14,7 @@ from typing import Literal
 from pydantic import AliasChoices, Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-Effort = Literal["low", "medium", "high", "xhigh", "max"]
+Effort = Literal["none", "low", "medium", "high", "xhigh", "max"]
 
 ProviderName = Literal[
     "anthropic",
@@ -84,7 +84,8 @@ class Settings(BaseSettings):
     # Anthropic only. "default": server-side refusal fallback chosen by the
     # provider per refusal category.
     generation_refusal_fallback: Literal["default", "off"] = "default"
-    max_output_tokens: int = Field(default=16_000, ge=256, le=128_000)
+    # Unset = the provider preset's default (sized per provider/tier).
+    max_output_tokens: int | None = Field(default=None, ge=256, le=128_000)
 
     # --- Provider API keys (read from the environment or .env) ----------------
     # Only the selected provider's key is used. The Anthropic SDK can also
@@ -108,7 +109,8 @@ class Settings(BaseSettings):
     stale_turn_seconds: float = Field(default=150.0, gt=0)
     max_input_characters: int = Field(default=8_000, ge=1, le=100_000)
     max_request_bytes: int = Field(default=64 * 1024, ge=1024)
-    max_context_tokens: int = Field(default=32_000, ge=1_000)
+    # Unset = the provider preset's default.
+    max_context_tokens: int | None = Field(default=None, ge=1_000)
     history_max_messages: int = Field(default=50, ge=1)
     max_response_characters: int = Field(default=8_000, ge=100)
 

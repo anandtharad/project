@@ -35,6 +35,32 @@ def build_llm_client(settings: Settings, resolved: ResolvedProvider) -> LLMClien
             max_retries=settings.generation_max_retries,
             refusal_fallback=settings.generation_refusal_fallback,
         )
+    if kind is AdapterKind.GROQ:
+        try:
+            from app.llm.providers.groq_provider import GroqLLMClient
+        except ImportError as exc:
+            raise _missing_sdk(resolved, exc) from exc
+        return GroqLLMClient(
+            api_key=resolved.api_key,
+            base_url=resolved.base_url,
+            max_retries=settings.generation_max_retries,
+        )
+    if kind is AdapterKind.OPENAI_COMPATIBLE:
+        try:
+            from app.llm.providers.openai_provider import OpenAICompatibleLLMClient
+        except ImportError as exc:
+            raise _missing_sdk(resolved, exc) from exc
+        preset = resolved.preset
+        return OpenAICompatibleLLMClient(
+            provider=preset.name,
+            api_key=resolved.api_key,
+            base_url=resolved.base_url,
+            max_retries=settings.generation_max_retries,
+            system_role=preset.system_role,
+            max_tokens_param=preset.max_tokens_param,
+            send_reasoning_effort=preset.effort_param == "reasoning_effort",
+            send_openai_headers=preset.send_openai_headers,
+        )
     raise ProviderConfigError(
         f"Provider {resolved.preset.name!r} ({kind.value} adapter) is not available yet"
     )

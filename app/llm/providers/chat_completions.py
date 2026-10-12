@@ -44,13 +44,18 @@ class ChatCompletionLike(Protocol):
     def usage(self) -> Any: ...
 
 
-def build_messages(system: str, messages: list[ChatMessage]) -> list[dict[str, str]]:
-    """System instruction first, then the conversation in order."""
+def build_messages(
+    system: str,
+    messages: list[ChatMessage],
+    *,
+    system_role: Literal["system", "developer"] = "system",
+) -> list[dict[str, str]]:
+    """Privileged instruction first, then the conversation in order."""
     roles: dict[ChatRole, Literal["user", "assistant"]] = {
         ChatRole.USER: "user",
         ChatRole.ASSISTANT: "assistant",
     }
-    return [{"role": "system", "content": system}] + [
+    return [{"role": system_role, "content": system}] + [
         {"role": roles[m.role], "content": m.content} for m in messages
     ]
 
@@ -61,6 +66,7 @@ def normalize_chat_completion(
     provider: str,
     requested_model: str,
     latency_ms: float,
+    request_id: str | None = None,
 ) -> GenerationResponse:
     if not response.choices:
         raise LLMError(LLMErrorCategory.RESPONSE_INVALID, "Provider returned no choices.")
@@ -90,7 +96,7 @@ def normalize_chat_completion(
                 getattr(usage, "prompt_tokens_details", None), "cached_tokens", None
             ),
         ),
-        provider_request_id=getattr(response, "_request_id", None) or response.id,
+        provider_request_id=request_id or getattr(response, "_request_id", None) or response.id,
         latency_ms=latency_ms,
         reasoning_removed=reasoning_removed,
     )
@@ -153,7 +159,8 @@ def classify_sdk_error(exc: Exception, sdk: ModuleType) -> LLMError:
         )
     if status in (408, 504):
         return error(LLMErrorCategory.TIMEOUT, "Provider request timed out.")
-    if status in (503, 529):
+    # 498: Groq flex-tier capacity exceeded (custom status, not retried by the SDK).
+    if status in (498, 503, 529):
         return error(
             LLMErrorCategory.OVERLOADED,
             "Provider is temporarily unavailable.",

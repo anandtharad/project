@@ -100,7 +100,7 @@ async def test_generation_request_uses_configured_settings(
     await send(client, cid, "hi")
     request = llm.requests[-1]
     assert request.model == resolved.model == "fake-stub"
-    assert request.max_output_tokens == settings.max_output_tokens
+    assert request.max_output_tokens == resolved.max_output_tokens
     assert request.timeout_seconds == settings.generation_timeout_seconds
     assert request.params.effort == resolved.effort
     assert request.trace.conversation_id == cid
