@@ -29,7 +29,17 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 # Environment variables that Settings or the provider SDKs read implicitly.
 # Tests must not depend on the developer's shell, so these are cleared
 # (live tests opt out: they need the real provider key).
-_ISOLATED_ENV_PREFIXES = ("GENERATION_", "OPENAI_", "ANTHROPIC_", "GROQ_", "GOOGLE_GENAI_")
+_ISOLATED_ENV_PREFIXES = (
+    "GENERATION_",
+    "OPENAI_",
+    "ANTHROPIC_",
+    "GROQ_",
+    "GOOGLE_GENAI_",
+    "DECISION_",
+    "JEV_",
+    "LAYA_",
+    "TYPESAFE_",
+)
 _ISOLATED_ENV_NAMES = {
     "MAX_OUTPUT_TOKENS",
     "MAX_CONTEXT_TOKENS",

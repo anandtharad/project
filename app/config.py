@@ -127,6 +127,28 @@ class Settings(BaseSettings):
     together_api_key: SecretStr | None = None
     mistral_api_key: SecretStr | None = None
 
+    # --- Decisions (spec §7) -------------------------------------------------
+    # "jev": TypeSafe's hosted API. "laya": a self-hosted Laya server
+    # (laya-serve) speaking the same protocol. "off": documented fallbacks only.
+    decision_provider: Literal["off", "jev", "laya"] = "off"
+    jev_api_key: SecretStr | None = Field(
+        default=None, validation_alias=AliasChoices("jev_api_key", "typesafe_api_key")
+    )
+    jev_base_url: str = "https://api.typesafe.ai"
+    # A pinned version, not an alias, so evaluations stay reproducible.
+    jev_model: str = "jev-1.13.0"
+    laya_base_url: str = "http://localhost:8100"
+    laya_api_key: SecretStr | None = None
+    # A laya-serve checkpoint name; "english" suits this English-first app.
+    laya_model: str = "english"
+    decision_timeout_seconds: float = Field(
+        default=3.0,
+        gt=0,
+        le=30,
+        validation_alias=AliasChoices("decision_timeout_seconds", "jev_timeout_seconds"),
+    )
+    decision_max_retries: int = Field(default=1, ge=0, le=3)
+
     # --- Turn limits --------------------------------------------------------
     turn_deadline_seconds: float = Field(default=90.0, gt=0)
     # A pending turn older than this is considered abandoned (process crash,
@@ -166,6 +188,13 @@ class Settings(BaseSettings):
             raise ValueError(
                 "GENERATION_PROVIDER=openai_compatible requires GENERATION_BASE_URL "
                 "and GENERATION_MODEL"
+            )
+        if self.decision_provider == "jev" and self.jev_api_key is None:
+            raise ValueError("DECISION_PROVIDER=jev requires JEV_API_KEY (or TYPESAFE_API_KEY)")
+        if self.decision_provider == "laya" and self.laya_api_key is None:
+            # laya-serve accepts any caller when it has no key, so require one.
+            raise ValueError(
+                "DECISION_PROVIDER=laya requires LAYA_API_KEY (set the same on laya-serve)"
             )
         if self.app_env is AppEnv.PRODUCTION:
             if self.auth_mode == "dev":

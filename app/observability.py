@@ -56,6 +56,7 @@ def configure_logging(level: str) -> None:
         "groq",
         "google_genai",
         "google.genai",
+        "typesafe_sdk",
     ):
         logging.getLogger(noisy).setLevel(max(logging.WARNING, root.level))
 

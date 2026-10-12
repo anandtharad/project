@@ -8,3 +8,6 @@ __pycache__/
 .env.*
 !.env.example
 *.log
+
+# Agent worktrees (local only)
+.claude/worktrees/
