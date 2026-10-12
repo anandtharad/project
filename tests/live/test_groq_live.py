@@ -1,7 +1,7 @@
 """Live Groq tests - real API calls against the free tier. Opt-in only.
 
-Run with:
-    RUN_LIVE_LLM_TESTS=1 GROQ_API_KEY=... uv run pytest tests/live/test_groq_live.py -v
+Run with (any OS; reads GROQ_API_KEY from .env or the environment):
+    uv run python scripts/dev.py live-groq
 
 Two calls per model (default 3 models = 6 calls), far below free-tier
 limits. Override the models with LIVE_GROQ_MODELS="model-a,model-b".

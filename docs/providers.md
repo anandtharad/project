@@ -122,8 +122,12 @@ docs pages were only reachable through search summaries from this
 environment; the contract notes record which facts that affects.
 
 **No live call has been made to any provider from this environment.** The
-egress policy blocks provider APIs. A gated live suite exists for Groq:
+egress policy blocks provider APIs. A gated live suite exists for Groq. It
+runs the same way on Windows, macOS and Linux and reads `GROQ_API_KEY` from
+`.env` or the environment:
 
 ```bash
-RUN_LIVE_LLM_TESTS=1 GROQ_API_KEY=... uv run pytest tests/live/test_groq_live.py -v
+uv run python scripts/dev.py live-groq
 ```
+
+Plain `pytest` skips it (opt-in). The command above sets the opt-in.

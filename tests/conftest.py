@@ -22,7 +22,7 @@ from fastapi import FastAPI
 from sqlalchemy import make_url, text
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
-from tests.helpers import ScriptedLLMClient, make_settings, running_app
+from tests.helpers import ScriptedLLMClient, make_settings, running_app, suite_of
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
@@ -133,8 +133,8 @@ def client(app_and_client: tuple[FastAPI, httpx.AsyncClient]) -> httpx.AsyncClie
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
     for item in items:
-        path = str(item.path)
-        if "/tests/integration/" in path or "/tests/security/" in path:
+        suite = suite_of(item.path)
+        if suite in ("integration", "security"):
             item.add_marker(pytest.mark.integration)
-        if "/tests/live/" in path:
+        if suite == "live":
             item.add_marker(pytest.mark.live)

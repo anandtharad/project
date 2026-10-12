@@ -6,6 +6,7 @@ import asyncio
 from collections import deque
 from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
+from pathlib import PurePath
 from typing import Any
 
 import httpx
@@ -24,6 +25,11 @@ from app.main import create_app
 ALICE = {"Authorization": "Bearer token-alice"}
 BOB = {"Authorization": "Bearer token-bob"}
 UNREACHABLE_DB = "postgresql+asyncpg://nobody:nothing@127.0.0.1:1/none"
+
+
+def suite_of(path: PurePath) -> str | None:
+    """The tests/<suite>/ directory a test file is in, on any OS."""
+    return path.parent.name if path.parent.parent.name == "tests" else None
 
 
 def make_settings(**overrides: Any) -> Settings:

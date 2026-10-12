@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from pathlib import Path
+from pathlib import Path, PurePath, PurePosixPath, PureWindowsPath
 
 import pytest
 from pydantic import ValidationError
 
 from app.config import Settings, detect_env_file_encoding
-from tests.helpers import make_settings
+from tests.helpers import make_settings, suite_of
 
 
 def test_defaults_are_valid() -> None:
@@ -73,3 +73,16 @@ def test_env_file_written_by_windows_tools_is_read(
 def test_missing_env_file_is_fine(tmp_path: Path) -> None:
     assert detect_env_file_encoding(tmp_path / "absent.env") is None
     assert detect_env_file_encoding(None) is None
+
+
+@pytest.mark.parametrize(
+    ("path", "suite"),
+    [
+        (PureWindowsPath(r"C:\anand\project\tests\live\test_groq_live.py"), "live"),
+        (PureWindowsPath(r"C:\anand\project\tests\integration\test_turns.py"), "integration"),
+        (PurePosixPath("/home/me/project/tests/security/test_input.py"), "security"),
+        (PurePosixPath("/home/me/project/tests/conftest.py"), None),
+    ],
+)
+def test_suite_markers_work_with_windows_and_posix_paths(path: PurePath, suite: str | None) -> None:
+    assert suite_of(path) == suite
