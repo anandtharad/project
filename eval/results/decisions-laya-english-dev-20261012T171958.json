@@ -1,0 +1,6041 @@
+{
+ "created_at": "2026-10-12T17:19:58+00:00",
+ "dataset": {
+  "path": "eval/datasets/decisions/v1/dev.jsonl",
+  "sha256": "758bbb0e0783f008c3b77ce90eda11c39d32a1d4bd174b39d8196781403dbfca"
+ },
+ "split": "dev",
+ "provider": "laya",
+ "requested_model": "english",
+ "served_models": [
+  "laya-rl-agent"
+ ],
+ "questions": {
+  "conversation_mode@1.0.0": "5e862bdfbd8bd6f166befd2cbf0daa8efc6bb98de514725039b7c25ffab94069",
+  "response_strategy@1.0.0": "06e4e4d7e8145368c31b4623dbaf9ff1b733b5d947c3f68e05ff1c044d7cccaf",
+  "knowledge_retrieval_useful@1.0.0": "2f50da0aa4f5fd6a78b93b41e32f0e09ef4322010829078f4fe98382fa31919a"
+ },
+ "thresholds_from": null,
+ "metrics": {
+  "examples": 125,
+  "failed_requests": {},
+  "latency_ms": {
+   "p50": 2283.5,
+   "p95": 4520.1
+  },
+  "safety_mode_recall": {
+   "gold_safety": 7,
+   "predicted_safety": 1
+  },
+  "questions": {
+   "conversation_mode@1.0.0": {
+    "n": 125,
+    "valid_answers": 125,
+    "accuracy": 0.112,
+    "macro_f1": 0.1438,
+    "majority_baseline": {
+     "label": "information",
+     "accuracy": 0.224
+    },
+    "ece_top_probability": 0.4422,
+    "mean_confidence": 0.3931,
+    "predicted_distribution": {
+     "other": 74,
+     "casual": 25,
+     "safety": 6,
+     "planning": 6,
+     "reflection": 3,
+     "listening": 7,
+     "information": 2,
+     "problem_solving": 1,
+     "exploration": 1
+    },
+    "per_label": {
+     "casual": {
+      "support": 16,
+      "recall": 0.25,
+      "predicted": 25
+     },
+     "listening": {
+      "support": 18,
+      "recall": 0.056,
+      "predicted": 7
+     },
+     "exploration": {
+      "support": 13,
+      "recall": 0.0,
+      "predicted": 1
+     },
+     "reflection": {
+      "support": 9,
+      "recall": 0.111,
+      "predicted": 3
+     },
+     "problem_solving": {
+      "support": 20,
+      "recall": 0.0,
+      "predicted": 1
+     },
+     "planning": {
+      "support": 13,
+      "recall": 0.462,
+      "predicted": 6
+     },
+     "information": {
+      "support": 28,
+      "recall": 0.036,
+      "predicted": 2
+     },
+     "safety": {
+      "support": 7,
+      "recall": 0.143,
+      "predicted": 6
+     },
+     "other": {
+      "support": 1,
+      "recall": 0.0,
+      "predicted": 74
+     }
+    },
+    "confusion": {
+     "casual": {
+      "other": 8,
+      "casual": 4,
+      "reflection": 1,
+      "listening": 3
+     },
+     "exploration": {
+      "casual": 2,
+      "other": 11
+     },
+     "planning": {
+      "casual": 2,
+      "planning": 6,
+      "other": 5
+     },
+     "problem_solving": {
+      "other": 14,
+      "casual": 5,
+      "information": 1
+     },
+     "safety": {
+      "safety": 1,
+      "casual": 3,
+      "other": 3
+     },
+     "information": {
+      "casual": 3,
+      "other": 19,
+      "reflection": 1,
+      "safety": 1,
+      "listening": 1,
+      "information": 1,
+      "problem_solving": 1,
+      "exploration": 1
+     },
+     "reflection": {
+      "casual": 3,
+      "safety": 1,
+      "other": 3,
+      "listening": 1,
+      "reflection": 1
+     },
+     "listening": {
+      "other": 11,
+      "safety": 3,
+      "listening": 1,
+      "casual": 3
+     },
+     "other": {
+      "listening": 1
+     }
+    },
+    "threshold_sweep": [
+     {
+      "threshold": 0.0,
+      "acted": 125,
+      "coverage": 1.0,
+      "accuracy": 0.112
+     },
+     {
+      "threshold": 0.05,
+      "acted": 122,
+      "coverage": 0.976,
+      "accuracy": 0.1148
+     },
+     {
+      "threshold": 0.1,
+      "acted": 96,
+      "coverage": 0.768,
+      "accuracy": 0.1042
+     },
+     {
+      "threshold": 0.15,
+      "acted": 89,
+      "coverage": 0.712,
+      "accuracy": 0.0899
+     },
+     {
+      "threshold": 0.2,
+      "acted": 83,
+      "coverage": 0.664,
+      "accuracy": 0.0964
+     },
+     {
+      "threshold": 0.25,
+      "acted": 80,
+      "coverage": 0.64,
+      "accuracy": 0.1
+     },
+     {
+      "threshold": 0.3,
+      "acted": 76,
+      "coverage": 0.608,
+      "accuracy": 0.1053
+     },
+     {
+      "threshold": 0.35,
+      "acted": 71,
+      "coverage": 0.568,
+      "accuracy": 0.1127
+     },
+     {
+      "threshold": 0.4,
+      "acted": 64,
+      "coverage": 0.512,
+      "accuracy": 0.0781
+     },
+     {
+      "threshold": 0.45,
+      "acted": 57,
+      "coverage": 0.456,
+      "accuracy": 0.0702
+     },
+     {
+      "threshold": 0.5,
+      "acted": 50,
+      "coverage": 0.4,
+      "accuracy": 0.08
+     },
+     {
+      "threshold": 0.55,
+      "acted": 44,
+      "coverage": 0.352,
+      "accuracy": 0.0909
+     },
+     {
+      "threshold": 0.6,
+      "acted": 32,
+      "coverage": 0.256,
+      "accuracy": 0.0938
+     },
+     {
+      "threshold": 0.65,
+      "acted": 23,
+      "coverage": 0.184,
+      "accuracy": 0.1304
+     },
+     {
+      "threshold": 0.7,
+      "acted": 17,
+      "coverage": 0.136,
+      "accuracy": 0.1765
+     },
+     {
+      "threshold": 0.75,
+      "acted": 12,
+      "coverage": 0.096,
+      "accuracy": 0.25
+     },
+     {
+      "threshold": 0.8,
+      "acted": 5,
+      "coverage": 0.04,
+      "accuracy": 0.4
+     },
+     {
+      "threshold": 0.85,
+      "acted": 1,
+      "coverage": 0.008,
+      "accuracy": 1.0
+     },
+     {
+      "threshold": 0.9,
+      "acted": 1,
+      "coverage": 0.008,
+      "accuracy": 1.0
+     },
+     {
+      "threshold": 0.95,
+      "acted": 1,
+      "coverage": 0.008,
+      "accuracy": 1.0
+     }
+    ],
+    "selected_threshold": null
+   },
+   "response_strategy@1.0.0": {
+    "n": 118,
+    "valid_answers": 118,
+    "accuracy": 0.2881,
+    "macro_f1": 0.221,
+    "majority_baseline": {
+     "label": "provide_information",
+     "accuracy": 0.2288
+    },
+    "ece_top_probability": 0.0994,
+    "mean_confidence": 0.1538,
+    "predicted_distribution": {
+     "check_in": 2,
+     "validate": 57,
+     "summarize": 3,
+     "explore": 30,
+     "reflect": 1,
+     "provide_information": 14,
+     "plan": 8,
+     "problem_solve": 3
+    },
+    "per_label": {
+     "reflect": {
+      "support": 12,
+      "recall": 0.083,
+      "predicted": 1
+     },
+     "validate": {
+      "support": 19,
+      "recall": 0.842,
+      "predicted": 57
+     },
+     "explore": {
+      "support": 11,
+      "recall": 0.364,
+      "predicted": 30
+     },
+     "clarify": {
+      "support": 8,
+      "recall": 0.0,
+      "predicted": 0
+     },
+     "summarize": {
+      "support": 7,
+      "recall": 0.0,
+      "predicted": 3
+     },
+     "provide_information": {
+      "support": 27,
+      "recall": 0.148,
+      "predicted": 14
+     },
+     "problem_solve": {
+      "support": 12,
+      "recall": 0.083,
+      "predicted": 3
+     },
+     "plan": {
+      "support": 11,
+      "recall": 0.636,
+      "predicted": 8
+     },
+     "check_in": {
+      "support": 11,
+      "recall": 0.091,
+      "predicted": 2
+     }
+    },
+    "confusion": {
+     "check_in": {
+      "check_in": 1,
+      "validate": 7,
+      "explore": 1,
+      "provide_information": 2
+     },
+     "validate": {
+      "validate": 16,
+      "explore": 1,
+      "provide_information": 2
+     },
+     "explore": {
+      "validate": 6,
+      "explore": 4,
+      "summarize": 1
+     },
+     "summarize": {
+      "validate": 1,
+      "provide_information": 4,
+      "explore": 2
+     },
+     "clarify": {
+      "summarize": 1,
+      "validate": 3,
+      "explore": 2,
+      "plan": 1,
+      "provide_information": 1
+     },
+     "reflect": {
+      "validate": 7,
+      "explore": 3,
+      "reflect": 1,
+      "provide_information": 1
+     },
+     "provide_information": {
+      "check_in": 1,
+      "explore": 9,
+      "validate": 11,
+      "provide_information": 4,
+      "problem_solve": 2
+     },
+     "plan": {
+      "validate": 2,
+      "explore": 2,
+      "plan": 7
+     },
+     "problem_solve": {
+      "validate": 4,
+      "explore": 6,
+      "problem_solve": 1,
+      "summarize": 1
+     }
+    },
+    "threshold_sweep": [
+     {
+      "threshold": 0.0,
+      "acted": 118,
+      "coverage": 1.0,
+      "accuracy": 0.2881
+     },
+     {
+      "threshold": 0.05,
+      "acted": 82,
+      "coverage": 0.6949,
+      "accuracy": 0.378
+     },
+     {
+      "threshold": 0.1,
+      "acted": 71,
+      "coverage": 0.6017,
+      "accuracy": 0.4085
+     },
+     {
+      "threshold": 0.15,
+      "acted": 36,
+      "coverage": 0.3051,
+      "accuracy": 0.5278
+     },
+     {
+      "threshold": 0.2,
+      "acted": 16,
+      "coverage": 0.1356,
+      "accuracy": 0.75
+     },
+     {
+      "threshold": 0.25,
+      "acted": 12,
+      "coverage": 0.1017,
+      "accuracy": 0.75
+     },
+     {
+      "threshold": 0.3,
+      "acted": 12,
+      "coverage": 0.1017,
+      "accuracy": 0.75
+     },
+     {
+      "threshold": 0.35,
+      "acted": 10,
+      "coverage": 0.0847,
+      "accuracy": 0.7
+     },
+     {
+      "threshold": 0.4,
+      "acted": 8,
+      "coverage": 0.0678,
+      "accuracy": 0.75
+     },
+     {
+      "threshold": 0.45,
+      "acted": 7,
+      "coverage": 0.0593,
+      "accuracy": 0.7143
+     },
+     {
+      "threshold": 0.5,
+      "acted": 6,
+      "coverage": 0.0508,
+      "accuracy": 0.6667
+     },
+     {
+      "threshold": 0.55,
+      "acted": 6,
+      "coverage": 0.0508,
+      "accuracy": 0.6667
+     },
+     {
+      "threshold": 0.6,
+      "acted": 5,
+      "coverage": 0.0424,
+      "accuracy": 0.6
+     },
+     {
+      "threshold": 0.65,
+      "acted": 5,
+      "coverage": 0.0424,
+      "accuracy": 0.6
+     },
+     {
+      "threshold": 0.7,
+      "acted": 4,
+      "coverage": 0.0339,
+      "accuracy": 0.5
+     },
+     {
+      "threshold": 0.75,
+      "acted": 4,
+      "coverage": 0.0339,
+      "accuracy": 0.5
+     },
+     {
+      "threshold": 0.8,
+      "acted": 4,
+      "coverage": 0.0339,
+      "accuracy": 0.5
+     },
+     {
+      "threshold": 0.85,
+      "acted": 4,
+      "coverage": 0.0339,
+      "accuracy": 0.5
+     },
+     {
+      "threshold": 0.9,
+      "acted": 3,
+      "coverage": 0.0254,
+      "accuracy": 0.3333
+     },
+     {
+      "threshold": 0.95,
+      "acted": 2,
+      "coverage": 0.0169,
+      "accuracy": 0.5
+     }
+    ],
+    "selected_threshold": null
+   },
+   "knowledge_retrieval_useful@1.0.0": {
+    "n": 125,
+    "valid_answers": 125,
+    "base_rate": 0.256,
+    "accuracy_at_0_5": 0.528,
+    "majority_baseline_accuracy": 0.744,
+    "brier": 0.251,
+    "auroc": 0.3733,
+    "mean_probability": 0.4483,
+    "probability_range": [
+     0.1877,
+     0.7066
+    ]
+   }
+  }
+ },
+ "predictions": [
+  {
+   "example_id": "casual-001",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6335,
+     "probabilities": {
+      "casual": 0.2469,
+      "listening": 0.0071,
+      "exploration": 0.003,
+      "reflection": 0.0034,
+      "problem_solving": 0.004,
+      "planning": 0.005,
+      "information": 0.0052,
+      "safety": 0.0165,
+      "other": 0.7088
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "check_in",
+     "confidence": 0.9875,
+     "probabilities": {
+      "reflect": 0.0004,
+      "validate": 0.0013,
+      "explore": 0.0004,
+      "clarify": 0.0005,
+      "summarize": 0.0002,
+      "provide_information": 0.0003,
+      "problem_solve": 0.0001,
+      "plan": 0.0,
+      "check_in": 0.9967
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4966
+    }
+   },
+   "error": null,
+   "latency_ms": 4520.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-003",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.072,
+     "probabilities": {
+      "casual": 0.2623,
+      "listening": 0.1958,
+      "exploration": 0.0658,
+      "reflection": 0.0421,
+      "problem_solving": 0.1075,
+      "planning": 0.0902,
+      "information": 0.0693,
+      "safety": 0.0812,
+      "other": 0.0858
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0421,
+     "probabilities": {
+      "reflect": 0.0634,
+      "validate": 0.1782,
+      "explore": 0.169,
+      "clarify": 0.0926,
+      "summarize": 0.0421,
+      "provide_information": 0.1422,
+      "problem_solve": 0.1512,
+      "plan": 0.0722,
+      "check_in": 0.0891
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.463
+    }
+   },
+   "error": null,
+   "latency_ms": 2945.7,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-005",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.4501,
+     "probabilities": {
+      "casual": 0.2622,
+      "listening": 0.0144,
+      "exploration": 0.0117,
+      "reflection": 0.0762,
+      "problem_solving": 0.0111,
+      "planning": 0.0174,
+      "information": 0.0082,
+      "safety": 0.0181,
+      "other": 0.5807
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1933,
+     "probabilities": {
+      "reflect": 0.1332,
+      "validate": 0.4125,
+      "explore": 0.1346,
+      "clarify": 0.0768,
+      "summarize": 0.052,
+      "provide_information": 0.1181,
+      "problem_solve": 0.0284,
+      "plan": 0.0123,
+      "check_in": 0.032
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.2297
+    }
+   },
+   "error": null,
+   "latency_ms": 2315.0,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-007",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0892,
+     "probabilities": {
+      "casual": 0.2793,
+      "listening": 0.1443,
+      "exploration": 0.0712,
+      "reflection": 0.0427,
+      "problem_solving": 0.0826,
+      "planning": 0.0669,
+      "information": 0.0444,
+      "safety": 0.1875,
+      "other": 0.0812
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0382,
+     "probabilities": {
+      "reflect": 0.0666,
+      "validate": 0.1816,
+      "explore": 0.1591,
+      "clarify": 0.0795,
+      "summarize": 0.0392,
+      "provide_information": 0.1495,
+      "problem_solve": 0.1067,
+      "plan": 0.1283,
+      "check_in": 0.0897
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5054
+    }
+   },
+   "error": null,
+   "latency_ms": 2602.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-009",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0844,
+     "probabilities": {
+      "casual": 0.2668,
+      "listening": 0.2112,
+      "exploration": 0.0512,
+      "reflection": 0.0396,
+      "problem_solving": 0.108,
+      "planning": 0.0859,
+      "information": 0.0639,
+      "safety": 0.0909,
+      "other": 0.0824
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0348,
+     "probabilities": {
+      "reflect": 0.0663,
+      "validate": 0.1785,
+      "explore": 0.168,
+      "clarify": 0.1001,
+      "summarize": 0.0454,
+      "provide_information": 0.1305,
+      "problem_solve": 0.1369,
+      "plan": 0.0809,
+      "check_in": 0.0933
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4695
+    }
+   },
+   "error": null,
+   "latency_ms": 3155.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-011",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.7529,
+     "probabilities": {
+      "casual": 0.0542,
+      "listening": 0.0087,
+      "exploration": 0.0067,
+      "reflection": 0.0123,
+      "problem_solving": 0.0063,
+      "planning": 0.0064,
+      "information": 0.0038,
+      "safety": 0.0153,
+      "other": 0.8864
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "summarize",
+     "confidence": 0.3647,
+     "probabilities": {
+      "reflect": 0.062,
+      "validate": 0.0818,
+      "explore": 0.0518,
+      "clarify": 0.0171,
+      "summarize": 0.5765,
+      "provide_information": 0.0346,
+      "problem_solve": 0.0097,
+      "plan": 0.0039,
+      "check_in": 0.1627
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3712
+    }
+   },
+   "error": null,
+   "latency_ms": 1685.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-013",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.4589,
+     "probabilities": {
+      "casual": 0.1077,
+      "listening": 0.0183,
+      "exploration": 0.0162,
+      "reflection": 0.0047,
+      "problem_solving": 0.036,
+      "planning": 0.0446,
+      "information": 0.0124,
+      "safety": 0.0831,
+      "other": 0.677
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0611,
+     "probabilities": {
+      "reflect": 0.1027,
+      "validate": 0.2394,
+      "explore": 0.1807,
+      "clarify": 0.1238,
+      "summarize": 0.0596,
+      "provide_information": 0.0752,
+      "problem_solve": 0.0855,
+      "plan": 0.0969,
+      "check_in": 0.0361
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3681
+    }
+   },
+   "error": null,
+   "latency_ms": 1917.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-015",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5122,
+     "probabilities": {
+      "casual": 0.098,
+      "listening": 0.0287,
+      "exploration": 0.0151,
+      "reflection": 0.0357,
+      "problem_solving": 0.0179,
+      "planning": 0.0291,
+      "information": 0.0116,
+      "safety": 0.0303,
+      "other": 0.7336
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0994,
+     "probabilities": {
+      "reflect": 0.1484,
+      "validate": 0.3058,
+      "explore": 0.1179,
+      "clarify": 0.103,
+      "summarize": 0.0515,
+      "provide_information": 0.1029,
+      "problem_solve": 0.0931,
+      "plan": 0.0598,
+      "check_in": 0.0175
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.2597
+    }
+   },
+   "error": null,
+   "latency_ms": 2150.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-017",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "safety",
+     "confidence": 0.129,
+     "probabilities": {
+      "casual": 0.12,
+      "listening": 0.2079,
+      "exploration": 0.0673,
+      "reflection": 0.0339,
+      "problem_solving": 0.077,
+      "planning": 0.056,
+      "information": 0.0291,
+      "safety": 0.3239,
+      "other": 0.085
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0477,
+     "probabilities": {
+      "reflect": 0.0569,
+      "validate": 0.1492,
+      "explore": 0.1717,
+      "clarify": 0.1155,
+      "summarize": 0.0305,
+      "provide_information": 0.1575,
+      "problem_solve": 0.1055,
+      "plan": 0.0629,
+      "check_in": 0.1503
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5465
+    }
+   },
+   "error": null,
+   "latency_ms": 2266.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-019",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5162,
+     "probabilities": {
+      "casual": 0.174,
+      "listening": 0.0203,
+      "exploration": 0.0193,
+      "reflection": 0.0124,
+      "problem_solving": 0.0141,
+      "planning": 0.0129,
+      "information": 0.0145,
+      "safety": 0.0357,
+      "other": 0.6966
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "check_in",
+     "confidence": 0.1342,
+     "probabilities": {
+      "reflect": 0.0779,
+      "validate": 0.166,
+      "explore": 0.1756,
+      "clarify": 0.129,
+      "summarize": 0.0288,
+      "provide_information": 0.0963,
+      "problem_solve": 0.0273,
+      "plan": 0.0115,
+      "check_in": 0.2875
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3204
+    }
+   },
+   "error": null,
+   "latency_ms": 1684.9,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-021",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 0.3842,
+     "probabilities": {
+      "casual": 0.3172,
+      "listening": 0.012,
+      "exploration": 0.0151,
+      "reflection": 0.0133,
+      "problem_solving": 0.0053,
+      "planning": 0.3369,
+      "information": 0.0073,
+      "safety": 0.0049,
+      "other": 0.2879
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1059,
+     "probabilities": {
+      "reflect": 0.1845,
+      "validate": 0.2656,
+      "explore": 0.1504,
+      "clarify": 0.0726,
+      "summarize": 0.0644,
+      "provide_information": 0.087,
+      "problem_solve": 0.0196,
+      "plan": 0.1304,
+      "check_in": 0.0255
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4418
+    }
+   },
+   "error": null,
+   "latency_ms": 2313.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-023",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5779,
+     "probabilities": {
+      "casual": 0.1749,
+      "listening": 0.0217,
+      "exploration": 0.0074,
+      "reflection": 0.0134,
+      "problem_solving": 0.0118,
+      "planning": 0.0177,
+      "information": 0.0055,
+      "safety": 0.0154,
+      "other": 0.7321
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0953,
+     "probabilities": {
+      "reflect": 0.1236,
+      "validate": 0.2955,
+      "explore": 0.1605,
+      "clarify": 0.094,
+      "summarize": 0.0412,
+      "provide_information": 0.0882,
+      "problem_solve": 0.1179,
+      "plan": 0.0407,
+      "check_in": 0.0384
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5832
+    }
+   },
+   "error": null,
+   "latency_ms": 2099.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-025",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.1022,
+     "probabilities": {
+      "casual": 0.2657,
+      "listening": 0.1463,
+      "exploration": 0.0622,
+      "reflection": 0.0322,
+      "problem_solving": 0.0925,
+      "planning": 0.0687,
+      "information": 0.0359,
+      "safety": 0.2176,
+      "other": 0.0788
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0448,
+     "probabilities": {
+      "reflect": 0.0584,
+      "validate": 0.174,
+      "explore": 0.1771,
+      "clarify": 0.0774,
+      "summarize": 0.0389,
+      "provide_information": 0.1138,
+      "problem_solve": 0.136,
+      "plan": 0.1484,
+      "check_in": 0.076
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.466
+    }
+   },
+   "error": null,
+   "latency_ms": 2537.9,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-027",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.09,
+     "probabilities": {
+      "casual": 0.2747,
+      "listening": 0.1539,
+      "exploration": 0.0706,
+      "reflection": 0.0441,
+      "problem_solving": 0.0836,
+      "planning": 0.0684,
+      "information": 0.0348,
+      "safety": 0.1818,
+      "other": 0.088
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0348,
+     "probabilities": {
+      "reflect": 0.0624,
+      "validate": 0.1538,
+      "explore": 0.1799,
+      "clarify": 0.1033,
+      "summarize": 0.0408,
+      "provide_information": 0.1314,
+      "problem_solve": 0.1088,
+      "plan": 0.082,
+      "check_in": 0.1376
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5268
+    }
+   },
+   "error": null,
+   "latency_ms": 2423.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-029",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6202,
+     "probabilities": {
+      "casual": 0.2041,
+      "listening": 0.0125,
+      "exploration": 0.007,
+      "reflection": 0.0165,
+      "problem_solving": 0.0064,
+      "planning": 0.0098,
+      "information": 0.0037,
+      "safety": 0.0053,
+      "other": 0.7346
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1497,
+     "probabilities": {
+      "reflect": 0.2061,
+      "validate": 0.3318,
+      "explore": 0.1346,
+      "clarify": 0.0718,
+      "summarize": 0.0714,
+      "provide_information": 0.0888,
+      "problem_solve": 0.026,
+      "plan": 0.0134,
+      "check_in": 0.0562
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5349
+    }
+   },
+   "error": null,
+   "latency_ms": 1760.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-031",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5054,
+     "probabilities": {
+      "casual": 0.1353,
+      "listening": 0.0307,
+      "exploration": 0.0136,
+      "reflection": 0.0261,
+      "problem_solving": 0.0206,
+      "planning": 0.0259,
+      "information": 0.0075,
+      "safety": 0.0288,
+      "other": 0.7115
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1447,
+     "probabilities": {
+      "reflect": 0.1321,
+      "validate": 0.3227,
+      "explore": 0.214,
+      "clarify": 0.0846,
+      "summarize": 0.0308,
+      "provide_information": 0.0779,
+      "problem_solve": 0.0847,
+      "plan": 0.0249,
+      "check_in": 0.0284
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4397
+    }
+   },
+   "error": null,
+   "latency_ms": 2062.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-033",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6549,
+     "probabilities": {
+      "casual": 0.1623,
+      "listening": 0.0084,
+      "exploration": 0.0044,
+      "reflection": 0.0111,
+      "problem_solving": 0.0055,
+      "planning": 0.0078,
+      "information": 0.0086,
+      "safety": 0.0108,
+      "other": 0.7812
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1437,
+     "probabilities": {
+      "reflect": 0.0827,
+      "validate": 0.2698,
+      "explore": 0.0866,
+      "clarify": 0.0473,
+      "summarize": 0.1411,
+      "provide_information": 0.229,
+      "problem_solve": 0.0139,
+      "plan": 0.0072,
+      "check_in": 0.1226
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5713
+    }
+   },
+   "error": null,
+   "latency_ms": 1790.5,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-035",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6345,
+     "probabilities": {
+      "casual": 0.1371,
+      "listening": 0.0117,
+      "exploration": 0.0062,
+      "reflection": 0.0471,
+      "problem_solving": 0.0043,
+      "planning": 0.0072,
+      "information": 0.0023,
+      "safety": 0.007,
+      "other": 0.7772
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1435,
+     "probabilities": {
+      "reflect": 0.1093,
+      "validate": 0.3268,
+      "explore": 0.2118,
+      "clarify": 0.1031,
+      "summarize": 0.0475,
+      "provide_information": 0.0986,
+      "problem_solve": 0.0335,
+      "plan": 0.0177,
+      "check_in": 0.0516
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4485
+    }
+   },
+   "error": null,
+   "latency_ms": 1979.7,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-037",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.4744,
+     "probabilities": {
+      "casual": 0.1097,
+      "listening": 0.0209,
+      "exploration": 0.0536,
+      "reflection": 0.0248,
+      "problem_solving": 0.013,
+      "planning": 0.021,
+      "information": 0.024,
+      "safety": 0.031,
+      "other": 0.702
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.124,
+     "probabilities": {
+      "reflect": 0.1032,
+      "validate": 0.2796,
+      "explore": 0.2527,
+      "clarify": 0.0603,
+      "summarize": 0.0405,
+      "provide_information": 0.1181,
+      "problem_solve": 0.0669,
+      "plan": 0.034,
+      "check_in": 0.0447
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3298
+    }
+   },
+   "error": null,
+   "latency_ms": 1877.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-039",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.6971,
+     "probabilities": {
+      "casual": 0.0494,
+      "listening": 0.006,
+      "exploration": 0.0013,
+      "reflection": 0.8122,
+      "problem_solving": 0.0008,
+      "planning": 0.0009,
+      "information": 0.0065,
+      "safety": 0.001,
+      "other": 0.1219
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.2317,
+     "probabilities": {
+      "reflect": 0.3835,
+      "validate": 0.1601,
+      "explore": 0.0585,
+      "clarify": 0.0381,
+      "summarize": 0.1165,
+      "provide_information": 0.2033,
+      "problem_solve": 0.0089,
+      "plan": 0.0042,
+      "check_in": 0.027
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4303
+    }
+   },
+   "error": null,
+   "latency_ms": 2194.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-041",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "safety",
+     "confidence": 0.1711,
+     "probabilities": {
+      "casual": 0.0959,
+      "listening": 0.2147,
+      "exploration": 0.0563,
+      "reflection": 0.0343,
+      "problem_solving": 0.0648,
+      "planning": 0.046,
+      "information": 0.0235,
+      "safety": 0.3768,
+      "other": 0.0877
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0449,
+     "probabilities": {
+      "reflect": 0.0581,
+      "validate": 0.1459,
+      "explore": 0.1921,
+      "clarify": 0.1052,
+      "summarize": 0.0388,
+      "provide_information": 0.1351,
+      "problem_solve": 0.0967,
+      "plan": 0.068,
+      "check_in": 0.1601
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5255
+    }
+   },
+   "error": null,
+   "latency_ms": 2506.9,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-043",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.7856,
+     "probabilities": {
+      "casual": 0.0609,
+      "listening": 0.0085,
+      "exploration": 0.0063,
+      "reflection": 0.003,
+      "problem_solving": 0.0042,
+      "planning": 0.0059,
+      "information": 0.0079,
+      "safety": 0.0043,
+      "other": 0.899
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.128,
+     "probabilities": {
+      "reflect": 0.1172,
+      "validate": 0.3089,
+      "explore": 0.1816,
+      "clarify": 0.1136,
+      "summarize": 0.0424,
+      "provide_information": 0.1242,
+      "problem_solve": 0.0647,
+      "plan": 0.0159,
+      "check_in": 0.0315
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3065
+    }
+   },
+   "error": null,
+   "latency_ms": 2057.2,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-045",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.7159,
+     "probabilities": {
+      "casual": 0.093,
+      "listening": 0.0118,
+      "exploration": 0.0056,
+      "reflection": 0.0184,
+      "problem_solving": 0.0023,
+      "planning": 0.0122,
+      "information": 0.0018,
+      "safety": 0.0059,
+      "other": 0.849
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.19,
+     "probabilities": {
+      "reflect": 0.1348,
+      "validate": 0.3504,
+      "explore": 0.2299,
+      "clarify": 0.0868,
+      "summarize": 0.0553,
+      "provide_information": 0.0882,
+      "problem_solve": 0.0225,
+      "plan": 0.0135,
+      "check_in": 0.0186
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5275
+    }
+   },
+   "error": null,
+   "latency_ms": 1975.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-047",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5549,
+     "probabilities": {
+      "casual": 0.1392,
+      "listening": 0.0188,
+      "exploration": 0.0108,
+      "reflection": 0.0195,
+      "problem_solving": 0.0076,
+      "planning": 0.0188,
+      "information": 0.011,
+      "safety": 0.0353,
+      "other": 0.739
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.175,
+     "probabilities": {
+      "reflect": 0.1265,
+      "validate": 0.3894,
+      "explore": 0.1302,
+      "clarify": 0.0768,
+      "summarize": 0.0543,
+      "provide_information": 0.1428,
+      "problem_solve": 0.0332,
+      "plan": 0.0142,
+      "check_in": 0.0327
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.2447
+    }
+   },
+   "error": null,
+   "latency_ms": 4048.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "casual-049",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.1973,
+     "probabilities": {
+      "casual": 0.1578,
+      "listening": 0.0934,
+      "exploration": 0.0462,
+      "reflection": 0.0315,
+      "problem_solving": 0.0574,
+      "planning": 0.0418,
+      "information": 0.0279,
+      "safety": 0.1085,
+      "other": 0.4354
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0389,
+     "probabilities": {
+      "reflect": 0.0671,
+      "validate": 0.1672,
+      "explore": 0.1723,
+      "clarify": 0.0995,
+      "summarize": 0.0362,
+      "provide_information": 0.1623,
+      "problem_solve": 0.1077,
+      "plan": 0.1013,
+      "check_in": 0.0864
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5401
+    }
+   },
+   "error": null,
+   "latency_ms": 2698.7,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-001",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.7114,
+     "probabilities": {
+      "casual": 0.0852,
+      "listening": 0.0174,
+      "exploration": 0.0058,
+      "reflection": 0.0083,
+      "problem_solving": 0.008,
+      "planning": 0.0164,
+      "information": 0.0051,
+      "safety": 0.0024,
+      "other": 0.8515
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.131,
+     "probabilities": {
+      "reflect": 0.1237,
+      "validate": 0.2731,
+      "explore": 0.2198,
+      "clarify": 0.1182,
+      "summarize": 0.0437,
+      "provide_information": 0.1288,
+      "problem_solve": 0.0528,
+      "plan": 0.015,
+      "check_in": 0.0249
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4875
+    }
+   },
+   "error": null,
+   "latency_ms": 1867.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-003",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.4787,
+     "probabilities": {
+      "casual": 0.2083,
+      "listening": 0.0158,
+      "exploration": 0.0199,
+      "reflection": 0.1054,
+      "problem_solving": 0.0056,
+      "planning": 0.0117,
+      "information": 0.0062,
+      "safety": 0.0057,
+      "other": 0.6213
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1482,
+     "probabilities": {
+      "reflect": 0.1659,
+      "validate": 0.32,
+      "explore": 0.1924,
+      "clarify": 0.0787,
+      "summarize": 0.0508,
+      "provide_information": 0.1034,
+      "problem_solve": 0.0424,
+      "plan": 0.0153,
+      "check_in": 0.0311
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3417
+    }
+   },
+   "error": null,
+   "latency_ms": 2042.7,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-005",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6986,
+     "probabilities": {
+      "casual": 0.1142,
+      "listening": 0.0176,
+      "exploration": 0.0056,
+      "reflection": 0.0098,
+      "problem_solving": 0.0037,
+      "planning": 0.005,
+      "information": 0.0062,
+      "safety": 0.0075,
+      "other": 0.8305
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1508,
+     "probabilities": {
+      "reflect": 0.1612,
+      "validate": 0.2698,
+      "explore": 0.2317,
+      "clarify": 0.0757,
+      "summarize": 0.0527,
+      "provide_information": 0.1389,
+      "problem_solve": 0.039,
+      "plan": 0.0116,
+      "check_in": 0.0194
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4673
+    }
+   },
+   "error": null,
+   "latency_ms": 6221.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-007",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.2795,
+     "probabilities": {
+      "casual": 0.076,
+      "listening": 0.088,
+      "exploration": 0.0414,
+      "reflection": 0.0218,
+      "problem_solving": 0.0594,
+      "planning": 0.0422,
+      "information": 0.0235,
+      "safety": 0.1053,
+      "other": 0.5424
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0361,
+     "probabilities": {
+      "reflect": 0.0648,
+      "validate": 0.1597,
+      "explore": 0.1682,
+      "clarify": 0.1028,
+      "summarize": 0.0347,
+      "provide_information": 0.1434,
+      "problem_solve": 0.1063,
+      "plan": 0.086,
+      "check_in": 0.1342
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.6023
+    }
+   },
+   "error": null,
+   "latency_ms": 8667.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-009",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.8382,
+     "probabilities": {
+      "casual": 0.0486,
+      "listening": 0.0101,
+      "exploration": 0.003,
+      "reflection": 0.0046,
+      "problem_solving": 0.0038,
+      "planning": 0.0019,
+      "information": 0.0014,
+      "safety": 0.0008,
+      "other": 0.9257
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.1868,
+     "probabilities": {
+      "reflect": 0.0988,
+      "validate": 0.198,
+      "explore": 0.3716,
+      "clarify": 0.1185,
+      "summarize": 0.0392,
+      "provide_information": 0.0472,
+      "problem_solve": 0.0995,
+      "plan": 0.01,
+      "check_in": 0.0173
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.6136
+    }
+   },
+   "error": null,
+   "latency_ms": 2089.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-011",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.0526,
+     "probabilities": {
+      "casual": 0.1055,
+      "listening": 0.2134,
+      "exploration": 0.0949,
+      "reflection": 0.056,
+      "problem_solving": 0.1001,
+      "planning": 0.0653,
+      "information": 0.0444,
+      "safety": 0.1359,
+      "other": 0.1845
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.0158,
+     "probabilities": {
+      "reflect": 0.087,
+      "validate": 0.145,
+      "explore": 0.1375,
+      "clarify": 0.0906,
+      "summarize": 0.0662,
+      "provide_information": 0.1628,
+      "problem_solve": 0.0971,
+      "plan": 0.1054,
+      "check_in": 0.1084
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5876
+    }
+   },
+   "error": null,
+   "latency_ms": 3843.9,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-013",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.2224,
+     "probabilities": {
+      "casual": 0.2842,
+      "listening": 0.0681,
+      "exploration": 0.1062,
+      "reflection": 0.3055,
+      "problem_solving": 0.0147,
+      "planning": 0.0141,
+      "information": 0.0234,
+      "safety": 0.0127,
+      "other": 0.1711
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.1805,
+     "probabilities": {
+      "reflect": 0.0787,
+      "validate": 0.2412,
+      "explore": 0.3101,
+      "clarify": 0.1418,
+      "summarize": 0.0326,
+      "provide_information": 0.134,
+      "problem_solve": 0.0291,
+      "plan": 0.0145,
+      "check_in": 0.0179
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5093
+    }
+   },
+   "error": null,
+   "latency_ms": 4926.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-015",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.2691,
+     "probabilities": {
+      "casual": 0.0947,
+      "listening": 0.0627,
+      "exploration": 0.037,
+      "reflection": 0.0451,
+      "problem_solving": 0.0281,
+      "planning": 0.0138,
+      "information": 0.0171,
+      "safety": 0.274,
+      "other": 0.4274
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1755,
+     "probabilities": {
+      "reflect": 0.1064,
+      "validate": 0.3066,
+      "explore": 0.2807,
+      "clarify": 0.0505,
+      "summarize": 0.0428,
+      "provide_information": 0.1212,
+      "problem_solve": 0.0416,
+      "plan": 0.0145,
+      "check_in": 0.0357
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3545
+    }
+   },
+   "error": null,
+   "latency_ms": 2523.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-017",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0654,
+     "probabilities": {
+      "casual": 0.2401,
+      "listening": 0.195,
+      "exploration": 0.0619,
+      "reflection": 0.0344,
+      "problem_solving": 0.1218,
+      "planning": 0.094,
+      "information": 0.0821,
+      "safety": 0.0858,
+      "other": 0.0849
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0412,
+     "probabilities": {
+      "reflect": 0.0637,
+      "validate": 0.1813,
+      "explore": 0.1655,
+      "clarify": 0.1029,
+      "summarize": 0.0405,
+      "provide_information": 0.1507,
+      "problem_solve": 0.1334,
+      "plan": 0.0723,
+      "check_in": 0.0897
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4783
+    }
+   },
+   "error": null,
+   "latency_ms": 4445.0,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-019",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 0.4108,
+     "probabilities": {
+      "casual": 0.1696,
+      "listening": 0.0185,
+      "exploration": 0.0224,
+      "reflection": 0.0213,
+      "problem_solving": 0.0068,
+      "planning": 0.5435,
+      "information": 0.0122,
+      "safety": 0.0015,
+      "other": 0.2043
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 0.4034,
+     "probabilities": {
+      "reflect": 0.0596,
+      "validate": 0.1527,
+      "explore": 0.0587,
+      "clarify": 0.0261,
+      "summarize": 0.0243,
+      "provide_information": 0.0358,
+      "problem_solve": 0.0138,
+      "plan": 0.6229,
+      "check_in": 0.006
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3525
+    }
+   },
+   "error": null,
+   "latency_ms": 2451.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-021",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 0.8411,
+     "probabilities": {
+      "casual": 0.0377,
+      "listening": 0.0036,
+      "exploration": 0.0036,
+      "reflection": 0.0026,
+      "problem_solving": 0.0035,
+      "planning": 0.9304,
+      "information": 0.0011,
+      "safety": 0.0012,
+      "other": 0.0162
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 0.8822,
+     "probabilities": {
+      "reflect": 0.0048,
+      "validate": 0.0154,
+      "explore": 0.0084,
+      "clarify": 0.0046,
+      "summarize": 0.0012,
+      "provide_information": 0.0044,
+      "problem_solve": 0.0044,
+      "plan": 0.9561,
+      "check_in": 0.0007
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.2866
+    }
+   },
+   "error": null,
+   "latency_ms": 2382.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-023",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.1131,
+     "probabilities": {
+      "casual": 0.0887,
+      "listening": 0.1207,
+      "exploration": 0.0516,
+      "reflection": 0.0418,
+      "problem_solving": 0.1146,
+      "planning": 0.0602,
+      "information": 0.0378,
+      "safety": 0.1509,
+      "other": 0.3336
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0212,
+     "probabilities": {
+      "reflect": 0.0782,
+      "validate": 0.1704,
+      "explore": 0.1485,
+      "clarify": 0.0873,
+      "summarize": 0.0684,
+      "provide_information": 0.1474,
+      "problem_solve": 0.1027,
+      "plan": 0.0831,
+      "check_in": 0.1142
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.585
+    }
+   },
+   "error": null,
+   "latency_ms": 3036.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-025",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "safety",
+     "confidence": 0.4463,
+     "probabilities": {
+      "casual": 0.0837,
+      "listening": 0.0386,
+      "exploration": 0.0084,
+      "reflection": 0.0064,
+      "problem_solving": 0.0151,
+      "planning": 0.0161,
+      "information": 0.0081,
+      "safety": 0.5992,
+      "other": 0.2244
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1082,
+     "probabilities": {
+      "reflect": 0.1215,
+      "validate": 0.3203,
+      "explore": 0.1527,
+      "clarify": 0.0995,
+      "summarize": 0.0552,
+      "provide_information": 0.1032,
+      "problem_solve": 0.0791,
+      "plan": 0.0454,
+      "check_in": 0.023
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3541
+    }
+   },
+   "error": null,
+   "latency_ms": 2396.9,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-027",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.1055,
+     "probabilities": {
+      "casual": 0.2853,
+      "listening": 0.1603,
+      "exploration": 0.0636,
+      "reflection": 0.0338,
+      "problem_solving": 0.0794,
+      "planning": 0.0746,
+      "information": 0.0358,
+      "safety": 0.193,
+      "other": 0.0743
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0455,
+     "probabilities": {
+      "reflect": 0.0597,
+      "validate": 0.1938,
+      "explore": 0.1694,
+      "clarify": 0.0891,
+      "summarize": 0.0288,
+      "provide_information": 0.1288,
+      "problem_solve": 0.1142,
+      "plan": 0.1071,
+      "check_in": 0.1091
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5265
+    }
+   },
+   "error": null,
+   "latency_ms": 2482.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-029",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.362,
+     "probabilities": {
+      "casual": 0.1795,
+      "listening": 0.0309,
+      "exploration": 0.0139,
+      "reflection": 0.4474,
+      "problem_solving": 0.0102,
+      "planning": 0.02,
+      "information": 0.0118,
+      "safety": 0.0066,
+      "other": 0.2797
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1348,
+     "probabilities": {
+      "reflect": 0.1728,
+      "validate": 0.2825,
+      "explore": 0.1999,
+      "clarify": 0.1118,
+      "summarize": 0.0359,
+      "provide_information": 0.1023,
+      "problem_solve": 0.0483,
+      "plan": 0.0227,
+      "check_in": 0.0237
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.474
+    }
+   },
+   "error": null,
+   "latency_ms": 2499.0,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-031",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.3626,
+     "probabilities": {
+      "casual": 0.1425,
+      "listening": 0.0425,
+      "exploration": 0.016,
+      "reflection": 0.1513,
+      "problem_solving": 0.0143,
+      "planning": 0.0642,
+      "information": 0.0123,
+      "safety": 0.0032,
+      "other": 0.5537
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1903,
+     "probabilities": {
+      "reflect": 0.1353,
+      "validate": 0.4008,
+      "explore": 0.1507,
+      "clarify": 0.1068,
+      "summarize": 0.0442,
+      "provide_information": 0.0911,
+      "problem_solve": 0.0355,
+      "plan": 0.0196,
+      "check_in": 0.016
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5031
+    }
+   },
+   "error": null,
+   "latency_ms": 2249.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-033",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.7304,
+     "probabilities": {
+      "casual": 0.0619,
+      "listening": 0.0098,
+      "exploration": 0.0256,
+      "reflection": 0.0132,
+      "problem_solving": 0.0049,
+      "planning": 0.0115,
+      "information": 0.003,
+      "safety": 0.0011,
+      "other": 0.8691
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.2055,
+     "probabilities": {
+      "reflect": 0.101,
+      "validate": 0.2223,
+      "explore": 0.3978,
+      "clarify": 0.0964,
+      "summarize": 0.0361,
+      "provide_information": 0.0538,
+      "problem_solve": 0.0372,
+      "plan": 0.0111,
+      "check_in": 0.0443
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.6487
+    }
+   },
+   "error": null,
+   "latency_ms": 2093.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-035",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.1933,
+     "probabilities": {
+      "casual": 0.1047,
+      "listening": 0.1058,
+      "exploration": 0.0464,
+      "reflection": 0.0268,
+      "problem_solving": 0.0708,
+      "planning": 0.0437,
+      "information": 0.0233,
+      "safety": 0.1496,
+      "other": 0.4289
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0419,
+     "probabilities": {
+      "reflect": 0.0677,
+      "validate": 0.162,
+      "explore": 0.1826,
+      "clarify": 0.0983,
+      "summarize": 0.0337,
+      "provide_information": 0.1474,
+      "problem_solve": 0.0992,
+      "plan": 0.0752,
+      "check_in": 0.1339
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5749
+    }
+   },
+   "error": null,
+   "latency_ms": 2671.7,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-037",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.7528,
+     "probabilities": {
+      "casual": 0.0211,
+      "listening": 0.0707,
+      "exploration": 0.0053,
+      "reflection": 0.0056,
+      "problem_solving": 0.0094,
+      "planning": 0.0033,
+      "information": 0.0024,
+      "safety": 0.0048,
+      "other": 0.8774
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1596,
+     "probabilities": {
+      "reflect": 0.2165,
+      "validate": 0.2463,
+      "explore": 0.2412,
+      "clarify": 0.0723,
+      "summarize": 0.0768,
+      "provide_information": 0.0679,
+      "problem_solve": 0.0595,
+      "plan": 0.0066,
+      "check_in": 0.013
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3868
+    }
+   },
+   "error": null,
+   "latency_ms": 2117.2,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-039",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.1686,
+     "probabilities": {
+      "casual": 0.0899,
+      "listening": 0.1353,
+      "exploration": 0.046,
+      "reflection": 0.0249,
+      "problem_solving": 0.1828,
+      "planning": 0.0328,
+      "information": 0.0326,
+      "safety": 0.0812,
+      "other": 0.3746
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0633,
+     "probabilities": {
+      "reflect": 0.0866,
+      "validate": 0.2308,
+      "explore": 0.1412,
+      "clarify": 0.0776,
+      "summarize": 0.0434,
+      "provide_information": 0.1305,
+      "problem_solve": 0.1388,
+      "plan": 0.0274,
+      "check_in": 0.1235
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5773
+    }
+   },
+   "error": null,
+   "latency_ms": 2973.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-041",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.8177,
+     "probabilities": {
+      "casual": 0.031,
+      "listening": 0.0087,
+      "exploration": 0.0053,
+      "reflection": 0.0145,
+      "problem_solving": 0.0037,
+      "planning": 0.004,
+      "information": 0.0024,
+      "safety": 0.0064,
+      "other": 0.9241
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1353,
+     "probabilities": {
+      "reflect": 0.1341,
+      "validate": 0.2625,
+      "explore": 0.2536,
+      "clarify": 0.0842,
+      "summarize": 0.0493,
+      "provide_information": 0.12,
+      "problem_solve": 0.0425,
+      "plan": 0.0122,
+      "check_in": 0.0415
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.425
+    }
+   },
+   "error": null,
+   "latency_ms": 2364.5,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-043",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6668,
+     "probabilities": {
+      "casual": 0.0563,
+      "listening": 0.0324,
+      "exploration": 0.0074,
+      "reflection": 0.0468,
+      "problem_solving": 0.0045,
+      "planning": 0.0051,
+      "information": 0.0036,
+      "safety": 0.0125,
+      "other": 0.8315
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1478,
+     "probabilities": {
+      "reflect": 0.1374,
+      "validate": 0.3167,
+      "explore": 0.2126,
+      "clarify": 0.0987,
+      "summarize": 0.0479,
+      "provide_information": 0.0977,
+      "problem_solve": 0.0425,
+      "plan": 0.0141,
+      "check_in": 0.0322
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3833
+    }
+   },
+   "error": null,
+   "latency_ms": 2124.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-045",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5044,
+     "probabilities": {
+      "casual": 0.2211,
+      "listening": 0.0147,
+      "exploration": 0.0133,
+      "reflection": 0.0073,
+      "problem_solving": 0.0252,
+      "planning": 0.023,
+      "information": 0.008,
+      "safety": 0.0302,
+      "other": 0.6572
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0567,
+     "probabilities": {
+      "reflect": 0.1192,
+      "validate": 0.1883,
+      "explore": 0.2189,
+      "clarify": 0.0998,
+      "summarize": 0.0631,
+      "provide_information": 0.1029,
+      "problem_solve": 0.1104,
+      "plan": 0.0624,
+      "check_in": 0.035
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4521
+    }
+   },
+   "error": null,
+   "latency_ms": 2112.5,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-047",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.7013,
+     "probabilities": {
+      "casual": 0.041,
+      "listening": 0.0248,
+      "exploration": 0.007,
+      "reflection": 0.0031,
+      "problem_solving": 0.0128,
+      "planning": 0.0092,
+      "information": 0.008,
+      "safety": 0.0337,
+      "other": 0.8605
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1074,
+     "probabilities": {
+      "reflect": 0.1578,
+      "validate": 0.2298,
+      "explore": 0.218,
+      "clarify": 0.105,
+      "summarize": 0.0549,
+      "provide_information": 0.1007,
+      "problem_solve": 0.0973,
+      "plan": 0.0199,
+      "check_in": 0.0166
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3453
+    }
+   },
+   "error": null,
+   "latency_ms": 2096.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "emotional-049",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.4178,
+     "probabilities": {
+      "casual": 0.1244,
+      "listening": 0.0238,
+      "exploration": 0.0424,
+      "reflection": 0.2079,
+      "problem_solving": 0.0061,
+      "planning": 0.0136,
+      "information": 0.0049,
+      "safety": 0.0069,
+      "other": 0.5701
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.1367,
+     "probabilities": {
+      "reflect": 0.1171,
+      "validate": 0.2138,
+      "explore": 0.3028,
+      "clarify": 0.1105,
+      "summarize": 0.0473,
+      "provide_information": 0.1165,
+      "problem_solve": 0.0254,
+      "plan": 0.0219,
+      "check_in": 0.0448
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5112
+    }
+   },
+   "error": null,
+   "latency_ms": 2117.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-001",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.0702,
+     "probabilities": {
+      "casual": 0.2197,
+      "listening": 0.2326,
+      "exploration": 0.0809,
+      "reflection": 0.0316,
+      "problem_solving": 0.1003,
+      "planning": 0.1016,
+      "information": 0.0704,
+      "safety": 0.0802,
+      "other": 0.0827
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.033,
+     "probabilities": {
+      "reflect": 0.0709,
+      "validate": 0.1653,
+      "explore": 0.1673,
+      "clarify": 0.0881,
+      "summarize": 0.0455,
+      "provide_information": 0.1585,
+      "problem_solve": 0.1209,
+      "plan": 0.0897,
+      "check_in": 0.0939
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5066
+    }
+   },
+   "error": null,
+   "latency_ms": 2531.7,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-003",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0423,
+     "probabilities": {
+      "casual": 0.2011,
+      "listening": 0.1955,
+      "exploration": 0.0997,
+      "reflection": 0.0467,
+      "problem_solving": 0.1138,
+      "planning": 0.0823,
+      "information": 0.0808,
+      "safety": 0.0897,
+      "other": 0.0905
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.0239,
+     "probabilities": {
+      "reflect": 0.0824,
+      "validate": 0.1501,
+      "explore": 0.1576,
+      "clarify": 0.0992,
+      "summarize": 0.0578,
+      "provide_information": 0.1695,
+      "problem_solve": 0.1001,
+      "plan": 0.0897,
+      "check_in": 0.0937
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5122
+    }
+   },
+   "error": null,
+   "latency_ms": 2904.7,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-005",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6051,
+     "probabilities": {
+      "casual": 0.0698,
+      "listening": 0.0134,
+      "exploration": 0.0157,
+      "reflection": 0.0076,
+      "problem_solving": 0.026,
+      "planning": 0.0311,
+      "information": 0.007,
+      "safety": 0.0301,
+      "other": 0.7994
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0951,
+     "probabilities": {
+      "reflect": 0.1219,
+      "validate": 0.2347,
+      "explore": 0.1868,
+      "clarify": 0.0859,
+      "summarize": 0.028,
+      "provide_information": 0.0705,
+      "problem_solve": 0.1762,
+      "plan": 0.0757,
+      "check_in": 0.0202
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.345
+    }
+   },
+   "error": null,
+   "latency_ms": 2218.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-007",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 0.9827,
+     "probabilities": {
+      "casual": 0.0026,
+      "listening": 0.0005,
+      "exploration": 0.0002,
+      "reflection": 0.0001,
+      "problem_solving": 0.0004,
+      "planning": 0.9951,
+      "information": 0.0002,
+      "safety": 0.0002,
+      "other": 0.0007
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 0.9576,
+     "probabilities": {
+      "reflect": 0.0018,
+      "validate": 0.0048,
+      "explore": 0.0022,
+      "clarify": 0.0017,
+      "summarize": 0.0004,
+      "provide_information": 0.0008,
+      "problem_solve": 0.0012,
+      "plan": 0.9869,
+      "check_in": 0.0002
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3284
+    }
+   },
+   "error": null,
+   "latency_ms": 1837.7,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-009",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.798,
+     "probabilities": {
+      "casual": 0.0498,
+      "listening": 0.0088,
+      "exploration": 0.005,
+      "reflection": 0.0026,
+      "problem_solving": 0.0055,
+      "planning": 0.0049,
+      "information": 0.0034,
+      "safety": 0.0109,
+      "other": 0.9089
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0954,
+     "probabilities": {
+      "reflect": 0.1306,
+      "validate": 0.2491,
+      "explore": 0.1947,
+      "clarify": 0.104,
+      "summarize": 0.0667,
+      "provide_information": 0.1352,
+      "problem_solve": 0.0691,
+      "plan": 0.0239,
+      "check_in": 0.0267
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.2303
+    }
+   },
+   "error": null,
+   "latency_ms": 2415.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-011",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.4696,
+     "probabilities": {
+      "casual": 0.5097,
+      "listening": 0.016,
+      "exploration": 0.0131,
+      "reflection": 0.0406,
+      "problem_solving": 0.008,
+      "planning": 0.0335,
+      "information": 0.0049,
+      "safety": 0.0041,
+      "other": 0.3701
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "summarize",
+     "confidence": 0.1307,
+     "probabilities": {
+      "reflect": 0.2053,
+      "validate": 0.1635,
+      "explore": 0.1653,
+      "clarify": 0.0902,
+      "summarize": 0.2461,
+      "provide_information": 0.0511,
+      "problem_solve": 0.0443,
+      "plan": 0.0169,
+      "check_in": 0.0174
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.265
+    }
+   },
+   "error": null,
+   "latency_ms": 2339.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-013",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6946,
+     "probabilities": {
+      "casual": 0.083,
+      "listening": 0.0228,
+      "exploration": 0.0073,
+      "reflection": 0.0202,
+      "problem_solving": 0.0056,
+      "planning": 0.0084,
+      "information": 0.0043,
+      "safety": 0.0052,
+      "other": 0.8433
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1298,
+     "probabilities": {
+      "reflect": 0.1833,
+      "validate": 0.3181,
+      "explore": 0.1464,
+      "clarify": 0.0753,
+      "summarize": 0.0597,
+      "provide_information": 0.1035,
+      "problem_solve": 0.0352,
+      "plan": 0.0162,
+      "check_in": 0.0623
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4324
+    }
+   },
+   "error": null,
+   "latency_ms": 2347.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-015",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0693,
+     "probabilities": {
+      "casual": 0.2633,
+      "listening": 0.1906,
+      "exploration": 0.0708,
+      "reflection": 0.0437,
+      "problem_solving": 0.1065,
+      "planning": 0.0891,
+      "information": 0.0702,
+      "safety": 0.0837,
+      "other": 0.0823
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0371,
+     "probabilities": {
+      "reflect": 0.0671,
+      "validate": 0.1723,
+      "explore": 0.164,
+      "clarify": 0.0914,
+      "summarize": 0.0443,
+      "provide_information": 0.1399,
+      "problem_solve": 0.1522,
+      "plan": 0.077,
+      "check_in": 0.0916
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4638
+    }
+   },
+   "error": null,
+   "latency_ms": 3064.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-017",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6226,
+     "probabilities": {
+      "casual": 0.1334,
+      "listening": 0.0225,
+      "exploration": 0.0104,
+      "reflection": 0.0102,
+      "problem_solving": 0.0077,
+      "planning": 0.01,
+      "information": 0.0058,
+      "safety": 0.0188,
+      "other": 0.7812
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0953,
+     "probabilities": {
+      "reflect": 0.1224,
+      "validate": 0.2639,
+      "explore": 0.216,
+      "clarify": 0.0884,
+      "summarize": 0.0495,
+      "provide_information": 0.0979,
+      "problem_solve": 0.0775,
+      "plan": 0.0605,
+      "check_in": 0.024
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4373
+    }
+   },
+   "error": null,
+   "latency_ms": 2348.9,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-019",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.8293,
+     "probabilities": {
+      "casual": 0.0224,
+      "listening": 0.009,
+      "exploration": 0.0025,
+      "reflection": 0.0238,
+      "problem_solving": 0.0024,
+      "planning": 0.0049,
+      "information": 0.0011,
+      "safety": 0.0051,
+      "other": 0.9288
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1374,
+     "probabilities": {
+      "reflect": 0.1795,
+      "validate": 0.2756,
+      "explore": 0.2417,
+      "clarify": 0.059,
+      "summarize": 0.043,
+      "provide_information": 0.0759,
+      "problem_solve": 0.058,
+      "plan": 0.0435,
+      "check_in": 0.0239
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.7066
+    }
+   },
+   "error": null,
+   "latency_ms": 2498.2,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-021",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5925,
+     "probabilities": {
+      "casual": 0.0486,
+      "listening": 0.0156,
+      "exploration": 0.0046,
+      "reflection": 0.1995,
+      "problem_solving": 0.0045,
+      "planning": 0.0039,
+      "information": 0.0019,
+      "safety": 0.008,
+      "other": 0.7134
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1767,
+     "probabilities": {
+      "reflect": 0.1731,
+      "validate": 0.2853,
+      "explore": 0.2558,
+      "clarify": 0.0798,
+      "summarize": 0.0524,
+      "provide_information": 0.0934,
+      "problem_solve": 0.0402,
+      "plan": 0.0091,
+      "check_in": 0.011
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.496
+    }
+   },
+   "error": null,
+   "latency_ms": 2249.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-023",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5681,
+     "probabilities": {
+      "casual": 0.1251,
+      "listening": 0.0235,
+      "exploration": 0.0099,
+      "reflection": 0.0261,
+      "problem_solving": 0.0153,
+      "planning": 0.0058,
+      "information": 0.0068,
+      "safety": 0.0352,
+      "other": 0.7523
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.145,
+     "probabilities": {
+      "reflect": 0.128,
+      "validate": 0.3192,
+      "explore": 0.2153,
+      "clarify": 0.0874,
+      "summarize": 0.0511,
+      "provide_information": 0.0997,
+      "problem_solve": 0.0516,
+      "plan": 0.0125,
+      "check_in": 0.0352
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3297
+    }
+   },
+   "error": null,
+   "latency_ms": 2372.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-025",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.1797,
+     "probabilities": {
+      "casual": 0.0989,
+      "listening": 0.1026,
+      "exploration": 0.0553,
+      "reflection": 0.0338,
+      "problem_solving": 0.0783,
+      "planning": 0.0496,
+      "information": 0.0302,
+      "safety": 0.1156,
+      "other": 0.4358
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0335,
+     "probabilities": {
+      "reflect": 0.0677,
+      "validate": 0.1656,
+      "explore": 0.1685,
+      "clarify": 0.0972,
+      "summarize": 0.0388,
+      "provide_information": 0.1458,
+      "problem_solve": 0.1117,
+      "plan": 0.0906,
+      "check_in": 0.1141
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5802
+    }
+   },
+   "error": null,
+   "latency_ms": 2801.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-027",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0579,
+     "probabilities": {
+      "casual": 0.2217,
+      "listening": 0.206,
+      "exploration": 0.077,
+      "reflection": 0.0385,
+      "problem_solving": 0.1101,
+      "planning": 0.0959,
+      "information": 0.0677,
+      "safety": 0.0899,
+      "other": 0.0932
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0378,
+     "probabilities": {
+      "reflect": 0.0607,
+      "validate": 0.1618,
+      "explore": 0.1522,
+      "clarify": 0.0844,
+      "summarize": 0.0384,
+      "provide_information": 0.1494,
+      "problem_solve": 0.1471,
+      "plan": 0.1261,
+      "check_in": 0.0798
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4836
+    }
+   },
+   "error": null,
+   "latency_ms": 2410.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-029",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.6512,
+     "probabilities": {
+      "casual": 0.7608,
+      "listening": 0.0046,
+      "exploration": 0.0023,
+      "reflection": 0.0033,
+      "problem_solving": 0.0028,
+      "planning": 0.0024,
+      "information": 0.0026,
+      "safety": 0.0522,
+      "other": 0.1691
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0946,
+     "probabilities": {
+      "reflect": 0.1126,
+      "validate": 0.2578,
+      "explore": 0.159,
+      "clarify": 0.1865,
+      "summarize": 0.0465,
+      "provide_information": 0.0803,
+      "problem_solve": 0.0915,
+      "plan": 0.037,
+      "check_in": 0.0289
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4718
+    }
+   },
+   "error": null,
+   "latency_ms": 2214.0,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-031",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0511,
+     "probabilities": {
+      "casual": 0.2368,
+      "listening": 0.1751,
+      "exploration": 0.0764,
+      "reflection": 0.0556,
+      "problem_solving": 0.1298,
+      "planning": 0.0891,
+      "information": 0.0722,
+      "safety": 0.0871,
+      "other": 0.0779
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0199,
+     "probabilities": {
+      "reflect": 0.0792,
+      "validate": 0.1378,
+      "explore": 0.1563,
+      "clarify": 0.1043,
+      "summarize": 0.0584,
+      "provide_information": 0.1514,
+      "problem_solve": 0.1308,
+      "plan": 0.0895,
+      "check_in": 0.0923
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4966
+    }
+   },
+   "error": null,
+   "latency_ms": 3933.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-033",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0413,
+     "probabilities": {
+      "casual": 0.1929,
+      "listening": 0.1923,
+      "exploration": 0.0838,
+      "reflection": 0.0451,
+      "problem_solving": 0.124,
+      "planning": 0.1017,
+      "information": 0.073,
+      "safety": 0.1053,
+      "other": 0.082
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0233,
+     "probabilities": {
+      "reflect": 0.0711,
+      "validate": 0.1404,
+      "explore": 0.1518,
+      "clarify": 0.0954,
+      "summarize": 0.0507,
+      "provide_information": 0.1331,
+      "problem_solve": 0.1285,
+      "plan": 0.1438,
+      "check_in": 0.0853
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4925
+    }
+   },
+   "error": null,
+   "latency_ms": 3780.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-035",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.1116,
+     "probabilities": {
+      "casual": 0.2827,
+      "listening": 0.1865,
+      "exploration": 0.0525,
+      "reflection": 0.0375,
+      "problem_solving": 0.0806,
+      "planning": 0.0675,
+      "information": 0.0351,
+      "safety": 0.1864,
+      "other": 0.0711
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0335,
+     "probabilities": {
+      "reflect": 0.0683,
+      "validate": 0.1712,
+      "explore": 0.1635,
+      "clarify": 0.087,
+      "summarize": 0.0463,
+      "provide_information": 0.1217,
+      "problem_solve": 0.1124,
+      "plan": 0.151,
+      "check_in": 0.0787
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4846
+    }
+   },
+   "error": null,
+   "latency_ms": 3768.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-037",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0571,
+     "probabilities": {
+      "casual": 0.2431,
+      "listening": 0.1817,
+      "exploration": 0.0709,
+      "reflection": 0.0469,
+      "problem_solving": 0.1197,
+      "planning": 0.0969,
+      "information": 0.0752,
+      "safety": 0.0884,
+      "other": 0.0772
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0286,
+     "probabilities": {
+      "reflect": 0.0719,
+      "validate": 0.1466,
+      "explore": 0.1731,
+      "clarify": 0.101,
+      "summarize": 0.0516,
+      "provide_information": 0.1524,
+      "problem_solve": 0.1308,
+      "plan": 0.0837,
+      "check_in": 0.089
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4883
+    }
+   },
+   "error": null,
+   "latency_ms": 3622.2,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-039",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.0736,
+     "probabilities": {
+      "casual": 0.2221,
+      "listening": 0.2382,
+      "exploration": 0.081,
+      "reflection": 0.0331,
+      "problem_solving": 0.1048,
+      "planning": 0.0912,
+      "information": 0.064,
+      "safety": 0.0833,
+      "other": 0.0824
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0377,
+     "probabilities": {
+      "reflect": 0.0655,
+      "validate": 0.1778,
+      "explore": 0.1554,
+      "clarify": 0.0928,
+      "summarize": 0.0464,
+      "provide_information": 0.1738,
+      "problem_solve": 0.1163,
+      "plan": 0.0854,
+      "check_in": 0.0866
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5131
+    }
+   },
+   "error": null,
+   "latency_ms": 3275.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-041",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0592,
+     "probabilities": {
+      "casual": 0.2239,
+      "listening": 0.195,
+      "exploration": 0.0829,
+      "reflection": 0.0332,
+      "problem_solving": 0.1328,
+      "planning": 0.0909,
+      "information": 0.0735,
+      "safety": 0.084,
+      "other": 0.0839
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0285,
+     "probabilities": {
+      "reflect": 0.0734,
+      "validate": 0.158,
+      "explore": 0.1662,
+      "clarify": 0.0968,
+      "summarize": 0.0504,
+      "provide_information": 0.1569,
+      "problem_solve": 0.1183,
+      "plan": 0.0889,
+      "check_in": 0.0911
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5219
+    }
+   },
+   "error": null,
+   "latency_ms": 2626.0,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-043",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.237,
+     "probabilities": {
+      "casual": 0.1978,
+      "listening": 0.0489,
+      "exploration": 0.1389,
+      "reflection": 0.0238,
+      "problem_solving": 0.033,
+      "planning": 0.0127,
+      "information": 0.0799,
+      "safety": 0.033,
+      "other": 0.4319
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.143,
+     "probabilities": {
+      "reflect": 0.0879,
+      "validate": 0.2379,
+      "explore": 0.1495,
+      "clarify": 0.1297,
+      "summarize": 0.0341,
+      "provide_information": 0.2666,
+      "problem_solve": 0.0509,
+      "plan": 0.0099,
+      "check_in": 0.0335
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5029
+    }
+   },
+   "error": null,
+   "latency_ms": 1896.7,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-045",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.7844,
+     "probabilities": {
+      "casual": 0.0531,
+      "listening": 0.0126,
+      "exploration": 0.0057,
+      "reflection": 0.0072,
+      "problem_solving": 0.0067,
+      "planning": 0.0052,
+      "information": 0.003,
+      "safety": 0.0049,
+      "other": 0.9016
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1224,
+     "probabilities": {
+      "reflect": 0.1168,
+      "validate": 0.2738,
+      "explore": 0.2404,
+      "clarify": 0.074,
+      "summarize": 0.0406,
+      "provide_information": 0.0855,
+      "problem_solve": 0.1125,
+      "plan": 0.0279,
+      "check_in": 0.0285
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4653
+    }
+   },
+   "error": null,
+   "latency_ms": 1961.9,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-047",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.3413,
+     "probabilities": {
+      "casual": 0.0414,
+      "listening": 0.0288,
+      "exploration": 0.2922,
+      "reflection": 0.0055,
+      "problem_solving": 0.077,
+      "planning": 0.0172,
+      "information": 0.0398,
+      "safety": 0.0196,
+      "other": 0.4786
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.1413,
+     "probabilities": {
+      "reflect": 0.078,
+      "validate": 0.1861,
+      "explore": 0.3075,
+      "clarify": 0.0758,
+      "summarize": 0.028,
+      "provide_information": 0.0914,
+      "problem_solve": 0.1804,
+      "plan": 0.0178,
+      "check_in": 0.035
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3624
+    }
+   },
+   "error": null,
+   "latency_ms": 2132.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "hard-049",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.3455,
+     "probabilities": {
+      "casual": 0.1338,
+      "listening": 0.0266,
+      "exploration": 0.0125,
+      "reflection": 0.0082,
+      "problem_solving": 0.0133,
+      "planning": 0.3026,
+      "information": 0.0128,
+      "safety": 0.0467,
+      "other": 0.4436
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 0.6619,
+     "probabilities": {
+      "reflect": 0.0196,
+      "validate": 0.0664,
+      "explore": 0.0263,
+      "clarify": 0.0166,
+      "summarize": 0.0054,
+      "provide_information": 0.0138,
+      "problem_solve": 0.0168,
+      "plan": 0.8328,
+      "check_in": 0.0022
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3869
+    }
+   },
+   "error": null,
+   "latency_ms": 1944.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-001",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.3594,
+     "probabilities": {
+      "casual": 0.2516,
+      "listening": 0.0212,
+      "exploration": 0.0542,
+      "reflection": 0.0059,
+      "problem_solving": 0.0125,
+      "planning": 0.0191,
+      "information": 0.1216,
+      "safety": 0.0132,
+      "other": 0.5006
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1076,
+     "probabilities": {
+      "reflect": 0.1002,
+      "validate": 0.2433,
+      "explore": 0.2019,
+      "clarify": 0.1325,
+      "summarize": 0.0456,
+      "provide_information": 0.1679,
+      "problem_solve": 0.0487,
+      "plan": 0.0219,
+      "check_in": 0.0381
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3229
+    }
+   },
+   "error": null,
+   "latency_ms": 1794.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-003",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6114,
+     "probabilities": {
+      "casual": 0.0614,
+      "listening": 0.0259,
+      "exploration": 0.0517,
+      "reflection": 0.0118,
+      "problem_solving": 0.0148,
+      "planning": 0.0094,
+      "information": 0.0131,
+      "safety": 0.0092,
+      "other": 0.8027
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.1492,
+     "probabilities": {
+      "reflect": 0.0816,
+      "validate": 0.1674,
+      "explore": 0.346,
+      "clarify": 0.1264,
+      "summarize": 0.0629,
+      "provide_information": 0.1132,
+      "problem_solve": 0.0708,
+      "plan": 0.0101,
+      "check_in": 0.0215
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3103
+    }
+   },
+   "error": null,
+   "latency_ms": 1663.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-005",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5864,
+     "probabilities": {
+      "casual": 0.0917,
+      "listening": 0.0175,
+      "exploration": 0.0222,
+      "reflection": 0.0075,
+      "problem_solving": 0.036,
+      "planning": 0.0136,
+      "information": 0.0139,
+      "safety": 0.0164,
+      "other": 0.7813
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1064,
+     "probabilities": {
+      "reflect": 0.1278,
+      "validate": 0.2484,
+      "explore": 0.2103,
+      "clarify": 0.1039,
+      "summarize": 0.0426,
+      "provide_information": 0.1037,
+      "problem_solve": 0.1181,
+      "plan": 0.0284,
+      "check_in": 0.0167
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3076
+    }
+   },
+   "error": null,
+   "latency_ms": 1810.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-007",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.2232,
+     "probabilities": {
+      "casual": 0.2193,
+      "listening": 0.0339,
+      "exploration": 0.0321,
+      "reflection": 0.008,
+      "problem_solving": 0.0533,
+      "planning": 0.011,
+      "information": 0.1938,
+      "safety": 0.0914,
+      "other": 0.3573
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1251,
+     "probabilities": {
+      "reflect": 0.1056,
+      "validate": 0.2445,
+      "explore": 0.2029,
+      "clarify": 0.0856,
+      "summarize": 0.0366,
+      "provide_information": 0.1787,
+      "problem_solve": 0.1148,
+      "plan": 0.0126,
+      "check_in": 0.0186
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4592
+    }
+   },
+   "error": null,
+   "latency_ms": 2283.5,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-009",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "safety",
+     "confidence": 0.763,
+     "probabilities": {
+      "casual": 0.0467,
+      "listening": 0.0066,
+      "exploration": 0.0046,
+      "reflection": 0.0018,
+      "problem_solving": 0.0035,
+      "planning": 0.0028,
+      "information": 0.0054,
+      "safety": 0.8852,
+      "other": 0.0433
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0697,
+     "probabilities": {
+      "reflect": 0.085,
+      "validate": 0.2141,
+      "explore": 0.1856,
+      "clarify": 0.1492,
+      "summarize": 0.0744,
+      "provide_information": 0.1418,
+      "problem_solve": 0.0768,
+      "plan": 0.03,
+      "check_in": 0.0431
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5329
+    }
+   },
+   "error": null,
+   "latency_ms": 2282.7,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-011",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.4158,
+     "probabilities": {
+      "casual": 0.1373,
+      "listening": 0.0264,
+      "exploration": 0.139,
+      "reflection": 0.0059,
+      "problem_solving": 0.0147,
+      "planning": 0.0098,
+      "information": 0.041,
+      "safety": 0.0173,
+      "other": 0.6087
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1555,
+     "probabilities": {
+      "reflect": 0.0773,
+      "validate": 0.2546,
+      "explore": 0.2189,
+      "clarify": 0.0917,
+      "summarize": 0.0287,
+      "provide_information": 0.2363,
+      "problem_solve": 0.0403,
+      "plan": 0.0151,
+      "check_in": 0.0373
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3696
+    }
+   },
+   "error": null,
+   "latency_ms": 2088.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-013",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "safety",
+     "confidence": 0.0799,
+     "probabilities": {
+      "casual": 0.1835,
+      "listening": 0.1897,
+      "exploration": 0.0873,
+      "reflection": 0.0514,
+      "problem_solving": 0.0918,
+      "planning": 0.0695,
+      "information": 0.0433,
+      "safety": 0.2337,
+      "other": 0.05
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.0373,
+     "probabilities": {
+      "reflect": 0.07,
+      "validate": 0.1664,
+      "explore": 0.167,
+      "clarify": 0.1001,
+      "summarize": 0.0391,
+      "provide_information": 0.1707,
+      "problem_solve": 0.0984,
+      "plan": 0.0987,
+      "check_in": 0.0897
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5402
+    }
+   },
+   "error": null,
+   "latency_ms": 7799.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-015",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5779,
+     "probabilities": {
+      "casual": 0.0725,
+      "listening": 0.0323,
+      "exploration": 0.0362,
+      "reflection": 0.0151,
+      "problem_solving": 0.0233,
+      "planning": 0.0208,
+      "information": 0.0107,
+      "safety": 0.0069,
+      "other": 0.7823
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.1373,
+     "probabilities": {
+      "reflect": 0.0997,
+      "validate": 0.2115,
+      "explore": 0.2889,
+      "clarify": 0.1055,
+      "summarize": 0.037,
+      "provide_information": 0.1094,
+      "problem_solve": 0.1176,
+      "plan": 0.0098,
+      "check_in": 0.0206
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3271
+    }
+   },
+   "error": null,
+   "latency_ms": 9513.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-017",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5113,
+     "probabilities": {
+      "casual": 0.1112,
+      "listening": 0.0206,
+      "exploration": 0.0193,
+      "reflection": 0.0088,
+      "problem_solving": 0.0419,
+      "planning": 0.0274,
+      "information": 0.0084,
+      "safety": 0.0388,
+      "other": 0.7236
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.1145,
+     "probabilities": {
+      "reflect": 0.1043,
+      "validate": 0.2223,
+      "explore": 0.2247,
+      "clarify": 0.0696,
+      "summarize": 0.0261,
+      "provide_information": 0.0831,
+      "problem_solve": 0.2016,
+      "plan": 0.0393,
+      "check_in": 0.029
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3867
+    }
+   },
+   "error": null,
+   "latency_ms": 4293.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-019",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.0758,
+     "probabilities": {
+      "casual": 0.2332,
+      "listening": 0.2333,
+      "exploration": 0.0543,
+      "reflection": 0.0432,
+      "problem_solving": 0.0998,
+      "planning": 0.0917,
+      "information": 0.0611,
+      "safety": 0.0979,
+      "other": 0.0855
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0324,
+     "probabilities": {
+      "reflect": 0.0718,
+      "validate": 0.1712,
+      "explore": 0.1635,
+      "clarify": 0.0982,
+      "summarize": 0.0454,
+      "provide_information": 0.137,
+      "problem_solve": 0.1396,
+      "plan": 0.0795,
+      "check_in": 0.0938
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.473
+    }
+   },
+   "error": null,
+   "latency_ms": 5768.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-021",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0831,
+     "probabilities": {
+      "casual": 0.2477,
+      "listening": 0.1774,
+      "exploration": 0.0677,
+      "reflection": 0.0428,
+      "problem_solving": 0.0925,
+      "planning": 0.0675,
+      "information": 0.0459,
+      "safety": 0.1876,
+      "other": 0.0707
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0309,
+     "probabilities": {
+      "reflect": 0.0675,
+      "validate": 0.1604,
+      "explore": 0.1709,
+      "clarify": 0.0952,
+      "summarize": 0.0454,
+      "provide_information": 0.134,
+      "problem_solve": 0.1309,
+      "plan": 0.1142,
+      "check_in": 0.0815
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4692
+    }
+   },
+   "error": null,
+   "latency_ms": 3314.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-023",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.0682,
+     "probabilities": {
+      "casual": 0.2119,
+      "listening": 0.2264,
+      "exploration": 0.0586,
+      "reflection": 0.0335,
+      "problem_solving": 0.1284,
+      "planning": 0.0896,
+      "information": 0.074,
+      "safety": 0.0898,
+      "other": 0.0879
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0363,
+     "probabilities": {
+      "reflect": 0.0689,
+      "validate": 0.1792,
+      "explore": 0.1539,
+      "clarify": 0.0935,
+      "summarize": 0.0459,
+      "provide_information": 0.1704,
+      "problem_solve": 0.1147,
+      "plan": 0.0892,
+      "check_in": 0.0845
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5035
+    }
+   },
+   "error": null,
+   "latency_ms": 2609.5,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-025",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0523,
+     "probabilities": {
+      "casual": 0.2161,
+      "listening": 0.2011,
+      "exploration": 0.0735,
+      "reflection": 0.0437,
+      "problem_solving": 0.1122,
+      "planning": 0.0802,
+      "information": 0.0853,
+      "safety": 0.108,
+      "other": 0.0799
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0328,
+     "probabilities": {
+      "reflect": 0.0683,
+      "validate": 0.1668,
+      "explore": 0.1546,
+      "clarify": 0.0931,
+      "summarize": 0.046,
+      "provide_information": 0.1586,
+      "problem_solve": 0.1363,
+      "plan": 0.0857,
+      "check_in": 0.0906
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4775
+    }
+   },
+   "error": null,
+   "latency_ms": 3073.2,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-027",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 0.5506,
+     "probabilities": {
+      "casual": 0.1489,
+      "listening": 0.0309,
+      "exploration": 0.0229,
+      "reflection": 0.0031,
+      "problem_solving": 0.0271,
+      "planning": 0.0023,
+      "information": 0.7228,
+      "safety": 0.0037,
+      "other": 0.0385
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.4567,
+     "probabilities": {
+      "reflect": 0.0544,
+      "validate": 0.0809,
+      "explore": 0.0761,
+      "clarify": 0.0435,
+      "summarize": 0.0172,
+      "provide_information": 0.686,
+      "problem_solve": 0.0238,
+      "plan": 0.0039,
+      "check_in": 0.0142
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5961
+    }
+   },
+   "error": null,
+   "latency_ms": 2428.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-029",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5831,
+     "probabilities": {
+      "casual": 0.0883,
+      "listening": 0.014,
+      "exploration": 0.0155,
+      "reflection": 0.0116,
+      "problem_solving": 0.0114,
+      "planning": 0.0624,
+      "information": 0.0048,
+      "safety": 0.0194,
+      "other": 0.7726
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.1729,
+     "probabilities": {
+      "reflect": 0.0763,
+      "validate": 0.2571,
+      "explore": 0.3273,
+      "clarify": 0.1122,
+      "summarize": 0.0293,
+      "provide_information": 0.0545,
+      "problem_solve": 0.0984,
+      "plan": 0.0238,
+      "check_in": 0.0212
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3395
+    }
+   },
+   "error": null,
+   "latency_ms": 2000.5,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-031",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5982,
+     "probabilities": {
+      "casual": 0.0501,
+      "listening": 0.0189,
+      "exploration": 0.048,
+      "reflection": 0.0284,
+      "problem_solving": 0.0107,
+      "planning": 0.006,
+      "information": 0.029,
+      "safety": 0.0108,
+      "other": 0.798
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.1463,
+     "probabilities": {
+      "reflect": 0.0797,
+      "validate": 0.2683,
+      "explore": 0.2728,
+      "clarify": 0.0785,
+      "summarize": 0.0352,
+      "provide_information": 0.1485,
+      "problem_solve": 0.0589,
+      "plan": 0.0154,
+      "check_in": 0.0427
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3511
+    }
+   },
+   "error": null,
+   "latency_ms": 2093.9,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-033",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.5451,
+     "probabilities": {
+      "casual": 0.0256,
+      "listening": 0.0142,
+      "exploration": 0.0094,
+      "reflection": 0.0034,
+      "problem_solving": 0.5829,
+      "planning": 0.0029,
+      "information": 0.0166,
+      "safety": 0.0027,
+      "other": 0.3424
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.2405,
+     "probabilities": {
+      "reflect": 0.0771,
+      "validate": 0.185,
+      "explore": 0.2046,
+      "clarify": 0.0489,
+      "summarize": 0.0179,
+      "provide_information": 0.0635,
+      "problem_solve": 0.3881,
+      "plan": 0.0053,
+      "check_in": 0.0096
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3447
+    }
+   },
+   "error": null,
+   "latency_ms": 1912.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-035",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.4234,
+     "probabilities": {
+      "casual": 0.2341,
+      "listening": 0.0383,
+      "exploration": 0.038,
+      "reflection": 0.0194,
+      "problem_solving": 0.038,
+      "planning": 0.0184,
+      "information": 0.0162,
+      "safety": 0.005,
+      "other": 0.5926
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1217,
+     "probabilities": {
+      "reflect": 0.1276,
+      "validate": 0.2669,
+      "explore": 0.2187,
+      "clarify": 0.1342,
+      "summarize": 0.0418,
+      "provide_information": 0.0989,
+      "problem_solve": 0.0656,
+      "plan": 0.0168,
+      "check_in": 0.0293
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4269
+    }
+   },
+   "error": null,
+   "latency_ms": 1993.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-037",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.309,
+     "probabilities": {
+      "casual": 0.0638,
+      "listening": 0.0301,
+      "exploration": 0.0331,
+      "reflection": 0.0058,
+      "problem_solving": 0.1558,
+      "planning": 0.0074,
+      "information": 0.0107,
+      "safety": 0.2754,
+      "other": 0.4178
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.1721,
+     "probabilities": {
+      "reflect": 0.0994,
+      "validate": 0.2073,
+      "explore": 0.2114,
+      "clarify": 0.064,
+      "summarize": 0.0247,
+      "provide_information": 0.0658,
+      "problem_solve": 0.2968,
+      "plan": 0.0163,
+      "check_in": 0.0144
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3145
+    }
+   },
+   "error": null,
+   "latency_ms": 2043.9,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-039",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.4492,
+     "probabilities": {
+      "casual": 0.145,
+      "listening": 0.0137,
+      "exploration": 0.0212,
+      "reflection": 0.0097,
+      "problem_solving": 0.0056,
+      "planning": 0.1741,
+      "information": 0.0197,
+      "safety": 0.0059,
+      "other": 0.6051
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 0.1608,
+     "probabilities": {
+      "reflect": 0.0976,
+      "validate": 0.2015,
+      "explore": 0.0795,
+      "clarify": 0.0446,
+      "summarize": 0.15,
+      "provide_information": 0.0678,
+      "problem_solve": 0.0156,
+      "plan": 0.3305,
+      "check_in": 0.013
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4627
+    }
+   },
+   "error": null,
+   "latency_ms": 2094.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-041",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.3164,
+     "probabilities": {
+      "casual": 0.2208,
+      "listening": 0.026,
+      "exploration": 0.0467,
+      "reflection": 0.0191,
+      "problem_solving": 0.0254,
+      "planning": 0.1451,
+      "information": 0.0097,
+      "safety": 0.0226,
+      "other": 0.4847
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 0.2089,
+     "probabilities": {
+      "reflect": 0.0695,
+      "validate": 0.216,
+      "explore": 0.1106,
+      "clarify": 0.0658,
+      "summarize": 0.0215,
+      "provide_information": 0.0577,
+      "problem_solve": 0.0374,
+      "plan": 0.4064,
+      "check_in": 0.0151
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.348
+    }
+   },
+   "error": null,
+   "latency_ms": 1986.2,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-043",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.2704,
+     "probabilities": {
+      "casual": 0.1655,
+      "listening": 0.0273,
+      "exploration": 0.3486,
+      "reflection": 0.0284,
+      "problem_solving": 0.0056,
+      "planning": 0.0056,
+      "information": 0.2884,
+      "safety": 0.02,
+      "other": 0.1106
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.3774,
+     "probabilities": {
+      "reflect": 0.0545,
+      "validate": 0.0775,
+      "explore": 0.2129,
+      "clarify": 0.0588,
+      "summarize": 0.0128,
+      "provide_information": 0.5546,
+      "problem_solve": 0.0133,
+      "plan": 0.0057,
+      "check_in": 0.0099
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.679
+    }
+   },
+   "error": null,
+   "latency_ms": 1960.2,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-045",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.3993,
+     "probabilities": {
+      "casual": 0.1122,
+      "listening": 0.0285,
+      "exploration": 0.2417,
+      "reflection": 0.0235,
+      "problem_solving": 0.0124,
+      "planning": 0.0068,
+      "information": 0.0153,
+      "safety": 0.0137,
+      "other": 0.5459
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1594,
+     "probabilities": {
+      "reflect": 0.0858,
+      "validate": 0.2963,
+      "explore": 0.1556,
+      "clarify": 0.2401,
+      "summarize": 0.0369,
+      "provide_information": 0.1028,
+      "problem_solve": 0.0295,
+      "plan": 0.0124,
+      "check_in": 0.0405
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4314
+    }
+   },
+   "error": null,
+   "latency_ms": 1682.7,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-047",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.439,
+     "probabilities": {
+      "casual": 0.1125,
+      "listening": 0.0262,
+      "exploration": 0.0372,
+      "reflection": 0.0185,
+      "problem_solving": 0.0165,
+      "planning": 0.007,
+      "information": 0.0176,
+      "safety": 0.1109,
+      "other": 0.6537
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.1271,
+     "probabilities": {
+      "reflect": 0.0634,
+      "validate": 0.1921,
+      "explore": 0.3165,
+      "clarify": 0.1214,
+      "summarize": 0.0438,
+      "provide_information": 0.128,
+      "problem_solve": 0.0698,
+      "plan": 0.0234,
+      "check_in": 0.0415
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4182
+    }
+   },
+   "error": null,
+   "latency_ms": 1871.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "information-049",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5853,
+     "probabilities": {
+      "casual": 0.0117,
+      "listening": 0.0226,
+      "exploration": 0.0497,
+      "reflection": 0.0138,
+      "problem_solving": 0.0118,
+      "planning": 0.0025,
+      "information": 0.1319,
+      "safety": 0.003,
+      "other": 0.7531
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.109,
+     "probabilities": {
+      "reflect": 0.1014,
+      "validate": 0.2143,
+      "explore": 0.2647,
+      "clarify": 0.1024,
+      "summarize": 0.048,
+      "provide_information": 0.1259,
+      "problem_solve": 0.0948,
+      "plan": 0.024,
+      "check_in": 0.0244
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3995
+    }
+   },
+   "error": null,
+   "latency_ms": 1888.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-001",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6167,
+     "probabilities": {
+      "casual": 0.076,
+      "listening": 0.0145,
+      "exploration": 0.0398,
+      "reflection": 0.0302,
+      "problem_solving": 0.0096,
+      "planning": 0.0223,
+      "information": 0.0067,
+      "safety": 0.0014,
+      "other": 0.7995
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.1672,
+     "probabilities": {
+      "reflect": 0.1001,
+      "validate": 0.2723,
+      "explore": 0.2816,
+      "clarify": 0.0519,
+      "summarize": 0.0361,
+      "provide_information": 0.0766,
+      "problem_solve": 0.1486,
+      "plan": 0.016,
+      "check_in": 0.0168
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3732
+    }
+   },
+   "error": null,
+   "latency_ms": 2157.5,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-003",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 0.3959,
+     "probabilities": {
+      "casual": 0.1928,
+      "listening": 0.0225,
+      "exploration": 0.0374,
+      "reflection": 0.0132,
+      "problem_solving": 0.0088,
+      "planning": 0.5553,
+      "information": 0.0111,
+      "safety": 0.0089,
+      "other": 0.15
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 0.3104,
+     "probabilities": {
+      "reflect": 0.0664,
+      "validate": 0.1973,
+      "explore": 0.0665,
+      "clarify": 0.0573,
+      "summarize": 0.0202,
+      "provide_information": 0.0454,
+      "problem_solve": 0.0198,
+      "plan": 0.5204,
+      "check_in": 0.0068
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3866
+    }
+   },
+   "error": null,
+   "latency_ms": 2502.0,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-005",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0587,
+     "probabilities": {
+      "casual": 0.2772,
+      "listening": 0.1274,
+      "exploration": 0.0978,
+      "reflection": 0.0567,
+      "problem_solving": 0.0994,
+      "planning": 0.0813,
+      "information": 0.0653,
+      "safety": 0.1205,
+      "other": 0.0744
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.0201,
+     "probabilities": {
+      "reflect": 0.0741,
+      "validate": 0.1365,
+      "explore": 0.1555,
+      "clarify": 0.0973,
+      "summarize": 0.0585,
+      "provide_information": 0.1561,
+      "problem_solve": 0.12,
+      "plan": 0.1128,
+      "check_in": 0.0892
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5155
+    }
+   },
+   "error": null,
+   "latency_ms": 4397.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-007",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.1975,
+     "probabilities": {
+      "casual": 0.1896,
+      "listening": 0.0459,
+      "exploration": 0.1828,
+      "reflection": 0.0195,
+      "problem_solving": 0.022,
+      "planning": 0.0404,
+      "information": 0.1499,
+      "safety": 0.0124,
+      "other": 0.3375
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.1626,
+     "probabilities": {
+      "reflect": 0.0698,
+      "validate": 0.149,
+      "explore": 0.3206,
+      "clarify": 0.1692,
+      "summarize": 0.0261,
+      "provide_information": 0.173,
+      "problem_solve": 0.0563,
+      "plan": 0.0169,
+      "check_in": 0.0191
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4619
+    }
+   },
+   "error": null,
+   "latency_ms": 1919.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-009",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5816,
+     "probabilities": {
+      "casual": 0.0745,
+      "listening": 0.0158,
+      "exploration": 0.0376,
+      "reflection": 0.0493,
+      "problem_solving": 0.0105,
+      "planning": 0.0205,
+      "information": 0.007,
+      "safety": 0.0062,
+      "other": 0.7786
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1509,
+     "probabilities": {
+      "reflect": 0.0936,
+      "validate": 0.2852,
+      "explore": 0.2851,
+      "clarify": 0.087,
+      "summarize": 0.0309,
+      "provide_information": 0.0622,
+      "problem_solve": 0.0916,
+      "plan": 0.0438,
+      "check_in": 0.0205
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3617
+    }
+   },
+   "error": null,
+   "latency_ms": 1994.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-011",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0724,
+     "probabilities": {
+      "casual": 0.257,
+      "listening": 0.157,
+      "exploration": 0.0807,
+      "reflection": 0.0416,
+      "problem_solving": 0.0969,
+      "planning": 0.0751,
+      "information": 0.0499,
+      "safety": 0.1672,
+      "other": 0.0748
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0314,
+     "probabilities": {
+      "reflect": 0.0662,
+      "validate": 0.1654,
+      "explore": 0.1592,
+      "clarify": 0.0962,
+      "summarize": 0.0444,
+      "provide_information": 0.1443,
+      "problem_solve": 0.1304,
+      "plan": 0.1125,
+      "check_in": 0.0815
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4926
+    }
+   },
+   "error": null,
+   "latency_ms": 2546.2,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-013",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.1071,
+     "probabilities": {
+      "casual": 0.3194,
+      "listening": 0.1906,
+      "exploration": 0.0525,
+      "reflection": 0.033,
+      "problem_solving": 0.0976,
+      "planning": 0.0817,
+      "information": 0.0672,
+      "safety": 0.0805,
+      "other": 0.0775
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0386,
+     "probabilities": {
+      "reflect": 0.0679,
+      "validate": 0.1908,
+      "explore": 0.1584,
+      "clarify": 0.092,
+      "summarize": 0.0438,
+      "provide_information": 0.1554,
+      "problem_solve": 0.1196,
+      "plan": 0.0879,
+      "check_in": 0.0842
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5085
+    }
+   },
+   "error": null,
+   "latency_ms": 2463.7,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-015",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.3993,
+     "probabilities": {
+      "casual": 0.0361,
+      "listening": 0.023,
+      "exploration": 0.0628,
+      "reflection": 0.0082,
+      "problem_solving": 0.0857,
+      "planning": 0.0944,
+      "information": 0.0292,
+      "safety": 0.02,
+      "other": 0.6406
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0859,
+     "probabilities": {
+      "reflect": 0.0869,
+      "validate": 0.212,
+      "explore": 0.2349,
+      "clarify": 0.0606,
+      "summarize": 0.0318,
+      "provide_information": 0.0863,
+      "problem_solve": 0.1476,
+      "plan": 0.1052,
+      "check_in": 0.0349
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3327
+    }
+   },
+   "error": null,
+   "latency_ms": 2062.0,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-017",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 0.7924,
+     "probabilities": {
+      "casual": 0.0412,
+      "listening": 0.0065,
+      "exploration": 0.0031,
+      "reflection": 0.0009,
+      "problem_solving": 0.0077,
+      "planning": 0.9069,
+      "information": 0.0059,
+      "safety": 0.0043,
+      "other": 0.0235
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 0.5934,
+     "probabilities": {
+      "reflect": 0.0264,
+      "validate": 0.0951,
+      "explore": 0.0257,
+      "clarify": 0.0181,
+      "summarize": 0.0041,
+      "provide_information": 0.0191,
+      "problem_solve": 0.0272,
+      "plan": 0.7812,
+      "check_in": 0.0031
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3896
+    }
+   },
+   "error": null,
+   "latency_ms": 1981.6,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-019",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.3403,
+     "probabilities": {
+      "casual": 0.0797,
+      "listening": 0.0286,
+      "exploration": 0.0845,
+      "reflection": 0.0398,
+      "problem_solving": 0.0289,
+      "planning": 0.019,
+      "information": 0.1049,
+      "safety": 0.0222,
+      "other": 0.5923
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1134,
+     "probabilities": {
+      "reflect": 0.1586,
+      "validate": 0.2898,
+      "explore": 0.1454,
+      "clarify": 0.0827,
+      "summarize": 0.041,
+      "provide_information": 0.1437,
+      "problem_solve": 0.0876,
+      "plan": 0.0286,
+      "check_in": 0.0227
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4209
+    }
+   },
+   "error": null,
+   "latency_ms": 1947.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-021",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0342,
+     "probabilities": {
+      "casual": 0.204,
+      "listening": 0.1578,
+      "exploration": 0.0885,
+      "reflection": 0.0596,
+      "problem_solving": 0.1366,
+      "planning": 0.1047,
+      "information": 0.07,
+      "safety": 0.1037,
+      "other": 0.075
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.0173,
+     "probabilities": {
+      "reflect": 0.081,
+      "validate": 0.132,
+      "explore": 0.1462,
+      "clarify": 0.0966,
+      "summarize": 0.0625,
+      "provide_information": 0.1571,
+      "problem_solve": 0.129,
+      "plan": 0.1101,
+      "check_in": 0.0855
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4985
+    }
+   },
+   "error": null,
+   "latency_ms": 3969.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-023",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.5922,
+     "probabilities": {
+      "casual": 0.1009,
+      "listening": 0.029,
+      "exploration": 0.0135,
+      "reflection": 0.0416,
+      "problem_solving": 0.0108,
+      "planning": 0.0124,
+      "information": 0.0056,
+      "safety": 0.0093,
+      "other": 0.777
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1685,
+     "probabilities": {
+      "reflect": 0.1338,
+      "validate": 0.3607,
+      "explore": 0.1907,
+      "clarify": 0.064,
+      "summarize": 0.0368,
+      "provide_information": 0.0939,
+      "problem_solve": 0.0829,
+      "plan": 0.0162,
+      "check_in": 0.021
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4577
+    }
+   },
+   "error": null,
+   "latency_ms": 2169.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-025",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.0871,
+     "probabilities": {
+      "casual": 0.1447,
+      "listening": 0.1614,
+      "exploration": 0.0652,
+      "reflection": 0.0347,
+      "problem_solving": 0.0918,
+      "planning": 0.0572,
+      "information": 0.0354,
+      "safety": 0.1527,
+      "other": 0.2569
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0376,
+     "probabilities": {
+      "reflect": 0.0631,
+      "validate": 0.1693,
+      "explore": 0.1699,
+      "clarify": 0.0993,
+      "summarize": 0.0325,
+      "provide_information": 0.1424,
+      "problem_solve": 0.1139,
+      "plan": 0.1029,
+      "check_in": 0.1069
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5806
+    }
+   },
+   "error": null,
+   "latency_ms": 2624.9,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-027",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.0616,
+     "probabilities": {
+      "casual": 0.2201,
+      "listening": 0.2203,
+      "exploration": 0.0932,
+      "reflection": 0.0386,
+      "problem_solving": 0.1023,
+      "planning": 0.0886,
+      "information": 0.087,
+      "safety": 0.073,
+      "other": 0.0768
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.0312,
+     "probabilities": {
+      "reflect": 0.0695,
+      "validate": 0.1588,
+      "explore": 0.1496,
+      "clarify": 0.0946,
+      "summarize": 0.05,
+      "provide_information": 0.1777,
+      "problem_solve": 0.1214,
+      "plan": 0.0888,
+      "check_in": 0.0897
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5069
+    }
+   },
+   "error": null,
+   "latency_ms": 2555.9,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-029",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.1269,
+     "probabilities": {
+      "casual": 0.1062,
+      "listening": 0.1217,
+      "exploration": 0.0564,
+      "reflection": 0.0416,
+      "problem_solving": 0.0805,
+      "planning": 0.057,
+      "information": 0.0326,
+      "safety": 0.1494,
+      "other": 0.3545
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.0235,
+     "probabilities": {
+      "reflect": 0.0751,
+      "validate": 0.1611,
+      "explore": 0.1583,
+      "clarify": 0.074,
+      "summarize": 0.0696,
+      "provide_information": 0.1587,
+      "problem_solve": 0.0997,
+      "plan": 0.1032,
+      "check_in": 0.1003
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5825
+    }
+   },
+   "error": null,
+   "latency_ms": 2861.3,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-031",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "safety",
+     "confidence": 0.0882,
+     "probabilities": {
+      "casual": 0.1392,
+      "listening": 0.1752,
+      "exploration": 0.0847,
+      "reflection": 0.0444,
+      "problem_solving": 0.0872,
+      "planning": 0.0667,
+      "information": 0.0343,
+      "safety": 0.2828,
+      "other": 0.0854
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.0395,
+     "probabilities": {
+      "reflect": 0.0588,
+      "validate": 0.1382,
+      "explore": 0.1547,
+      "clarify": 0.1131,
+      "summarize": 0.04,
+      "provide_information": 0.1733,
+      "problem_solve": 0.0972,
+      "plan": 0.0716,
+      "check_in": 0.1532
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5298
+    }
+   },
+   "error": null,
+   "latency_ms": 3278.2,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-033",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6074,
+     "probabilities": {
+      "casual": 0.0643,
+      "listening": 0.0244,
+      "exploration": 0.0088,
+      "reflection": 0.0068,
+      "problem_solving": 0.0641,
+      "planning": 0.013,
+      "information": 0.0091,
+      "safety": 0.0148,
+      "other": 0.7948
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.3156,
+     "probabilities": {
+      "reflect": 0.0483,
+      "validate": 0.1611,
+      "explore": 0.1199,
+      "clarify": 0.0412,
+      "summarize": 0.01,
+      "provide_information": 0.0306,
+      "problem_solve": 0.5359,
+      "plan": 0.0337,
+      "check_in": 0.0193
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3556
+    }
+   },
+   "error": null,
+   "latency_ms": 2062.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-035",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.6077,
+     "probabilities": {
+      "casual": 0.0517,
+      "listening": 0.0162,
+      "exploration": 0.0141,
+      "reflection": 0.003,
+      "problem_solving": 0.0098,
+      "planning": 0.0846,
+      "information": 0.0153,
+      "safety": 0.0144,
+      "other": 0.791
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1113,
+     "probabilities": {
+      "reflect": 0.064,
+      "validate": 0.2022,
+      "explore": 0.15,
+      "clarify": 0.1727,
+      "summarize": 0.0171,
+      "provide_information": 0.0573,
+      "problem_solve": 0.1994,
+      "plan": 0.1262,
+      "check_in": 0.0109
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.1877
+    }
+   },
+   "error": null,
+   "latency_ms": 2232.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-037",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0635,
+     "probabilities": {
+      "casual": 0.2438,
+      "listening": 0.1904,
+      "exploration": 0.0699,
+      "reflection": 0.042,
+      "problem_solving": 0.104,
+      "planning": 0.1234,
+      "information": 0.0777,
+      "safety": 0.0737,
+      "other": 0.0752
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.0295,
+     "probabilities": {
+      "reflect": 0.0664,
+      "validate": 0.1372,
+      "explore": 0.1687,
+      "clarify": 0.0963,
+      "summarize": 0.0518,
+      "provide_information": 0.1688,
+      "problem_solve": 0.1276,
+      "plan": 0.0923,
+      "check_in": 0.0909
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.506
+    }
+   },
+   "error": null,
+   "latency_ms": 3734.5,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-039",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.2606,
+     "probabilities": {
+      "casual": 0.1879,
+      "listening": 0.0356,
+      "exploration": 0.1017,
+      "reflection": 0.0446,
+      "problem_solving": 0.046,
+      "planning": 0.0259,
+      "information": 0.0656,
+      "safety": 0.0122,
+      "other": 0.4807
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.0988,
+     "probabilities": {
+      "reflect": 0.0961,
+      "validate": 0.2112,
+      "explore": 0.265,
+      "clarify": 0.0961,
+      "summarize": 0.035,
+      "provide_information": 0.1147,
+      "problem_solve": 0.1066,
+      "plan": 0.0297,
+      "check_in": 0.0456
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3581
+    }
+   },
+   "error": null,
+   "latency_ms": 1975.4,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-041",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 0.4545,
+     "probabilities": {
+      "casual": 0.1363,
+      "listening": 0.0205,
+      "exploration": 0.0429,
+      "reflection": 0.0034,
+      "problem_solving": 0.0121,
+      "planning": 0.0055,
+      "information": 0.6335,
+      "safety": 0.0117,
+      "other": 0.1341
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.9164,
+     "probabilities": {
+      "reflect": 0.0035,
+      "validate": 0.0096,
+      "explore": 0.0038,
+      "clarify": 0.0041,
+      "summarize": 0.0016,
+      "provide_information": 0.9711,
+      "problem_solve": 0.0045,
+      "plan": 0.0008,
+      "check_in": 0.001
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5286
+    }
+   },
+   "error": null,
+   "latency_ms": 1804.0,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-043",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.0536,
+     "probabilities": {
+      "casual": 0.2013,
+      "listening": 0.2172,
+      "exploration": 0.0627,
+      "reflection": 0.0515,
+      "problem_solving": 0.113,
+      "planning": 0.0987,
+      "information": 0.0669,
+      "safety": 0.1103,
+      "other": 0.0785
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.0233,
+     "probabilities": {
+      "reflect": 0.0741,
+      "validate": 0.1449,
+      "explore": 0.1438,
+      "clarify": 0.1009,
+      "summarize": 0.0532,
+      "provide_information": 0.1627,
+      "problem_solve": 0.1344,
+      "plan": 0.0917,
+      "check_in": 0.0942
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4848
+    }
+   },
+   "error": null,
+   "latency_ms": 3735.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-045",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.7032,
+     "probabilities": {
+      "casual": 0.0641,
+      "listening": 0.0105,
+      "exploration": 0.022,
+      "reflection": 0.0198,
+      "problem_solving": 0.0058,
+      "planning": 0.006,
+      "information": 0.0109,
+      "safety": 0.0044,
+      "other": 0.8565
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.1693,
+     "probabilities": {
+      "reflect": 0.122,
+      "validate": 0.3117,
+      "explore": 0.246,
+      "clarify": 0.0767,
+      "summarize": 0.0402,
+      "provide_information": 0.1289,
+      "problem_solve": 0.0381,
+      "plan": 0.0164,
+      "check_in": 0.0199
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.5813
+    }
+   },
+   "error": null,
+   "latency_ms": 1928.1,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-047",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "other",
+     "confidence": 0.4612,
+     "probabilities": {
+      "casual": 0.1412,
+      "listening": 0.0196,
+      "exploration": 0.0928,
+      "reflection": 0.0079,
+      "problem_solving": 0.0108,
+      "planning": 0.0119,
+      "information": 0.0442,
+      "safety": 0.0132,
+      "other": 0.6585
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.1083,
+     "probabilities": {
+      "reflect": 0.0785,
+      "validate": 0.2026,
+      "explore": 0.1759,
+      "clarify": 0.189,
+      "summarize": 0.0335,
+      "provide_information": 0.2036,
+      "problem_solve": 0.0476,
+      "plan": 0.0319,
+      "check_in": 0.0374
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4972
+    }
+   },
+   "error": null,
+   "latency_ms": 2001.8,
+   "model_id": "laya-rl-agent"
+  },
+  {
+   "example_id": "practical-049",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.0887,
+     "probabilities": {
+      "casual": 0.2573,
+      "listening": 0.0869,
+      "exploration": 0.0686,
+      "reflection": 0.1867,
+      "problem_solving": 0.0412,
+      "planning": 0.0567,
+      "information": 0.1057,
+      "safety": 0.0349,
+      "other": 0.162
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "summarize",
+     "confidence": 0.1415,
+     "probabilities": {
+      "reflect": 0.1737,
+      "validate": 0.1092,
+      "explore": 0.1152,
+      "clarify": 0.0378,
+      "summarize": 0.2689,
+      "provide_information": 0.212,
+      "problem_solve": 0.0492,
+      "plan": 0.0219,
+      "check_in": 0.0123
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4692
+    }
+   },
+   "error": null,
+   "latency_ms": 2089.2,
+   "model_id": "laya-rl-agent"
+  }
+ ]
+}

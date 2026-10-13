@@ -20,6 +20,7 @@ RUN uv sync --frozen --no-dev --no-install-project --all-extras
 COPY alembic.ini ./
 COPY migrations ./migrations
 COPY prompts ./prompts
+COPY decisions ./decisions
 COPY app ./app
 
 RUN useradd --create-home --uid 10001 appuser

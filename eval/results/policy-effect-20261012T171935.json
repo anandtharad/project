@@ -1,0 +1,410 @@
+{
+ "created_at": "2026-10-12T17:19:35+00:00",
+ "dataset": {
+  "path": "eval/datasets/decisions/v1/dev.jsonl",
+  "sha256": "758bbb0e0783f008c3b77ce90eda11c39d32a1d4bd174b39d8196781403dbfca"
+ },
+ "provider": "groq",
+ "reply_model": "openai/gpt-oss-120b",
+ "judge_model": "openai/gpt-oss-20b",
+ "prompt": "companion_system@1.1.0",
+ "strategies": [
+  "validate",
+  "problem_solve",
+  "explore"
+ ],
+ "summary": {
+  "judged_forced_replies": 36,
+  "judge_recovery_accuracy": 0.3333,
+  "judge_recovery_95ci": [
+   0.2021,
+   0.4967
+  ],
+  "chance": 0.3333,
+  "errors": {},
+  "per_strategy": {
+   "validate": {
+    "replies": 12,
+    "judged_as": {
+     "explore": 6,
+     "problem_solve": 4,
+     "validate": 2
+    },
+    "asks_question_rate": 1.0,
+    "advice_wording_rate": 0.333,
+    "mean_words": 119.3
+   },
+   "problem_solve": {
+    "replies": 12,
+    "judged_as": {
+     "explore": 6,
+     "problem_solve": 5,
+     "validate": 1
+    },
+    "asks_question_rate": 0.917,
+    "advice_wording_rate": 0.583,
+    "mean_words": 150.8
+   },
+   "explore": {
+    "replies": 12,
+    "judged_as": {
+     "explore": 5,
+     "problem_solve": 6,
+     "validate": 1
+    },
+    "asks_question_rate": 1.0,
+    "advice_wording_rate": 0.333,
+    "mean_words": 95.7
+   },
+   "open": {
+    "replies": 12,
+    "judged_as": {
+     "explore": 5,
+     "problem_solve": 5,
+     "validate": 2
+    },
+    "asks_question_rate": 0.75,
+    "advice_wording_rate": 0.333,
+    "mean_words": 140.8
+   }
+  }
+ },
+ "samples": [
+  {
+   "example_id": "casual-001",
+   "strategy": "validate",
+   "reply": "Hey! I don’t experience days the way people do, but I’m here and ready to chat. How’s your day going?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-001",
+   "strategy": "problem_solve",
+   "reply": "Hey! I’m just here, ready to chat. How’s your day going?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-001",
+   "strategy": "explore",
+   "reply": "Hey! I’m here and ready to chat. How’s your day been so far?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-001",
+   "strategy": "open",
+   "reply": "Hey! I'm doing fine, just here and ready to chat. How's your day been so far?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-021",
+   "strategy": "validate",
+   "reply": "That sounds like a fun weekend! Here’s a simple way to fit everything in while keeping some downtime:\n\n**Saturday**  \n- **Morning:** Head to the farmers market when it opens (usually around 8 am). You’ll have a few hours to stroll, pick up fresh produce, and maybe grab a coffee or pastry.  \n- **Mid‑day:** Grab a light lunch (the market often has food stalls) or head back home for a quick bite.  \n- **Afternoon:** Take a moderate hike – aim for a 2–3‑hour trail so you both have time to rest afterward. Pack some water and snacks from the market.  \n- **Evening:** Keep dinner low‑key. You could order in or make something simple with the market finds, leaving the main cooking session for Sunday.\n\n**Sunday**  \n- **Morning:** Sleep in a bit, then maybe revisit the market if there’s something you missed, or enjoy a relaxed brunch at home with the produce you bought.  \n- **Afternoon:** Free time to explore town, relax, or do a short activity you both enjoy (maybe a coffee shop or a museum).  \n- **Evening:** Cook dinner together. Plan a dish that uses the fresh ingredients you got—perhaps a veggie‑packed pasta, a stir‑fry, or a simple roasted‑vegetable sheet‑pan meal. Cooking together can be a great way to catch up and share stories.\n\nHow does that flow feel to you? Anything you’d like to shift or add?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "casual-021",
+   "strategy": "problem_solve",
+   "reply": "That sounds like a fun weekend! Here’s a simple layout that fits all three activities without feeling rushed:\n\n**Saturday**  \n- **Morning (8:30‑11:00 am)** – **Farmers market**  \n  Arrive early enough to browse, pick up fresh produce, and maybe grab a coffee or a pastry together.  \n\n- **Mid‑day (11:30 am‑1:00 pm)** – Light lunch / snack  \n  You could eat something you picked up at the market (e.g., a fresh sandwich or fruit) or head back home for a quick bite.  \n\n- **Afternoon (1:30‑4:30 pm)** – **Hike**  \n  Choose a trail that’s a reasonable drive from the market (30‑45 min each way). Aim for a 2‑hour hike, leaving time for a short rest and a photo stop.  \n\n- **Evening (6:00‑8:30 pm)** – **Dinner together**  \n  Use the market goodies (maybe some veggies, herbs, or a nice piece of cheese) to cook a simple, collaborative meal. Something like a fresh salad, roasted vegetables, and a protein (fish, chicken, or tofu) works well and doesn’t require a lot of prep time.\n\n**Sunday**  \n- **Morning (relaxed)** – Breakfast at home or a local café (you can use any leftover market goodies).  \n- **Late morning/early afternoon** – Free time to explore town, visit a museum, or just hang out and catch up.  \n- **Afternoon** – Optional: a short walk or a coffee shop visit if you both want a low‑key ending to the weekend.  \n\nFeel free to shift the start times a bit depending on how early the market opens or how far the trail is, but this keeps the three main events on Saturday and leaves Sunday open for a more relaxed finish. Does that timing work for you, or is there anything else you’d like to squeeze in?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "casual-021",
+   "strategy": "explore",
+   "reply": "That sounds like a fun weekend! If you’re looking to squeeze the market, a hike, and a home‑cooked dinner into Saturday and Sunday, a simple flow could be:\n\n**Saturday**  \n- **Morning:** Head to the farmers market when it opens (most are around 8 a.m.–12 p.m.). You’ll have plenty of time to wander, pick up fresh produce, maybe grab a coffee or a pastry for later.  \n- **Mid‑day/Lunch:** Grab a light bite at the market or bring the fresh finds back to your place for a quick salad or sandwich.  \n- **Afternoon:** Choose a nearby trail for a moderate hike—something that lets you both talk but still gets a bit of exercise. Aim for a 2–3 hour outing so you’re back home with enough energy for the evening.  \n- **Evening:** Cook dinner together with the market ingredients. It can be a relaxed “cook‑along” where you each take a part of the meal (e.g., one handles the protein, the other the side dish).  \n\n**Sunday**  \n- Keep the day a bit more low‑key—maybe brunch at a café you both like, a walk around the neighborhood, or just hanging out at home catching up. If there’s something else you both want to fit in (a museum, a visit to a local shop, etc.), you have the whole afternoon free.\n\nDoes that layout feel doable, or is there anything you’d like to shift around?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "casual-021",
+   "strategy": "open",
+   "reply": "Sounds like a fun weekend! Here’s a simple layout that fits the three things you mentioned while leaving some breathing room for just hanging out.\n\n**Saturday**  \n- **Morning (8 – 10 am):** Farmers market. Arrive early so you can wander the stalls, pick up fresh produce, maybe some pastries for later, and grab a coffee.  \n- **Late morning (10 – 12 pm):** Head back, stash the market goodies, and take a relaxed brunch together—maybe use a few of those market finds.  \n- **Afternoon (1 – 4 pm):** Hike. Choose a trail that’s about 2–3 hours round‑trip so you’re not exhausted for the evening. Pack a small snack (nuts, fruit) and plenty of water.  \n- **Evening (5 – 8 pm):** Free time to unwind, shower, and prep for dinner.  \n- **Dinner (7 – 9 pm):** Cook together. Use the fresh veggies or herbs you grabbed at the market, and maybe make a simple pasta or stir‑fry that lets you both chop and chat.\n\n**Sunday**  \n- **Morning (9 – 11 am):** Leisurely breakfast—perhaps leftovers from Saturday’s market haul, or something easy like eggs and toast.  \n- **Mid‑day (11 am – 1 pm):** Optional low‑key activity: a walk around a nearby park, a quick coffee shop visit, or just catching up on any shows or books you both like.  \n- **Afternoon (1 – 4 pm):** Free time for her to explore or for you both to relax before she heads out.  \n\nFeel free to shift the times based on when she arrives or how energetic you both feel, but this keeps the market, hike, and cooking all in place without feeling rushed. Does that flow work for you, or is there another activity you’d like to squeeze in?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "casual-039",
+   "strategy": "validate",
+   "reply": "Wow, what a night! Dancing till the early morning must have left your feet feeling like they’ve been through a marathon, and getting emotional during the vows shows how much the moment meant to you. It sounds like you really let yourself enjoy the celebration. How are you feeling now that you’ve had a chance to unwind a bit?",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "casual-039",
+   "strategy": "problem_solve",
+   "reply": "Sounds like it was an emotional night! Dancing till the early morning can really take a toll on your feet—how are they feeling now? And those vows… what part of the ceremony got you teary?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-039",
+   "strategy": "explore",
+   "reply": "Sounds like a marathon night—dancing till the early morning and getting swept up in the emotions of the vows. How are you feeling now that you’ve had a chance to unwind a bit?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-039",
+   "strategy": "open",
+   "reply": "Wow, that sounds like a marathon of feelings and foot‑pain! Dancing until the early morning must have been exhausting, and the vows really got to you. How are you feeling now that you’ve had a chance to rest a bit?",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "emotional-007",
+   "strategy": "validate",
+   "reply": "It sounds like your mind is already running a marathon, and that’s totally understandable when something feels that important. Here’s a simple, low‑pressure routine you could try tonight to help calm the loop:\n\n1. **Set a clear “cut‑off” time** – decide on a specific moment (e.g., 9 p.m.) after which you’ll stop any interview prep. Put a reminder on your phone so you have a gentle nudge.\n\n2. **Do a quick “brain dump”** – spend 5–10 minutes writing down every question you think might come up, plus a brief bullet‑point answer for each. Getting them on paper can make them feel less like a swirling storm in your head.\n\n3. **Close the notebook** – once the dump is done, close the notebook (or shut the document) and place it somewhere out of sight. Tell yourself that you’ve captured the thoughts for tomorrow; you don’t need to revisit them tonight.\n\n4. **Shift to a soothing activity** – pick something that signals “relax” to your body. It could be a warm shower, a short walk, light stretching, or listening to a favorite low‑key playlist. Keep it to about 20–30 minutes.\n\n5. **Practice a short wind‑down ritual** – dim the lights, turn off screens (or use a blue‑light filter), and do a breathing exercise: inhale for 4 seconds, hold 4, exhale 4, hold 4. Repeat a few cycles, or try a guided meditation app for 5–10 minutes.\n\n6. **Create a simple “morning cue”** – lay out your interview outfit and any materials you’ll need (notebook, pen, copy of your résumé) in a spot you’ll see first thing. Knowing it’s ready can reduce anxiety later.\n\n7. **Stick to a reasonable bedtime** – aim to be in bed by a time that gives you at least 7 hours of sleep. If you find your mind still wandering, place a notebook by the bedside and jot a quick note (“thoughts about interview”) then close the book and return to sleep.\n\nThe goal isn’t to eliminate every possible question—just to give your brain a chance to rest and trust that you’ll handle the rest tomorrow. How does that feel for a plan you could try tonight?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "emotional-007",
+   "strategy": "problem_solve",
+   "reply": "I hear you—your mind is already running a marathon. Let’s set up a short, calming routine that gives your brain a clear “off‑switch” and helps you drift toward sleep instead of endless rehearsals.\n\n1. **Create a “brain dump” (10 min)** – Grab a notebook or a phone note and write down every interview question you can think of, plus a quick bullet‑point answer for each. Don’t worry about polish; just get the ideas out of your head. When the list is done, close the notebook and tell yourself you’ve captured everything you need.\n\n2. **Set a cut‑off time** – Choose a firm deadline (e.g., 9 pm). When the timer goes off, you stop all work‑related thinking. Put the notebook away and, if you like, switch your phone to Do‑Not‑Disturb.\n\n3. **Do a physical wind‑down (20 min)**  \n   * dim the lights, lower the thermostat a couple of degrees, and turn off screens.  \n   * Stretch or do a gentle yoga flow (cat‑cow, forward fold, child’s pose).  \n   * Follow with a slow, deep‑breathing exercise: inhale 4 seconds, hold 2, exhale 6. Repeat for a couple of minutes.\n\n4. **Relaxing distraction (15 min)** – Choose something soothing that isn’t stimulating: a short podcast episode about a hobby, an audiobook, or a calming playlist. Keep the volume low and the content low‑key so your mind can drift.\n\n5. **Bedtime ritual (5 min)** – Put on a pair of socks, sip a warm (caffeine‑free) drink if you like, and do a quick gratitude scan: name three things that went well today or that you’re looking forward to. Then settle under the covers.\n\n6. **If thoughts creep back** – Keep a small “worry sheet” by the bed. When a question pops up, jot a single word or phrase (“leadership,” “conflict”) and reassure yourself you’ll revisit it in the morning if needed. Then return to your breathing.\n\nTry to start this routine about an hour before you want to be asleep, and stick to the timing as closely as you can. The goal is to give your brain a concrete signal that it’s time to rest, while still honoring the interview prep you’ve already done. How does that feel for a plan?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "emotional-007",
+   "strategy": "explore",
+   "reply": "I hear you—when the stakes feel high, the mind can turn into a looping replay. Let’s set up a short, calming routine for tonight that gives you a clear end point and helps shift your focus away from the interview prep.\n\n1. **Set a “cut‑off” time** – Pick a specific minute (for example, 9 p.m.) after which you’ll stop any interview‑related thinking. Put a gentle alarm or reminder on your phone so you know when the time’s up.\n\n2. **Do a quick “brain dump”** – Before the cut‑off, spend 10‑15 minutes writing down every question you’re worried about and a one‑sentence note for each (e.g., “Tell me about a challenge you overcame → I’ll share the project‑X story”). Getting them onto paper often reduces the urge to keep rehearsing.\n\n3. **Physical wind‑down**  \n   * **Light movement** – 5‑10 minutes of gentle stretching, yoga, or a short walk outside can lower adrenaline.  \n   * **Warm shower or bath** – The heat signals your body it’s time to relax.\n\n4. **Sensory reset**  \n   * Dim the lights, turn off screens (or use a blue‑light filter) at least 30 minutes before bed.  \n   * Play calming music or a nature sound track at low volume.  \n   * Consider a short guided meditation or breathing exercise (e.g., inhale 4‑seconds, hold 4, exhale 6).\n\n5. **Create a “ready‑for‑tomorrow” cue** – Lay out your interview outfit, have a glass of water nearby, and place any notes you’ve written in a spot you’ll see in the morning. Knowing everything’s prepared can ease the “what‑if” loop.\n\n6. **End with a pleasant, non‑work activity** – Read a few pages of a novel, watch a short comedy clip, or do a hobby you enjoy for 15‑20 minutes. The goal is to give your brain a clear, enjoyable transition before sleep.\n\nAfter you’ve followed the routine, try a simple “body scan” for a couple of minutes: start at your toes and mentally note any tension, breathing slowly and releasing it as you move upward. This often helps the mind settle.\n\nHow does that feel? Anything you’d like to tweak to fit your usual bedtime habits?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "emotional-007",
+   "strategy": "open",
+   "reply": "I hear you—your mind is already running a full‑speed rehearsal, and that’s making it hard to relax. Here’s a short, low‑pressure routine you can try tonight to help your body and mind wind down without getting stuck in endless practice:\n\n1. **Set a “stop‑practice” alarm** – Choose a time that gives you at least 1‑2 hours of sleep before the interview (maybe 8 p.m. if you’ll be up at 6 a.m.). When the alarm goes off, it’s a cue to put the mirror away.\n\n2. **Do a quick brain dump** – Grab a notebook or a phone note and write down every question you’re worried about, plus a one‑sentence bullet for how you’d answer it. Seeing them on paper can make them feel less “inside your head.” Once it’s written, close the notebook and set it aside.\n\n3. **Shift to a calming activity (15‑20 min)**  \n   - *Gentle stretch or yoga flow*: focus on breathing and feeling the stretch rather than thinking.  \n   - *Guided meditation*: apps like Insight Timer or YouTube have 5‑minute “sleep” meditations that count down and end with soft music.  \n   - *Warm shower or bath*: the heat relaxes muscles and signals to your body that it’s time to wind down.\n\n4. **Create a “sleep‑ready” environment**  \n   - Dim the lights, turn off screens (or use a blue‑light filter).  \n   - Put on something cozy, set the room temperature cool but comfortable, and consider a white‑noise fan or soft music.\n\n5. **Practice a brief “mental run‑through” (5 min max)**  \n   - Close your eyes and picture the interview setting.  \n   - See yourself answering a couple of key questions confidently.  \n   - End the visualization by picturing yourself finishing the interview, feeling calm, and then going to sleep.\n\n6. **Wind‑down ritual** – About 30 minutes before bed, do something soothing that doesn’t require much thinking: read a light‑hearted chapter, listen to an audiobook, or sip a warm, non‑caffeinated drink.\n\n7. **When thoughts pop up** – If you notice the mind racing again, gently label the thought (“I’m thinking about question X”) and return your focus to your breath or the calming activity. It’s okay to acknowledge it without diving in.\n\nGive yourself permission to stop rehearsing after the alarm. You’ve already prepared—you’ll be fine. Good luck tomorrow; you’ve got this!",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "emotional-025",
+   "strategy": "validate",
+   "reply": "That really stings—four years of planning and then a rejection shows up in your inbox. It makes sense that you’d keep checking the portal, hoping something different might appear. How are you feeling about it right now?",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "emotional-025",
+   "strategy": "problem_solve",
+   "reply": "That really stings, especially after all the time you’ve invested. It makes sense that you’d keep checking the portal, hoping for a different outcome. How are you feeling about what’s next right now?",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "emotional-025",
+   "strategy": "explore",
+   "reply": "That really stings, especially after putting so much time and hope into it. It sounds like you were counting on that next step for a while. How are you feeling about what comes next—do you want to talk about other options, or just vent a bit?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "emotional-025",
+   "strategy": "open",
+   "reply": "I’m really sorry you’re going through that. It sounds like you’ve put a lot of time and energy into this goal, and getting that email must feel like a huge let‑down. How are you feeling about it right now?",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "emotional-045",
+   "strategy": "validate",
+   "reply": "It sounds like you want to be prepared for a conversation with your roommate tonight. What’s the main point you need to get across, or what’s the biggest concern you have about how it might go?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "emotional-045",
+   "strategy": "problem_solve",
+   "reply": "Sounds like you’ve got a conversation coming up with your roommate and you want to feel ready for it. What’s the main point you need to get across tonight—like a concern about chores, noise, guests, rent, or something else? Knowing the specific issue will help us shape what to say.",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "emotional-045",
+   "strategy": "explore",
+   "reply": "Sounds like you’ve got a conversation coming up with your roommate and you want to be ready with what to say. What’s the main issue you need to bring up? Is it about chores, noise, guests, rent, or something else?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "emotional-045",
+   "strategy": "open",
+   "reply": "Sounds like you’ve got a conversation coming up with your roommate and you want to be ready. What’s the main issue you need to address, and how’s the dynamic between you two right now?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "hard-015",
+   "strategy": "validate",
+   "reply": "I hear you—breathing exercises can feel a bit cheesy when you’re under pressure. What usually helps you calm down, even just a little, when you’re nervous?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "hard-015",
+   "strategy": "problem_solve",
+   "reply": "I hear you—breathing tricks can feel a bit cheesy when you’re already on edge. Here are a couple of low‑key things you can do right now that often help calm shaky hands without slowing you down too much:\n\n1. **Ground your grip** – Hold a pen, a paperclip, or the edge of the podium with a firm but relaxed grip for a few seconds, then release. The brief, controlled pressure can reset the nervous tension in your fingers.\n\n2. **Cold splash** – If you can step briefly to the restroom, splash cold water on your wrists or the back of your hands. The temperature shift gives your nervous system a quick “reset” signal.\n\n3. **Micro‑movement** – Before you start, lightly tap your fingers on the table or do a few quick fist‑opens and closes. It lets excess adrenaline burn off in a controlled way instead of shaking.\n\n4. **Visual cue** – Pick one small, non‑distracting spot on the screen or a note card and glance at it for a second just before you speak. It gives your brain a tiny anchor point and can reduce the feeling of “everything’s moving.”\n\nYou’ve got the content ready, and the audience is there to hear *you*, not perfect hands. Which of these feels doable for you in the next few minutes?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "hard-015",
+   "strategy": "explore",
+   "reply": "I hear you—it can feel kind of ridiculous when a simple breath feels like it won’t move the whole shake. Sometimes it’s less about “fixing” the tremor and more about giving your nervous system a tiny pause. If you’re up for it, you could try a quick grounding move: place both hands on the edge of the podium or a table, press firmly for a few seconds, and notice the solid surface. That physical anchor can help the shaking feel a bit less overwhelming in the moment. How does that sound?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "hard-015",
+   "strategy": "open",
+   "reply": "I hear you—sometimes the usual breathing tricks feel a bit cheesy when you’re under pressure. If you’d prefer something else, a quick physical cue can help: gently press your fingertips together and release them a few times while you talk, or hold a small object (like a pen) and focus on its texture. It gives your mind a tiny distraction and can calm the shaking enough to get through the presentation.  \n\nDoes that sound more useful, or is there another way you’d like to tackle the nerves?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "hard-041",
+   "strategy": "validate",
+   "reply": "I'm glad to hear it turned out okay. How did it feel being back around the table after that argument?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "hard-041",
+   "strategy": "problem_solve",
+   "reply": "I'm glad to hear it went okay. How are you feeling about it now—any lingering thoughts or anything you wish had gone differently?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "hard-041",
+   "strategy": "explore",
+   "reply": "I’m glad to hear it went okay. How did it feel being back at the table after that argument?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "hard-041",
+   "strategy": "open",
+   "reply": "Sounds like it turned out okay, even if it felt a bit tentative. How are you feeling about it now—relieved, still uneasy, or somewhere in between?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "information-009",
+   "strategy": "validate",
+   "reply": "Hard‑boiled eggs will stay fresh in the refrigerator for about 1 week. Keep them in their shells if you can—that helps protect them from absorbing other odors and from drying out. If you’ve already peeled them, store the peeled eggs in an airtight container with a little water or damp paper towel to keep them moist, and try to use them within a few days. \n\nDo you have a favorite way you like to use them in your meal prep?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "information-009",
+   "strategy": "problem_solve",
+   "reply": "Hard‑boiled eggs will stay good in the fridge for about 1 week. Keep them in their shells if you can—that helps them stay fresh a bit longer and prevents them from absorbing odors. If you’ve already peeled them, store the peeled halves or whole eggs in an airtight container with a damp paper towel on top to keep them from drying out, and try to use them within 3‑4 days.",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "information-009",
+   "strategy": "explore",
+   "reply": "Hard‑boiled eggs will stay good in the refrigerator for about 1 week if you keep them in their shells. Once you peel them, it’s best to use them within 3‑5 days, stored in an airtight container. If you notice any off smells or a slimy texture, it’s safer to discard them. How do you usually use the eggs in your meal prep?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "information-009",
+   "strategy": "open",
+   "reply": "Hard‑boiled eggs will stay good in the refrigerator for about ​1 week. Keep them in their shells if you can—that helps protect them from drying out and from picking up odors. If you’ve already peeled them, store them in a sealed container with a little bit of water (or just dry) and try to use them within a few days. When you’re ready to eat them, give them a quick sniff and check the texture; any off smell or slimy feel means it’s time to toss them.",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "information-027",
+   "strategy": "validate",
+   "reply": "Changing a tire isn’t as fancy as it sounds—just a few tools and a bit of patience. Here’s a straightforward rundown:\n\n1. **Safety first** – Pull over onto a flat, stable surface away from traffic. Turn on your hazard lights, engage the parking brake, and if you have them, put on your reflective triangles or flares.\n\n2. **Gather your gear** – You’ll need the spare (or a “donut”), the lug wrench (or socket), and the car’s jack. Most cars keep these in the trunk under the floor panel.\n\n3. **Loosen the lug nuts** – Before you jack the car up, use the wrench to turn each lug nut counter‑clockwise just enough to break their resistance. Don’t fully remove them yet; just get them loose while the tire is still on the ground.\n\n4. **Jack the car** – Locate the proper jacking point (usually a reinforced spot near the wheel, marked in the owner’s manual). Pump the jack until the flat tire is clear of the ground.\n\n5. **Remove the tire** – Finish unscrewing the lug nuts and set them aside where they won’t roll away. Pull the tire straight off the hub.\n\n6. **Mount the spare** – Align the spare’s holes with the lug bolts and push it onto the hub. Hand‑tighten the lug nuts as much as you can.\n\n7. **Lower the car** – Slowly release the jack until the spare is resting on the ground, then remove the jack.\n\n8. **Tighten the lug nuts** – Using a star pattern (tighten one, then the opposite, and so on) helps keep the wheel balanced. Give each nut a firm, final turn with the wrench.\n\n9. **Check the pressure** – If your spare is a temporary “donut,” make sure it’s inflated to the recommended psi (usually higher than a regular tire). Drive slowly to a shop to get the flat repaired or replace the spare with a full‑size tire.\n\nA quick tip: after you’ve driven a short distance, re‑check the lug nuts to be sure they stayed tight. \n\nAnything in particular that’s tripping you up, or do you have all the tools you need?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "information-027",
+   "strategy": "problem_solve",
+   "reply": "It’s totally normal to feel a bit awkward about it—most people learn it when they need to. Here’s a straightforward walk‑through for a typical car with a spare:\n\n1. **Find a safe spot** – Pull over onto a flat, stable surface away from traffic, turn on your hazard lights, and engage the parking brake.\n\n2. **Gather your tools** – You’ll need the spare tire, the jack, and the lug‑nut wrench (usually stored in the trunk with the spare). Some cars also have a wheel‑lock key if the lug nuts are special.\n\n3. **Loosen the lug nuts** – Before you lift the car, use the wrench to turn each lug nut counter‑clockwise just enough to break their resistance. Don’t remove them yet; just loosen them.\n\n4. **Jack up the car** – Locate the proper jacking point (often a reinforced spot behind the tire; your owner’s manual will show it). Pump or crank the jack until the flat tire is off the ground and can spin freely.\n\n5. **Remove the flat** – Finish unscrewing the lug nuts and set them aside in a safe spot. Pull the tire straight toward you and set it aside.\n\n6. **Mount the spare** – Align the spare’s holes with the wheel studs and push it on. Hand‑tighten the lug nuts as much as you can.\n\n7. **Lower the car** – Slowly turn the jack to lower the vehicle back onto the ground. Once the tire touches the ground, remove the jack.\n\n8. **Tighten the lug nuts fully** – With the car weight on the tire, use the wrench to tighten the lug nuts in a star‑pattern (tightening one, then the opposite, and so on) until they’re snug. A final firm pull with the wrench is good, but you don’t need a torque wrench for a temporary fix.\n\n9. **Check the spare** – Make sure the spare is properly inflated (most spares are “donut” types and require higher pressure). Then, put the flat tire, jack, and tools back in the trunk.\n\nA couple of quick tips:\n\n- **Practice once** when you don’t need it urgently; it’ll feel less stressful if it ever happens.\n- **Don’t forget** to have the flat repaired or replaced soon—donut spares are meant for short distances and lower speeds (usually under 50 mph).\n\nIf you run into any step that feels unclear, let me know which part and I can walk through it in more detail. How does that sound?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "information-027",
+   "strategy": "explore",
+   "reply": "Changing a flat can feel a bit awkward the first few times, but it’s definitely something you can handle on your own. Have you ever had the chance to look at the spare or the tools in your trunk, or would you like a quick rundown of the basic steps so you feel more confident next time?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "information-027",
+   "strategy": "open",
+   "reply": "Changing a tire isn’t as fancy as it sounds—just a few steps and a bit of patience. Here’s a quick rundown you can follow the next time you’re stuck:\n\n1. **Find a safe spot** – Pull off the road onto a flat, stable surface away from traffic. Turn on your hazard lights.\n\n2. **Gather your tools** – You’ll need the spare (usually a “donut” spare), the jack, and the lug wrench (often a cross‑shaped “star” socket). They’re usually stored in the trunk under the floor mat.\n\n3. **Loosen the lug nuts** – Before you lift the car, use the wrench to turn the lug nuts counter‑clockwise just enough to break their resistance. Don’t remove them completely yet.\n\n4. **Jack up the car** – Consult your owner’s manual for the proper jack point near the flat tire. Pump or crank the jack until the tire is off the ground and can spin freely.\n\n5. **Remove the lug nuts and tire** – Finish unscrewing the nuts, set them somewhere safe (they’re small), and pull the tire straight off.\n\n6. **Put the spare on** – Align the spare’s holes with the wheel studs, push it on, and hand‑tighten the lug nuts as much as you can.\n\n7. **Lower the car** – Slowly release the jack so the tire touches the ground, then finish tightening the lug nuts in a criss‑cross pattern. This helps the wheel sit evenly.\n\n8. **Check the pressure** – If you have a gauge, make sure the spare is inflated to the recommended PSI (often listed on the door jamb). If it’s a temporary “donut” spare, remember it’s not meant for long drives or high speeds—usually no more than 50‑70 mph and a few dozen miles until you can get a proper tire.\n\n9. **Stow everything** – Put the flat tire, jack, and tools back in the trunk, and you’re good to go.\n\nIf you’re ever unsure about a step, a quick look at your car’s manual (or a short how‑to video) can clear things up. And don’t worry— most people have been in the same spot at some point; the “live‑it‑down” part usually fades pretty quickly after the first successful change. \n\nDo you have the tools in your car already, or will you need to pick something up before your next road trip?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "information-045",
+   "strategy": "validate",
+   "reply": "It sounds like you’re curious about a topic that came up in therapy but you weren’t sure what it meant—totally understandable.  \n\nIn attachment theory, the idea is that early relationships with caregivers shape the way we relate to others later on. Psychologists usually describe four main styles:\n\n* **Secure** – you generally feel comfortable both giving and receiving closeness; you trust that others will be there for you and you can be independent when needed.  \n* **Anxious (or pre‑occupied)** – you tend to worry a lot about whether people truly care for you, often seeking reassurance and fearing abandonment.  \n* **Avoidant (or dismissive)** – you prefer emotional distance, may downplay the importance of close bonds, and can feel uneasy with too much intimacy.  \n* **Disorganized (or fearful‑avoidant)** – you experience mixed feelings: you want closeness but also feel unsafe or confused about relationships, often because past experiences were unpredictable or traumatic.\n\nTherapists use these categories to explore patterns in how you connect with friends, partners, or family, and to help you notice where you might want to try something different. Does any of that ring a bell with how you experience relationships?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "information-045",
+   "strategy": "problem_solve",
+   "reply": "Attachment theory is a way psychologists think about how we form and keep close relationships, especially early on with caregivers. The basic idea is that the patterns we develop with the people who cared for us as kids tend to show up later in how we relate to romantic partners, friends, and even coworkers. There are four common “attachment styles” that people usually fall into:\n\n1. **Secure** – You generally feel comfortable getting close to others and also feel okay being on your own. When problems arise you tend to trust that the relationship can survive and you can talk about your needs.\n\n2. **Anxious (or pre‑occupied)** – You often worry that others might not care about you enough. You may seek a lot of reassurance, feel uneasy when you’re apart, and sometimes act clingy or overly sensitive to perceived slights.\n\n3. **Avoidant (or dismissive‑avoidant)** – You value independence a lot and may feel uneasy with too much closeness. You might keep emotional distance, downplay the importance of relationships, or pull away when things get intimate.\n\n4. **Fearful‑avoidant (also called disorganized)** – This is a mix of the anxious and avoidant patterns. You want connection but also feel scared of getting hurt, so you might swing between seeking closeness and pushing people away.\n\nPeople aren’t stuck in one style forever; the way you relate can shift depending on the relationship, life circumstances, or personal growth work (like therapy). If you recognize any of these patterns in yourself, it can be a useful starting point for understanding why you react the way you do in relationships and for exploring new ways of relating.\n\nDoes any of that click with what you’ve been noticing about yourself?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "information-045",
+   "strategy": "explore",
+   "reply": "Attachment styles are patterns of how we relate to other people, especially in close or romantic relationships, and they often trace back to the ways we experienced care and safety as kids. Psychologists usually describe four main styles:\n\n* **Secure** – you generally feel comfortable getting close to others and also feel okay being on your own. You tend to trust that people will be there for you and you can rely on them.\n\n* **Anxious‑preoccupied** – you often worry that others won’t love or value you enough, so you may seek a lot of reassurance and feel uneasy when you’re apart.\n\n* **Dismissive‑avoidant** – you value independence a lot and may keep emotional distance, sometimes downplaying the importance of close bonds.\n\n* **Fearful‑avoidant (also called disorganized)** – you want closeness but also feel scared of it, leading to a push‑pull pattern where you’re torn between seeking connection and pulling away.\n\nThese styles aren’t set in stone; they can shift over time and with new experiences, especially with supportive relationships or therapy. Does any of that sound familiar to how you usually feel in your close relationships?",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "information-045",
+   "strategy": "open",
+   "reply": "Attachment theory is a way of describing how we relate to other people, especially in close relationships. It started with research on how babies bond with their caregivers, and researchers later noticed similar patterns show up in adult friendships, romantic partners, and even at work.\n\nThe basic idea is that early experiences with caregivers shape a mental “template” for how safe we feel when we get close to others. Most people fall into one of four main styles:\n\n1. **Secure** – You generally feel comfortable both giving and receiving support. You trust that others will be there for you, and you can be independent without fearing abandonment.\n\n2. **Anxious‑preoccupied** – You tend to worry a lot about being abandoned or not being loved enough. You may seek a lot of reassurance, feel jealous easily, and can become overly dependent on a partner’s validation.\n\n3. **Dismissive‑avoidant** (sometimes called “avoidant”) – You value independence a lot and may downplay the importance of close relationships. You might keep emotional distance, feel uncomfortable with intimacy, or think you don’t need anyone else.\n\n4. **Fearful‑avoidant** (also called “disorganized”) – You want close connections but also fear them. This can lead to a push‑pull dynamic: you crave intimacy but also feel unsafe, so you may withdraw or act unpredictably.\n\nPeople aren’t locked into one style forever; they can shift over time or show different patterns in different relationships. Understanding your own style can help you see why you react the way you do in conflicts, how you handle closeness, and what you might want to work on.\n\nIf you’re curious, you could ask your therapist to explore which style feels most familiar to you and how it shows up in your current relationships. That can be a useful starting point for deeper conversation.",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "practical-013",
+   "strategy": "validate",
+   "reply": "Hey, welcome back! It sounds like you made it through a pretty intense week. How are you feeling now that it’s over?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "practical-013",
+   "strategy": "problem_solve",
+   "reply": "Hey, glad to hear you made it through the week! How are you feeling now that the exam’s behind you? Anything you’d like to unwind with or plan for the next few days?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "practical-013",
+   "strategy": "explore",
+   "reply": "Hey, welcome back! Sounds like you made it through the crunch. How did the exam go, and what’s next on your plate?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "practical-013",
+   "strategy": "open",
+   "reply": "Hey! Glad to hear you made it through. How did the exam feel—anything in particular that stood out?",
+   "judged": "explore",
+   "error": null
+  }
+ ]
+}

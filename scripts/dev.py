@@ -8,6 +8,7 @@ command the same way on any OS:
     uv run python scripts/dev.py test          # full suite (needs the database)
     uv run python scripts/dev.py groq-models   # list models your Groq key can use
     uv run python scripts/dev.py live-groq     # live Groq tests (small free-tier usage)
+    uv run python scripts/dev.py laya          # run the self-hosted Laya decision server
 
 Keys are read from the project's .env file (any encoding Windows tools
 write) or from the environment, and are never printed.
@@ -149,6 +150,44 @@ def groq_models(_: argparse.Namespace) -> int:
     return 0
 
 
+LAYA_PACKAGE = "laya[serve]==0.4.6"
+
+
+def laya(args: argparse.Namespace) -> int:
+    """Run the pinned Laya server on localhost with the settings the app uses."""
+    from urllib.parse import urlsplit
+
+    settings = Settings()
+    if settings.laya_api_key is None:
+        print("Set LAYA_API_KEY in .env first (any long random string).")
+        return 1
+    port = urlsplit(settings.laya_base_url).port or 8100
+    env = {
+        **os.environ,
+        "LAYA_HOST": "127.0.0.1",
+        "LAYA_PORT": str(port),
+        "LAYA_JEV_STRICT": "1",
+        "LAYA_MODELS": settings.laya_model,
+        "LAYA_PRELOAD": "1",
+        "LAYA_API_KEY": settings.laya_api_key.get_secret_value(),
+        "USE_TF": "0",
+    }
+    command = ["uv", "tool", "run", "--python", "3.12", "--from", LAYA_PACKAGE]
+    if sys.platform.startswith("linux"):
+        # The default Linux torch wheel bundles CUDA; use the CPU build.
+        command += [
+            "--with",
+            "torch",
+            "--index",
+            "https://download.pytorch.org/whl/cpu",
+            "--index-strategy",
+            "unsafe-best-match",
+        ]
+    print(f"Starting {LAYA_PACKAGE} on http://127.0.0.1:{port} (first start downloads ~800 MB)")
+    # Fixed command: uv running the pinned laya-serve entry point.
+    return subprocess.call([*command, "laya-serve"], env=env)  # noqa: S603
+
+
 def live_groq(args: argparse.Namespace) -> int:
     extra = {"RUN_LIVE_LLM_TESTS": "1"}
     if args.models:
@@ -173,6 +212,9 @@ def main() -> int:
         sub.set_defaults(func=func)
     commands.add_parser("groq-models", help="list models available to your Groq key").set_defaults(
         func=groq_models
+    )
+    commands.add_parser("laya", help="run the self-hosted Laya decision server").set_defaults(
+        func=laya
     )
     live = commands.add_parser("live-groq", help="live Groq tests (2 calls per model)")
     live.add_argument(

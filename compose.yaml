@@ -4,6 +4,8 @@ name: companion-ai
 
 x-app-env: &app-env
   DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-companion}:${POSTGRES_PASSWORD:-companion}@db:5432/${POSTGRES_DB:-companion}
+  # Inside compose the Laya server is reached by service name.
+  LAYA_BASE_URL: http://laya:8100
 
 services:
   db:
@@ -45,5 +47,27 @@ services:
       migrate:
         condition: service_completed_successfully
 
+  # Optional self-hosted decision model. Start it with:
+  #   docker compose --profile laya up -d laya
+  # and set DECISION_PROVIDER=laya and LAYA_API_KEY in .env.
+  laya:
+    profiles: ["laya"]
+    build:
+      context: .
+      dockerfile: docker/laya.Dockerfile
+    environment:
+      LAYA_HOST: 0.0.0.0  # inside the container; published on localhost only
+      LAYA_PORT: "8100"
+      LAYA_JEV_STRICT: "1"
+      LAYA_MODELS: english
+      LAYA_PRELOAD: "1"
+      # Without a key laya-serve accepts any caller; the app requires one.
+      LAYA_API_KEY: ${LAYA_API_KEY:-}
+    ports:
+      - "127.0.0.1:${LAYA_PORT:-8100}:8100"
+    volumes:
+      - laya-cache:/cache
+
 volumes:
   pgdata:
+  laya-cache:
