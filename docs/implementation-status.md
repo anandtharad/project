@@ -9,7 +9,7 @@ Last updated: 2026-10-13. Spec: COMPANION-TECH-SPEC-001 v2.1.
 | 0: Foundation | **Done** |
 | 1: Basic conversation | **Done** (live LLM calls verified with Groq; other providers unverified, see below) |
 | 2: State and Jev | **Built and evaluated.** 4 of 5 acceptance criteria met; strategy decisions are wired and the policy measurably changes replies, but no decision model passes calibration yet, so decisions run in shadow mode (see Phase 2 acceptance) |
-| 3: Memory | Not started |
+| 3: Memory | **Built and evaluated.** All 5 acceptance criteria met on the synthetic evaluation set (see Phase 3 acceptance); retrieval and extraction quality are moderate and measured, not assumed |
 | 4: RAG | Not started |
 | 5: Safety | Not started. **Required before any real-user exposure** |
 | 6: Evaluation and observability | Not started (structured logging and provenance already exist) |
@@ -129,8 +129,10 @@ are clean.
 | Jev timeout / malformed result | Documented fallback per question, turn completes | `test_service_failures_fall_back_for_every_question`, `test_slow_service_is_cut_off_at_the_decision_timeout`, `test_decision_outage_falls_back_and_the_turn_completes` |
 | State extraction failure | Previous state kept, turn completes | `test_extraction_failure_keeps_previous_state_and_the_turn_completes`, `test_extractor_failures_keep_the_previous_state` |
 | Stale state write | Rejected, reply kept | `test_stale_state_write_is_rejected_but_the_reply_is_kept` |
-| Embedding failure / RAG unavailable | Phase 4 | — |
-| Memory store unavailable | Phase 3 | — |
+| Embedding failure | Full-text matching; memory stored without a vector and embedded later | `test_embedding_failure_falls_back_to_full_text_and_is_backfilled_later` |
+| Memory store unavailable | No memories in the prompt, flagged; turn completes | `test_an_unavailable_memory_store_means_no_memories_and_the_turn_succeeds` |
+| Memory extraction failure | Nothing stored; turn unaffected; one retry for a schema-breaking answer | `test_a_failed_extraction_does_not_affect_the_turn`, `test_an_extraction_that_breaks_the_schema_is_retried_once` |
+| RAG unavailable | Phase 4 | — |
 | Safety dependency unavailable | Phase 5 | — |
 
 ## Verified vs unverified integrations
@@ -153,6 +155,15 @@ are clean.
   normalization, error classification, SDK retry behavior. **No live call was
   made** because no API key was available in this environment. Run
   `RUN_LIVE_LLM_TESTS=1 uv run pytest tests/live` with a key to verify.
+- **Local embeddings (fastembed, bge-small-en-v1.5):** verified here by
+  running it (download, load, inference, thread safety, pgvector round trip)
+  and through the memory evaluation. Not yet run on Windows; all its wheels
+  exist for Windows x64 / Python 3.12.
+- **OpenAI and Gemini embeddings:** built on the official SDKs (openai 3.29,
+  google-genai 2.29) and tested against mocked transports. **No live call**
+  (no keys).
+- **pgvector:** verified against extension 0.6.0 (local) and 0.8.7 (the
+  compose image).
 - **Server-side refusal fallback** (`fallbacks: "default"`): request shape
   verified offline. Whether your account or organization has the beta enabled
   is unverified. If it doesn't, the provider returns 400, which shows up as
@@ -162,6 +173,7 @@ are clean.
 ## Stubs and development-only pieces
 
 - `GENERATION_PROVIDER=fake`: labeled stub, no model is called. Refused in production.
+- `EMBEDDING_PROVIDER=fake`: hashed bag of words for tests. Refused in production.
 - Development bearer-token auth: not production authentication. Production
   startup is refused.
 - `/docs` and `/openapi.json`: disabled in production.
@@ -202,7 +214,15 @@ are clean.
 - No independent safety layer (Phase 5). Do not use with real users.
 - No per-user rate limiting or cost quotas. Concurrency is limited only per
   conversation.
-- No conversation deletion endpoint and no retention policy yet.
+- No conversation deletion endpoint and no retention policy for
+  conversations yet (memories have both). Deleting a memory does not delete
+  the message it came from.
+- Memory sensitivity screening relies on the extraction model's label, with
+  a code backstop only for precise money amounts. Retrieval precision on the
+  held-out set is about 0.6, so some irrelevant memories reach the prompt;
+  the prompt tells the companion to use a memory only when it helps.
+- Memory extraction is one more LLM call after each reply (in the
+  background) and shares the provider's rate limits.
 - No streaming responses. Each reply is returned when complete.
 - The context token budget is a character-based estimate, not provider token
   counts.
@@ -235,6 +255,21 @@ decision adapter from the verified contract, initial Choice questions,
 retrieval-routing decision (recorded only until Phase 4), strategy policy,
 validation and fallbacks, and evaluation on labelled data are all built.
 See [decisions.md](decisions.md).
+
+## Phase 3 acceptance
+
+| Criterion | Status | Evidence |
+|---|---|---|
+| Useful memories persist across sessions | Met | stored after the reply, retrieved into a later conversation: `test_a_useful_memory_persists_into_a_later_conversation`; live extraction recall 0.73 on the held-out split (0.94 on dev); live end-to-end through the API in Docker (docs/memory.md) |
+| Irrelevant content is not automatically stored | Met, with measured errors | code-side policy (explicit, quote in the message, no identifiers, no sensitive categories by default, no instruction-like content, no duplicates, at most 3 per message); messages under 20 characters never reach the extractor; live: 3 of 39 held-out items with nothing to store had something stored, against 14 of 39 for the model's raw candidates; precision of what is stored 0.85 |
+| Retrieval is relevance-filtered | Met | semantic threshold 0.49 chosen on dev; held-out test precision 0.62 and recall 0.74 (top 5 without a threshold: precision 0.40); expired and superseded memories never returned (0 in every run) |
+| Deletion is reflected in future retrieval | Met | `test_deletion_is_reflected_in_future_retrieval` (the row and its embedding are gone), delete-all, expiry and purge tests |
+| Unauthorized access is blocked | Met | `tests/security/test_memory_isolation.py`: another person's memory is a 404 for view, delete and confirm; delete-all and settings are per person; one person's memories never reach another's reply or extraction call |
+
+Phase 3 tasks (spec §21): schema, candidate extraction and eligibility
+policy, persistence and retrieval, duplicate and contradiction handling,
+user inspection and deletion, retention, and cross-user security tests are
+all built. See [memory.md](memory.md).
 
 ## Open questions and next steps
 

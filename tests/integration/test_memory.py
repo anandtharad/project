@@ -464,3 +464,37 @@ async def test_a_failed_extraction_does_not_affect_the_turn(
     assert first.json()["assistant_content"].startswith("reply to:")
     assert second.status_code == 201
     assert await memories(client) == []
+
+
+async def test_turning_memory_off_during_extraction_stores_nothing(
+    app: FastAPI, client: httpx.AsyncClient, llm: ScriptedLLMClient
+) -> None:
+    async def turn_off_then_answer(request: Any) -> str:
+        # The person switches memory off while the extraction call is running.
+        body = {"memory_enabled": False, "allow_sensitive": False}
+        response = await client.put("/v1/users/me/memory-settings", json=body, headers=ALICE)
+        assert response.status_code == 200
+        return candidates(DOG_MEMORY)
+
+    llm.queue_memory(turn_off_then_answer)
+    cid = await create_conversation(client, ALICE)
+    await turn(app, client, cid, DOG)
+    assert await memories(client, status="all") == []
+
+
+async def test_a_failed_structured_extraction_is_retried_once(
+    app: FastAPI, client: httpx.AsyncClient, llm: ScriptedLLMClient
+) -> None:
+    invalid = LLMError(LLMErrorCategory.RESPONSE_INVALID, "schema")
+    llm.queue_memory(invalid, candidates(DOG_MEMORY))
+    cid = await create_conversation(client, ALICE)
+    await turn(app, client, cid, DOG)
+    assert len(llm.memory_requests) == 2
+    assert [m["content"] for m in await memories(client)] == [DOG_MEMORY["content"]]
+
+    # A second failure in a row: nothing stored, no third call.
+    rejected = LLMError(LLMErrorCategory.INVALID_REQUEST, "400")
+    llm.queue_memory(invalid, rejected, candidates(candidate("teaches Year 3", "I teach Year 3")))
+    await turn(app, client, cid, "I teach Year 3 at a primary school near home.")
+    assert len(llm.memory_requests) == 4
+    assert len(await memories(client)) == 1

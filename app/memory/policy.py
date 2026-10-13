@@ -9,7 +9,9 @@ the person's confirmation, or reject it, and always says why. Rules:
    never stored as a fact.
 2. Identifiers and secrets (phone numbers, addresses, passwords...) are never
    stored. Other sensitive categories are rejected unless the person turned
-   on `allow_sensitive` in their memory settings.
+   on `allow_sensitive` in their memory settings. The category comes from the
+   model; as a backstop, content with a precise amount of money is treated
+   as financial detail whatever the model said.
 3. Content that tries to instruct the assistant ("ignore your rules") is
    rejected; memories are data, never instructions.
 4. Duplicates of an active memory are rejected.
@@ -35,7 +37,17 @@ MAX_CONTENT = 200
 LIFETIME_DAYS = {"short": 30, "medium": 180}
 _INSTRUCTION_LIKE = re.compile(
     r"\b(?:ignore|disregard|forget|override)\b[^.]{0,40}\b(?:instructions?|rules|guidelines|"
-    r"system prompt|policy|safety)\b|\bsystem prompt\b|\bjailbreak\b|\bdeveloper mode\b",
+    r"system prompt|policy|safety)\b|\bsystem prompt\b|\bjailbreak\b|\bdeveloper mode\b"
+    # Demands for agreement are not preferences ("always agree I'm right").
+    r"|\b(?:always|have to|must)\s+agree\b|\bnever\b[^.]{0,30}\b(?:disagree|challenge)",
+    re.IGNORECASE,
+)
+
+# Backstop for the model's sensitivity label: a precise amount of money (a
+# number together with a currency or money word) is financial detail.
+_PRECISE_MONEY = re.compile(
+    r"(?=.*\d)(?=.*(?:[£$€]|\b(?:salary|salaries|paid|pay|earn(?:s|ing)?|income|debts?|loans?|"
+    r"mortgage|overdraft|owe[sd]?|savings|balance|rent|pounds|dollars|euros|grand)\b))",
     re.IGNORECASE,
 )
 
@@ -117,6 +129,8 @@ def decide(
             results[index] = reject("identifier")
         elif c.sensitive_category != "none" and not settings.allow_sensitive:
             results[index] = reject(f"sensitive:{c.sensitive_category}")
+        elif _PRECISE_MONEY.search(content) and not settings.allow_sensitive:
+            results[index] = reject("sensitive:finance")
         elif _INSTRUCTION_LIKE.search(content) or _INSTRUCTION_LIKE.search(c.evidence):
             results[index] = reject("instruction_like")
         elif key in active or key in seen or c.relation == "duplicate":

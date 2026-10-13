@@ -148,9 +148,10 @@ class Settings(BaseSettings):
     memory_extraction_max_output_tokens: int = Field(default=1024, ge=256, le=8192)
     memory_prompt_version: str = "1.0.0"
     memory_max_retrieved: int = Field(default=5, ge=1, le=20)
-    # Minimum cosine similarity for a semantic match; chosen on the memory
-    # evaluation set's dev split (docs/memory.md).
-    memory_min_semantic: float = Field(default=0.6, ge=0.0, le=1.0)
+    # Minimum cosine similarity for a semantic match. 0.49 is the best F1 on
+    # the memory evaluation set's dev split with the local bge-small-en-v1.5
+    # model (docs/memory.md); other embedding models need their own value.
+    memory_min_semantic: float = Field(default=0.49, ge=0.0, le=1.0)
     memory_max_per_turn: int = Field(default=3, ge=1, le=10)
     # Every memory expires at most this many days after it is stored.
     memory_retention_days: int = Field(default=365, ge=1, le=3650)

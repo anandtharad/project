@@ -10,6 +10,7 @@ each adapter only adds its provider-specific request parameters.
 
 from __future__ import annotations
 
+import re
 from types import ModuleType
 from typing import Any, Literal, Protocol
 
@@ -155,6 +156,20 @@ def _retry_after(headers: Any) -> float | None:
         return None
 
 
+_CODE = re.compile(r"[a-z0-9_.\-]{1,64}")
+
+
+def _body_code(exc: Exception) -> str | None:
+    """The error code from the response body. The openai SDK copies it to
+    `exc.code`; the groq SDK leaves it in `{"error": {"code": ...}}`."""
+    body = getattr(exc, "body", None)
+    if isinstance(body, dict):
+        inner = body.get("error", body)
+        if isinstance(inner, dict) and isinstance(inner.get("code"), str):
+            return str(inner["code"])
+    return None
+
+
 def classify_sdk_error(exc: Exception, sdk: ModuleType) -> LLMError:
     """Map an `openai`/`groq` SDK exception to a normalized error.
 
@@ -176,8 +191,9 @@ def classify_sdk_error(exc: Exception, sdk: ModuleType) -> LLMError:
     status: int = exc.status_code
     headers = exc.response.headers
     request_id = headers.get("x-request-id") or headers.get("request-id")
-    code = str(getattr(exc, "code", None) or "").lower()
+    code = str(getattr(exc, "code", None) or _body_code(exc) or "").lower()
     text = str(exc.message).lower()
+    loggable_code = code if _CODE.fullmatch(code) else None
 
     def error(
         category: LLMErrorCategory, message: str, *, retry_after: float | None = None
@@ -188,6 +204,7 @@ def classify_sdk_error(exc: Exception, sdk: ModuleType) -> LLMError:
             status_code=status,
             retry_after_seconds=retry_after,
             provider_request_id=request_id,
+            provider_code=loggable_code,
         )
 
     # Some compatible providers (e.g. xAI) report an invalid key as a 400.
@@ -232,6 +249,12 @@ def classify_sdk_error(exc: Exception, sdk: ModuleType) -> LLMError:
             LLMErrorCategory.SERVER_ERROR,
             "Provider reported a transient conflict.",
             retry_after=_retry_after(headers),
+        )
+    # Groq strict structured outputs: the model's own output broke the schema
+    # (400 json_validate_failed). A bad answer, not a bad request.
+    if code == "json_validate_failed":
+        return error(
+            LLMErrorCategory.RESPONSE_INVALID, "The model's output did not match the schema."
         )
     if status in (400, 413, 422):
         return error(LLMErrorCategory.INVALID_REQUEST, "Provider rejected the request.")

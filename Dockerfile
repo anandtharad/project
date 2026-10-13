@@ -23,7 +23,9 @@ COPY prompts ./prompts
 COPY decisions ./decisions
 COPY app ./app
 
-RUN useradd --create-home --uid 10001 appuser
+# /cache: the embedding model cache (a volume in compose), writable by the app.
+RUN useradd --create-home --uid 10001 appuser \
+    && mkdir -p /cache && chown appuser:appuser /cache
 USER appuser
 
 EXPOSE 8000

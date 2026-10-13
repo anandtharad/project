@@ -1,0 +1,133 @@
+[
+ [
+  0.847,
+  "Is a single dad to two daughters, aged 6 and 9",
+  [
+   "is a single dad"
+  ]
+ ],
+ [
+  0.846,
+  "Going on a trip to Lisbon next month to celebrate an anniversary",
+  [
+   "is going to Lisbon next month"
+  ]
+ ],
+ [
+  0.836,
+  "Wants to be spoken to casually like a mate; swearing is fine",
+  [
+   "wants a casual, friendly tone"
+  ]
+ ],
+ [
+  0.824,
+  "Is writing a fantasy novel, about 40k words in, with a main character called Wren",
+  [
+   "their novel's main character is called Wren"
+  ]
+ ],
+ [
+  0.823,
+  "Is 27 and works in insurance",
+  [
+   "works in insurance",
+   "Works in insurance"
+  ]
+ ],
+ [
+  0.822,
+  "Is an early riser, up at 5:30 most days for a run",
+  [
+   "usually gets up at 5:30 to go running"
+  ]
+ ],
+ [
+  0.82,
+  "Started their new architect job last Monday",
+  [
+   "started a new job last week"
+  ]
+ ],
+ [
+  0.819,
+  "Is writing a fantasy novel, about 40k words in, with a main character named Wren",
+  [
+   "their novel's main character is called Wren"
+  ]
+ ],
+ [
+  0.816,
+  "Wants to be spoken to casually like a mate; swearing is fine",
+  [
+   "is fine with swearing in conversation"
+  ]
+ ],
+ [
+  0.813,
+  "Wants to be talked to casually like a mate; swearing is fine",
+  [
+   "is fine with swearing in conversation"
+  ]
+ ],
+ [
+  0.813,
+  "Does not want recipe suggestions containing meat, eggs or dairy",
+  [
+   "wants only vegan recipe suggestions"
+  ]
+ ],
+ [
+  0.767,
+  "Doing a coding bootcamp that finishes in January",
+  [
+   "plans to apply for junior frontend developer jobs after the bootcamp"
+  ]
+ ],
+ [
+  0.754,
+  "Celebrating a three-year relationship anniversary with a trip to Lisbon next month",
+  [
+   "is going to Lisbon next month"
+  ]
+ ],
+ [
+  0.746,
+  "Is 27 and works in insurance",
+  [
+   "is 27 years old",
+   "Is 27 years old"
+  ]
+ ],
+ [
+  0.729,
+  "Is learning Spanish, at about B1 level",
+  [
+   "wants to converse in Spanish for practice"
+  ]
+ ],
+ [
+  0.726,
+  "Is learning Spanish at about B1 level",
+  [
+   "wants to converse in Spanish for practice",
+   "Wants the companion to talk to them in Spanish for practice"
+  ]
+ ],
+ [
+  0.708,
+  "Started a Python course this week and is new to coding",
+  [
+   "wants beginner-level explanations",
+   "Wants things explained as to a total beginner"
+  ]
+ ],
+ [
+  0.7,
+  "Works as a junior architect at a small firm in Bristol",
+  [
+   "started a new job last week",
+   "Started their new architect job last Monday"
+  ]
+ ]
+]

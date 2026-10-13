@@ -270,6 +270,26 @@ async def test_http_errors_are_classified(
     assert "gsk_" not in info.value.message
 
 
+async def test_schema_validation_failure_is_an_invalid_response() -> None:
+    def handler(_: httpx.Request) -> httpx.Response:
+        body = {
+            "error": {
+                "message": "Generated JSON does not match the expected schema.",
+                "type": "invalid_request_error",
+                "code": "json_validate_failed",
+                "failed_generation": '{"topic": "x"}',
+            }
+        }
+        return httpx.Response(400, json=body)
+
+    with pytest.raises(LLMError) as info:
+        await make_client(handler).generate(make_request())
+    assert info.value.category is LLMErrorCategory.RESPONSE_INVALID
+    assert info.value.provider_code == "json_validate_failed"
+    assert not info.value.retryable  # the SDK layer does not retry it
+    assert "topic" not in info.value.message  # the failed output is not echoed
+
+
 async def test_rate_limit_retry_after_is_captured() -> None:
     handler = error_handler(429, {"retry-after": "7", "x-request-id": "req_err"})
     with pytest.raises(LLMError) as info:

@@ -17,7 +17,7 @@ Retrieval is hybrid and deliberately small:
 from __future__ import annotations
 
 import uuid
-from collections.abc import Sequence
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -72,6 +72,30 @@ def to_memory(record: MemoryRecord) -> Memory:
         supersedes_id=record.supersedes_id,
         provenance=record.provenance,
     )
+
+
+def select_hits(
+    candidates: Iterable[RetrievedMemory], params: RetrievalParams
+) -> list[RetrievedMemory]:
+    """Threshold, de-duplicate and rank scored candidates (given newest first,
+    so a duplicate keeps its newest copy). Shared with eval/memory runs."""
+    scored: list[RetrievedMemory] = []
+    seen: set[str] = set()
+    for candidate in candidates:
+        sem, lex = candidate.semantic, candidate.lexical
+        semantic_hit = sem is not None and sem >= params.min_semantic
+        lexical_hit = lex > 0 and (params.lexical_only_ok or sem is None)
+        if not (semantic_hit or lexical_hit):
+            continue
+        key = normalize(candidate.memory.content)
+        if key in seen:
+            continue
+        seen.add(key)
+        # Semantic similarity leads; a full-text match adds a small boost.
+        score = (sem or 0.0) + min(lex, 1.0) * 0.2
+        scored.append(candidate.model_copy(update={"score": score}))
+    scored.sort(key=lambda r: (r.score, r.memory.created_at), reverse=True)
+    return scored[: params.limit]
 
 
 def _not_expired(now: datetime) -> Any:
@@ -202,9 +226,20 @@ class MemoryStore:
         new: Sequence[NewMemory],
         provenance: dict[str, Any],
     ) -> list[uuid.UUID]:
-        """Store accepted memories in one transaction; returns their IDs."""
+        """Store accepted memories in one transaction; returns their IDs.
+
+        The person may have turned memory off while extraction was running:
+        the setting is checked again here, inside the same transaction, so
+        nothing is stored after they turned it off."""
         created: list[uuid.UUID] = []
         async with self._sessions() as session, session.begin():
+            enabled = await session.scalar(
+                select(UserMemorySettings.memory_enabled)
+                .where(UserMemorySettings.user_id == user_id)
+                .with_for_update()
+            )
+            if enabled is False:
+                return []
             for item in new:
                 d = item.decision
                 assert d.status is not None
@@ -329,25 +364,15 @@ class MemoryStore:
                 .limit(_CANDIDATE_POOL)
             )
             rows = (await session.execute(stmt)).all()
-        scored: list[RetrievedMemory] = []
-        seen: set[str] = set()
-        for record, sem, lex in rows:
-            sem_value = float(sem) if sem is not None else None
-            lex_value = float(lex or 0.0)
-            semantic_hit = sem_value is not None and sem_value >= params.min_semantic
-            lexical_hit = lex_value > 0 and (params.lexical_only_ok or sem_value is None)
-            if not (semantic_hit or lexical_hit):
-                continue
-            key = normalize(record.content)
-            if key in seen:
-                continue
-            seen.add(key)
-            # Semantic similarity leads; a full-text match adds a small boost.
-            score = (sem_value or 0.0) + min(lex_value, 1.0) * 0.2
-            scored.append(
+        return select_hits(
+            (
                 RetrievedMemory(
-                    memory=to_memory(record), score=score, semantic=sem_value, lexical=lex_value
+                    memory=to_memory(record),
+                    score=0.0,
+                    semantic=float(sem) if sem is not None else None,
+                    lexical=float(lex or 0.0),
                 )
-            )
-        scored.sort(key=lambda r: (r.score, r.memory.created_at), reverse=True)
-        return scored[: params.limit]
+                for record, sem, lex in rows
+            ),
+            params,
+        )

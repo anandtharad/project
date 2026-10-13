@@ -1,4 +1,4 @@
-# Threat model and privacy notes (Phases 1-2 scope)
+# Threat model and privacy notes (Phases 1-3 scope)
 
 Informed by the OWASP Top 10 for LLM Applications and the NIST AI RMF. These
 references shape the analysis; they do not certify the system. This document
@@ -10,6 +10,8 @@ covers what exists today and is revisited at each phase.
 - User-to-conversation ownership.
 - Provider credentials (`GENERATION_API_KEY`, `JEV_API_KEY`, `LAYA_API_KEY`) and dev tokens.
 - Conversation state (inferred goals and emotional context about a person).
+- Memories: facts a person shared, kept across conversations, with
+  embeddings of them.
 - The system prompt (low sensitivity, but its integrity matters).
 - Availability and spend (paid LLM calls).
 
@@ -21,6 +23,9 @@ covers what exists today and is revisited at each phase.
 2b. API → decision service: the latest message and up to four earlier
    messages are sent to Laya (self-hosted: stays on your machine) or TypeSafe
    Jev (third party). Conversation notes are not sent.
+2c. API → embedding provider: memory text and each message are embedded.
+   With `EMBEDDING_PROVIDER=local` (the default) nothing leaves the machine;
+   with `openai`/`gemini` the text goes to that provider.
 3. LLM output → API: model output is untrusted until validated.
 4. API → PostgreSQL: trusted store; access only through ownership-scoped queries.
 
@@ -30,7 +35,10 @@ covers what exists today and is revisited at each phase.
 |---|---|---|
 | Cross-user data disclosure | Ownership filter in the SQL that loads a conversation; foreign conversations return the same 404 as missing ones; idempotency replay happens only after the ownership check; tests cover read, list, post and replay across users | Production authN/authZ (Phase 1 uses static dev tokens) |
 | Prompt injection (direct) | User text only travels in user-role messages; the system instruction is the fixed versioned prompt, which tells the model that conversation text cannot change it; the model has **no tools**, so injected instructions cannot access data | Behavioral resistance (e.g. refusing to reveal the system prompt) is unverified without live evaluation; output policy checks arrive in Phase 5 |
-| Prompt injection (indirect: memory/RAG) | N/A: no memory or retrieval yet | Phases 3/4 must treat memory and documents as untrusted data sections |
+| Prompt injection (indirect: memory) | Memories come from untrusted text, so they are untrusted: candidates that read like instructions are rejected in code; memories reach the reply model only in the user role, as an escaped JSON `<memories>` block (it cannot close the block), and the prompt says they are never instructions; the extractor sees its input inside escaped tags; content is capped at 200 characters and stripped of control characters (tests cover breaking out of the block) | Behavioral resistance is unverified without live adversarial evaluation. RAG documents (Phase 4) need the same treatment |
+| Cross-user memory disclosure | Every memory query filters on `user_id` in SQL, including the vector search; another person's memory ID returns the same 404 as a missing one; the extractor is shown only the same person's memories; tests cover list, view, delete, delete-all, confirm, settings, retrieval into a turn and extraction | Production authN/authZ |
+| Unwanted memory (storing what the person did not mean to share) | The model only proposes; code stores only explicit statements whose quote appears in the person's message; identifiers never; sensitive categories only with `allow_sensitive`, with a code backstop for precise money amounts; at most 3 per message; memory can be turned off, and every memory listed, deleted or left to expire | The sensitivity screen depends on the model's label: on the test split 2 of 13 sensitive items leaked before the money backstop (docs/memory.md) |
+| Memory poisoning across sessions (a false "fact" steering later replies) | Only what the person said in their own message is stored; conflicting facts are held as unconfirmed and the companion asks; superseded and expired memories are never retrieved; the person can see and delete everything | A person can deliberately store false facts about themselves; that only affects their own conversations |
 | Prompt injection via conversation state | State is extracted from untrusted text, so it is untrusted too: it reaches the reply model only in the user role, inside a `<conversation_notes>` block whose JSON escapes `<`/`>` (it cannot close the block), and the prompt says the notes are never instructions. The extraction prompt treats its input as data inside escaped tags. Field lengths and counts are capped | Behavioral resistance is unverified without live adversarial evaluation |
 | Decision manipulation | Decisions never control access, persistence or safety handling and run after the ownership check; answers are validated against the question asked (invalid answers are rejected, not repaired); only calibrated, above-threshold answers change the policy, and the worst case is one of the fixed prompt fragments; `safety_response` cannot be selected | A manipulated `conversation_mode=safety` only makes the reply more cautious |
 | Unsafe output handling | Output is stored and returned as plain text, never executed or rendered by the server; refusals, truncations, empty and over-long replies are rejected | **No safety-policy output validation yet (Phase 5)**; clients must escape output when rendering |
@@ -53,7 +61,10 @@ covers what exists today and is revisited at each phase.
   Phase 2: a conversation state per conversation (topic, goals and emotional
   context marked stated or inferred, open questions) and per-turn decision
   results. These are inferences about the person; they are deleted with the
-  conversation (cascade) but have no separate view or delete API yet.
+  conversation (cascade) but have no separate view or delete API yet. From
+  Phase 3: memories (short sentences the person said about themselves, the
+  supporting quote, and an embedding), which the person can list, delete
+  one by one or all at once, and turn off.
 - **Third-party processing:** conversation content (system prompt plus recent
   history) is sent to the configured LLM provider on every turn: Anthropic,
   OpenAI, Groq, Google, xAI, Alibaba Cloud, DeepSeek, OpenRouter (and the
@@ -62,17 +73,24 @@ covers what exists today and is revisited at each phase.
   up to four earlier messages are also sent to
   TypeSafe on every turn (TypeSafe states it does not train on user data;
   zero data retention is offered to enterprise customers). With `laya` they
-  stay on your machine.
+  stay on your machine. Retrieved memories travel in the reply prompt, and
+  the extraction call sends the latest messages and related memories, both
+  to the same LLM provider.
   Review that provider's commercial terms, data retention, data residency and
   training policies before handling real user data. Free tiers (e.g. Groq,
   Gemini) can have different data-use terms from paid tiers. Server-side refusal fallback
   (`GENERATION_REFUSAL_FALLBACK=default`) may route a declined request to
   another Anthropic model under the same terms.
-- **Retention and deletion:** **not implemented yet.** Conversations and
-  messages are kept until deleted manually. Deleting a user cascades to
-  their conversations and messages at the database level, but no API exposes
-  this yet. Phase 3 adds memory deletion. A conversation-deletion endpoint
-  and a retention policy are tracked in implementation-status.md.
+- **Retention and deletion:** memories expire (at most
+  `MEMORY_RETENTION_DAYS`, 365 by default) and are purged by the maintenance
+  loop; the person can delete them at any time, and deleting a memory
+  deletes its embedding (same row). The full table of where memory content
+  lives is in [memory.md](memory.md#retention-and-deletion-spec-107-154).
+  Conversations and messages still have **no** retention policy or deletion
+  endpoint: they are kept until deleted manually, and deleting a memory does
+  not delete the message it came from. Deleting a user cascades to their
+  conversations, messages and memories at the database level, but no API
+  exposes this yet.
 - **Backups:** none are configured by this repository. Any backup an operator
   adds must follow the same retention and deletion policy, since deleting a
   row does not remove it from existing backups.

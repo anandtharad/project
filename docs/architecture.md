@@ -1,4 +1,4 @@
-# Architecture (as built: Phases 1-2)
+# Architecture (as built: Phases 1-3)
 
 This describes what exists today. Components from the specification that are
 not built yet are listed at the end, with where they will plug in.
@@ -40,6 +40,9 @@ HTTP request
 | State extractor | `app/state/*` | typed conversation state with provenance, one structured LLM call | persistence, policy |
 | Decision service | `app/decisions/*` | versioned questions, System One adapter, answer validation, thresholds, fallbacks | access control, safety handling |
 | Response policy | `app/orchestration/policy.py` | choosing the reply approach in code | wording (prompt fragments) |
+| Memory service | `app/memory/*` | retrieval for a turn, post-turn extraction, the eligibility policy, user-scoped storage, retention | what the reply says about memories (prompt) |
+| Embeddings | `app/embeddings/*` | vectors for memory search (local fastembed, OpenAI, Gemini) | storage |
+| Background tasks | `app/background.py` | post-turn work after the reply is saved; drained at shutdown | the turn's result |
 
 Core invariant: nothing the model produces can trigger data access. The model
 has no tools, and ownership is checked in SQL (`get_owned_conversation`)
@@ -51,12 +54,16 @@ Stages are recorded per turn (`app/orchestration/lifecycle.py`) and returned as
 `timing_ms` in development:
 
 `RECEIVED → VALIDATED → AUTHORIZED → USER_MESSAGE_PERSISTED → CONTEXT_LOADED →
-STATE_UPDATED → DECISIONS_RESOLVED → POLICY_CREATED → CONTEXT_BUILT →
-RESPONSE_GENERATED → RESPONSE_VALIDATED → ASSISTANT_MESSAGE_PERSISTED → COMPLETED`
+MEMORIES_RETRIEVED → STATE_UPDATED → DECISIONS_RESOLVED → POLICY_CREATED →
+CONTEXT_BUILT → RESPONSE_GENERATED → RESPONSE_VALIDATED →
+ASSISTANT_MESSAGE_PERSISTED → COMPLETED`
 
-The specification's `INPUT_SAFETY_ANALYZED` and `RETRIEVAL_PERFORMED_IF_NEEDED`
-stages arrive with Phases 5 and 3/4. State extraction and decisions never fail
-a turn; see [decisions.md](decisions.md) for each stage's failure behavior.
+Memory retrieval runs concurrently with the state update. Memory extraction
+runs after `ASSISTANT_MESSAGE_PERSISTED`, as a background task. The
+specification's `INPUT_SAFETY_ANALYZED` stage arrives with Phase 5, and
+knowledge retrieval with Phase 4. State extraction, decisions and memory
+never fail a turn; see [decisions.md](decisions.md) and
+[memory.md](memory.md) for each stage's failure behavior.
 
 No transaction is held open during generation:
 
@@ -77,7 +84,7 @@ Any failure after step 1 marks the turn `failed`, with a category such as
 `persistence_error`. If even that write fails, the turn stays `pending`, ages
 past `STALE_TURN_SECONDS`, and the next request takes it over.
 
-## Data model (migrations `0001`, `0002`)
+## Data model (migrations `0001`-`0003`)
 
 - `users(id, external_id UNIQUE, created_at)`
 - `conversations(id, user_id → users ON DELETE CASCADE, status, last_sequence, created_at, updated_at)`
@@ -86,6 +93,8 @@ past `STALE_TURN_SECONDS`, and the next request takes it over.
   assistant provenance `reply_to_message_id → messages, provider, model_id, prompt_id, prompt_version, generation_metadata JSONB)`
 - `conversation_states(conversation_id PK → conversations ON DELETE CASCADE, schema_version, state JSONB, state_version > 0, source_message_id → messages ON DELETE SET NULL, extraction JSONB, updated_at)`
 - `turn_decisions(id, conversation_id → conversations, user_message_id → messages, question_id, question_version, kind, value, returned_value, probabilities, confidence, provider, model_id, latency_ms, validation_status, fallback, fallback_reason, created_at)`, `UNIQUE (user_message_id, question_id)`
+- `memories(id, user_id → users ON DELETE CASCADE, memory_type, content, status, importance 1-3, provenance JSONB, source_conversation_id / source_message_id ON DELETE SET NULL, supersedes_id → memories ON DELETE SET NULL, expires_at, embedding vector (pgvector, any dimension), embedding_model, schema_version, created_at, updated_at)`; checks on type, status, importance, and "a vector always names its model"; index `(user_id, status)`
+- `user_memory_settings(user_id PK → users ON DELETE CASCADE, memory_enabled, allow_sensitive, updated_at)`
 
 Database-enforced invariants:
 - `UNIQUE (conversation_id, sequence)`: total order and no duplicate positions.
@@ -98,7 +107,8 @@ Database-enforced invariants:
 `generation_metadata` records requested and served model, prompt checksum,
 finish reason, fallback use, provider request ID, token usage, latency,
 generation parameters, context-budget stats, the response policy, a decision
-summary, state-extraction provenance and the trace ID. Every reply is
+summary, state-extraction provenance, the memories used (IDs and scores
+only) and the trace ID. Every reply is
 traceable to its exact model, prompt, policy and settings.
 
 ## LLM adapters
@@ -182,8 +192,7 @@ and a test enforces this. SDK/HTTP debug loggers are capped at WARNING.
 
 | Spec component | Phase | Integration point |
 |---|---|---|
-| Memory | 3 | new tables and service; authorized memories become a separate context section |
-| Knowledge RAG (pgvector) | 4 | compose already runs the pgvector image; extension enabled by the Phase 4 migration |
+| Knowledge RAG (pgvector) | 4 | the extension is enabled by migration `0003`; reuse `app/embeddings` |
 | Input safety analysis, safety pathway, policy output checks | 5 | before `CONTEXT_BUILT` and inside `ResponseValidator` |
 | Evaluation runner, experiment tables | 6 | `evaluation_runs` / `evaluation_results` |
 | SFT data pipeline | 7 | offline tooling under `data/training` and `scripts/` |

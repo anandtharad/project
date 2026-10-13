@@ -28,7 +28,7 @@ from app.llm.base import LLMClient
 from app.llm.factory import build_llm_client
 from app.llm.providers.registry import ResolvedProvider, resolve_provider
 from app.llm.schemas import GenerationParams
-from app.memory.service import MemoryService
+from app.memory.service import MemoryExtractor, MemoryService
 from app.memory.store import MemoryStore, RetrievalParams
 from app.observability import configure_logging, log_event
 from app.orchestration.engine import TurnOrchestrator
@@ -96,22 +96,31 @@ def build_memory_service(
 ) -> MemoryService | None:
     if not settings.memory_enabled:
         return None
-    model = settings.memory_extraction_model or resolved.model
     return MemoryService(
         store=store,
         embeddings=build_embedding_client(settings),
+        extractor=build_memory_extractor(settings, resolved, llm, prompt),
+        retrieval=RetrievalParams(
+            limit=settings.memory_max_retrieved, min_semantic=settings.memory_min_semantic
+        ),
+        retention_days=settings.memory_retention_days,
+        max_per_turn=settings.memory_max_per_turn,
+    )
+
+
+def build_memory_extractor(
+    settings: Settings, resolved: ResolvedProvider, llm: LLMClient, prompt: PromptTemplate
+) -> MemoryExtractor | None:
+    if not settings.memory_extraction_enabled:
+        return None
+    model = settings.memory_extraction_model or resolved.model
+    return MemoryExtractor(
         llm=llm,
         model=model,
         prompt=prompt,
         params=GenerationParams(effort=state_extraction_effort(settings, resolved, model)),
         max_output_tokens=settings.memory_extraction_max_output_tokens,
         timeout_seconds=settings.memory_extraction_timeout_seconds,
-        retrieval=RetrievalParams(
-            limit=settings.memory_max_retrieved, min_semantic=settings.memory_min_semantic
-        ),
-        retention_days=settings.memory_retention_days,
-        max_per_turn=settings.memory_max_per_turn,
-        extraction_enabled=settings.memory_extraction_enabled,
     )
 
 

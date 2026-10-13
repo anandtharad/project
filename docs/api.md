@@ -73,6 +73,26 @@ Messages in conversation order (`limit` is 1–200). Each item has
 (`pending`/`completed`/`failed`). If more messages exist,
 `next_after_sequence` gives the value to pass as `after_sequence`.
 
+### Memories: `/v1/users/me/...`
+
+Each person's own memories (spec §10.7; design in [memory.md](memory.md)).
+Another person's memory ID returns the same `404 memory_not_found` as a
+missing one.
+
+| Method and path | Result |
+|---|---|
+| `GET /v1/users/me/memories?status=` | `200 {"memories": [...]}`. `status`: `active`, `pending_confirmation`, `superseded` or `all`; default active and pending. Expired memories are never listed |
+| `GET /v1/users/me/memories/{memory_id}` | `200` one memory |
+| `DELETE /v1/users/me/memories/{memory_id}` | `204`; the row and its embedding are deleted |
+| `DELETE /v1/users/me/memories` | `200 {"deleted": n}` |
+| `POST /v1/users/me/memories/{memory_id}/confirm` | `200`; a pending memory becomes active and supersedes the memory it conflicted with |
+| `GET /v1/users/me/memory-settings` | `200 {"memory_enabled": true, "allow_sensitive": false}` |
+| `PUT /v1/users/me/memory-settings` | the same body, both fields required and strictly boolean |
+
+A memory: `memory_id`, `memory_type` (`episodic`, `semantic`,
+`preference`), `content`, `status`, `importance` (1-3), `created_at`,
+`updated_at`, `expires_at`, `source_conversation_id`, `supersedes_id`.
+
 ## Idempotency
 
 Idempotency is enforced in PostgreSQL (a unique constraint on
@@ -112,7 +132,7 @@ never included.
 | HTTP | category | codes |
 |---|---|---|
 | 401 | `unauthorized` | `unauthorized` |
-| 404 | `not_found` | `conversation_not_found` (also returned for another user's conversation), `route_not_found` |
+| 404 | `not_found` | `conversation_not_found` (also returned for another user's conversation), `memory_not_found` (likewise), `route_not_found` |
 | 409 | `conflict` | `turn_in_progress`, `turn_superseded`, `idempotency_key_reused` |
 | 413 | `invalid_request` | `request_too_large` (body over `MAX_REQUEST_BYTES`) |
 | 422 | `invalid_request` | `validation_failed` (with field `details`), `content_too_long` |

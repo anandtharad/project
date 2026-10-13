@@ -1,4 +1,4 @@
-# Local development stack: PostgreSQL (with pgvector, used from Phase 3),
+# Local development stack: PostgreSQL (with pgvector, for memory search),
 # a one-shot migration job, and the API.
 name: companion-ai
 
@@ -6,6 +6,8 @@ x-app-env: &app-env
   DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-companion}:${POSTGRES_PASSWORD:-companion}@db:5432/${POSTGRES_DB:-companion}
   # Inside compose the Laya server is reached by service name.
   LAYA_BASE_URL: http://laya:8100
+  # The local embedding model (about 65 MB) is downloaded once into a volume.
+  EMBEDDING_CACHE_DIR: /cache/fastembed
 
 services:
   db:
@@ -43,6 +45,8 @@ services:
     environment: *app-env
     ports:
       - "127.0.0.1:${APP_PORT:-8000}:8000"
+    volumes:
+      - embedding-cache:/cache
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -71,3 +75,4 @@ services:
 volumes:
   pgdata:
   laya-cache:
+  embedding-cache:

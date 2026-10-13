@@ -170,6 +170,7 @@ class LLMError(Exception):
         status_code: int | None = None,
         retry_after_seconds: float | None = None,
         provider_request_id: str | None = None,
+        provider_code: str | None = None,
     ) -> None:
         super().__init__(message)
         self.category = category
@@ -177,6 +178,9 @@ class LLMError(Exception):
         self.status_code = status_code
         self.retry_after_seconds = retry_after_seconds
         self.provider_request_id = provider_request_id
+        # The provider's own error code (e.g. "json_validate_failed"), when it
+        # is a plain identifier; safe to log, never content.
+        self.provider_code = provider_code
 
     @property
     def retryable(self) -> bool:

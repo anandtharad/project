@@ -33,6 +33,7 @@ from app.llm.schemas import (
     GenerationPurpose,
     GenerationRequest,
     LLMError,
+    LLMErrorCategory,
     ResponseSchema,
     TraceMetadata,
 )
@@ -101,36 +102,120 @@ def build_extraction_input(shown: Sequence[Memory], history: Sequence[ChatMessag
     )
 
 
-class MemoryService:
+_RETRY_ONCE = frozenset({LLMErrorCategory.RESPONSE_INVALID, LLMErrorCategory.INVALID_REQUEST})
+
+
+@dataclass(frozen=True)
+class Proposal:
+    """The extraction model's candidates, or why there are none."""
+
+    output: ExtractionOutput | None
+    failure: str | None = None
+    model_id: str | None = None
+    structured_mode: str | None = None
+    provider_code: str | None = None
+
+
+class MemoryExtractor:
+    """One structured LLM call: memory candidates from the latest message.
+    Used by post-turn processing and, unchanged, by eval/memory runs."""
+
     def __init__(
         self,
         *,
-        store: MemoryStore,
-        embeddings: EmbeddingClient | None,
         llm: LLMClient,
         model: str,
         prompt: PromptTemplate,
         params: GenerationParams,
         max_output_tokens: int,
         timeout_seconds: float,
-        retrieval: RetrievalParams,
-        retention_days: int,
-        max_per_turn: int = 3,
-        extraction_enabled: bool = True,
     ) -> None:
-        self.store = store
-        self._embeddings = embeddings
         self._llm = llm
-        self._model = model
-        self._prompt = prompt
+        self.model = model
+        self.prompt = prompt
         self._system = prompt.render()
         self._params = params
         self._max_output_tokens = max_output_tokens
         self._timeout = timeout_seconds
+
+    def request(
+        self,
+        shown: Sequence[Memory],
+        history: Sequence[ChatMessage],
+        *,
+        trace_id: str,
+        conversation_id: uuid.UUID,
+    ) -> GenerationRequest:
+        return GenerationRequest(
+            model=self.model,
+            system=self._system,
+            messages=[
+                ChatMessage(role=ChatRole.USER, content=build_extraction_input(shown, history))
+            ],
+            max_output_tokens=self._max_output_tokens,
+            timeout_seconds=self._timeout,
+            params=self._params,
+            trace=TraceMetadata(
+                trace_id=trace_id,
+                purpose=GenerationPurpose.MEMORY_EXTRACTION,
+                conversation_id=str(conversation_id),
+            ),
+            response_schema=ResponseSchema(
+                name="memory_candidates", json_schema=MEMORY_EXTRACTION_JSON_SCHEMA
+            ),
+        )
+
+    async def propose(
+        self,
+        shown: Sequence[Memory],
+        history: Sequence[ChatMessage],
+        *,
+        trace_id: str,
+        conversation_id: uuid.UUID,
+    ) -> Proposal:
+        request = self.request(shown, history, trace_id=trace_id, conversation_id=conversation_id)
+        # Bounded recovery: one more try when the answer broke the schema, or
+        # when the provider rejected a structured request. On Groq about 3% of
+        # extraction calls failed with a 400 and every immediate retry
+        # succeeded (docs/memory.md). This runs after the reply, so the extra
+        # call costs no latency.
+        for attempt in range(2):
+            try:
+                async with asyncio.timeout(self._timeout):
+                    response = await self._llm.generate(request)
+                break
+            except TimeoutError:
+                return Proposal(None, "timeout")
+            except LLMError as exc:
+                if exc.category in _RETRY_ONCE and attempt == 0:
+                    continue
+                return Proposal(None, f"llm:{exc.category.value}", provider_code=exc.provider_code)
+        mode = response.structured_mode.value if response.structured_mode else None
+        try:
+            output = ExtractionOutput.model_validate_json(response.content)
+        except ValidationError:
+            return Proposal(None, "invalid_output", response.model_id, mode)
+        return Proposal(output, None, response.model_id, mode)
+
+
+class MemoryService:
+    def __init__(
+        self,
+        *,
+        store: MemoryStore,
+        embeddings: EmbeddingClient | None,
+        extractor: MemoryExtractor | None,
+        retrieval: RetrievalParams,
+        retention_days: int,
+        max_per_turn: int = 3,
+    ) -> None:
+        self.store = store
+        self._embeddings = embeddings
+        # None: post-turn extraction is turned off (retrieval still works).
+        self._extractor = extractor
         self._retrieval = retrieval
         self._retention_days = retention_days
         self._max_per_turn = max_per_turn
-        self._extraction_enabled = extraction_enabled
 
     @property
     def embedding_model(self) -> str | None:
@@ -184,7 +269,7 @@ class MemoryService:
         trace_id: str,
     ) -> ProcessingResult:
         latest = history[-1].content if history else ""
-        if not self._extraction_enabled:
+        if self._extractor is None:
             return ProcessingResult("skipped", "extraction_disabled")
         if len(latest.strip()) < MIN_EXTRACTION_CHARS:
             return ProcessingResult("skipped", "too_short")
@@ -192,38 +277,19 @@ class MemoryService:
         if not settings.memory_enabled:
             return ProcessingResult("skipped", "memory_disabled")
         shown = await self._related(user_id, latest)
-        try:
-            async with asyncio.timeout(self._timeout):
-                response = await self._llm.generate(
-                    GenerationRequest(
-                        model=self._model,
-                        system=self._system,
-                        messages=[
-                            ChatMessage(
-                                role=ChatRole.USER, content=build_extraction_input(shown, history)
-                            )
-                        ],
-                        max_output_tokens=self._max_output_tokens,
-                        timeout_seconds=self._timeout,
-                        params=self._params,
-                        trace=TraceMetadata(
-                            trace_id=trace_id,
-                            purpose=GenerationPurpose.MEMORY_EXTRACTION,
-                            conversation_id=str(conversation_id),
-                        ),
-                        response_schema=ResponseSchema(
-                            name="memory_candidates", json_schema=MEMORY_EXTRACTION_JSON_SCHEMA
-                        ),
-                    )
-                )
-        except TimeoutError:
-            return self._failed("timeout")
-        except LLMError as exc:
-            return self._failed(f"llm:{exc.category.value}")
-        try:
-            output = ExtractionOutput.model_validate_json(response.content)
-        except ValidationError:
-            return self._failed("invalid_output")
+        proposal = await self._extractor.propose(
+            shown, history, trace_id=trace_id, conversation_id=conversation_id
+        )
+        if proposal.output is None:
+            log_event(
+                logger,
+                "memory.extraction_failed",
+                level=logging.WARNING,
+                failure=proposal.failure,
+                provider_code=proposal.provider_code,
+            )
+            return ProcessingResult("failed", proposal.failure)
+        output = proposal.output
         decisions = decide(
             output.candidates,
             latest_message=latest,
@@ -254,11 +320,9 @@ class MemoryService:
                 source_message_id=user_message_id,
                 new=new,
                 provenance={
-                    "extraction_model": response.model_id,
-                    "prompt": self._prompt.key,
-                    "structured_mode": response.structured_mode.value
-                    if response.structured_mode
-                    else None,
+                    "extraction_model": proposal.model_id,
+                    "prompt": self._extractor.prompt.key,
+                    "structured_mode": proposal.structured_mode,
                 },
             )
             if new
@@ -287,10 +351,6 @@ class MemoryService:
             statuses=(MemoryStatus.ACTIVE, MemoryStatus.PENDING_CONFIRMATION),
         )
         return [r.memory for r in retrieved]
-
-    def _failed(self, reason: str) -> ProcessingResult:
-        log_event(logger, "memory.extraction_failed", level=logging.WARNING, failure=reason)
-        return ProcessingResult("failed", reason)
 
     def start(self) -> None:
         if self._embeddings is not None:

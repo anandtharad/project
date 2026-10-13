@@ -72,7 +72,7 @@ class RetrievedMemory(BaseModel):
     memory: Memory
     score: float
     semantic: float | None = None
-    lexical: float | None = None
+    lexical: float = 0.0
 
 
 # --- What the extraction model returns ---------------------------------------
