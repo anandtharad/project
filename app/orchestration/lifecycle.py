@@ -13,6 +13,7 @@ class TurnStage(StrEnum):
     USER_MESSAGE_PERSISTED = "user_message_persisted"
     CONTEXT_LOADED = "context_loaded"
     STATE_UPDATED = "state_updated"
+    MEMORIES_RETRIEVED = "memories_retrieved"
     DECISIONS_RESOLVED = "decisions_resolved"
     POLICY_CREATED = "policy_created"
     CONTEXT_BUILT = "context_built"

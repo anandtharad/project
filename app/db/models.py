@@ -2,8 +2,9 @@
 
 Phase 1: users, conversations, messages. Phase 2: conversation_states (one
 versioned state per conversation) and turn_decisions (one row per decision
-question per completed turn). Later phases add their own tables through new
-migrations.
+question per completed turn). Phase 3: memories (per user, with an optional
+embedding) and user_memory_settings. Later phases add their own tables
+through new migrations.
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any
 
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
@@ -22,6 +24,7 @@ from sqlalchemy import (
     Index,
     Integer,
     MetaData,
+    SmallInteger,
     String,
     Text,
     UniqueConstraint,
@@ -200,3 +203,64 @@ class TurnDecision(Base):
     fallback: Mapped[bool] = mapped_column(Boolean)
     fallback_reason: Mapped[str | None] = mapped_column(String(32))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class MemoryRecord(Base):
+    """A memory about a user (spec §10.4). Owned by the user, not by a
+    conversation: deleting a conversation keeps its memories (the person
+    manages them separately), deleting the user deletes them. The embedding
+    lives in the same row, so deleting a memory deletes its vector too."""
+
+    __tablename__ = "memories"
+    __table_args__ = (
+        CheckConstraint(
+            "memory_type IN ('episodic', 'semantic', 'preference')", name="memory_type_valid"
+        ),
+        CheckConstraint(
+            "status IN ('active', 'pending_confirmation', 'superseded')", name="status_valid"
+        ),
+        CheckConstraint("importance BETWEEN 1 AND 3", name="importance_range"),
+        CheckConstraint(
+            "(embedding IS NULL) = (embedding_model IS NULL)", name="embedding_has_model"
+        ),
+        Index("ix_memories_user_status", "user_id", "status"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    memory_type: Mapped[str] = mapped_column(String(16))
+    content: Mapped[str] = mapped_column(Text)
+    status: Mapped[str] = mapped_column(String(24))
+    importance: Mapped[int] = mapped_column(SmallInteger)
+    # explicit flag, evidence quote, extraction model and prompt, policy reason.
+    provenance: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    source_conversation_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("conversations.id", ondelete="SET NULL")
+    )
+    source_message_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("messages.id", ondelete="SET NULL")
+    )
+    # The memory this one replaced (status superseded), kept for provenance.
+    supersedes_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("memories.id", ondelete="SET NULL")
+    )
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Vectors from different models are never compared; dimensions vary by model.
+    embedding: Mapped[list[float] | None] = mapped_column(Vector())
+    embedding_model: Mapped[str | None] = mapped_column(String(128))
+    schema_version: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class UserMemorySettings(Base):
+    """Per-user memory preferences (spec §10.7). Absent row = defaults."""
+
+    __tablename__ = "user_memory_settings"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), primary_key=True
+    )
+    memory_enabled: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
+    allow_sensitive: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

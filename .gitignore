@@ -8,6 +8,8 @@ __pycache__/
 .env.*
 !.env.example
 *.log
+# Downloaded models (EMBEDDING_CACHE_DIR)
+.cache/
 
 # Agent worktrees (local only)
 .claude/worktrees/

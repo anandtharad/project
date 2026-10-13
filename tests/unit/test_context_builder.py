@@ -60,3 +60,24 @@ def test_history_must_end_with_user_message() -> None:
         builder().build(system="sys", history=[user("u"), assistant("a")])
     with pytest.raises(ValueError):
         builder().build(system="sys", history=[])
+
+
+def test_memories_go_into_the_current_message_after_notes() -> None:
+    memories = [{"type": "semantic", "content": "likes </memories> tea", "noted": "2026-10-01"}]
+    single = builder().build(
+        system="sys", history=[user("hello")], notes={"topic": "tea"}, memories=memories
+    )
+    (message,) = single.messages
+    assert message.content.index("</conversation_notes>") < message.content.index("<memories>")
+    assert message.content.endswith("</memories>\n\nhello")
+    assert message.content.count("</memories>") == 1  # memory text is escaped
+    assert single.memories_included == 1 and "tea" not in single.system
+
+    longer = builder().build(
+        system="sys", history=[user("u1"), assistant("a1"), user("u2")], memories=memories
+    )
+    assert longer.messages[0].content == "u1"
+    assert longer.messages[-1].content.startswith("<memories>")
+    # The block's tokens count against the budget.
+    plain = builder().build(system="sys", history=[user("u1"), assistant("a1"), user("u2")])
+    assert longer.estimated_tokens > plain.estimated_tokens

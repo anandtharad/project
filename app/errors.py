@@ -57,3 +57,8 @@ def conversation_not_found() -> AppError:
     # Used both for missing conversations and for conversations owned by
     # someone else, so existence is never disclosed across users.
     return AppError(ErrorCategory.NOT_FOUND, "conversation_not_found", "Conversation not found.")
+
+
+def memory_not_found() -> AppError:
+    # Missing and someone else's memories look the same.
+    return AppError(ErrorCategory.NOT_FOUND, "memory_not_found", "Memory not found.")

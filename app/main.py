@@ -2,28 +2,34 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 from pathlib import Path
 
 from alembic.config import Config as AlembicConfig
 from alembic.script import ScriptDirectory
 from fastapi import FastAPI
 
-from app.api import conversations, health, messages
+from app.api import conversations, health, memories, messages
 from app.api.errors import register_error_handlers
 from app.api.middleware import BodySizeLimitMiddleware, TraceMiddleware
+from app.background import BackgroundTasks
 from app.config import AppEnv, Effort, Settings, get_settings
 from app.context.builder import ContextBuilder
 from app.db.session import create_engine, create_session_factory
 from app.decisions.factory import build_decision_service
 from app.decisions.questions import QUESTIONS, verify_locked
 from app.decisions.service import DecisionBackend
+from app.embeddings.factory import build_embedding_client
 from app.llm.base import LLMClient
 from app.llm.factory import build_llm_client
 from app.llm.providers.registry import ResolvedProvider, resolve_provider
 from app.llm.schemas import GenerationParams
+from app.memory.service import MemoryService
+from app.memory.store import MemoryStore, RetrievalParams
 from app.observability import configure_logging, log_event
 from app.orchestration.engine import TurnOrchestrator
 from app.orchestration.persistence import TurnStore
@@ -34,6 +40,7 @@ from app.state.extractor import StateExtractor
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 COMPANION_PROMPT_ID = "companion_system"
 STATE_PROMPT_ID = "state_extraction"
+MEMORY_PROMPT_ID = "memory_extraction"
 
 logger = logging.getLogger("app")
 
@@ -80,6 +87,65 @@ def build_state_extractor(
     )
 
 
+def build_memory_service(
+    settings: Settings,
+    resolved: ResolvedProvider,
+    llm: LLMClient,
+    prompt: PromptTemplate,
+    store: MemoryStore,
+) -> MemoryService | None:
+    if not settings.memory_enabled:
+        return None
+    model = settings.memory_extraction_model or resolved.model
+    return MemoryService(
+        store=store,
+        embeddings=build_embedding_client(settings),
+        llm=llm,
+        model=model,
+        prompt=prompt,
+        params=GenerationParams(effort=state_extraction_effort(settings, resolved, model)),
+        max_output_tokens=settings.memory_extraction_max_output_tokens,
+        timeout_seconds=settings.memory_extraction_timeout_seconds,
+        retrieval=RetrievalParams(
+            limit=settings.memory_max_retrieved, min_semantic=settings.memory_min_semantic
+        ),
+        retention_days=settings.memory_retention_days,
+        max_per_turn=settings.memory_max_per_turn,
+        extraction_enabled=settings.memory_extraction_enabled,
+    )
+
+
+async def maintain_memories(store: MemoryStore, memory: MemoryService | None) -> None:
+    """One maintenance pass: retention purge, then embeddings for memories
+    stored without a current-model vector. Each part fails on its own."""
+    try:
+        purged = await store.purge_expired(datetime.now(UTC))
+        if purged:
+            log_event(logger, "memory.purged", count=purged)
+    except Exception as exc:  # retention must keep running
+        log_event(
+            logger, "memory.purge_failed", level=logging.WARNING, error_type=type(exc).__name__
+        )
+    if memory is None:
+        return
+    try:
+        embedded = await memory.backfill_embeddings()
+        if embedded:
+            log_event(logger, "memory.embeddings_backfilled", count=embedded)
+    except Exception as exc:
+        log_event(
+            logger, "memory.backfill_failed", level=logging.WARNING, error_type=type(exc).__name__
+        )
+
+
+async def maintain_memories_periodically(
+    store: MemoryStore, memory: MemoryService | None, interval_seconds: int
+) -> None:
+    while True:
+        await maintain_memories(store, memory)
+        await asyncio.sleep(interval_seconds)
+
+
 def create_app(
     settings: Settings | None = None,
     *,
@@ -92,6 +158,7 @@ def create_app(
     registry = PromptRegistry()
     prompt = registry.get(COMPANION_PROMPT_ID, settings.companion_prompt_version)
     state_prompt = registry.get(STATE_PROMPT_ID, settings.state_prompt_version)
+    memory_prompt = registry.get(MEMORY_PROMPT_ID, settings.memory_prompt_version)
     verify_locked(QUESTIONS)
     dev_tokens = settings.dev_token_map()
     head = migration_head()
@@ -104,6 +171,19 @@ def create_app(
         llm = llm_client or build_llm_client(settings, resolved)
         decisions = build_decision_service(settings, backend=decision_backend)
         state_extractor = build_state_extractor(settings, resolved, llm, state_prompt)
+        memory_store = MemoryStore(session_factory)
+        memory = build_memory_service(settings, resolved, llm, memory_prompt, memory_store)
+        background = BackgroundTasks()
+        app.state.memory_store = memory_store
+        app.state.memory = memory
+        app.state.background = background
+        if memory is not None:
+            memory.start()  # loads a local embedding model in the background
+        maintenance_task = asyncio.create_task(
+            maintain_memories_periodically(
+                memory_store, memory, settings.memory_maintenance_interval_seconds
+            )
+        )
         app.state.settings = settings
         app.state.engine = engine
         app.state.session_factory = session_factory
@@ -131,6 +211,8 @@ def create_app(
             validator=ResponseValidator(max_characters=settings.max_response_characters),
             decisions=decisions,
             state_extractor=state_extractor,
+            memory=memory,
+            background=background,
         )
         log_event(
             logger,
@@ -142,12 +224,19 @@ def create_app(
             migration_head=head,
             decision_provider=settings.decision_provider,
             state_model=state_extractor.model if state_extractor else None,
+            memory_enabled=memory is not None,
+            embedding_model=memory.embedding_model if memory else None,
         )
         for warning in resolved.warnings:
             log_event(logger, "config.warning", level=logging.WARNING, detail=warning)
         try:
             yield
         finally:
+            maintenance_task.cancel()
+            await asyncio.gather(maintenance_task, return_exceptions=True)
+            await background.aclose()
+            if memory is not None:
+                await memory.aclose()
             await decisions.aclose()
             await llm.aclose()
             await engine.dispose()
@@ -165,6 +254,7 @@ def create_app(
     app.include_router(health.router)
     app.include_router(conversations.router)
     app.include_router(messages.router)
+    app.include_router(memories.router)
     # Added last = outermost: tracing wraps the size limit.
     app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_request_bytes)
     app.add_middleware(TraceMiddleware)

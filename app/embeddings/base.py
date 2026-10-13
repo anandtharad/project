@@ -35,6 +35,10 @@ class EmbeddingClient(Protocol):
         """One unit-length vector per text. Raises EmbeddingError."""
         ...
 
+    def start(self) -> None:
+        """Begin slow setup (loading a local model) in the background; never blocks."""
+        ...
+
     async def aclose(self) -> None: ...
 
 
@@ -69,6 +73,9 @@ class FakeEmbeddingClient:
                 vector[0] = 1.0
             vectors.append(normalized(vector))
         return vectors
+
+    def start(self) -> None:
+        return None
 
     async def aclose(self) -> None:
         return None

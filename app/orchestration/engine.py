@@ -32,6 +32,7 @@ from dataclasses import dataclass
 
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.background import BackgroundTasks
 from app.config import Effort, Settings
 from app.context.builder import ContextBuilder
 from app.decisions.schemas import DecisionSet
@@ -46,6 +47,8 @@ from app.llm.schemas import (
     LLMError,
     TraceMetadata,
 )
+from app.memory.schemas import MemoryStatus
+from app.memory.service import MemoryService, RetrievalResult
 from app.observability import log_event
 from app.orchestration.lifecycle import TurnStage, TurnTrace
 from app.orchestration.persistence import (
@@ -87,6 +90,8 @@ class TurnOrchestrator:
         validator: ResponseValidator,
         decisions: DecisionService,
         state_extractor: StateExtractor | None = None,
+        memory: MemoryService | None = None,
+        background: BackgroundTasks | None = None,
     ) -> None:
         self._settings = settings
         self._model = model
@@ -104,6 +109,8 @@ class TurnOrchestrator:
         self._validator = validator
         self._decisions = decisions
         self._state_extractor = state_extractor
+        self._memory = memory
+        self._background = background
 
     async def submit_message(
         self,
@@ -130,7 +137,7 @@ class TurnOrchestrator:
         trace.mark(TurnStage.USER_MESSAGE_PERSISTED)
         trace.mark(TurnStage.CONTEXT_LOADED)
         try:
-            return await self._run(begun, trace, trace_id, conversation_id, content)
+            return await self._run(begun, trace, trace_id, user_id, conversation_id, content)
         except (AppError, TurnAttemptLost):
             raise
         except Exception:
@@ -145,11 +152,17 @@ class TurnOrchestrator:
         begun: StartedTurn,
         trace: TurnTrace,
         trace_id: str,
+        user_id: uuid.UUID,
         conversation_id: uuid.UUID,
         content: str,
     ) -> TurnResult:
         previous = begun.state.state if begun.state is not None else None
-        extraction = await self._update_state(previous, begun, trace, trace_id)
+        # Independent, so they run concurrently; neither can fail the turn.
+        extraction, recalled = await asyncio.gather(
+            self._update_state(previous, begun, trace, trace_id),
+            self._recall(user_id, content),
+        )
+        trace.mark(TurnStage.MEMORIES_RETRIEVED)
         state = extraction.state if extraction is not None and extraction.state else previous
         trace.mark(TurnStage.STATE_UPDATED)
 
@@ -170,6 +183,7 @@ class TurnOrchestrator:
             system=self._system_prompt(policy),
             history=begun.history,
             notes=state.notes() if state is not None and not state.is_empty() else None,
+            memories=_memories_for_context(recalled),
         )
         trace.mark(TurnStage.CONTEXT_BUILT)
         request = GenerationRequest(
@@ -235,6 +249,7 @@ class TurnOrchestrator:
                 "policy": policy.summary() if self._policy_enabled else None,
                 "decisions": _decisions_summary(decisions),
                 "state": _state_summary(extraction, self._state_extractor),
+                "memory": _memory_summary(recalled),
                 "trace_id": trace_id,
             },
         )
@@ -261,6 +276,18 @@ class TurnOrchestrator:
                 "The response could not be saved. Your message was kept; please retry.",
             ) from exc
         trace.mark(TurnStage.ASSISTANT_MESSAGE_PERSISTED)
+        if self._memory is not None and self._background is not None:
+            # Post-turn processing: after the reply is stored, never part of it.
+            self._background.spawn(
+                self._memory.process_turn(
+                    user_id=user_id,
+                    conversation_id=begun.conversation_id,
+                    user_message_id=begun.user_message_id,
+                    history=begun.history,
+                    trace_id=trace_id,
+                ),
+                name="memory_extraction",
+            )
         if state_write is not None and completed.state_version is None:
             log_event(logger, "state.write_rejected_stale", level=logging.WARNING)
         trace.mark(TurnStage.COMPLETED)
@@ -279,6 +306,11 @@ class TurnOrchestrator:
             total_ms=round(trace.elapsed_seconds() * 1000, 2),
         )
         return TurnResult(turn=completed, timings_ms=trace.timings_ms())
+
+    async def _recall(self, user_id: uuid.UUID, content: str) -> RetrievalResult | None:
+        if self._memory is None:
+            return None
+        return await self._memory.retrieve_for_turn(user_id, content)
 
     def _system_prompt(self, policy: ResponsePolicy) -> str:
         if not self._policy_enabled:
@@ -412,4 +444,36 @@ def _state_summary(
         "structured_mode": extraction.structured_mode.value if extraction.structured_mode else None,
         "latency_ms": extraction.latency_ms,
         "updated": extraction.status is ExtractionStatus.UPDATED,
+    }
+
+
+_PENDING = MemoryStatus.PENDING_CONFIRMATION
+
+
+def _memories_for_context(recalled: RetrievalResult | None) -> list[dict[str, str]] | None:
+    if recalled is None or not recalled.memories:
+        return None
+    return [
+        {
+            "type": r.memory.memory_type.value,
+            "content": r.memory.content,
+            "noted": r.memory.created_at.date().isoformat(),
+            # Held because it conflicts with an older memory (spec §10.6).
+            **(
+                {"status": "unconfirmed"}
+                if r.memory.status is MemoryStatus.PENDING_CONFIRMATION
+                else {}
+            ),
+        }
+        for r in recalled.memories
+    ]
+
+
+def _memory_summary(recalled: RetrievalResult | None) -> dict[str, object] | None:
+    if recalled is None:
+        return None
+    return {
+        "mode": recalled.mode,
+        "failure": recalled.failure,
+        "used": [{"id": str(r.memory.id), "score": round(r.score, 4)} for r in recalled.memories],
     }

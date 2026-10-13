@@ -31,6 +31,7 @@ class GenerationPurpose(StrEnum):
 
     CONVERSATION = "conversation"
     STATE_EXTRACTION = "state_extraction"
+    MEMORY_EXTRACTION = "memory_extraction"
 
 
 class GenerationParams(BaseModel):

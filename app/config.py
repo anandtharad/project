@@ -138,6 +138,37 @@ class Settings(BaseSettings):
     state_extraction_max_output_tokens: int = Field(default=1024, ge=256, le=8192)
     state_prompt_version: str = "1.0.0"
 
+    # --- Memory (spec §10) ---------------------------------------------------
+    memory_enabled: bool = True
+    # Post-turn candidate extraction (one structured LLM call per turn whose
+    # message is long enough). Unset model = the reply model.
+    memory_extraction_enabled: bool = True
+    memory_extraction_model: str | None = None
+    memory_extraction_timeout_seconds: float = Field(default=20.0, gt=0, le=120)
+    memory_extraction_max_output_tokens: int = Field(default=1024, ge=256, le=8192)
+    memory_prompt_version: str = "1.0.0"
+    memory_max_retrieved: int = Field(default=5, ge=1, le=20)
+    # Minimum cosine similarity for a semantic match; chosen on the memory
+    # evaluation set's dev split (docs/memory.md).
+    memory_min_semantic: float = Field(default=0.6, ge=0.0, le=1.0)
+    memory_max_per_turn: int = Field(default=3, ge=1, le=10)
+    # Every memory expires at most this many days after it is stored.
+    memory_retention_days: int = Field(default=365, ge=1, le=3650)
+    # Maintenance: delete expired memories and embed memories stored without a
+    # vector (the local model was still loading, or EMBEDDING_MODEL changed).
+    memory_maintenance_interval_seconds: int = Field(default=600, ge=60)
+    # Embeddings for semantic retrieval: "local" (fastembed on CPU, no key),
+    # "openai", "gemini", or "none" (full-text matching only).
+    embedding_provider: Literal["none", "local", "openai", "gemini", "fake"] = "local"
+    # Unset = the provider default (see app/embeddings/factory.py).
+    embedding_model: str | None = None
+    embedding_timeout_seconds: float = Field(default=10.0, gt=0, le=60)
+    # openai/gemini only: request shorter vectors (unset = the model's default).
+    embedding_dimensions: int | None = Field(default=None, ge=1, le=4096)
+    # local only: where the model is downloaded (about 65 MB). Unset = fastembed's
+    # default, FASTEMBED_CACHE_PATH or the OS temp folder, which cleanup tools may empty.
+    embedding_cache_dir: str | None = None
+
     # --- Decisions (spec §7) -------------------------------------------------
     # "jev": TypeSafe's hosted API. "laya": a self-hosted Laya server
     # (laya-serve) speaking the same protocol. "off": documented fallbacks only.
@@ -173,7 +204,7 @@ class Settings(BaseSettings):
     max_response_characters: int = Field(default=8_000, ge=100)
 
     # --- Prompts ------------------------------------------------------------
-    companion_prompt_version: str = "1.3.0"
+    companion_prompt_version: str = "1.4.0"
 
     # --- Diagnostics --------------------------------------------------------
     expose_timing_metadata: bool = True
@@ -215,6 +246,8 @@ class Settings(BaseSettings):
                 )
             if self.generation_provider == "fake":
                 raise ValueError("GENERATION_PROVIDER=fake is a development stub")
+            if self.embedding_provider == "fake":
+                raise ValueError("EMBEDDING_PROVIDER=fake is a development stub")
             if self.expose_timing_metadata:
                 raise ValueError("EXPOSE_TIMING_METADATA must be false in production")
         return self

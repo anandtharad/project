@@ -44,6 +44,8 @@ def make_settings(**overrides: Any) -> Settings:
         "log_level": "WARNING",
         "database_url": UNREACHABLE_DB,
         "generation_provider": "fake",
+        # Deterministic, no model download; tests needing real vectors opt in.
+        "embedding_provider": "fake",
         "dev_auth_tokens": "alice:token-alice,bob:token-bob",
         "turn_deadline_seconds": 10.0,
         "stale_turn_seconds": 30.0,
@@ -92,6 +94,9 @@ EMPTY_EXTRACTION = json.dumps(
 )
 
 
+NO_MEMORIES = json.dumps({"candidates": []})
+
+
 class ScriptedLLMClient:
     """Deterministic LLM test double.
 
@@ -99,16 +104,19 @@ class ScriptedLLMClient:
     it replies "reply to: <last user message>" so tests can trace which
     context was used. Every request is recorded.
 
-    State-extraction calls are recorded separately in `state_requests` and
-    consume `queue_state` steps; by default they return an empty state, so
-    scripted conversation replies are unaffected.
+    State-extraction and memory-extraction calls are recorded separately
+    (`state_requests`, `memory_requests`) and consume their own queues
+    (`queue_state`, `queue_memory`); by default they return an empty state and
+    no memory candidates, so scripted conversation replies are unaffected.
     """
 
     def __init__(self) -> None:
         self.requests: list[GenerationRequest] = []
         self.state_requests: list[GenerationRequest] = []
+        self.memory_requests: list[GenerationRequest] = []
         self._steps: deque[Step] = deque()
         self._state_steps: deque[Step] = deque()
+        self._memory_steps: deque[Step] = deque()
 
     @property
     def provider(self) -> str:
@@ -123,11 +131,17 @@ class ScriptedLLMClient:
     def queue_state(self, *steps: Step) -> None:
         self._state_steps.extend(steps)
 
+    def queue_memory(self, *steps: Step) -> None:
+        self._memory_steps.extend(steps)
+
     async def generate(self, request: GenerationRequest) -> GenerationResponse:
         step: Step
         if request.trace.purpose is GenerationPurpose.STATE_EXTRACTION:
             self.state_requests.append(request)
             step = self._state_steps.popleft() if self._state_steps else EMPTY_EXTRACTION
+        elif request.trace.purpose is GenerationPurpose.MEMORY_EXTRACTION:
+            self.memory_requests.append(request)
+            step = self._memory_steps.popleft() if self._memory_steps else NO_MEMORIES
         else:
             self.requests.append(request)
             step = (

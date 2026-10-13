@@ -39,6 +39,8 @@ _ISOLATED_ENV_PREFIXES = (
     "JEV_",
     "LAYA_",
     "TYPESAFE_",
+    "EMBEDDING_",
+    "MEMORY_",
 )
 _ISOLATED_ENV_NAMES = {
     "MAX_OUTPUT_TOKENS",

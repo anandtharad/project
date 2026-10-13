@@ -6,6 +6,9 @@ the conversation notes derived from them (spec §13.2) - only ever travels in
 user-role messages; it is never spliced into the system instruction. The
 notes open the first included user message inside a <conversation_notes>
 block whose JSON escapes "<" and ">", so nothing in it can close the block.
+Retrieved memories (also untrusted) open the current user message inside a
+<memories> block, escaped the same way, following the spec's context order
+(§13.1: state, recent messages, memories, current message).
 
 Token counts are estimated (≈4 characters per token plus per-message
 overhead). This is a budgeting heuristic, not an exact provider count.
@@ -29,10 +32,17 @@ def estimate_tokens(text: str) -> int:
     return math.ceil(len(text) / _CHARS_PER_TOKEN)
 
 
+def _escaped_json(value: Any) -> str:
+    body = json.dumps(value, ensure_ascii=False, indent=1)
+    return body.replace("<", "\\u003c").replace(">", "\\u003e")
+
+
 def render_notes(notes: Mapping[str, Any]) -> str:
-    body = json.dumps(dict(notes), ensure_ascii=False, indent=1)
-    body = body.replace("<", "\\u003c").replace(">", "\\u003e")
-    return f"<conversation_notes>\n{body}\n</conversation_notes>"
+    return f"<conversation_notes>\n{_escaped_json(dict(notes))}\n</conversation_notes>"
+
+
+def render_memories(memories: Sequence[Mapping[str, Any]]) -> str:
+    return f"<memories>\n{_escaped_json([dict(m) for m in memories])}\n</memories>"
 
 
 @dataclass(frozen=True)
@@ -43,6 +53,7 @@ class BuiltContext:
     omitted_messages: int
     estimated_tokens: int
     notes_included: bool = False
+    memories_included: int = 0
 
 
 class ContextBuilder:
@@ -56,6 +67,7 @@ class ContextBuilder:
         system: str,
         history: Sequence[ChatMessage],
         notes: Mapping[str, Any] | None = None,
+        memories: Sequence[Mapping[str, Any]] | None = None,
     ) -> BuiltContext:
         """`history` is ordered oldest-first and ends with the current user message."""
         if not history or history[-1].role is not ChatRole.USER:
@@ -65,6 +77,9 @@ class ContextBuilder:
         used = estimate_tokens(system)
         if notes_block is not None:
             used += estimate_tokens(notes_block)
+        memories_block = render_memories(memories) if memories else None
+        if memories_block is not None:
+            used += estimate_tokens(memories_block)
         selected: list[ChatMessage] = []
         # Walk backwards from the current message; it is always included.
         for message in reversed(history):
@@ -84,6 +99,9 @@ class ContextBuilder:
             selected.pop(0)
 
         merged = _merge_consecutive(selected)
+        if memories_block is not None:
+            last = merged[-1]
+            merged[-1] = ChatMessage(role=last.role, content=f"{memories_block}\n\n{last.content}")
         if notes_block is not None:
             first = merged[0]
             merged[0] = ChatMessage(role=first.role, content=f"{notes_block}\n\n{first.content}")
@@ -94,6 +112,7 @@ class ContextBuilder:
             omitted_messages=len(history) - len(selected),
             estimated_tokens=used,
             notes_included=notes_block is not None,
+            memories_included=len(memories) if memories else 0,
         )
 
 
