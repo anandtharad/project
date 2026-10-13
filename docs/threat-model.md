@@ -18,8 +18,9 @@ covers what exists today and is revisited at each phase.
 1. Client → API: everything in a request is untrusted.
 2. API → LLM provider: conversation content leaves the system here (replies
    and state extraction).
-2b. API → decision service: recent messages and conversation notes are sent
-   to Laya (self-hosted: stays on your machine) or TypeSafe Jev (third party).
+2b. API → decision service: the latest message and up to four earlier
+   messages are sent to Laya (self-hosted: stays on your machine) or TypeSafe
+   Jev (third party). Conversation notes are not sent.
 3. LLM output → API: model output is untrusted until validated.
 4. API → PostgreSQL: trusted store; access only through ownership-scoped queries.
 
@@ -57,8 +58,8 @@ covers what exists today and is revisited at each phase.
   history) is sent to the configured LLM provider on every turn: Anthropic,
   OpenAI, Groq, Google, xAI, Alibaba Cloud, DeepSeek, OpenRouter (and the
   upstream provider it routes to), Together, or Mistral; with Ollama it stays
-  on your own server. With `DECISION_PROVIDER=jev`, the latest message, up
-  to four earlier messages and the conversation notes are also sent to
+  on your own server. With `DECISION_PROVIDER=jev`, the latest message and
+  up to four earlier messages are also sent to
   TypeSafe on every turn (TypeSafe states it does not train on user data;
   zero data retention is offered to enterprise customers). With `laya` they
   stay on your machine.

@@ -9,7 +9,14 @@ from __future__ import annotations
 
 from app.config import Settings
 from app.llm.base import LLMClient
-from app.llm.providers.registry import AdapterKind, ProviderConfigError, ResolvedProvider
+from app.llm.providers.registry import (
+    AdapterKind,
+    ProviderConfigError,
+    ProviderPreset,
+    ResolvedProvider,
+    structured_output_for,
+)
+from app.llm.structured import ChatStructuredOutput
 
 
 def _missing_sdk(resolved: ResolvedProvider, exc: ImportError) -> ProviderConfigError:
@@ -76,12 +83,15 @@ def build_llm_client(settings: Settings, resolved: ResolvedProvider) -> LLMClien
                 if preset.effort_param in ("reasoning_effort", "enable_thinking")
                 else "none"
             ),
-            structured_output=(
-                resolved.structured_output if resolved.structured_output != "adapter" else "prompt"
-            ),
+            structured_output=lambda model: _chat_style(preset, model),
             structured_require_parameters=preset.structured_require_parameters,
             send_openai_headers=preset.send_openai_headers,
         )
     raise ProviderConfigError(
         f"Provider {resolved.preset.name!r} ({kind.value} adapter) is not available yet"
     )
+
+
+def _chat_style(preset: ProviderPreset, model: str) -> ChatStructuredOutput:
+    style = structured_output_for(preset, model)
+    return style if style != "adapter" else "prompt"

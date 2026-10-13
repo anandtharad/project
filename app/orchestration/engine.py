@@ -129,15 +129,33 @@ class TurnOrchestrator:
         trace.mark(TurnStage.AUTHORIZED)
         trace.mark(TurnStage.USER_MESSAGE_PERSISTED)
         trace.mark(TurnStage.CONTEXT_LOADED)
+        try:
+            return await self._run(begun, trace, trace_id, conversation_id, content)
+        except (AppError, TurnAttemptLost):
+            raise
+        except Exception:
+            # An unexpected error must not hold the conversation's pending
+            # slot until it goes stale; mark the turn failed so a retry works.
+            log_event(logger, "turn.unexpected_error", level=logging.ERROR)
+            await self._fail(begun, "internal_error")
+            raise
 
+    async def _run(
+        self,
+        begun: StartedTurn,
+        trace: TurnTrace,
+        trace_id: str,
+        conversation_id: uuid.UUID,
+        content: str,
+    ) -> TurnResult:
         previous = begun.state.state if begun.state is not None else None
         extraction = await self._update_state(previous, begun, trace, trace_id)
         state = extraction.state if extraction is not None and extraction.state else previous
         trace.mark(TurnStage.STATE_UPDATED)
 
-        decisions = await self._decisions.decide(
-            build_decision_state(begun.history, state.notes() if state else None)
-        )
+        # Recent messages only, exactly what scripts/eval_decisions.py measures:
+        # thresholds chosen there stay valid for live turns.
+        decisions = await self._decisions.decide(build_decision_state(begun.history))
         mode = decisions.acted_on("conversation_mode")
         if mode is not None and isinstance(mode.value, str):
             state = (state or ConversationState()).model_copy(

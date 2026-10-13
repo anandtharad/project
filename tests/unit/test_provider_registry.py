@@ -283,6 +283,9 @@ def test_structured_output_presets_are_consistent() -> None:
         ("openai", "gpt-4o-2024-08-06", "json_schema"),
         ("openai", "gpt-4o-2024-05-13", "json_object"),
         ("openai", "gpt-4-turbo", "json_object"),
+        ("openai", "gpt-4-0613", "prompt"),
+        ("openai", "gpt-4", "prompt"),  # exact match; must not catch gpt-4o
+        ("openai", "gpt-4o", "json_schema"),
         ("openai", "gpt-3.5-turbo-0125", "json_object"),
         ("xai", None, "json_schema"),
         ("xai", "grok-4.7", "json_schema"),
@@ -293,6 +296,7 @@ def test_structured_output_presets_are_consistent() -> None:
         ("together", "openai/gpt-oss-120b", "json_schema_best_effort"),
         ("mistral", None, "json_schema"),
         ("mistral", "codestral-mamba-latest", "prompt"),
+        ("mistral", "open-codestral-mamba", "prompt"),
         ("ollama", "llama3", "json_schema_best_effort"),
         ("openai_compatible", None, "prompt"),
         ("anthropic", None, "adapter"),
@@ -322,5 +326,17 @@ def test_factory_passes_structured_output_settings(
     settings = settings_for(provider, generation_model=model)
     client = build_llm_client(settings, resolve_provider(settings))
     assert isinstance(client, OpenAICompatibleLLMClient)
-    assert client._structured_output == style
+    resolver = client._structured_output
+    assert callable(resolver) and resolver(model) == style
     assert client._structured_require_parameters is require_parameters
+
+
+def test_structured_style_follows_the_requested_model_not_the_generation_model() -> None:
+    # e.g. STATE_EXTRACTION_MODEL differs from GENERATION_MODEL.
+    settings = settings_for("mistral", generation_model="mistral-large-latest")
+    client = build_llm_client(settings, resolve_provider(settings))
+    assert isinstance(client, OpenAICompatibleLLMClient)
+    resolver = client._structured_output
+    assert callable(resolver)
+    assert resolver("mistral-large-latest") == "json_schema"
+    assert resolver("codestral-mamba-latest") == "prompt"

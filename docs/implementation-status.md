@@ -87,11 +87,28 @@ unmodified here.
 
 | Suite | Result |
 |---|---|
-| unit | 226 passed |
-| integration | 38 passed |
+| unit | 439 passed |
+| integration | 50 passed |
 | security | 43 passed |
-| live | 8 skipped (opt-in; provider APIs unreachable from this environment) |
-| **total** | **307 passed, 8 skipped** |
+| live | 8 skipped (opt-in; run with `scripts/dev.py live-groq`) |
+| **total** | **532 passed, 8 skipped** (2026-10-13) |
+
+Live runs made from this environment once network access was allowed
+(2026-10-13): Groq live tests, strict structured state extraction, the
+decision and policy-effect evaluations, and a three-turn end-to-end chat
+through the API with Groq and a local Laya server (docs/decisions.md).
+
+A second adversarial review (5 lenses, each finding checked by an
+independent skeptic) of the Phase 2 changes confirmed 15 issues; all are
+fixed and covered by tests. They include: the explicit-request patterns read
+"there are no solutions left" as refusing advice and could override the
+danger guidance (now first-person requests only, and prompt 1.3.0 puts the
+danger guidance first); curly apostrophes turned "I don't want advice" into
+an advice request; an exhausted turn budget left a turn stuck as pending;
+a NUL character in extracted state could fail the reply transaction; the
+OpenAI-compatible adapter chose the structured-output mode from the reply
+model instead of the requested one; and threshold coverage ignored failed
+requests.
 
 Without `TEST_DATABASE_URL`, the database-backed tests skip, each with an
 explicit reason. Tests clear provider-related environment variables, so the
@@ -210,7 +227,7 @@ are clean.
 | Invalid decisions are rejected | Met | every answer validated against its question (label in options and most probable, probabilities over exactly the options summing to ~1, values in [0, 1]); invalid answers fall back, never repaired: `test_answers_that_do_not_fit_the_question_are_rejected` and related tests |
 | Missing fields do not crash the app | Met | all state fields optional; missing answers fall back individually; an unreadable stored state is replaced: `test_invalid_and_missing_answers_fall_back_individually`, extraction failure tests |
 | Jev outage has defined behavior | Met (offline; Laya outage also exercised) | timeout, connection, 429, 401/422, 5xx/529 and malformed responses each map to a fallback reason; the turn completes |
-| Strategy decisions measurably affect responses | **Partly met** | the policy measurably changes replies on held-out data (judge recovers the forced strategy 0.80 vs 0.33 chance, prompt 1.2.0; docs/decisions.md). It acts today on explicit requests in the message. Decision-driven strategies are wired and tested, but Laya zero-shot is at or below the majority baseline (no threshold qualifies), and Jev has no key yet, so decisions stay in shadow mode |
+| Strategy decisions measurably affect responses | **Partly met** | the policy measurably changes replies on held-out data (judge recovers the forced strategy 0.80 vs 0.33 chance, prompt 1.2.0; docs/decisions.md). It acts today on explicit requests in the message. Decision-driven strategies are wired and tested, but Laya zero-shot is below the majority baseline for conversation_mode, at chance for retrieval, and only modestly above it for response_strategy (0.27 vs 0.17 on test), with no confidence threshold reaching the target accuracy, and Jev has no key yet, so decisions stay in shadow mode |
 | No decision bypasses safety or authorization | Met | decisions run after the ownership check and only select fixed prompt fragments; `safety_response` is not selectable; a safety signal takes precedence: `test_decisions_never_run_for_a_foreign_conversation`, `test_safety_mode_signal_takes_precedence`, policy tests |
 
 Phase 2 tasks (spec §21): state schema and persistence, state extraction,

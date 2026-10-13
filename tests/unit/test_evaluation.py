@@ -137,3 +137,17 @@ def test_effect_examples_are_open_ended_without_explicit_requests() -> None:
     for e in chosen:
         assert e.labels["conversation_mode"] in OPEN_ENDED_MODES
         assert explicit_request(e.conversation[-1].content) == (None, True)
+
+
+def test_failed_requests_count_against_threshold_coverage() -> None:
+    examples = [example(i, "listening") for i in range(4)]
+    predictions = [predicted(0, "listening", confidence=0.95)] + [
+        Prediction(example_id=f"x-{i}", answers={"conversation_mode": None}) for i in (1, 2, 3)
+    ]
+    m = choice_metrics(CONVERSATION_MODE, examples, predictions, threshold=0.9)
+    assert m["at_given_threshold"] == {
+        "threshold": 0.9,
+        "acted": 1,
+        "coverage": 0.25,  # 1 of 4 turns, not 1 of 1 valid answer
+        "accuracy": 1.0,
+    }

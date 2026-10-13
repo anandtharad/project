@@ -53,13 +53,36 @@ def decision_set(**acted: str) -> DecisionSet:
 @pytest.mark.parametrize(
     ("message", "strategy", "advice"),
     [
+        # Refusals of advice.
         ("I don't want advice, I just need to vent.", Strategy.VALIDATE, False),
         ("Not looking for solutions, just want to be heard", Strategy.VALIDATE, False),
         ("Can you just listen for a minute?", Strategy.VALIDATE, False),
+        ("Please don\u2019t give me advice.", Strategy.VALIDATE, False),  # curly apostrophe
+        ("I don\u2019t want any advice right now", Strategy.VALIDATE, False),
+        ("I didn't ask for any advice", Strategy.VALIDATE, False),
+        ("I never asked for any advice.", Strategy.VALIDATE, False),
+        ("No advice please.", Strategy.VALIDATE, False),
+        # Requests for advice, including ones that contain a negation.
         ("What should I do about my landlord?", Strategy.PROBLEM_SOLVE, True),
         ("Any tips for sleeping better?", Strategy.PROBLEM_SOLVE, True),
-        ("Help me plan my week please", Strategy.PLAN, True),
+        ("I don't know what to do, any advice?", Strategy.PROBLEM_SOLVE, True),
+        ("No, I actually want your advice. What should I do?", Strategy.PROBLEM_SOLVE, True),
+        ("Could you give me some advice?", Strategy.PROBLEM_SOLVE, True),
+        ("Could you help me plan my week?", Strategy.PLAN, True),
+        ("Help me make a schedule for exams", Strategy.PLAN, True),
         ("Can you summarize what we talked about?", Strategy.SUMMARIZE, True),
+        # Not requests: hopelessness, mentions, statements.
+        (
+            "I have tried everything and there are no solutions left. I'm going to end it tonight.",
+            None,
+            True,
+        ),
+        ("No one can fix this.", None, True),
+        ("There's no fix for me.", None, True),
+        ("I just need to talk to my landlord about the rent.", None, True),
+        ("My boss asked me to summarize the quarterly report and I froze.", None, True),
+        ("I hate my schedule for work, it's exhausting me", None, True),
+        ("I didn't get any advice from my doctor and it's frustrating", None, True),
         ("I had a long day.", None, True),
         ("I advise people at work all day", None, True),
     ],
@@ -87,7 +110,8 @@ def test_policy_precedence() -> None:
     safety = choose_policy(
         "What should I do", decision_set(conversation_mode="safety", response_strategy="plan")
     )
-    assert safety.safety_signal and safety.fragments == ("safety_signal", "no_advice")
+    # Never "no_advice": it would forbid the crisis-line suggestion.
+    assert safety.safety_signal and safety.fragments == ("safety_signal",)
 
 
 def test_every_policy_fragment_exists_in_the_prompt() -> None:
@@ -230,3 +254,31 @@ def test_extraction_uses_the_reply_model_unless_configured() -> None:
         generation_provider="groq", groq_api_key="gsk_x", state_extraction_model="qwen/qwen3.8-27b"
     )
     assert state_extraction_model(explicit, resolve_provider(explicit)) == "qwen/qwen3.8-27b"
+
+
+def test_control_characters_never_reach_stored_state() -> None:
+    raw = json.loads(EMPTY_EXTRACTION) | {"topic": "a\u0000b", "subtopics": ["x\u0007y"]}
+    state = ExtractedState.model_validate(raw).to_state(None)
+    assert state.topic == "ab" and state.subtopics == ("xy",)
+
+
+async def test_extractor_with_no_budget_left_fails_without_calling_the_model() -> None:
+    llm = ScriptedLLMClient()
+    result = await make_extractor(llm).extract(
+        None,
+        [ChatMessage(role=ChatRole.USER, content="hi")],
+        trace_id="t",
+        conversation_id="c",
+        timeout_seconds=-1.0,
+    )
+    assert result.failure == "timeout" and llm.state_requests == []
+
+
+def test_extraction_effort_is_resolved_for_the_extraction_model() -> None:
+    from app.main import state_extraction_effort
+
+    settings = make_settings(generation_provider="groq", groq_api_key="gsk_x")
+    resolved = resolve_provider(settings)
+    assert state_extraction_effort(settings, resolved, resolved.model) == "low"
+    # A model without known reasoning controls gets no effort parameter.
+    assert state_extraction_effort(settings, resolved, "llama-3.1-8b-instant") is None

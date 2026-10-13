@@ -179,6 +179,7 @@ class GroqLLMClient:
                 requested_model=request.model,
                 latency_ms=latency_ms,
                 request_id=request_id,
+                structured=plan is not None,
             ),
             plan,
         )

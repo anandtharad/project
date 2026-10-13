@@ -173,7 +173,7 @@ class Settings(BaseSettings):
     max_response_characters: int = Field(default=8_000, ge=100)
 
     # --- Prompts ------------------------------------------------------------
-    companion_prompt_version: str = "1.2.0"
+    companion_prompt_version: str = "1.3.0"
 
     # --- Diagnostics --------------------------------------------------------
     expose_timing_metadata: bool = True

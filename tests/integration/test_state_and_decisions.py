@@ -325,3 +325,22 @@ async def test_state_extraction_can_be_disabled(
         assert isinstance(app, FastAPI)
     assert llm.state_requests == []
     assert await stored_state(db_engine, cid) is None
+
+
+async def test_unexpected_error_marks_the_turn_failed_so_a_retry_works(
+    database_url: str, clean_db: None
+) -> None:
+    llm = ScriptedLLMClient()
+
+    async def boom(request: Any) -> str:
+        raise RuntimeError("unexpected")
+
+    llm.queue(boom)
+    async with running_app(make_settings(database_url=database_url), llm) as (_, client):
+        cid = await create_conversation(client, ALICE)
+        body = {"content": "hello", "idempotency_key": "k-1"}
+        first = await client.post(f"/v1/conversations/{cid}/messages", json=body, headers=ALICE)
+        assert first.status_code == 500
+        # Not stuck as pending: the same request can be retried at once.
+        retry = await client.post(f"/v1/conversations/{cid}/messages", json=body, headers=ALICE)
+        assert retry.status_code == 201, retry.text

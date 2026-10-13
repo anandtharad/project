@@ -158,7 +158,7 @@ is the source of truth. Important ones:
 | `MAX_INPUT_CHARACTERS`, `MAX_REQUEST_BYTES` | input limits enforced before any model call |
 | `STATE_EXTRACTION_ENABLED`, `STATE_EXTRACTION_MODEL` | conversation-state update before each reply (default on; the reply model) |
 | `DECISION_PROVIDER` | `off` (default), `laya` (self-hosted, `LAYA_API_KEY`) or `jev` (`JEV_API_KEY`) |
-| `COMPANION_PROMPT_VERSION` | reply prompt; `1.2.0` carries the response-policy slot (`1.0.0` runs without a policy) |
+| `COMPANION_PROMPT_VERSION` | reply prompt; `1.3.0` (default) carries the response-policy slot (`1.0.0` runs without a policy) |
 
 `APP_ENV=production` refuses to start until production authentication exists.
 

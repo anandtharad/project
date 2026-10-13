@@ -14,7 +14,7 @@ from fastapi import FastAPI
 from app.api import conversations, health, messages
 from app.api.errors import register_error_handlers
 from app.api.middleware import BodySizeLimitMiddleware, TraceMiddleware
-from app.config import AppEnv, Settings, get_settings
+from app.config import AppEnv, Effort, Settings, get_settings
 from app.context.builder import ContextBuilder
 from app.db.session import create_engine, create_session_factory
 from app.decisions.factory import build_decision_service
@@ -53,16 +53,28 @@ def state_extraction_model(settings: Settings, resolved: ResolvedProvider) -> st
     return settings.state_extraction_model or resolved.model
 
 
+def state_extraction_effort(
+    settings: Settings, resolved: ResolvedProvider, model: str
+) -> Effort | None:
+    """The effort setting resolved for the extraction model itself: the reply
+    model's effort can be invalid for another model (e.g. reasoning_effort sent
+    to a model without reasoning controls)."""
+    if model == resolved.model:
+        return resolved.effort
+    return resolve_provider(settings.model_copy(update={"generation_model": model})).effort
+
+
 def build_state_extractor(
     settings: Settings, resolved: ResolvedProvider, llm: LLMClient, prompt: PromptTemplate
 ) -> StateExtractor | None:
     if not settings.state_extraction_enabled:
         return None
+    model = state_extraction_model(settings, resolved)
     return StateExtractor(
         llm=llm,
-        model=state_extraction_model(settings, resolved),
+        model=model,
         prompt=prompt,
-        params=GenerationParams(effort=resolved.effort),
+        params=GenerationParams(effort=state_extraction_effort(settings, resolved, model)),
         max_output_tokens=settings.state_extraction_max_output_tokens,
         timeout_seconds=settings.state_extraction_timeout_seconds,
     )

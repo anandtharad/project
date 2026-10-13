@@ -24,3 +24,12 @@ from app.llm.reasoning import strip_reasoning
 )
 def test_strip_reasoning(raw: str, expected: str, removed: bool) -> None:
     assert strip_reasoning(raw) == (expected, removed)
+
+
+def test_structured_replies_lose_only_a_reasoning_prefix() -> None:
+    from app.llm.reasoning import strip_reasoning_prefix
+
+    body = '{"topic": "why the model leaks </think> and <think> tags"}'
+    assert strip_reasoning_prefix(body) == (body, False)
+    assert strip_reasoning_prefix("<think>plan the JSON</think>\n" + body) == (body, True)
+    assert strip_reasoning_prefix("reasoning without an opening tag</think>" + body) == (body, True)

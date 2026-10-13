@@ -9,8 +9,9 @@ keeps conversation state (spec §8), and turns both into a response policy.
 user message saved (ownership checked)
   -> state update      one structured LLM call (STATE_EXTRACTION)
   -> decisions         one request to the decision model, all questions
+                       (state = latest message + up to 4 earlier messages)
   -> policy            plain code
-  -> reply prompt      companion_system 1.1.0 + policy fragment(s)
+  -> reply prompt      companion_system 1.3.0 + policy fragment(s)
   -> reply, validation, then reply + decisions + state saved in one transaction
 ```
 
@@ -98,14 +99,24 @@ Evaluation below.
    points the model to its danger guidance. A signal, not the safety layer.
 2. **explicit_request**: the message says what the person wants: "I don't
    want advice / just need to vent" (validate, no advice), "what should I
-   do / any tips" (problem_solve), "help me plan" (plan), "summarize"
-   (summarize).
+   do? / any tips for...?" (problem_solve), "help me plan..." (plan), "can
+   you summarize...?" (summarize).
 3. **decision**: a calibrated `response_strategy`.
 4. **default**: no constraint; the model chooses, exactly as in Phase 1.
 
 Each policy maps to fixed text: fragments of the locked `companion_system`
-1.1.0 prompt (`[fragments]` table, part of its checksum). The policy always
-allows a complete reply with neither advice nor a question.
+prompt (1.3.0; `[fragments]` table, part of its checksum). The default
+(open), reflect, validate and no-advice policies allow a complete reply with
+neither advice nor a question; explore and clarify ask one question, and
+problem_solve and plan offer options or steps. The prompt's danger guidance
+always takes precedence over the chosen approach, including a no-advice
+instruction (1.3.0), and the safety signal never adds "no advice".
+
+Explicit requests are matched conservatively, as first-person requests to
+the companion ("I don't want advice", "what should I do?", "can you help me
+plan my week?", "can you summarize what we talked about?"). Mentions and
+statements ("my boss asked me to summarize...", "there are no solutions
+left") are not requests; curly apostrophes are normalized.
 
 ## Conversation state
 
@@ -144,7 +155,10 @@ uv run python scripts/eval_policy_effect.py --examples 12
 ```
 
 Results are written to `eval/results/` with the dataset checksum, question
-checksums, and the served model.
+checksums, and the served model. The evaluation builds the decision state
+exactly as a live turn does (latest message and up to four earlier
+messages; conversation notes are not sent to the decision model), so
+thresholds chosen on dev apply unchanged to live turns.
 
 ## Results (2026-10-12/13, live)
 
@@ -187,6 +201,12 @@ validate / problem_solve / explore (chance = 0.33).
 | 1.1.0 (soft fragments; judge `gpt-oss-20b`, 12 dev conversations incl. explicit requests) | dev | 0.33 | 0.20-0.50 |
 | 1.2.0 (directive fragments) | dev | 0.77 | 0.59-0.88 |
 | 1.2.0 | **held-out test** | **0.80** | **0.63-0.91** |
+
+The default prompt is now 1.3.0. It differs from 1.2.0 only in safety wording found by the Phase 2
+review: the danger guidance takes precedence over the chosen approach, and the no-advice fragment
+says it never overrides it. The strategy fragments are unchanged. The effect was not re-measured on
+1.3.0 because the run would exceed Groq's free-tier daily token limit for the reply model; rerun
+`scripts/eval_policy_effect.py --split test` to confirm.
 
 Held-out test, surface measures per strategy (10 replies each):
 

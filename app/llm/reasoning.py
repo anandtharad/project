@@ -31,3 +31,19 @@ def strip_reasoning(text: str) -> tuple[str, bool]:
     cleaned = _UNCLOSED_TAIL.sub("", cleaned)
     removed = cleaned != text
     return (cleaned.strip() if removed else text), removed
+
+
+# A structured (JSON) reply can only carry reasoning before the JSON starts:
+# a leading <think>...</think> block, or an orphan prefix ending in </think>.
+# Tags inside JSON string values are content and are left alone.
+_JSON_REASONING_PREFIX = re.compile(
+    r"\A\s*(?:<think>.*?</think>|[^{\[]*?</think>)\s*", re.IGNORECASE | re.DOTALL
+)
+
+
+def strip_reasoning_prefix(text: str) -> tuple[str, bool]:
+    """Like `strip_reasoning`, for JSON replies: only a reasoning prefix is removed."""
+    match = _JSON_REASONING_PREFIX.match(text)
+    if match is None:
+        return text, False
+    return text[match.end() :], True

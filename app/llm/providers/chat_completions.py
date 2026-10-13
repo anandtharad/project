@@ -13,7 +13,7 @@ from __future__ import annotations
 from types import ModuleType
 from typing import Any, Literal, Protocol
 
-from app.llm.reasoning import strip_reasoning
+from app.llm.reasoning import strip_reasoning, strip_reasoning_prefix
 from app.llm.schemas import (
     ChatMessage,
     ChatRole,
@@ -109,6 +109,7 @@ def normalize_chat_completion(
     requested_model: str,
     latency_ms: float,
     request_id: str | None = None,
+    structured: bool = False,
 ) -> GenerationResponse:
     if not response.choices:
         raise LLMError(LLMErrorCategory.RESPONSE_INVALID, "Provider returned no choices.")
@@ -118,7 +119,7 @@ def normalize_chat_completion(
     raw_text = _content_text(message.content)
     # Reasoning returned in separate fields (`reasoning`, `reasoning_content`)
     # is never read; inline <think> blocks are stripped defensively.
-    text, reasoning_removed = strip_reasoning(raw_text)
+    text, reasoning_removed = (strip_reasoning_prefix if structured else strip_reasoning)(raw_text)
     raw_reason = choice.finish_reason
     finish = _FINISH_REASONS.get(raw_reason or "", FinishReason.OTHER)
     if refusal:

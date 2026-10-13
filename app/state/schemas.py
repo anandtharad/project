@@ -9,6 +9,7 @@ model, never instructions, and never a source of verified personal facts.
 
 from __future__ import annotations
 
+import unicodedata
 from datetime import datetime
 from typing import Any, Literal
 
@@ -24,6 +25,9 @@ MAX_ITEM_TEXT = 120
 
 
 def _clean(text: str, limit: int) -> str | None:
+    # Drop control characters: PostgreSQL rejects NUL in jsonb, which would
+    # fail the whole completion transaction.
+    text = "".join(c for c in text if unicodedata.category(c) != "Cc" or c in "\t\n")
     text = " ".join(text.split())
     return text[:limit] or None
 

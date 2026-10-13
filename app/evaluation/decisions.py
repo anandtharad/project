@@ -221,7 +221,11 @@ def choice_metrics(
     confidences = [float(a["confidence"]) for a, _ in valid]
     valid_correct = [ok for _, ok in valid]
     top_probability = [float(a["probabilities"][a["choice"]]) for a, _ in valid]
-    sweep = threshold_sweep(confidences, valid_correct)
+    # Thresholds are swept over every scored example: a failed request or an
+    # invalid answer falls back in a live turn, so it is never acted on and
+    # must count in the coverage denominator (-1 is below every threshold).
+    all_confidences = [float(a["confidence"]) if a is not None else -1.0 for a in answers]
+    sweep = threshold_sweep(all_confidences, correct)
     result: dict[str, Any] = {
         "n": n,
         "valid_answers": len(valid),
@@ -240,7 +244,7 @@ def choice_metrics(
         "selected_threshold": select_threshold(sweep),
     }
     if threshold is not None:
-        result["at_given_threshold"] = at_threshold(confidences, valid_correct, threshold)
+        result["at_given_threshold"] = at_threshold(all_confidences, correct, threshold)
     return result
 
 

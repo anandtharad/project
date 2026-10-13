@@ -40,7 +40,7 @@ import httpx
 from google import genai
 from google.genai import errors, types
 
-from app.llm.reasoning import strip_reasoning
+from app.llm.reasoning import strip_reasoning, strip_reasoning_prefix
 from app.llm.schemas import (
     ChatRole,
     Effort,
@@ -220,14 +220,21 @@ class GeminiLLMClient:
         latency_ms = (time.perf_counter() - started) * 1000
         return finish_structured(
             normalize_gemini_response(
-                response, requested_model=request.model, latency_ms=latency_ms
+                response,
+                requested_model=request.model,
+                latency_ms=latency_ms,
+                structured=plan is not None,
             ),
             plan,
         )
 
 
 def normalize_gemini_response(
-    response: types.GenerateContentResponse, *, requested_model: str, latency_ms: float
+    response: types.GenerateContentResponse,
+    *,
+    requested_model: str,
+    latency_ms: float,
+    structured: bool = False,
 ) -> GenerationResponse:
     candidate = response.candidates[0] if response.candidates else None
     raw_reason: str | None
@@ -250,7 +257,7 @@ def normalize_gemini_response(
             finish = FinishReason.REFUSAL
         else:
             finish = FinishReason.OTHER
-    text, reasoning_removed = strip_reasoning(text)
+    text, reasoning_removed = (strip_reasoning_prefix if structured else strip_reasoning)(text)
     usage = response.usage_metadata
     output_tokens: int | None = None
     if usage is not None and (usage.candidates_token_count or usage.thoughts_token_count):

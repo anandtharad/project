@@ -115,7 +115,10 @@ class StateExtractor:
         conversation_id: str,
         timeout_seconds: float | None = None,
     ) -> ExtractionResult:
-        timeout = min(self._timeout, timeout_seconds or self._timeout)
+        timeout = self._timeout if timeout_seconds is None else min(self._timeout, timeout_seconds)
+        if timeout <= 0:
+            # The turn budget is already spent; GenerationRequest rejects it.
+            return self._failed("timeout")
         request = GenerationRequest(
             model=self._model,
             system=self._system,
@@ -135,8 +138,6 @@ class StateExtractor:
             ),
         )
         try:
-            if timeout <= 0:
-                raise TimeoutError
             async with asyncio.timeout(timeout):
                 response = await self._llm.generate(request)
         except TimeoutError:

@@ -341,19 +341,25 @@ _MODEL_EFFORT_VALUES: dict[str, tuple[Effort, ...]] = {
 _MODEL_STRUCTURED_OUTPUT: dict[str, tuple[tuple[str, ChatStructuredOutput], ...]] = {
     # json_schema needs gpt-4o-mini / gpt-4o-2024-08-06 or later; JSON mode
     # covers gpt-3.5-turbo and gpt-4-*.
+    # A trailing "$" means an exact match ("gpt-4" must not catch gpt-4o).
     "openai": (
         ("gpt-3.5-turbo", "json_object"),
-        ("gpt-4-", "json_object"),
+        ("gpt-4-turbo", "json_object"),
+        ("gpt-4-1106", "json_object"),
+        ("gpt-4-0125", "json_object"),
+        ("gpt-4-", "prompt"),
+        ("gpt-4$", "prompt"),
         ("gpt-4o-2024-05-13", "json_object"),
     ),
     # Every current Mistral model supports both modes except codestral-mamba.
-    "mistral": (("codestral-mamba", "prompt"),),
+    "mistral": (("codestral-mamba", "prompt"), ("open-codestral-mamba", "prompt")),
 }
 
 
 def structured_output_for(preset: ProviderPreset, model: str) -> StructuredOutput:
     for prefix, style in _MODEL_STRUCTURED_OUTPUT.get(preset.name, ()):
-        if model.startswith(prefix):
+        exact = prefix.endswith("$")
+        if (model == prefix[:-1]) if exact else model.startswith(prefix):
             return style
     return preset.structured_output
 

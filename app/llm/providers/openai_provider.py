@@ -40,7 +40,7 @@ from __future__ import annotations
 
 import os
 import time
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from typing import Any, Literal, cast
 
 import httpx2
@@ -126,7 +126,9 @@ class OpenAICompatibleLLMClient:
         system_role: Literal["system", "developer"] = "system",
         max_tokens_param: Literal["max_completion_tokens", "max_tokens"] = "max_completion_tokens",
         effort_style: Literal["none", "reasoning_effort", "enable_thinking"] = "none",
-        structured_output: ChatStructuredOutput = "prompt",
+        # A fixed style, or a function of the requested model (the request
+        # model can differ from GENERATION_MODEL, e.g. STATE_EXTRACTION_MODEL).
+        structured_output: ChatStructuredOutput | Callable[[str], ChatStructuredOutput] = "prompt",
         structured_require_parameters: bool = False,
         send_openai_headers: bool = False,
         http_client: httpx2.AsyncClient | None = None,
@@ -160,7 +162,12 @@ class OpenAICompatibleLLMClient:
         use_completion_tokens = self._max_tokens_param == "max_completion_tokens"
         extra_body = effort_extra_body(params.effort, self._effort_style, request.max_output_tokens)
         schema = request.response_schema
-        plan = chat_plan(self._structured_output, schema) if schema is not None else None
+        style = (
+            self._structured_output(request.model)
+            if callable(self._structured_output)
+            else self._structured_output
+        )
+        plan = chat_plan(style, schema) if schema is not None else None
         system = request.system
         response_format: dict[str, Any] | None = None
         if schema is not None and plan is not None:
@@ -201,6 +208,7 @@ class OpenAICompatibleLLMClient:
                 provider=self._provider,
                 requested_model=request.model,
                 latency_ms=latency_ms,
+                structured=plan is not None,
             ),
             plan,
         )

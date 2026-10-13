@@ -14,7 +14,14 @@ fragment of the companion prompt). Order of precedence:
                      Phase 1. Uncalibrated or failed decisions end here, so
                      they can never make replies worse than the baseline.
 
-The policy always allows a complete reply with neither advice nor a question.
+The default (open), reflect, validate and no-advice policies allow a complete
+reply with neither advice nor a question; explore and clarify ask one
+question, and problem_solve and plan offer options or steps. The prompt's
+danger guidance always takes precedence over the chosen approach.
+
+Explicit requests are matched conservatively, as first-person requests to
+the companion: a mention of a word ("my boss asked me to summarize...") or a
+statement of hopelessness ("there are no solutions left") is not a request.
 """
 
 from __future__ import annotations
@@ -45,31 +52,49 @@ assert set(RESPONSE_STRATEGY.options) == {s.value for s in Strategy}
 
 PolicySource = Literal["safety_signal", "explicit_request", "decision", "default"]
 
+_NEGATION = r"(?:don't|do not|didn't|did not|doesn't|does not|never|not|stop)"
+_ADVICE_WORDS = r"(?:advice|solutions?|fix(?:es)?|suggestions?|tips)"
 _NO_ADVICE = re.compile(
-    r"\b(?:don'?t|do not|no|not looking for|not asking for)\b[^.?!]{0,25}"
-    r"\b(?:advice|solutions?|fix(?:ing)?|suggestions?|tips)\b"
+    rf"\b{_NEGATION}\s+(?:really\s+|even\s+)?"
+    r"(?:want(?:ing)?|need(?:ing)?|looking for|ask(?:ed|ing)? for|giv(?:e|ing) me)\s+"
+    rf"(?:any\s+|some\s+|your\s+)?{_ADVICE_WORDS}\b"
+    r"|\bno (?:advice|suggestions|tips)(?: please| right now| for now)?\s*(?:[.!,]|$)"
     r"|\bjust (?:want|need) to (?:vent|rant|be heard|talk|get (?:it|this) off my chest)\b"
+    r"(?!\s+(?:to|with)\b)"
     r"|\bjust (?:listen|hear me out)\b",
     re.IGNORECASE,
 )
 _EXPLICIT: tuple[tuple[re.Pattern[str], Strategy], ...] = (
     (
-        re.compile(r"\b(?:summari[sz]e|recap|sum (?:it|this|that|things) up)\b", re.I),
+        re.compile(
+            r"\b(?:(?:can|could|would|will) you (?:please )?"
+            r"(?:summari[sz]e|recap|sum (?:it|this|that|things|everything) up)"
+            r"|(?:please )?summari[sz]e (?:what (?:we|i)|this conversation|our|everything)"
+            r"|give me a (?:quick |short )?(?:recap|summary))",
+            re.I,
+        ),
         Strategy.SUMMARIZE,
     ),
     (
         re.compile(
-            r"\b(?:help me (?:make a |)plan|make (?:me )?a plan|plan (?:out )?my\b"
-            r"|(?:a|my) (?:schedule|to-?do list) for)",
+            r"\b(?:(?:can|could|would|will) you )?help me (?:make |write |put together )?"
+            r"(?:a |my )?(?:plan|schedule|to-?do list)\b"
+            r"|\b(?:can|could|would|will) you (?:make|write|draft) (?:me )?(?:a |my )?"
+            r"(?:plan|schedule|to-?do list)\b"
+            r"|\bhelp me plan\b",
             re.I,
         ),
         Strategy.PLAN,
     ),
     (
         re.compile(
-            r"\b(?:what should i do|what would you do|any (?:advice|suggestions|tips|ideas)"
-            r"|(?:give|got) (?:me )?(?:some )?(?:advice|suggestions|tips)"
-            r"|help me (?:decide|figure out|fix|solve|choose))\b",
+            r"\bwhat (?:should|do you think) i (?:should )?do\b"
+            r"|\bwhat would you do\b"
+            # A question ("any tips for sleeping better?"), not a statement.
+            r"|\b(?:any|got any|do you have any) (?:advice|suggestions|tips|ideas)\b[^.!?]*\?"
+            r"|\b(?:can|could|would) you (?:please )?(?:give|offer) me (?:some )?"
+            r"(?:advice|suggestions|tips)\b"
+            r"|\bhelp me (?:decide|figure out|fix|solve|choose)\b",
             re.I,
         ),
         Strategy.PROBLEM_SOLVE,
@@ -89,9 +114,10 @@ class ResponsePolicy:
     def fragments(self) -> tuple[str, ...]:
         """Names of the prompt fragments that express this policy, in order."""
         if self.safety_signal:
-            names = ["safety_signal"]
-        else:
-            names = [self.strategy.value if self.strategy else "open"]
+            # The safety fragment carries its own limits on advice; adding
+            # "no_advice" would forbid the crisis-line suggestion it requires.
+            return ("safety_signal",)
+        names = [self.strategy.value if self.strategy else "open"]
         if not self.advice_allowed:
             names.append("no_advice")
         return tuple(names)
@@ -108,6 +134,8 @@ class ResponsePolicy:
 
 def explicit_request(message: str) -> tuple[Strategy | None, bool]:
     """(strategy the person asked for, whether advice is welcome)."""
+    # Phones and word processors type curly apostrophes (U+2019 in "don\u2019t").
+    message = message.replace("\u2019", "'").replace("\u2018", "'")
     if _NO_ADVICE.search(message):
         return Strategy.VALIDATE, False
     for pattern, strategy in _EXPLICIT:
@@ -121,7 +149,7 @@ def choose_policy(message: str, decisions: DecisionSet) -> ResponsePolicy:
     mode = decisions.acted_on("conversation_mode")
     if mode is not None and mode.value == "safety":
         return ResponsePolicy(
-            strategy=None, advice_allowed=False, source="safety_signal", safety_signal=True
+            strategy=None, advice_allowed=True, source="safety_signal", safety_signal=True
         )
     if requested is not None or not advice_allowed:
         return ResponsePolicy(
