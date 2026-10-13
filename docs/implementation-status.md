@@ -1,6 +1,6 @@
 # Implementation status
 
-Last updated: 2026-10-12. Spec: COMPANION-TECH-SPEC-001 v2.1.
+Last updated: 2026-10-13. Spec: COMPANION-TECH-SPEC-001 v2.1.
 
 ## Phase summary
 
@@ -8,7 +8,7 @@ Last updated: 2026-10-12. Spec: COMPANION-TECH-SPEC-001 v2.1.
 |---|---|
 | 0: Foundation | **Done** |
 | 1: Basic conversation | **Done** (live LLM calls verified with Groq; other providers unverified, see below) |
-| 2: State and Jev | Not started. **Blocked**: official Jev docs unreachable (see Blockers) |
+| 2: State and Jev | **Built and evaluated.** 4 of 5 acceptance criteria met; strategy decisions are wired and the policy measurably changes replies, but no decision model passes calibration yet, so decisions run in shadow mode (see Phase 2 acceptance) |
 | 3: Memory | Not started |
 | 4: RAG | Not started |
 | 5: Safety | Not started. **Required before any real-user exposure** |
@@ -29,6 +29,7 @@ speech-to-text and text-to-speech are separate.
 | Groq adapter | Done; offline-tested through the real `groq` SDK |
 | Gemini adapter | Done; offline-tested through the real `google-genai` SDK |
 | Credential-leak protections (OpenAI SDK env fallbacks) | Done; tested |
+| Structured output (JSON Schema replies) in every adapter | Done; offline-tested through each SDK. Live on Groq: strict mode valid on `gpt-oss-120b` and `qwen3.8-27b`, **fails on `gpt-oss-20b`** (`json_validate_failed`) |
 | **Live Groq calls** | **Verified** on 2026-10-12: `tests/live/test_groq_live.py` passed 6/6 on the user's Windows machine (Python 3.12.3) for `openai/gpt-oss-120b`, `openai/gpt-oss-20b` and `qwen/qwen3.8-27b`, and a manual multi-turn chat through the API and PostgreSQL worked |
 | Live calls to other providers | **Unverified**: no keys. This cloud environment's egress policy also blocks provider APIs |
 
@@ -108,7 +109,9 @@ are clean.
 | Database transaction failure | Not reported complete | `test_persistence_failure_is_not_reported_as_complete`, `test_double_database_failure_leaves_turn_recoverable`, `test_database_outage_returns_dependency_error` |
 | Output validation failure | Safe failure, nothing stored | `test_invalid_generations_are_not_persisted` |
 | Duplicate request | Resolved, no duplicate turn | `test_idempotency.py`, `test_concurrency.py` |
-| Jev timeout / malformed result | Phase 2 | — |
+| Jev timeout / malformed result | Documented fallback per question, turn completes | `test_service_failures_fall_back_for_every_question`, `test_slow_service_is_cut_off_at_the_decision_timeout`, `test_decision_outage_falls_back_and_the_turn_completes` |
+| State extraction failure | Previous state kept, turn completes | `test_extraction_failure_keeps_previous_state_and_the_turn_completes`, `test_extractor_failures_keep_the_previous_state` |
+| Stale state write | Rejected, reply kept | `test_stale_state_write_is_rejected_but_the_reply_is_kept` |
 | Embedding failure / RAG unavailable | Phase 4 | — |
 | Memory store unavailable | Phase 3 | — |
 | Safety dependency unavailable | Phase 5 | — |
@@ -148,17 +151,26 @@ are clean.
 
 ## Deviations from the specification (with reasons)
 
-- **Tables:** only `users`, `conversations` and `messages` exist. The other
-  tables in §15.1 (states, memories, knowledge, safety events, evaluation)
-  are created by their own phases' migrations, so there are no empty
-  placeholder tables (§20: "do not create empty modules").
+- **Tables:** `users`, `conversations`, `messages`, `conversation_states`
+  and `turn_decisions` exist. The other tables in §15.1 (memories,
+  knowledge, safety events, evaluation) are created by their own phases'
+  migrations, so there are no empty placeholder tables (§20). Evaluation
+  results are JSON files under `eval/results/` until the Phase 6 tables.
+  `turn_decisions` is an experiment-specific table (§15.1 allows them) for
+  the per-decision records §7.6/§7.8 require.
 - **Response validator location:** `app/orchestration/validation.py` rather
   than `app/safety/validation.py`. Phase 1 validates the response *contract*
   only. Putting it under `safety/` would suggest safety checks exist. Phase 5
   adds the safety package.
-- **`LLMClient.generate_structured`** is not defined yet. It is added in
-  Phase 2 with its first consumer (state extraction), rather than shipped
-  as a stub.
+- **Structured generation** is a `response_schema` field on the existing
+  `generate()` request rather than a separate `generate_structured` method:
+  one code path per adapter, with the mode reported in `structured_mode`.
+- **Jev configuration names:** `DECISION_PROVIDER=off|jev|laya` replaces
+  `JEV_ENABLED`, because the same adapter also serves self-hosted Laya.
+  `JEV_API_KEY`, `JEV_MODEL` and `JEV_TIMEOUT_SECONDS` (alias of
+  `DECISION_TIMEOUT_SECONDS`) keep the spec's names.
+- **Laya** was added at the user's request as a self-hosted, open-weights
+  decision model that speaks Jev's protocol; it is not in the spec.
 - **Idempotency key scope** is per conversation. Each conversation has
   exactly one owner, so this satisfies "same key and owner", and it lets a
   client reuse a key across conversations.
@@ -179,18 +191,42 @@ are clean.
   counts.
 - Long conversations are truncated to the most recent messages. There is no
   summarization (later phase).
+- Decisions add latency: Laya on CPU takes about 2-5 s per turn (p95 ~5 s);
+  `DECISION_TIMEOUT_SECONDS` bounds it (fallbacks after that).
+- State extraction adds one LLM call per turn (~0.7-1.2 s on Groq) and, on
+  Groq's free tier, shares the reply model's per-minute token limit.
+- The decision evaluation set is synthetic and AI-labelled (see its dataset
+  card); results on it are indicative until humans review the labels.
+- The `safety` conversation mode is a signal only, and Laya's recall of it
+  on the evaluation set is 3 of 13. It is not a safety mechanism (Phase 5).
 - A request cancelled mid-generation leaves its turn `pending` until
   `STALE_TURN_SECONDS` passes (150 s by default). Until then, new messages in
   that conversation get `409 turn_in_progress`.
 
-## Blockers and open questions for Phase 2
+## Phase 2 acceptance
 
-1. **Jev documentation is unreachable.** `docs.typesafe.ai` and
-   `www.typesafeai.org` both fail DNS resolution from this environment.
-   Third-party articles confirm Jev exists (TypeSafe AI decision model;
-   Choice/Score/Noul question types; early access since 2026-09-14), but the
-   specification requires the *official* API contract before integration
-   (§0.4, §7.1). Phase 2 needs one of these: network access to the official
-   docs, the API reference provided directly, or a Jev API key for contract
-   testing.
-2. **LLM credentials** for live verification and the Phase 6 model comparison.
+| Criterion | Status | Evidence |
+|---|---|---|
+| Invalid decisions are rejected | Met | every answer validated against its question (label in options and most probable, probabilities over exactly the options summing to ~1, values in [0, 1]); invalid answers fall back, never repaired: `test_answers_that_do_not_fit_the_question_are_rejected` and related tests |
+| Missing fields do not crash the app | Met | all state fields optional; missing answers fall back individually; an unreadable stored state is replaced: `test_invalid_and_missing_answers_fall_back_individually`, extraction failure tests |
+| Jev outage has defined behavior | Met (offline; Laya outage also exercised) | timeout, connection, 429, 401/422, 5xx/529 and malformed responses each map to a fallback reason; the turn completes |
+| Strategy decisions measurably affect responses | **Partly met** | the policy measurably changes replies on held-out data (judge recovers the forced strategy 0.80 vs 0.33 chance, prompt 1.2.0; docs/decisions.md). It acts today on explicit requests in the message. Decision-driven strategies are wired and tested, but Laya zero-shot is at or below the majority baseline (no threshold qualifies), and Jev has no key yet, so decisions stay in shadow mode |
+| No decision bypasses safety or authorization | Met | decisions run after the ownership check and only select fixed prompt fragments; `safety_response` is not selectable; a safety signal takes precedence: `test_decisions_never_run_for_a_foreign_conversation`, `test_safety_mode_signal_takes_precedence`, policy tests |
+
+Phase 2 tasks (spec §21): state schema and persistence, state extraction,
+decision adapter from the verified contract, initial Choice questions,
+retrieval-routing decision (recorded only until Phase 4), strategy policy,
+validation and fallbacks, and evaluation on labelled data are all built.
+See [decisions.md](decisions.md).
+
+## Open questions and next steps
+
+1. **A decision model that passes calibration.** Options: a Jev API key
+   (`DECISION_PROVIDER=jev`, then rerun `scripts/eval_decisions.py`), or
+   fine-tuning Laya on labelled decisions (its notebook runs on Kaggle's
+   free GPUs). Either way, thresholds come from the dev split and are
+   confirmed on test before any question leaves shadow mode.
+2. **Human review of the evaluation labels**, at least the ambiguous and
+   adversarial rows.
+3. **LLM credentials** for providers other than Groq, and the Phase 6 model
+   comparison.
