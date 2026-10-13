@@ -78,6 +78,18 @@ def doctor(_: argparse.Namespace) -> int:
     except Exception as exc:  # report configuration problems plainly
         print(f"Settings    ERROR: {type(exc).__name__}: {exc}")
         return 1
+    try:
+        handles = sorted(set(settings.dev_token_map().values()))
+    except ValueError as exc:
+        print(f"Dev auth    ERROR: {exc}")
+        ok = False
+    else:
+        if handles:
+            # Tokens are secrets: only the user names are shown.
+            print(f"Dev auth    users {', '.join(handles)} (pass the text after ':' as --token)")
+        else:
+            print("Dev auth    DEV_AUTH_TOKENS is not set: every request will get 401")
+            ok = False
     print(f"Provider    {settings.generation_provider}")
     for name in ("groq_api_key", "openai_api_key", "gemini_api_key", "anthropic_api_key"):
         print(f"  {name.upper():<20} {_mask(getattr(settings, name))}")

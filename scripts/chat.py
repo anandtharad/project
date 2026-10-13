@@ -31,6 +31,15 @@ def main() -> int:
         conversation_id = args.conversation
         if conversation_id is None:
             created = client.post("/v1/conversations")
+            if created.status_code == 401:
+                print(
+                    "401 Unauthorized: the server does not know this token.\n"
+                    "--token is the text after the colon in DEV_AUTH_TOKENS in the server's\n"
+                    ".env (for 'me:abc123' pass --token abc123). After editing .env, restart\n"
+                    "the server. 'uv run python scripts/dev.py doctor' lists the configured users.",
+                    file=sys.stderr,
+                )
+                return 1
             created.raise_for_status()
             conversation_id = created.json()["conversation_id"]
         quit_keys = "Ctrl-Z then Enter" if os.name == "nt" else "Ctrl-D"

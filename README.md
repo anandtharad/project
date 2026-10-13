@@ -59,7 +59,8 @@ curl -s -X POST localhost:8000/v1/conversations/$CID/messages \
   -d '{"content": "I have been feeling overwhelmed lately.", "idempotency_key": "msg-1"}'
 ```
 
-Or chat interactively: `uv run python scripts/chat.py --token <your dev token>`.
+Or chat interactively: `uv run python scripts/chat.py --token <your dev token>`, where the
+token is the text after the colon in `DEV_AUTH_TOKENS` (for `me:abc123`, `--token abc123`).
 
 Interactive API docs (non-production only): `http://127.0.0.1:8000/docs`.
 Written reference: [docs/api.md](docs/api.md).
