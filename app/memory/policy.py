@@ -38,8 +38,11 @@ LIFETIME_DAYS = {"short": 30, "medium": 180}
 _INSTRUCTION_LIKE = re.compile(
     r"\b(?:ignore|disregard|forget|override)\b[^.]{0,40}\b(?:instructions?|rules|guidelines|"
     r"system prompt|policy|safety)\b|\bsystem prompt\b|\bjailbreak\b|\bdeveloper mode\b"
-    # Demands for agreement are not preferences ("always agree I'm right").
-    r"|\b(?:always|have to|must)\s+agree\b|\bnever\b[^.]{0,30}\b(?:disagree|challenge)",
+    # Demands for agreement are not preferences ("always agree I'm right"),
+    # nor is switching off safety behavior ("no safety warnings").
+    r"|\b(?:always|have to|must)\s+agree\b|\bnever\b[^.]{0,30}\b(?:disagree|challenge)"
+    r"|\b(?:no|stop|without|skip|drop|turn off|remove)\b[^.]{0,20}\b(?:safety|warnings?|"
+    r"disclaimers?|filters?)\b",
     re.IGNORECASE,
 )
 
