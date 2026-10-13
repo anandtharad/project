@@ -14,6 +14,7 @@ from app.llm.schemas import ChatRole, GenerationPurpose
 from app.prompting import PromptRegistry
 from tests.helpers import (
     ALICE,
+    DEFAULT_PROMPT_VERSION,
     ScriptedLLMClient,
     create_conversation,
     default_system_prompt,
@@ -120,13 +121,13 @@ async def test_model_and_prompt_versions_are_recorded(
     response = await send(client, cid, "Record my provenance")
     assistant_id = uuid.UUID(response.json()["assistant_message_id"])
 
-    prompt = PromptRegistry().get("companion_system", "1.1.0")
+    prompt = PromptRegistry().get("companion_system", DEFAULT_PROMPT_VERSION)
     async with db_engine.connect() as conn:
         row = (await conn.execute(select(Message).where(Message.id == assistant_id))).one()
     assert row.provider == "scripted"
     assert row.model_id == "scripted-model"
     assert row.prompt_id == "companion_system"
-    assert row.prompt_version == "1.1.0"
+    assert row.prompt_version == DEFAULT_PROMPT_VERSION
     assert row.reply_to_message_id == uuid.UUID(response.json()["user_message_id"])
     metadata = row.generation_metadata
     assert metadata["prompt_checksum"] == prompt.checksum

@@ -1,0 +1,284 @@
+{
+ "created_at": "2026-10-13T01:58:00+00:00",
+ "dataset": {
+  "path": "eval/datasets/decisions/v1/dev.jsonl",
+  "sha256": "758bbb0e0783f008c3b77ce90eda11c39d32a1d4bd174b39d8196781403dbfca"
+ },
+ "split": "dev",
+ "examples": [
+  "casual-001",
+  "casual-015",
+  "casual-033",
+  "casual-047",
+  "emotional-017",
+  "emotional-037",
+  "hard-001",
+  "hard-019",
+  "information-013",
+  "practical-009"
+ ],
+ "provider": "groq",
+ "reply_model": "openai/gpt-oss-120b",
+ "judge_model": "openai/gpt-oss-120b",
+ "prompt": "companion_system@1.2.0",
+ "strategies": [
+  "validate",
+  "problem_solve",
+  "explore"
+ ],
+ "summary": {
+  "judged_forced_replies": 30,
+  "judge_recovery_accuracy": 0.7667,
+  "judge_recovery_95ci": [
+   0.5907,
+   0.8821
+  ],
+  "chance": 0.3333,
+  "errors": {},
+  "per_strategy": {
+   "validate": {
+    "replies": 10,
+    "judged_as": {
+     "explore": 1,
+     "validate": 9
+    },
+    "asks_question_rate": 0.1,
+    "advice_wording_rate": 0.2,
+    "mean_words": 39.2
+   },
+   "problem_solve": {
+    "replies": 10,
+    "judged_as": {
+     "explore": 4,
+     "problem_solve": 6
+    },
+    "asks_question_rate": 1.0,
+    "advice_wording_rate": 0.5,
+    "mean_words": 94.3
+   },
+   "explore": {
+    "replies": 10,
+    "judged_as": {
+     "explore": 8,
+     "validate": 1,
+     "problem_solve": 1
+    },
+    "asks_question_rate": 1.0,
+    "advice_wording_rate": 0.0,
+    "mean_words": 34.2
+   }
+  }
+ },
+ "samples": [
+  {
+   "example_id": "casual-001",
+   "strategy": "validate",
+   "reply": "Hey! I’m doing fine, just here and ready to chat. How’s your day going?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-001",
+   "strategy": "problem_solve",
+   "reply": "Hey! I’m doing fine, thanks for asking. How’s your day going?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-001",
+   "strategy": "explore",
+   "reply": "Hey! I’m just here, ready to chat. How’s your day been so far?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-015",
+   "strategy": "validate",
+   "reply": "Congratulations on passing the bar—that’s a huge accomplishment after three years of hard work. It makes sense that you’d feel a huge sense of relief and pride now that it’s finally behind you. This milestone marks the end of a long, demanding chapter and the start of new professional possibilities. Well done!",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "casual-015",
+   "strategy": "problem_solve",
+   "reply": "Congratulations on passing the bar exam! That’s a huge accomplishment after three years of hard work. What’s next for you—starting a new job, taking a break, or something else?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-015",
+   "strategy": "explore",
+   "reply": "Congratulations on passing the bar exam! That’s an incredible accomplishment, especially after three years of hard work. How are you feeling about this milestone?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-033",
+   "strategy": "validate",
+   "reply": "Sounds like it’s been a pretty ordinary day—just the kind of steady, uneventful Tuesday that can feel both reassuring and a little dull at the same time. It makes sense to have those low‑key days where nothing big pops up.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "casual-033",
+   "strategy": "problem_solve",
+   "reply": "Sounds like a pretty typical day. Anything in particular on your mind that you’d like to chat about?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-033",
+   "strategy": "explore",
+   "reply": "Sounds like it’s been a pretty ordinary day. Anything in particular that stood out, even in a small way, about today?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-047",
+   "strategy": "validate",
+   "reply": "That’s a great accomplishment, especially after spending an hour figuring it out on your own. It makes sense to feel proud—learning a new tech skill can be a bit of a puzzle, and you stuck with it until it worked.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "casual-047",
+   "strategy": "problem_solve",
+   "reply": "That’s awesome—learning a new tech skill on your own can feel like a real win. If you’d like to make future calls smoother, you could:\n\n1. Save her contact as a favorite so you don’t have to search for it each time.  \n2. Try a quick “test call” before the scheduled time to check your camera, microphone, and internet connection.  \n3. Explore any built‑in features like screen‑share or photo filters that might make the chats more fun for both of you.\n\nDo any of those sound useful for your next call?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "casual-047",
+   "strategy": "explore",
+   "reply": "That’s a great win— figuring out video calls on your own can feel pretty rewarding. How does it feel knowing you can now chat face‑to‑face with your granddaughter whenever you both have time?",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "emotional-017",
+   "strategy": "validate",
+   "reply": "Morning. With only a few hours of sleep and a presentation in just 20 minutes, it makes sense to feel frazzled and exhausted. It sounds like you’ve been pushing through a tough schedule to get ready.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "emotional-017",
+   "strategy": "problem_solve",
+   "reply": "Sounds rough—only a few hours of sleep and the big moment is right around the corner.  \n\nHere are a couple of quick things you can try in the next 20 minutes:\n\n1. **Do a brief body reset** – splash cold water on your face, stand up, stretch, and take three deep breaths (inhale 4 sec, hold 2 sec, exhale 6 sec). It can jolt your alertness more than a coffee.\n\n2. **Run through a 2‑minute outline** – glance at your slides or notes and rehearse the opening line, the key three points, and the closing takeaway. Keeping it short helps lock the flow in your mind without overwhelming you.\n\nIf you have a chance on the way, a small snack (a handful of nuts or a banana) and a sip of water can steady your energy too.  \n\nHow are you feeling about the main message you want the board to walk away with?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "emotional-017",
+   "strategy": "explore",
+   "reply": "Morning—only three hours of sleep and you’ve got to be out in 20 minutes. That sounds exhausting. What’s the one thing you can do right now that might help you feel a little steadier before you head in?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "emotional-037",
+   "strategy": "validate",
+   "reply": "It sounds really painful to be caught in that yelling, especially when it’s about something as stressful as money. Turning up the music so loudly was a way to try to block out the chaos, even though it ended up hurting you. It’s understandable to feel exhausted and fed up with having to endure that kind of atmosphere.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "emotional-037",
+   "strategy": "problem_solve",
+   "reply": "It sounds like the shouting got you feeling overwhelmed enough to drown it out with really loud music.  \n\nYou could try a few things next time:\n\n1. Find a quieter spot in the house (maybe a bedroom, bathroom, or a closet) where you can listen at a safer volume and give yourself a break from the argument.  \n2. Keep a short “reset” activity ready—like a quick walk, a few deep breaths, or a short video you enjoy—so you have something to shift your focus without needing to crank the volume.  \n3. If you feel comfortable, let your parents know, even briefly, that the yelling is affecting you and ask if they could keep the volume down or step into another room for a bit.\n\nWhat’s one small change that feels doable for you tonight?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "emotional-037",
+   "strategy": "explore",
+   "reply": "It sounds like the shouting got so overwhelming that you felt the need to drown it out, even if the volume ended up hurting you. That must be exhausting. What do you think would help you feel a little more calm in moments like this?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "hard-001",
+   "strategy": "validate",
+   "reply": "That sounds frustrating—it’s tough when the pressure builds up right before you go in. I hear you.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "hard-001",
+   "strategy": "problem_solve",
+   "reply": "Sounds like the nerves are kicking in. Do you want to run through any last‑minute points, or just vent a bit before you head in?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "hard-001",
+   "strategy": "explore",
+   "reply": "Sounds like the nerves are really kicking in. What’s the one part of the interview you feel most confident about right now?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "hard-019",
+   "strategy": "validate",
+   "reply": "It sounds like the breakup has left a big hole in your day‑to‑day life, and the emptiness is pulling you toward withdrawing and sleeping a lot. Wanting to avoid people and plans is a natural way to try to protect yourself from more hurt right now.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "hard-019",
+   "strategy": "problem_solve",
+   "reply": "It sounds like the breakup has left you feeling really drained and isolated, and you’ve been coping by pulling back from everything and sleeping a lot.  \n\nHere are a few things you might try when you feel a little up to it:\n\n1. **Tiny routine tweaks** – Pick one simple, low‑stakes activity (like a short walk, a shower, or making a cup of tea) and do it at the same time each day. Even a brief change can give a bit of structure without feeling overwhelming.  \n\n2. **Limit the “all‑or‑nothing” mindset** – Instead of canceling every plan, consider keeping just one low‑pressure invitation per week—a coffee with a friend you trust, or a casual meetup you don’t have to stay long. Knowing you have one small social slot can make the rest of the week feel a little lighter.  \n\n3. **Gentle self‑care check‑ins** – When you notice you’ve been sleeping most of the day, ask yourself a quick question: “Is there one tiny thing I could do right now that would make me feel a bit better?” It might be stretching, listening to a favorite song, or jotting down a thought. Small actions can break the cycle of numbness.\n\nHow does the idea of adding just one brief, low‑pressure activity to your day feel for you right now?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "hard-019",
+   "strategy": "explore",
+   "reply": "It sounds like the breakup has left a big hole, and the urge to shut down—cancelling plans, sleeping a lot— is how you’re trying to cope with that emptiness. I hear how overwhelming that feels right now.  \n\nWhat do you think might be the first small thing, even something simple, that could give you a tiny break from that feeling?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "information-013",
+   "strategy": "validate",
+   "reply": "It sounds like the waiting is weighing on you a lot, and missing him makes the whole process feel even harder. That mix of uncertainty and longing is completely understandable.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "information-013",
+   "strategy": "problem_solve",
+   "reply": "It sounds like the long wait is weighing on you a lot, and missing him makes it feel even tougher. What do you usually do to help pass the time while you’re waiting for the visa decision?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "information-013",
+   "strategy": "explore",
+   "reply": "It sounds like the waiting is weighing on you a lot, and missing him makes the whole process feel even longer. What’s been the hardest part of the waiting period for you?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "practical-009",
+   "strategy": "validate",
+   "reply": "It sounds like you’re feeling torn between the appeal of further study and the comfort of staying where you are, and it’s understandable to question whether the pull toward a master’s is truly yours or influenced by what others are doing. The uncertainty about what’s really motivating you is a normal part of making a big decision like this.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "practical-009",
+   "strategy": "problem_solve",
+   "reply": "It sounds like you’re caught between a genuine curiosity about further study and a feeling that you might be chasing something because it’s expected by the people around you.  \n\nHere are a couple of ways you could start untangling that:\n\n1. **Clarify your own goals** – Write down, in a few bullet points, what you hope to achieve in the next 5‑10 years (e.g., higher salary, deeper expertise, a career shift, personal fulfillment). Then note whether a master’s degree is a clear step toward any of those items, or if staying where you are could get you there just as well.\n\n2. **Test the waters** – Look for low‑commitment ways to explore the field you’d study: a short online course, a workshop, or a project at work that uses similar skills. If you find it energizing, that’s a signal the degree might be right for you; if it feels like extra busywork, the pull may be more social.\n\n3. **Talk to people who’ve taken both paths** – Reach out to a colleague who stayed in a similar role and a friend who did the master’s. Ask specifically about the day‑to‑day reality after their choices, not just the outcomes they expected. Their insights can help separate the hype from the practical impact.\n\nWhat’s one thing you’d really like to know about either path that could help you decide?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "practical-009",
+   "strategy": "explore",
+   "reply": "It sounds like you’re feeling pulled between two different motivations—one that feels like a clear, personal goal, and another that seems tied to what others are doing. What do you notice about the moments when the idea of a master’s feels truly your own, versus when it feels more like you’re following the crowd?",
+   "judged": "explore",
+   "error": null
+  }
+ ]
+}

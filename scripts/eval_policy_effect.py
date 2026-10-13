@@ -3,12 +3,15 @@
 Uses GENERATION_PROVIDER and its key from .env for the replies, and the judge
 model (default: the state-extraction model, openai/gpt-oss-20b on Groq):
 
-    uv run python scripts/eval_policy_effect.py --examples 12
+    uv run python scripts/eval_policy_effect.py --split dev --examples 10 --no-open
+    uv run python scripts/eval_policy_effect.py --split test --examples 10
 
-Each example is answered once per strategy (validate, problem_solve, explore)
-plus once unconstrained ("open"), then judged blind. On Groq's free tier the
-default run (48 replies + 36 judgements) takes about 10-15 minutes because of
-the per-minute token limit; rate limits are waited out automatically.
+Only open-ended messages with no explicit request are used (see
+select_examples). Each is answered once per strategy (validate,
+problem_solve, explore), optionally once unconstrained ("open"), and every
+reply is judged blind. Tune on dev, report test. On Groq's free tier a run
+of 10 examples uses roughly 70-90K tokens of the reply model's 200K daily
+limit and takes 10-15 minutes; rate limits are waited out automatically.
 """
 
 from __future__ import annotations
@@ -33,6 +36,7 @@ from app.evaluation.policy_effect import (  # noqa: E402
     judge_request,
     parse_label,
     reply_request,
+    select_examples,
     summarize_effect,
 )
 from app.llm.factory import build_llm_client  # noqa: E402
@@ -41,18 +45,12 @@ from app.llm.schemas import GenerationParams, LLMError  # noqa: E402
 from app.main import state_extraction_model  # noqa: E402
 from app.prompting import PromptRegistry  # noqa: E402
 
-DATASET = ROOT / "eval" / "datasets" / "decisions" / "v1" / "dev.jsonl"
+DATASET_DIR = ROOT / "eval" / "datasets" / "decisions" / "v1"
 RESULTS_DIR = ROOT / "eval" / "results"
 
 
-def pick(examples: list[Example], count: int) -> list[Example]:
-    eligible = [e for e in examples if e.labels.get("conversation_mode") != "safety"]
-    step = max(1, len(eligible) // count)
-    return eligible[::step][:count]
-
-
 async def run_samples(
-    settings: Settings, examples: list[Example], strategies: tuple[str, ...]
+    settings: Settings, examples: list[Example], strategies: tuple[str, ...], with_open: bool
 ) -> tuple[list[Sample], dict[str, str]]:
     resolved = resolve_provider(settings)
     llm = build_llm_client(settings, resolved)
@@ -65,7 +63,7 @@ async def run_samples(
     samples: list[Sample] = []
     try:
         for index, example in enumerate(examples, 1):
-            for strategy in (*strategies, "open"):
+            for strategy in (*strategies, "open") if with_open else strategies:
                 sample = Sample(example_id=example.id, strategy=strategy)
                 try:
                     sample.reply = await _call(
@@ -103,16 +101,24 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
-    parser.add_argument("--examples", type=int, default=12)
+    parser.add_argument("--split", choices=("dev", "test"), default="dev")
+    parser.add_argument("--examples", type=int, default=10)
+    parser.add_argument("--no-open", action="store_true", help="skip the unconstrained baseline")
     args = parser.parse_args()
     settings = Settings()
-    examples = pick(load_examples(DATASET), args.examples)
-    print(f"Answering {len(examples)} dev conversations x {len(DEFAULT_STRATEGIES) + 1} policies")
-    samples, models = asyncio.run(run_samples(settings, examples, DEFAULT_STRATEGIES))
+    dataset = DATASET_DIR / f"{args.split}.jsonl"
+    examples = select_examples(load_examples(dataset), args.examples)
+    policies = len(DEFAULT_STRATEGIES) + (0 if args.no_open else 1)
+    print(f"Answering {len(examples)} {args.split} conversations x {policies} policies")
+    samples, models = asyncio.run(
+        run_samples(settings, examples, DEFAULT_STRATEGIES, not args.no_open)
+    )
     summary = summarize_effect(samples, DEFAULT_STRATEGIES)
     record = {
         "created_at": datetime.now(UTC).isoformat(timespec="seconds"),
-        "dataset": {"path": str(DATASET.relative_to(ROOT)), "sha256": file_sha256(DATASET)},
+        "dataset": {"path": str(dataset.relative_to(ROOT)), "sha256": file_sha256(dataset)},
+        "split": args.split,
+        "examples": [e.id for e in examples],
         "provider": settings.generation_provider,
         **models,
         "strategies": list(DEFAULT_STRATEGIES),
@@ -120,7 +126,8 @@ def main() -> int:
         "samples": [s.__dict__ for s in samples],
     }
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    out = RESULTS_DIR / f"policy-effect-{datetime.now(UTC).strftime('%Y%m%dT%H%M%S')}.json"
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
+    out = RESULTS_DIR / f"policy-effect-{args.split}-{stamp}.json"
     out.write_text(
         json.dumps(record, indent=1, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
     )

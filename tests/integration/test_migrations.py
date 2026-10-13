@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from app.db.models import Base
 from app.main import migration_head
 from tests.conftest import alembic_config, create_temp_database, drop_temp_database
+from tests.helpers import DEFAULT_PROMPT_VERSION
 
 
 @pytest.fixture
@@ -61,6 +62,6 @@ async def test_ready_when_migrated(client: httpx.AsyncClient) -> None:
             "database": "ok",
             "migrations": "ok",
             "llm_provider": "scripted",
-            "prompt": "companion_system@1.1.0",
+            "prompt": f"companion_system@{DEFAULT_PROMPT_VERSION}",
         },
     }

@@ -126,3 +126,14 @@ def test_policy_effect_helpers() -> None:
     assert summary["per_strategy"]["problem_solve"]["advice_wording_rate"] == 1.0
     assert summary["per_strategy"]["explore"]["asks_question_rate"] == 1.0
     assert summary["chance"] == pytest.approx(1 / 3, abs=1e-3)
+
+
+def test_effect_examples_are_open_ended_without_explicit_requests() -> None:
+    from app.evaluation.policy_effect import OPEN_ENDED_MODES, select_examples
+    from app.orchestration.policy import explicit_request
+
+    chosen = select_examples(load_examples(DATASET / "test.jsonl"), 10)
+    assert len(chosen) == 10
+    for e in chosen:
+        assert e.labels["conversation_mode"] in OPEN_ENDED_MODES
+        assert explicit_request(e.conversation[-1].content) == (None, True)

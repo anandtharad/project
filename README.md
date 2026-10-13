@@ -4,16 +4,20 @@ An English-first conversational companion built as a decision-controlled LLM
 application: application code owns authorization, orchestration, persistence
 and enforcement; the LLM only produces conversational language.
 
-> **Status: Phase 0 (foundation) and Phase 1 (basic conversation) are done.**
-> This is a development build. It has **no independent safety layer yet**
-> (Phase 5) and only **development authentication**. Do not expose it to real
-> users. See [docs/implementation-status.md](docs/implementation-status.md).
+> **Status: Phases 0-1 are done; Phase 2 (state and decisions) is built and
+> evaluated, see the status page for what is and isn't met.** This is a
+> development build. It has **no independent safety layer yet** (Phase 5)
+> and only **development authentication**. Do not expose it to real users.
+> See [docs/implementation-status.md](docs/implementation-status.md).
 
 What works now: text in → validated → persisted conversation history →
-instruction LLM (Anthropic Claude via adapter) → validated response →
-persisted assistant turn. It has idempotent retries, one in-flight turn per
-conversation, bounded timeouts, controlled provider failures, and model and
-prompt provenance on every reply.
+conversation state updated (structured LLM call) → bounded decisions from a
+decision model (self-hosted Laya or TypeSafe Jev; shadow mode until
+calibrated) → response policy in code → instruction LLM → validated
+response → reply, decisions and versioned state persisted together. It has
+idempotent retries, one in-flight turn per conversation, bounded timeouts,
+controlled provider failures, and model, prompt and policy provenance on
+every reply. Details: [docs/decisions.md](docs/decisions.md).
 
 The LLM is swappable: Anthropic, OpenAI, Groq, Google Gemini, xAI (Grok),
 Qwen (Alibaba Model Studio), DeepSeek, OpenRouter, Together, Mistral, Ollama,
@@ -79,6 +83,9 @@ uv run python scripts/dev.py test          # unit + integration + security tests
 uv run python scripts/dev.py groq-models   # models your Groq key can use
 uv run python scripts/dev.py live-groq     # live Groq tests: 6 small free-tier calls
 uv run python scripts/dev.py live-groq --models openai/gpt-oss-20b
+uv run python scripts/dev.py laya          # self-hosted Laya decision server (optional)
+uv run python scripts/eval_decisions.py --split dev       # decision accuracy (needs a decision provider)
+uv run python scripts/eval_policy_effect.py --split dev   # do strategies change replies? (live LLM)
 ```
 
 `test` uses the compose database by default. Set `TEST_DATABASE_URL` to use a
@@ -149,6 +156,9 @@ is the source of truth. Important ones:
 | `MAX_OUTPUT_TOKENS`, `MAX_CONTEXT_TOKENS` | optional; provider defaults (Groq's are sized for its free tier) |
 | `TURN_DEADLINE_SECONDS` / `STALE_TURN_SECONDS` | overall turn budget / when a pending turn counts as abandoned |
 | `MAX_INPUT_CHARACTERS`, `MAX_REQUEST_BYTES` | input limits enforced before any model call |
+| `STATE_EXTRACTION_ENABLED`, `STATE_EXTRACTION_MODEL` | conversation-state update before each reply (default on; the reply model) |
+| `DECISION_PROVIDER` | `off` (default), `laya` (self-hosted, `LAYA_API_KEY`) or `jev` (`JEV_API_KEY`) |
+| `COMPANION_PROMPT_VERSION` | reply prompt; `1.2.0` carries the response-policy slot (`1.0.0` runs without a policy) |
 
 `APP_ENV=production` refuses to start until production authentication exists.
 
@@ -166,7 +176,10 @@ in place. To change behavior, add a new version file, run
 ```
 app/
   api/            HTTP: routes, dev auth, error contract, middleware
-  orchestration/  turn lifecycle, transactional turn store, response validation
+  orchestration/  turn lifecycle, transactional turn store, response policy, validation
+  decisions/      decision questions, System One adapter (Laya / Jev), validation, thresholds
+  state/          conversation state schema and structured extraction
+  evaluation/     decision and policy-effect evaluation metrics
   llm/            provider-neutral schemas, provider presets, and adapters
                   (Anthropic, OpenAI-compatible, Groq, Gemini, dev stub)
   context/        context assembly with a history budget
@@ -174,6 +187,9 @@ app/
   prompting.py    versioned prompt registry
 migrations/       Alembic migrations
 prompts/          versioned prompt files + checksum lock
+decisions/        decision-question checksum lock
+eval/             evaluation datasets (with dataset cards) and results
+docker/           optional Laya decision-server image
 tests/            unit / integration / security / live
 docs/             architecture, API, threat model, implementation status
 ```
@@ -182,6 +198,7 @@ docs/             architecture, API, threat model, implementation status
 
 - [Architecture](docs/architecture.md)
 - [LLM providers](docs/providers.md)
+- [Decisions, state and response policy](docs/decisions.md)
 - [API reference](docs/api.md)
 - [Threat model and privacy notes](docs/threat-model.md)
 - [Implementation status and known limitations](docs/implementation-status.md)

@@ -199,9 +199,12 @@ async def list_messages(
     return messages
 
 
+DEFAULT_PROMPT_VERSION: str = Settings.model_fields["companion_prompt_version"].default
+
+
 def default_system_prompt() -> str:
     """The reply system prompt when no policy constrains the approach."""
-    prompt = PromptRegistry().get("companion_system", "1.1.0")
+    prompt = PromptRegistry().get("companion_system", DEFAULT_PROMPT_VERSION)
     return prompt.render(response_guidance=prompt.fragment("open"))
 
 

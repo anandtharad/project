@@ -1,0 +1,364 @@
+{
+ "created_at": "2026-10-13T02:11:03+00:00",
+ "dataset": {
+  "path": "eval/datasets/decisions/v1/test.jsonl",
+  "sha256": "72f46874b3c06744f11603faa14962043b641f36154d478ef3ec778b1b4f92c8"
+ },
+ "split": "test",
+ "examples": [
+  "casual-002",
+  "casual-016",
+  "casual-032",
+  "casual-048",
+  "emotional-016",
+  "emotional-030",
+  "emotional-044",
+  "hard-016",
+  "hard-044",
+  "information-026"
+ ],
+ "provider": "groq",
+ "reply_model": "openai/gpt-oss-120b",
+ "judge_model": "openai/gpt-oss-120b",
+ "prompt": "companion_system@1.2.0",
+ "strategies": [
+  "validate",
+  "problem_solve",
+  "explore"
+ ],
+ "summary": {
+  "judged_forced_replies": 30,
+  "judge_recovery_accuracy": 0.8,
+  "judge_recovery_95ci": [
+   0.6269,
+   0.905
+  ],
+  "chance": 0.3333,
+  "errors": {},
+  "per_strategy": {
+   "validate": {
+    "replies": 10,
+    "judged_as": {
+     "validate": 9,
+     "explore": 1
+    },
+    "asks_question_rate": 0.1,
+    "advice_wording_rate": 0.1,
+    "mean_words": 44.1
+   },
+   "problem_solve": {
+    "replies": 10,
+    "judged_as": {
+     "problem_solve": 6,
+     "explore": 3,
+     "validate": 1
+    },
+    "asks_question_rate": 1.0,
+    "advice_wording_rate": 0.7,
+    "mean_words": 109.1
+   },
+   "explore": {
+    "replies": 10,
+    "judged_as": {
+     "explore": 9,
+     "problem_solve": 1
+    },
+    "asks_question_rate": 1.0,
+    "advice_wording_rate": 0.2,
+    "mean_words": 34.0
+   },
+   "open": {
+    "replies": 10,
+    "judged_as": {
+     "explore": 9,
+     "validate": 1
+    },
+    "asks_question_rate": 0.9,
+    "advice_wording_rate": 0.2,
+    "mean_words": 55.4
+   }
+  }
+ },
+ "samples": [
+  {
+   "example_id": "casual-002",
+   "strategy": "validate",
+   "reply": "Wow, that’s exciting! It makes sense you’re still shaking—signing a lease for a place you’ve been dreaming about, especially one with a big window and a quirky balcony, is a big milestone. All that anticipation and the reality of it finally being yours can feel pretty intense.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "casual-002",
+   "strategy": "problem_solve",
+   "reply": "Congrats—that’s awesome news! It sounds like the place really clicked for you, especially with that big window and the quirky balcony.  \n\nIf you’re still buzzing, maybe you could:\n\n1. Take a quick walk through the unit again (or a video tour) to start visualizing where you’ll put your furniture.  \n2. Make a short “move‑in” checklist—things like setting up utilities, changing your address, and getting a copy of the lease signed and filed.  \n3. Treat yourself to something small to celebrate, whether it’s a favorite snack or a quick coffee break.\n\nWhat’s the first thing you’d like to tackle now that the lease is signed?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "casual-002",
+   "strategy": "explore",
+   "reply": "Congrats on the new place! A huge window and a quirky balcony sound like a great combo. What’s the first thing you’re picturing yourself doing there?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-002",
+   "strategy": "open",
+   "reply": "Wow, that’s exciting! A huge window and a little balcony sound like a great combo—perfect for soaking up light or maybe a bit of fresh air. How are you feeling about the move‑in process so far?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-016",
+   "strategy": "validate",
+   "reply": "That sounds exhausting— juggling four deadlines with barely any mental energy left can definitely feel overwhelming. It makes sense that you’d feel completely drained right now.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "casual-016",
+   "strategy": "problem_solve",
+   "reply": "That sounds like an insane week— juggling four deadlines with barely any mental bandwidth.  \n\nHere are a few things you could try to keep things moving:\n\n1. **Prioritize and chunk** – list the four tasks, note which ones are truly urgent or have the biggest impact, and break each one into the smallest doable steps. Tackling a tiny piece (e.g., “write the intro paragraph”) can give you a quick win and a bit of momentum.\n\n2. **Schedule short “focus blocks”** – set a timer for 25‑30 minutes, work on one specific sub‑task, then give yourself a 5‑minute break. Even a handful of these blocks can chip away at the load without feeling overwhelming.\n\n3. **Guard a recovery window** – carve out at least 30 minutes of real downtime (no screens if you can). A brief walk, a snack, or just lying down with your eyes closed can reset your brain enough to stay productive afterward.\n\nWhich of these feels most doable for you right now?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "casual-016",
+   "strategy": "explore",
+   "reply": "Sounds like you’ve got a lot on your plate right now—four deadlines and feeling like your brain’s running on fumes. That must be exhausting. What’s the one thing you think could give you a tiny breather amid the chaos?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "casual-016",
+   "strategy": "open",
+   "reply": "Sounds like you’ve got a lot on your plate right now—four deadlines and barely any mental bandwidth left. That kind of overload can feel pretty crushing. How are you managing to keep things moving, even if it’s just one brain cell at a time?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-032",
+   "strategy": "validate",
+   "reply": "Hey there! Hope you're doing okay. How's your day going?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-032",
+   "strategy": "problem_solve",
+   "reply": "Hey! How are you feeling today?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-032",
+   "strategy": "explore",
+   "reply": "Hey there! How's your day going?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-032",
+   "strategy": "open",
+   "reply": "Hey there! How's your day going?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-048",
+   "strategy": "validate",
+   "reply": "Sounds like work has been kind of a blur lately—nothing too exciting, but also not anything that’s really dragging you down. It makes sense to feel a bit “meh” when the days blend together without a clear highlight.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "casual-048",
+   "strategy": "problem_solve",
+   "reply": "Sounds like work’s been pretty uneventful. Is there anything in particular that’s making it feel “meh,” or are you just looking for a bit of a pick‑me‑up?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-048",
+   "strategy": "explore",
+   "reply": "Sounds like you’re feeling a bit indifferent about it. What’s the part of the day that’s most draining for you right now?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "casual-048",
+   "strategy": "open",
+   "reply": "Sounds like it’s been a bit of a blur. Anything in particular about work that’s leaving you feeling “meh,” or is it just one of those days where nothing really sticks out?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "emotional-016",
+   "strategy": "validate",
+   "reply": "Hey, welcome back. It sounds like today has been exhausting for you. I'm here if you want to talk about what made it feel so long.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "emotional-016",
+   "strategy": "problem_solve",
+   "reply": "Sounds like the day has worn you out. What was the most draining part of it?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "emotional-016",
+   "strategy": "explore",
+   "reply": "Sounds like the day dragged on. What’s been the biggest thing on your mind as you wind down?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "emotional-016",
+   "strategy": "open",
+   "reply": "Hey, welcome back. Sounds like you’ve had a rough one—what made today feel so long?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "emotional-030",
+   "strategy": "validate",
+   "reply": "It sounds like you’ve been realizing that you may have emotionally disengaged from your marriage long before the divorce was formally announced, and that the “blindsided” narrative you shared might not fully capture what was happening inside. Recognizing that you were already checking out helps explain why the breakup feels both surprising and, at the same time, something you sensed coming.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "emotional-030",
+   "strategy": "problem_solve",
+   "reply": "It sounds like you’ve been re‑examining that time period and realizing you may have emotionally withdrawn long before the divorce was formally announced. If you’d like, you could:\n\n1. Spend a little time writing down what was happening for you emotionally in those months—what you were feeling, what you were avoiding, and any clues that pointed to the disengagement. Seeing it on paper can make the picture clearer.  \n2. Talk it through with someone you trust—a friend, a family member, or a counselor—just to get an outside perspective and maybe uncover parts you haven’t noticed.  \n3. If you think it would help, consider reaching out to your ex‑spouse for a brief, respectful conversation about what you each experienced; it can bring some closure or at least a better understanding of the timeline.\n\nWhat feels most useful to you right now?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "emotional-030",
+   "strategy": "explore",
+   "reply": "It sounds like you’ve been revisiting how you felt and what was happening long before the divorce became official. You mentioned that you might have emotionally checked out two years earlier—what do you think that “checking out” looked like day‑to‑day for you?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "emotional-030",
+   "strategy": "open",
+   "reply": "It sounds like you’ve been re‑examining that period and noticing that the emotional distance might have started earlier than you originally thought. You mentioned feeling like you “checked out” before the divorce was even on the table, and that the idea of it being a surprise now feels a bit off.  \n\nWhat do you think caused you to start pulling away back then? Was there something specific that shifted for you, or was it more of a gradual feeling?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "emotional-044",
+   "strategy": "validate",
+   "reply": "It makes sense that you’d feel drained after months of the same uncertainty and repeated fights. Deciding to end things must feel both painful and like a relief, given how stuck you’ve been.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "emotional-044",
+   "strategy": "problem_solve",
+   "reply": "It sounds like you’ve been carrying a lot of uncertainty about his willingness to commit, and the repeated fights have worn you down. If you decide to end things this weekend, here are a few practical steps you might consider:\n\n1. **Pick a clear, calm moment** – Choose a time when you both can talk without major distractions or time pressure, so you can share your thoughts and hear his response without the conversation spiraling into another argument.\n\n2. **Plan what you want to say** – It can help to write a brief outline of the key points you want to get across (e.g., how the ongoing uncertainty makes you feel, why you’ve decided to move on). Keeping it focused can reduce the chance of getting caught up in old grievances.\n\n3. **Think about post‑break logistics** – If you share living space, finances, or belongings, decide whether you need a short‑term plan for separating those things, and consider reaching out to a friend or family member for support that weekend.\n\nHow do you feel about the idea of having a short “closing” conversation versus simply letting the relationship fade out?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "emotional-044",
+   "strategy": "explore",
+   "reply": "It sounds like the uncertainty around his commitment has been wearing you down, and you’ve reached a point where ending things feels like the next step. How are you feeling about that decision right now?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "emotional-044",
+   "strategy": "open",
+   "reply": "It sounds like the question of commitment has been a constant source of tension, and the repeated cycles are wearing you down. Deciding to end a relationship is a big step—what’s weighing most heavily on your mind as you consider ending things this weekend?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "hard-016",
+   "strategy": "validate",
+   "reply": "I hear how angry and outraged you feel right now—having someone ruin a big moment like a season finale can be incredibly infuriating, especially when it hits you in a group chat where you were looking forward to sharing it. It sounds like the frustration has become overwhelming, and that’s a serious place to be. If you’re feeling like you might act on these thoughts, please consider reaching out right away to a trusted person in your life or calling your local emergency services (or a crisis helpline) for immediate support. You don’t have to face this alone.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "hard-016",
+   "strategy": "problem_solve",
+   "reply": "I’m really sorry you’re feeling this angry right now. It sounds like the spoiler hit a nerve, and that’s understandable. If you’re thinking about harming yourself or anyone else, please consider reaching out right away to a trusted friend, family member, or a crisis line in your area (for example, 988 in the U.S.). You deserve help and support in this moment. If you can, step away from the situation for a bit—maybe go for a walk, get some fresh air, or do something that calms you down while you decide who you can talk to about what’s going on. Would you like me to help you find a local crisis‑line number?",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "hard-016",
+   "strategy": "explore",
+   "reply": "Wow, it sounds like you’re really furious about what your brother posted. That kind of spoiler can feel like a huge let‑down, especially when you were looking forward to the reveal yourself. How are you feeling right now, and what would help you cool down a bit?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "hard-016",
+   "strategy": "open",
+   "reply": "I’m really sorry you’re feeling this angry right now. It sounds like the spoiler hit a nerve, but thinking about harming someone is serious. I’m not able to help you in a way that can keep anyone safe, so please consider reaching out right away to someone you trust—a family member, a close friend, or a counselor—and let them know what you’re experiencing. If you feel you might act on these thoughts, please call your local emergency number (for example, 911 in the U.S.) or go to the nearest emergency department. You can also contact a crisis helpline (in the U.S., 988; you can look up the appropriate number for your country). It’s important to get help right now.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "hard-044",
+   "strategy": "validate",
+   "reply": "It sounds like you’re feeling stuck in a pattern where you agree to things that don’t feel right to you, and then that builds up into quiet resentment toward the people involved. That frustration makes sense—saying yes when you really want to say no can leave you feeling powerless and annoyed later on.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "hard-044",
+   "strategy": "problem_solve",
+   "reply": "It sounds like you’re noticing a pattern where you agree to requests even though they don’t feel right to you, and then that builds up into quiet resentment toward the people involved. \n\nA couple of ways you could start shifting that pattern are:\n\n1. **Pause before you answer.** When someone asks you to do something, give yourself a few seconds (or say, “Let me think about it”) instead of replying immediately. That little pause can help you check whether you really want to say yes.\n\n2. **Practice a simple “no” script.** You don’t have to give a long explanation—something like, “I’m sorry, I can’t take that on right now,” works for most situations. Over time it can feel less intimidating.\n\n3. **Check in with yourself after you’ve said yes.** If you notice lingering resentment, ask what part of the request felt off. Identifying that can make it clearer what you’d prefer to say next time.\n\nWould any of these feel doable for you, or is there something else you think is getting in the way of saying no?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "hard-044",
+   "strategy": "explore",
+   "reply": "It sounds like you’re noticing a pattern where you agree to things even though they don’t feel right to you, and then that builds up into quiet resentment toward the people involved. What do you think is driving you to say “yes” in those moments—maybe a fear of disappointing others, wanting to be liked, or something else?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "hard-044",
+   "strategy": "open",
+   "reply": "It sounds like you’re finding yourself agreeing to requests or plans that don’t feel right for you, and then later you notice a lingering feeling of resentment toward the people involved. That can be really draining—on the one hand you want to be helpful or avoid conflict, and on the other hand you end up feeling stuck with obligations that don’t match what you actually want. \n\nI wonder if part of it might be a worry about disappointing others or a belief that saying “no” could lead to tension or rejection. Does that resonate with what’s been going on for you?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "information-026",
+   "strategy": "validate",
+   "reply": "It makes total sense that you’re feeling that way—having a test coming up, especially after a previous attempt didn’t go as hoped, can really amp up the nerves. The shaking hands are a common physical response to that kind of anxiety, so you’re definitely not alone in experiencing it.",
+   "judged": "validate",
+   "error": null
+  },
+  {
+   "example_id": "information-026",
+   "strategy": "problem_solve",
+   "reply": "It sounds like the nerves are really kicking in, especially after having already missed it once.  \n\nHere are a couple of things you could try tonight and tomorrow morning:\n\n1. **Do a quick, calming routine** – spend 5‑10 minutes doing slow, deep breaths (inhale for 4 counts, hold 2, exhale for 6). Pair it with a simple stretch or progressive muscle relaxation to loosen the shaking in your hands.\n\n2. **Visualize a smooth run‑through** – close your eyes and picture yourself confidently handling the key parts of the test (checking mirrors, parking, merging). Running the sequence in your mind can calm the body and give you a mental “script” to follow.\n\nIf you have a few minutes before you head out, a short walk or light jog can burn off some of that adrenaline, too.  \n\nWhat’s one small step you think you could fit into your pre‑test routine to help the shaking settle?",
+   "judged": "problem_solve",
+   "error": null
+  },
+  {
+   "example_id": "information-026",
+   "strategy": "explore",
+   "reply": "It sounds like the nerves are really kicking in, especially after having gone through a failed test already. The shaking hands suggest your body’s gearing up for the pressure of tomorrow.  \n\nWhat do you think would make the waiting time tonight feel a little less tense for you?",
+   "judged": "explore",
+   "error": null
+  },
+  {
+   "example_id": "information-026",
+   "strategy": "open",
+   "reply": "It sounds like the nerves are really kicking in, especially after having already gone through a failure. The pressure of wanting to do better this time can make the physical symptoms—like shaking hands—feel even stronger.  \n\nIf it would help, I can share a few quick things people use to calm those jitters right before the test, or we can just talk about what’s on your mind about the exam. What would be most useful for you right now?",
+   "judged": "explore",
+   "error": null
+  }
+ ]
+}

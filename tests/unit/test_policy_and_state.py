@@ -24,9 +24,9 @@ from app.orchestration.policy import Strategy, choose_policy, explicit_request
 from app.prompting import PromptRegistry, template_checksum
 from app.state.extractor import ExtractionStatus, StateExtractor, build_extraction_input
 from app.state.schemas import ConversationState, ExtractedState, InferredField
-from tests.helpers import EMPTY_EXTRACTION, ScriptedLLMClient, make_settings
+from tests.helpers import DEFAULT_PROMPT_VERSION, EMPTY_EXTRACTION, ScriptedLLMClient, make_settings
 
-PROMPT = PromptRegistry().get("companion_system", "1.1.0")
+PROMPT = PromptRegistry().get("companion_system", DEFAULT_PROMPT_VERSION)
 
 
 def decision_set(**acted: str) -> DecisionSet:

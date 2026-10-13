@@ -37,6 +37,10 @@ from app.llm.schemas import (
 from app.prompting import PromptTemplate
 
 DEFAULT_STRATEGIES = ("validate", "problem_solve", "explore")
+# Messages where several approaches are reasonable: forcing a strategy on an
+# explicit request ("help me plan...") would only test whether the model
+# obeys the person over the policy, which the prompt says it should.
+OPEN_ENDED_MODES = frozenset({"listening", "exploration", "reflection", "casual"})
 _ADVICE = re.compile(
     r"\b(?:you could|you might|try|consider|i(?:'d| would) suggest|i recommend|one option"
     r"|it (?:might|may) help|steps?|plan)\b",
@@ -68,6 +72,20 @@ class Sample:
     reply: str | None = None
     judged: str | None = None
     error: str | None = None
+
+
+def select_examples(examples: Sequence[Example], count: int) -> list[Example]:
+    """Open-ended messages with no explicit request, spread across the split."""
+    from app.orchestration.policy import explicit_request
+
+    eligible = [
+        e
+        for e in examples
+        if e.labels.get("conversation_mode") in OPEN_ENDED_MODES
+        and explicit_request(e.conversation[-1].content) == (None, True)
+    ]
+    step = max(1, len(eligible) // count) if count else 1
+    return eligible[::step][:count]
 
 
 async def _call(llm: LLMClient, request: GenerationRequest, attempts: int = 6) -> str:

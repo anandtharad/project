@@ -27,6 +27,7 @@ from app.prompting import PromptRegistry
 from tests.helpers import (
     ALICE,
     BOB,
+    DEFAULT_PROMPT_VERSION,
     ScriptedDecisionBackend,
     ScriptedLLMClient,
     blocking_step,
@@ -36,7 +37,7 @@ from tests.helpers import (
     running_app,
 )
 
-PROMPT = PromptRegistry().get("companion_system", "1.1.0")
+PROMPT = PromptRegistry().get("companion_system", DEFAULT_PROMPT_VERSION)
 
 
 def extraction(topic: str, goal: str = "", provenance: str = "unknown") -> str:
