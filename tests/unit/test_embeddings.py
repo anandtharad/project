@@ -316,3 +316,62 @@ async def test_real_local_model_ranks_the_related_memory_first() -> None:
     assert scores[0] > scores[1]
     assert all(abs(norm(v) - 1) < 1e-4 for v in docs)
     await client.aclose()
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        httpx2.Response(200, text="<html>captive portal</html>"),
+        httpx2.Response(200, json={"object": "list", "data": "nope"}),
+        httpx2.Response(200, text="{not json"),
+    ],
+)
+async def test_openai_malformed_bodies_become_embedding_errors(response: httpx2.Response) -> None:
+    client = openai_client(lambda r: response)
+    with pytest.raises(EmbeddingError):
+        await client.embed(["x"], kind="query")
+
+
+async def test_openai_embeddings_are_not_retried_inside_a_turn() -> None:
+    calls = 0
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        nonlocal calls
+        calls += 1
+        return httpx2.Response(429, headers={"retry-after": "30"}, json={"error": {}})
+
+    client = OpenAIEmbeddingClient(
+        api_key="sk-test",
+        model="text-embedding-3-small",
+        timeout_seconds=5,
+        http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(handler)),
+    )
+    with pytest.raises(EmbeddingError, match="429"):
+        await client.embed(["x"], kind="query")
+    assert calls == 1
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        httpx.Response(200, text="<html>captive portal</html>"),
+        httpx.Response(200, json={"embeddings": [{"values": "nope"}]}),
+    ],
+)
+async def test_gemini_malformed_bodies_become_embedding_errors(response: httpx.Response) -> None:
+    client = gemini_client(lambda r: response)
+    with pytest.raises(EmbeddingError):
+        await client.embed(["x"], kind="query")
+
+
+async def test_a_finished_load_is_used_rather_than_started_again(
+    stub_fastembed: type[StubTextEmbedding],
+) -> None:
+    client = local_client()
+    client.start()
+    await asyncio.wait({client._load})
+    # The load finished but its done-callback may not have run yet.
+    client._model = None
+    vectors = await client.embed(["hi"], kind="query")
+    assert len(vectors) == 1 and stub_fastembed.loads == 1
+    await client.aclose()

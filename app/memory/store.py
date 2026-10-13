@@ -10,25 +10,42 @@ Retrieval is hybrid and deliberately small:
 - lexical: PostgreSQL full-text match (`english` configuration, any word),
   which boosts semantic matches and is the fallback when no embedding is
   available (spec §23);
-- only `active`, unexpired memories are candidates; results are thresholded,
-  de-duplicated and capped at `limit`.
+- only memories with the requested statuses (active, and pending ones shown
+  as unconfirmed) that have not expired and are within the retention period
+  are candidates; results are thresholded, de-duplicated and capped at
+  `limit`.
 """
 
 from __future__ import annotations
 
 import uuid
 from collections.abc import Iterable, Sequence
-from dataclasses import dataclass
-from datetime import datetime
+from dataclasses import dataclass, replace
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
-from sqlalchemy import Float, Text, case, cast, delete, func, literal, null, or_, select, update
+from sqlalchemy import (
+    Float,
+    Text,
+    and_,
+    case,
+    cast,
+    delete,
+    func,
+    literal,
+    not_,
+    null,
+    or_,
+    select,
+    update,
+)
 from sqlalchemy.dialects.postgresql import TSQUERY
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.orm import defer
 
-from app.db.models import MemoryRecord, UserMemorySettings
-from app.memory.policy import MemorySettings, PolicyDecision, normalize
+from app.db.models import MemoryRecord, Message, UserMemorySettings
+from app.memory.policy import MemorySettings, PolicyDecision, looks_financial, normalize
 from app.memory.schemas import (
     MEMORY_SCHEMA_VERSION,
     Memory,
@@ -37,7 +54,7 @@ from app.memory.schemas import (
     RetrievedMemory,
 )
 
-# Candidates considered per retrieval (most recent first); memory sets are small.
+# Candidates considered per retrieval, best-scored first.
 _CANDIDATE_POOL = 500
 
 
@@ -98,8 +115,22 @@ def select_hits(
     return scored[: params.limit]
 
 
-def _not_expired(now: datetime) -> Any:
-    return or_(MemoryRecord.expires_at.is_(None), MemoryRecord.expires_at > now)
+async def _lock_settings(session: AsyncSession, user_id: uuid.UUID) -> UserMemorySettings:
+    """The person's settings row, created with defaults if missing, locked for
+    the rest of the transaction (settings changes and delete-all wait)."""
+    await session.execute(
+        pg_insert(UserMemorySettings)
+        .values(user_id=user_id)
+        .on_conflict_do_nothing(index_elements=[UserMemorySettings.user_id])
+    )
+    row = await session.scalar(
+        select(UserMemorySettings)
+        .where(UserMemorySettings.user_id == user_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
+    assert row is not None
+    return row
 
 
 async def _supersede(session: AsyncSession, user_id: uuid.UUID, memory_id: uuid.UUID) -> None:
@@ -120,8 +151,19 @@ async def _supersede(session: AsyncSession, user_id: uuid.UUID, memory_id: uuid.
 
 
 class MemoryStore:
-    def __init__(self, session_factory: async_sessionmaker[AsyncSession]) -> None:
+    def __init__(
+        self, session_factory: async_sessionmaker[AsyncSession], *, retention_days: int = 365
+    ) -> None:
         self._sessions = session_factory
+        # Applied to existing memories too, so lowering it takes effect at once.
+        self._retention = timedelta(days=retention_days)
+
+    def _live(self, now: datetime) -> Any:
+        """Not expired, and within the retention period."""
+        return and_(
+            or_(MemoryRecord.expires_at.is_(None), MemoryRecord.expires_at > now),
+            MemoryRecord.created_at > now - self._retention,
+        )
 
     # --- user controls --------------------------------------------------------
 
@@ -131,10 +173,11 @@ class MemoryStore:
         async with self._sessions() as session:
             rows = await session.scalars(
                 select(MemoryRecord)
+                .options(defer(MemoryRecord.embedding))
                 .where(
                     MemoryRecord.user_id == user_id,
                     MemoryRecord.status.in_([s.value for s in statuses]),
-                    _not_expired(now),
+                    self._live(now),
                 )
                 .order_by(MemoryRecord.created_at.desc())
             )
@@ -144,7 +187,9 @@ class MemoryStore:
         async with self._sessions() as session:
             record = await session.scalar(
                 select(MemoryRecord).where(
-                    MemoryRecord.id == memory_id, MemoryRecord.user_id == user_id
+                    MemoryRecord.id == memory_id,
+                    MemoryRecord.user_id == user_id,
+                    self._live(datetime.now(UTC)),
                 )
             )
             return to_memory(record) if record is not None else None
@@ -159,7 +204,15 @@ class MemoryStore:
             return result.first() is not None
 
     async def delete_all(self, user_id: uuid.UUID) -> int:
+        """Delete every memory and record when, so an extraction already
+        running for an earlier message cannot store anything afterwards."""
         async with self._sessions() as session, session.begin():
+            await _lock_settings(session, user_id)
+            await session.execute(
+                update(UserMemorySettings)
+                .where(UserMemorySettings.user_id == user_id)
+                .values(memories_cleared_at=func.now())
+            )
             result = await session.execute(
                 delete(MemoryRecord)
                 .where(MemoryRecord.user_id == user_id)
@@ -170,9 +223,16 @@ class MemoryStore:
     async def confirm(self, user_id: uuid.UUID, memory_id: uuid.UUID) -> Memory | None:
         """A pending memory becomes active and supersedes the memory it conflicted with."""
         async with self._sessions() as session, session.begin():
+            # Every per-person write takes this lock first, so writes queue in
+            # one order instead of deadlocking on memory rows.
+            await _lock_settings(session, user_id)
             record = await session.scalar(
                 select(MemoryRecord)
-                .where(MemoryRecord.id == memory_id, MemoryRecord.user_id == user_id)
+                .where(
+                    MemoryRecord.id == memory_id,
+                    MemoryRecord.user_id == user_id,
+                    self._live(datetime.now(UTC)),
+                )
                 .with_for_update()
             )
             if record is None:
@@ -228,20 +288,49 @@ class MemoryStore:
     ) -> list[uuid.UUID]:
         """Store accepted memories in one transaction; returns their IDs.
 
-        The person may have turned memory off while extraction was running:
-        the setting is checked again here, inside the same transaction, so
-        nothing is stored after they turned it off."""
+        The person's settings may have changed while extraction was running.
+        They are read again here under a row lock (the row is created if it
+        does not exist yet, so the lock always holds): nothing is stored if
+        memory was turned off or all memories were deleted after the source
+        message was sent, and nothing sensitive if `allow_sensitive` was
+        turned off."""
         created: list[uuid.UUID] = []
         async with self._sessions() as session, session.begin():
-            enabled = await session.scalar(
-                select(UserMemorySettings.memory_enabled)
-                .where(UserMemorySettings.user_id == user_id)
-                .with_for_update()
-            )
-            if enabled is False:
+            settings = await _lock_settings(session, user_id)
+            if not settings.memory_enabled:
                 return []
+            if settings.memories_cleared_at is not None:
+                sent = await session.scalar(
+                    select(Message.created_at).where(Message.id == source_message_id)
+                )
+                if sent is None or sent <= settings.memories_cleared_at:
+                    return []
+            if not settings.allow_sensitive:
+                new = [
+                    item
+                    for item in new
+                    if item.decision.candidate.sensitive_category == "none"
+                    and not looks_financial(item.decision.content)
+                ]
+            # A memory to supersede or conflict with may have been deleted (or
+            # purged) while extraction ran: then this is just a new memory.
+            related = {item.decision.related_id for item in new} - {None}
+            existing = (
+                set(
+                    await session.scalars(
+                        select(MemoryRecord.id)
+                        .where(MemoryRecord.user_id == user_id, MemoryRecord.id.in_(related))
+                        .with_for_update()
+                    )
+                )
+                if related
+                else set()
+            )
+            superseded: list[uuid.UUID] = []
             for item in new:
                 d = item.decision
+                if d.related_id is not None and d.related_id not in existing:
+                    d = replace(d, action="store", related_id=None)
                 assert d.status is not None
                 memory_id = uuid.uuid4()
                 session.add(
@@ -252,10 +341,13 @@ class MemoryStore:
                         content=d.content,
                         status=d.status.value,
                         importance=d.importance,
+                        # The supporting quote is checked but not kept: it can
+                        # hold more than the memory (source_message_id points
+                        # at the message).
                         provenance={
                             **provenance,
                             "explicit": d.candidate.explicit,
-                            "evidence": d.candidate.evidence[:200],
+                            "sensitive_category": d.candidate.sensitive_category,
                             "policy": d.reason,
                             "lifetime": d.candidate.lifetime,
                         },
@@ -269,17 +361,21 @@ class MemoryStore:
                     )
                 )
                 if d.action == "supersede" and d.related_id is not None:
-                    await _supersede(session, user_id, d.related_id)
+                    superseded.append(d.related_id)
                 created.append(memory_id)
+            # After every row is in, so a conflicting proposal from this same
+            # batch is superseded too, whatever the order.
+            await session.flush()
+            for memory_id in superseded:
+                await _supersede(session, user_id, memory_id)
         return created
 
     async def purge_expired(self, now: datetime) -> int:
-        """Retention: delete memories past their expiry, for every user."""
+        """Retention: delete memories past their expiry or older than the
+        retention period, for every user."""
         async with self._sessions() as session, session.begin():
             result = await session.execute(
-                delete(MemoryRecord)
-                .where(MemoryRecord.expires_at.is_not(None), MemoryRecord.expires_at <= now)
-                .returning(MemoryRecord.id)
+                delete(MemoryRecord).where(not_(self._live(now))).returning(MemoryRecord.id)
             )
             return len(result.all())
 
@@ -354,13 +450,17 @@ class MemoryStore:
         conditions = [
             MemoryRecord.user_id == user_id,
             MemoryRecord.status.in_([s.value for s in statuses]),
-            _not_expired(now),
+            self._live(now),
         ]
+        # The pool is ranked by the same score select_hits uses, so a large
+        # memory set never hides a strong match behind newer, weaker ones.
+        score = func.coalesce(semantic, 0.0) + func.least(lexical, 1.0) * 0.2
         async with self._sessions() as session:
             stmt = (
                 select(MemoryRecord, semantic, lexical.label("lexical"))
+                .options(defer(MemoryRecord.embedding))
                 .where(*conditions)
-                .order_by(MemoryRecord.created_at.desc())
+                .order_by(score.desc(), MemoryRecord.created_at.desc())
                 .limit(_CANDIDATE_POOL)
             )
             rows = (await session.execute(stmt)).all()

@@ -3,12 +3,14 @@
 Uses PostgreSQL with pgvector, the scripted LLM (whose memory-extraction
 calls return queued candidates) and the deterministic fake embeddings. The
 fake embeddings only share words, so these tests lower the semantic
-threshold; tuning it is the evaluation's job (eval/run_memory_eval.py).
+threshold; tuning it is the evaluation's job (scripts/eval_memory.py).
 """
 
 from __future__ import annotations
 
+import asyncio
 import json
+import logging
 import uuid
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime, timedelta
@@ -498,3 +500,203 @@ async def test_a_failed_structured_extraction_is_retried_once(
     await turn(app, client, cid, "I teach Year 3 at a primary school near home.")
     assert len(llm.memory_requests) == 4
     assert len(await memories(client)) == 1
+
+
+async def test_the_supporting_quote_is_checked_but_not_kept(
+    app: FastAPI, client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
+) -> None:
+    message = "My number is 07700 900123 and my rescue greyhound Biscuit keeps me going."
+    quote = "My number is 07700 900123 and my rescue greyhound Biscuit"
+    await remember(
+        app, client, llm, message, candidate("has a rescue greyhound called Biscuit", quote)
+    )
+    async with db_engine.connect() as conn:
+        provenance = (await conn.execute(select(MemoryRecord.provenance))).scalar_one()
+    assert "evidence" not in provenance and "07700" not in json.dumps(provenance)
+    assert provenance["sensitive_category"] == "none"
+
+
+async def test_turning_sensitive_memories_off_during_extraction_applies(
+    app: FastAPI, client: httpx.AsyncClient, llm: ScriptedLLMClient
+) -> None:
+    allow = {"memory_enabled": True, "allow_sensitive": True}
+    await client.put("/v1/users/me/memory-settings", json=allow, headers=ALICE)
+
+    async def disallow_then_answer(request: Any) -> str:
+        body = {"memory_enabled": True, "allow_sensitive": False}
+        await client.put("/v1/users/me/memory-settings", json=body, headers=ALICE)
+        return candidates(
+            candidate("has type 1 diabetes", "I have type 1 diabetes", sensitive_category="health"),
+            candidate("plays the cello", "I play the cello"),
+        )
+
+    llm.queue_memory(disallow_then_answer)
+    cid = await create_conversation(client, ALICE)
+    await turn(app, client, cid, "I have type 1 diabetes and I play the cello in an orchestra.")
+    assert [m["content"] for m in await memories(client)] == ["plays the cello"]
+
+
+async def test_deleting_everything_during_extraction_stores_nothing_from_before(
+    app: FastAPI, client: httpx.AsyncClient, llm: ScriptedLLMClient
+) -> None:
+    async def delete_all_then_answer(request: Any) -> str:
+        assert (await client.delete("/v1/users/me/memories", headers=ALICE)).status_code == 200
+        return candidates(DOG_MEMORY)
+
+    llm.queue_memory(delete_all_then_answer)
+    cid = await create_conversation(client, ALICE)
+    await turn(app, client, cid, DOG)
+    assert await memories(client, status="all") == []
+    # Later messages are remembered again.
+    stored = await remember(app, client, llm, DOG, DOG_MEMORY)
+    assert len(stored) == 1
+
+
+async def test_memories_older_than_the_retention_period_are_not_used(
+    app: FastAPI, client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
+) -> None:
+    # Stored with a long expiry, but older than MEMORY_RETENTION_DAYS (365):
+    # lowering the retention period applies to existing memories too.
+    (dog,) = await remember(app, client, llm, DOG, DOG_MEMORY)
+    async with db_engine.begin() as conn:
+        await conn.execute(
+            update(MemoryRecord).values(
+                created_at=datetime.now(UTC) - timedelta(days=400),
+                expires_at=datetime.now(UTC) + timedelta(days=30),
+            )
+        )
+    assert await memories(client) == []
+    viewed = await client.get(f"/v1/users/me/memories/{dog['memory_id']}", headers=ALICE)
+    assert viewed.status_code == 404
+    await maintain_memories(app.state.memory_store, app.state.memory)
+    async with db_engine.connect() as conn:
+        assert (await conn.execute(select(MemoryRecord.id))).all() == []
+
+
+async def test_logs_do_not_say_which_sensitive_category_was_found(
+    app: FastAPI,
+    client: httpx.AsyncClient,
+    llm: ScriptedLLMClient,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    caplog.set_level(logging.INFO, logger="app.memory")
+    message = "I came out as gay last year and I play the cello in an orchestra."
+    await remember(
+        app,
+        client,
+        llm,
+        message,
+        candidate("is gay", "I came out as gay", sensitive_category="sexuality"),
+    )
+    text = json.dumps([getattr(r, "event_fields", {}) for r in caplog.records], default=str)
+    assert "reject:sensitive" in text and "sexuality" not in text
+
+
+class BrokenEmbeddings(FakeEmbeddingClient):
+    """A client bug (not an EmbeddingError), or a hang."""
+
+    def __init__(self, hang: bool = False) -> None:
+        super().__init__()
+        self.hang = hang
+
+    async def embed(self, texts: Any, *, kind: Any) -> list[list[float]]:
+        if self.hang:
+            await asyncio.sleep(3600)
+        raise AttributeError("'str' object has no attribute 'data'")
+
+
+@pytest.mark.parametrize("hang", [False, True])
+async def test_a_broken_or_hanging_embedding_client_does_not_fail_the_turn(
+    app: FastAPI,
+    client: httpx.AsyncClient,
+    llm: ScriptedLLMClient,
+    db_engine: AsyncEngine,
+    hang: bool,
+) -> None:
+    await remember(app, client, llm, DOG, DOG_MEMORY)
+    app.state.memory._embeddings = BrokenEmbeddings(hang=hang)
+    app.state.memory._embedding_timeout = 0.2
+    cid = await create_conversation(client, ALICE)
+    response = await turn(app, client, cid, "How is my greyhound Biscuit getting on?")
+    assert "called Biscuit" in last_user_message(llm)  # full-text fallback
+    metadata = await reply_metadata(db_engine, response)
+    assert metadata["memory"]["mode"] == "lexical"
+
+
+async def test_a_strong_old_match_is_found_beyond_the_candidate_pool(
+    app: FastAPI,
+    client: httpx.AsyncClient,
+    llm: ScriptedLLMClient,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import app.memory.store as store_module
+
+    await remember(app, client, llm, DOG, DOG_MEMORY)
+    for hobby in ("plays chess on Sundays", "keeps bees in the garden", "paints murals"):
+        await remember(
+            app,
+            client,
+            llm,
+            f"Oh and I {hobby.split(' ', 1)[1]} for fun.",
+            candidate(hobby, f"I {hobby.split(' ', 1)[1]}"),
+        )
+    monkeypatch.setattr(store_module, "_CANDIDATE_POOL", 2)  # fewer than the memories
+    cid = await create_conversation(client, ALICE)
+    await turn(app, client, cid, "Any tips for walking a rescue greyhound like Biscuit?")
+    assert "called Biscuit" in last_user_message(llm)
+
+
+async def test_superseding_a_memory_deleted_during_extraction_keeps_the_batch(
+    app: FastAPI, client: httpx.AsyncClient, llm: ScriptedLLMClient
+) -> None:
+    (bath,) = await remember(
+        app,
+        client,
+        llm,
+        "I live in Bath with my partner and a cat.",
+        candidate("lives in Bath", "I live in Bath"),
+    )
+
+    async def delete_then_answer(request: Any) -> str:
+        await client.delete(f"/v1/users/me/memories/{bath['memory_id']}", headers=ALICE)
+        return candidates(
+            candidate(
+                "lives in Bristol", "I moved to Bristol", relation="updates", related_memory=0
+            ),
+            candidate("has a cat called Tom", "a cat called Tom"),
+        )
+
+    llm.queue_memory(delete_then_answer)
+    cid = await create_conversation(client, ALICE)
+    await turn(
+        app, client, cid, "I don't live in Bath now, I moved to Bristol with a cat called Tom."
+    )
+    stored = await memories(client)
+    assert sorted(m["content"] for m in stored) == ["has a cat called Tom", "lives in Bristol"]
+    assert all(m["supersedes_id"] is None for m in stored)
+
+
+async def test_an_update_and_a_conflict_in_one_batch_settle_the_same_way_in_any_order(
+    app: FastAPI, client: httpx.AsyncClient, llm: ScriptedLLMClient
+) -> None:
+    await remember(
+        app,
+        client,
+        llm,
+        "I live in Leeds with my partner and a dog.",
+        candidate("lives in Leeds", "I live in Leeds"),
+    )
+    message = "I don't live in Leeds any more, I moved to Hull, or maybe York soon, who knows."
+    llm.queue_memory(
+        candidates(
+            candidate("may move to York", "maybe York", relation="conflicts", related_memory=0),
+            candidate("lives in Hull", "I moved to Hull", relation="updates", related_memory=0),
+        )
+    )
+    cid = await create_conversation(client, ALICE)
+    await turn(app, client, cid, message)
+    assert [m["content"] for m in await memories(client)] == ["lives in Hull"]
+    assert sorted(m["content"] for m in await memories(client, status="superseded")) == [
+        "lives in Leeds",
+        "may move to York",
+    ]

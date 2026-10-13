@@ -87,11 +87,11 @@ unmodified here.
 
 | Suite | Result |
 |---|---|
-| unit | 439 passed |
-| integration | 50 passed |
-| security | 43 passed |
+| unit | 514 passed |
+| integration | 79 passed |
+| security | 53 passed |
 | live | 8 skipped (opt-in; run with `scripts/dev.py live-groq`) |
-| **total** | **532 passed, 8 skipped** (2026-10-13) |
+| **total** | **646 passed, 8 skipped** (2026-10-13, after Phase 3) |
 
 Live runs made from this environment once network access was allowed
 (2026-10-13): Groq live tests, strict structured state extraction, the
@@ -109,6 +109,20 @@ a NUL character in extracted state could fail the reply transaction; the
 OpenAI-compatible adapter chose the structured-output mode from the reply
 model instead of the requested one; and threshold coverage ignored failed
 requests.
+
+A third review of the Phase 3 changes (security and privacy, correctness
+and concurrency, docs against code; three independent reviewers, each
+finding reproduced) confirmed 29 distinct issues; all are fixed, the code
+ones covered by tests.
+The most important: the supporting quote was stored unscreened (it could
+hold a diagnosis or a phone number) and is no longer stored; the "quote is
+in the message" check accepted one-letter quotes and inferences; identifiers
+had no code check; logs named which sensitive category was found; a
+malformed embedding response, or OpenAI embedding retries, could fail or
+time out a whole turn; retrieval looked only at the 500 newest memories;
+settings changes, delete-all and deletes could race with a running
+extraction; and lowering the retention period did not apply to existing
+memories.
 
 Without `TEST_DATABASE_URL`, the database-backed tests skip, each with an
 explicit reason. Tests clear provider-related environment variables, so the
@@ -131,7 +145,7 @@ are clean.
 | Stale state write | Rejected, reply kept | `test_stale_state_write_is_rejected_but_the_reply_is_kept` |
 | Embedding failure | Full-text matching; memory stored without a vector and embedded later | `test_embedding_failure_falls_back_to_full_text_and_is_backfilled_later` |
 | Memory store unavailable | No memories in the prompt, flagged; turn completes | `test_an_unavailable_memory_store_means_no_memories_and_the_turn_succeeds` |
-| Memory extraction failure | Nothing stored; turn unaffected; one retry for a schema-breaking answer | `test_a_failed_extraction_does_not_affect_the_turn`, `test_an_extraction_that_breaks_the_schema_is_retried_once` |
+| Memory extraction failure | Nothing stored; turn unaffected; one retry when the provider reports a schema failure or rejects the structured request | `test_a_failed_extraction_does_not_affect_the_turn`, `test_a_failed_structured_extraction_is_retried_once` |
 | RAG unavailable | Phase 4 | — |
 | Safety dependency unavailable | Phase 5 | — |
 
@@ -180,10 +194,10 @@ are clean.
 
 ## Deviations from the specification (with reasons)
 
-- **Tables:** `users`, `conversations`, `messages`, `conversation_states`
-  and `turn_decisions` exist. The other tables in §15.1 (memories,
-  knowledge, safety events, evaluation) are created by their own phases'
-  migrations, so there are no empty placeholder tables (§20). Evaluation
+- **Tables:** `users`, `conversations`, `messages`, `conversation_states`,
+  `turn_decisions`, `memories` and `user_memory_settings` exist. The other
+  tables in §15.1 (knowledge, safety events, evaluation) are created by
+  their own phases' migrations, so there are no empty placeholder tables (§20). Evaluation
   results are JSON files under `eval/results/` until the Phase 6 tables.
   `turn_decisions` is an experiment-specific table (§15.1 allows them) for
   the per-decision records §7.6/§7.8 require.
@@ -260,10 +274,10 @@ See [decisions.md](decisions.md).
 
 | Criterion | Status | Evidence |
 |---|---|---|
-| Useful memories persist across sessions | Met | stored after the reply, retrieved into a later conversation: `test_a_useful_memory_persists_into_a_later_conversation`; live extraction recall 0.73 on the held-out split (0.94 on dev); live end-to-end through the API in Docker (docs/memory.md) |
-| Irrelevant content is not automatically stored | Met, with measured errors | code-side policy (explicit, quote in the message, no identifiers, no sensitive categories by default, no instruction-like content, no duplicates, at most 3 per message); messages under 20 characters never reach the extractor; live: 3 of 39 held-out items with nothing to store had something stored, against 14 of 39 for the model's raw candidates; precision of what is stored 0.85 |
+| Useful memories persist across sessions | Met | stored after the reply, retrieved into a later conversation: `test_a_useful_memory_persists_into_a_later_conversation`; live extraction recall 1.00 on the held-out split (prompt 1.1.0; 0.94 on dev); live end-to-end in Docker: a fact told in one conversation was recalled and used in the next (docs/memory.md) |
+| Irrelevant content is not automatically stored | Met, with measured errors | code-side policy (explicit, a quote of two or more words in the message sharing a word with the memory, no identifiers, no sensitive categories by default, no instruction-like content, no duplicates, at most 3 per message); messages under 20 characters never reach the extractor; live: 3 of 39 held-out items with nothing to store had something stored, against 13 of 39 for the model's raw candidates; precision of what is stored 0.86. Remaining errors include 3 religion/legal details the model labelled not sensitive |
 | Retrieval is relevance-filtered | Met | semantic threshold 0.49 chosen on dev; held-out test precision 0.62 and recall 0.74 (top 5 without a threshold: precision 0.40); expired and superseded memories never returned (0 in every run) |
-| Deletion is reflected in future retrieval | Met | `test_deletion_is_reflected_in_future_retrieval` (the row and its embedding are gone), delete-all, expiry and purge tests |
+| Deletion is reflected in future retrieval | Met | `test_deletion_is_reflected_in_future_retrieval` (the row and its embedding are gone), delete-all (also during a running extraction), expiry, retention and purge tests; live in Docker: after deletion the companion said it had no record of the dog's name |
 | Unauthorized access is blocked | Met | `tests/security/test_memory_isolation.py`: another person's memory is a 404 for view, delete and confirm; delete-all and settings are per person; one person's memories never reach another's reply or extraction call |
 
 Phase 3 tasks (spec §21): schema, candidate extraction and eligibility

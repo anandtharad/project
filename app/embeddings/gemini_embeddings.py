@@ -67,14 +67,16 @@ class GeminiEmbeddingClient:
                     task_type=_TASK_TYPES[kind], output_dimensionality=self._dimensions
                 ),
             )
+            embeddings = response.embeddings or []
+            if len(embeddings) != len(texts) or any(not e.values for e in embeddings):
+                raise EmbeddingError("gemini embeddings: unexpected number of vectors")
+            return [normalized(e.values or []) for e in embeddings]
+        except EmbeddingError:
+            raise
         except errors.APIError as exc:
             raise EmbeddingError(f"gemini embeddings: HTTP {exc.code}") from exc
-        except httpx.HTTPError as exc:
+        except Exception as exc:  # transport errors and malformed bodies alike
             raise EmbeddingError(f"gemini embeddings: {type(exc).__name__}") from exc
-        embeddings = response.embeddings or []
-        if len(embeddings) != len(texts) or any(not e.values for e in embeddings):
-            raise EmbeddingError("gemini embeddings: unexpected number of vectors")
-        return [normalized(e.values or []) for e in embeddings]
 
     def start(self) -> None:
         return None

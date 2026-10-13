@@ -105,6 +105,7 @@ def build_memory_service(
         ),
         retention_days=settings.memory_retention_days,
         max_per_turn=settings.memory_max_per_turn,
+        embedding_timeout_seconds=settings.embedding_timeout_seconds,
     )
 
 
@@ -180,7 +181,7 @@ def create_app(
         llm = llm_client or build_llm_client(settings, resolved)
         decisions = build_decision_service(settings, backend=decision_backend)
         state_extractor = build_state_extractor(settings, resolved, llm, state_prompt)
-        memory_store = MemoryStore(session_factory)
+        memory_store = MemoryStore(session_factory, retention_days=settings.memory_retention_days)
         memory = build_memory_service(settings, resolved, llm, memory_prompt, memory_store)
         background = BackgroundTasks()
         app.state.memory_store = memory_store

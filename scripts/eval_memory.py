@@ -5,7 +5,7 @@ needs pgvector and permission to create databases) with the configured
 embedding provider, by default the local model:
 
     uv run python scripts/eval_memory.py retrieval --split dev
-    uv run python scripts/eval_memory.py retrieval --split test --min-semantic 0.62
+    uv run python scripts/eval_memory.py retrieval --split test --min-semantic 0.49
 
 On dev it sweeps the semantic threshold and selects the one with the best F1;
 on test pass the dev threshold unchanged.
@@ -148,7 +148,8 @@ async def score_scenarios(
     url = await temp_database(base_url)
     engine = create_async_engine(url)
     sessions = async_sessionmaker(engine, expire_on_commit=False)
-    store = MemoryStore(sessions)
+    # Retrieval is measured here, not retention: authored ages are kept as they are.
+    store = MemoryStore(sessions, retention_days=3650)
     now = datetime.now(UTC)
     candidates: dict[str, list[Any]] = {}
     lexical: dict[str, list[str]] = {}
@@ -318,7 +319,11 @@ def write_cache(path: Path, cache: dict[str, Any]) -> None:
 
 
 async def propose_all(
-    settings: Settings, items: list[ExtractionItem], cache_path: Path, pause: float
+    settings: Settings,
+    items: list[ExtractionItem],
+    cache_path: Path,
+    pause: float,
+    cached_only: bool = False,
 ) -> tuple[dict[str, Any], str, str]:
     resolved = resolve_provider(settings)
     llm = build_llm_client(settings, resolved)
@@ -329,15 +334,25 @@ async def propose_all(
     print(f"Extraction model {resolved.preset.name}:{extractor.model}, prompt {prompt.key}")
     try:
         for n, item in enumerate(items, 1):
-            if item.id in cache and cache[item.id]["failure"] is None:
+            if item.id in cache and (cache[item.id]["failure"] is None or cached_only):
                 continue
+            if cached_only:
+                continue
+            failed_here: list[str] = []
             for attempt in range(8):
                 proposal = await extractor.propose(
                     [], item.history, trace_id=f"eval-{item.id}", conversation_id=uuid.uuid4()
                 )
-                retryable = proposal.failure in ("llm:rate_limited", "llm:overloaded", "timeout")
+                retryable = proposal.failure in (
+                    "llm:rate_limited",
+                    "llm:overloaded",
+                    "llm:timeout",
+                    "timeout",
+                )
                 if not retryable:
                     break
+                assert proposal.failure is not None
+                failed_here.append(proposal.failure)
                 wait = min(120, 10 * 2**attempt)
                 print(f"  {item.id}: {proposal.failure}, waiting {wait}s")
                 await asyncio.sleep(wait)
@@ -348,6 +363,7 @@ async def propose_all(
                 "earlier_failures": [
                     *earlier.get("earlier_failures", []),
                     *([earlier["failure"]] if earlier.get("failure") else []),
+                    *failed_here,
                 ],
                 "failure": proposal.failure,
                 "model_id": proposal.model_id,
@@ -396,7 +412,9 @@ def run_extraction(args: argparse.Namespace) -> int:
         f"extraction-{settings.generation_provider}-{model_key}-"
         f"{settings.memory_prompt_version}-{args.split}.json"
     )
-    cache, model, prompt_key = asyncio.run(propose_all(settings, items, cache_path, args.pause))
+    cache, model, prompt_key = asyncio.run(
+        propose_all(settings, items, cache_path, args.pause, args.cached_only)
+    )
     answered = [i for i in items if i.id in cache]
     now = datetime.now(UTC)
     kept: dict[str, list[str]] = {}
@@ -485,6 +503,11 @@ def main() -> int:
     extraction.add_argument("--split", choices=("dev", "test"), default="dev")
     extraction.add_argument("--limit", type=int, help="first N items only")
     extraction.add_argument("--pause", type=float, default=2.0, help="seconds between calls")
+    extraction.add_argument(
+        "--cached-only",
+        action="store_true",
+        help="score cached answers only (no model calls; failed items stay failed)",
+    )
     extraction.set_defaults(func=run_extraction)
     args = parser.parse_args()
     started = time.monotonic()

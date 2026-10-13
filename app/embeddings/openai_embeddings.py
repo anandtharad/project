@@ -28,7 +28,9 @@ class OpenAIEmbeddingClient:
         timeout_seconds: float,
         dimensions: int | None = None,
         base_url: str | None = None,
-        max_retries: int = 2,
+        # No SDK retries: retrieval runs inside a turn, and a retry honoring
+        # Retry-After could take longer than the whole turn's deadline.
+        max_retries: int = 0,
         http_client: httpx2.AsyncClient | None = None,
     ) -> None:
         self._client = openai.AsyncOpenAI(
@@ -55,14 +57,16 @@ class OpenAIEmbeddingClient:
                 encoding_format="float",
                 dimensions=self._dimensions if self._dimensions else openai.omit,
             )
+            data = sorted(response.data, key=lambda item: item.index)
+            if len(data) != len(texts):
+                raise EmbeddingError("openai embeddings: unexpected number of vectors")
+            return [normalized(item.embedding) for item in data]
+        except EmbeddingError:
+            raise
         except openai.APIStatusError as exc:
             raise EmbeddingError(f"openai embeddings: HTTP {exc.status_code}") from exc
-        except openai.APIError as exc:
+        except Exception as exc:  # transport errors and malformed bodies alike
             raise EmbeddingError(f"openai embeddings: {type(exc).__name__}") from exc
-        data = sorted(response.data, key=lambda item: item.index)
-        if len(data) != len(texts):
-            raise EmbeddingError("openai embeddings: unexpected number of vectors")
-        return [normalized(item.embedding) for item in data]
 
     def start(self) -> None:
         return None

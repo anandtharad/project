@@ -22,7 +22,7 @@ a later message (retrieval).
    the world, details only about other people, or instructions to the AI.
    Sensitive categories are labelled and not stored by default. Identifiers
    and secrets are never stored. This matches `app/memory/policy.py` and
-   prompt `memory_extraction@1.0.0`.
+   prompt `memory_extraction@1.0.0` (the set was written before 1.1.0).
 2. **Extraction items.** Two author agents wrote 75 items each. One wrote
    mostly positive and mixed messages (`ext-pos-*`). The other wrote mostly
    negative and hard ones (`ext-neg-*`): small talk, questions, momentary
@@ -65,10 +65,12 @@ All votes are kept in each row (`votes`).
 | Extraction: memory-level F1 (matched at 0.8) | 0.98 | |
 | Retrieval: memory relevant? (kappa, 218 active memories) | 0.96 | 0.97 / 0.95 |
 
-The majority changed the intended memories on 4 extraction items and the
-intended relevant set on 2 scenarios. There were 7 minority-only memories,
-almost all granularity choices (one annotator split "single dad with two
-daughters" into two memories, another kept it as one).
+The majority changed the intended memories on 5 extraction items (on four,
+two intended memories were merged into the one both annotators wrote; on
+one, the annotators' phrasing replaced the intended one) and the intended
+relevant set on 2 scenarios. There were 7 minority-only memories, almost all
+granularity choices (for example, one annotator added a second memory for a
+detail the other two left inside the first).
 
 **Read these numbers with care.** The annotators are AI models given the
 same guide, so their errors are correlated. High agreement shows the labels

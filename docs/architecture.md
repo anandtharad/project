@@ -42,7 +42,7 @@ HTTP request
 | Response policy | `app/orchestration/policy.py` | choosing the reply approach in code | wording (prompt fragments) |
 | Memory service | `app/memory/*` | retrieval for a turn, post-turn extraction, the eligibility policy, user-scoped storage, retention | what the reply says about memories (prompt) |
 | Embeddings | `app/embeddings/*` | vectors for memory search (local fastembed, OpenAI, Gemini) | storage |
-| Background tasks | `app/background.py` | post-turn work after the reply is saved; drained at shutdown | the turn's result |
+| Background tasks | `app/background.py` | post-turn work after the reply is saved; given 5 s at shutdown, then cancelled | the turn's result |
 
 Core invariant: nothing the model produces can trigger data access. The model
 has no tools, and ownership is checked in SQL (`get_owned_conversation`)

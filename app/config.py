@@ -146,7 +146,7 @@ class Settings(BaseSettings):
     memory_extraction_model: str | None = None
     memory_extraction_timeout_seconds: float = Field(default=20.0, gt=0, le=120)
     memory_extraction_max_output_tokens: int = Field(default=1024, ge=256, le=8192)
-    memory_prompt_version: str = "1.0.0"
+    memory_prompt_version: str = "1.1.0"
     memory_max_retrieved: int = Field(default=5, ge=1, le=20)
     # Minimum cosine similarity for a semantic match. 0.49 is the best F1 on
     # the memory evaluation set's dev split with the local bge-small-en-v1.5

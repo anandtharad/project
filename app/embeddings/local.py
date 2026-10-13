@@ -90,6 +90,11 @@ class LocalEmbeddingClient:
         """Begin loading (and on first run downloading) the model in the background."""
         if self._model is not None or (self._load is not None and not self._load.done()):
             return
+        load = self._load
+        if load is not None and not load.cancelled() and load.exception() is None:
+            # Loaded, but the done-callback has not run yet: use it, don't reload.
+            self._model = load.result()
+            return
         if (
             self._failed_at is not None
             and time.monotonic() - self._failed_at < RELOAD_AFTER_SECONDS
@@ -123,7 +128,8 @@ class LocalEmbeddingClient:
             return []
         if self._model is None:
             self.start()
-            raise EmbeddingError("local embedding model is not loaded yet")
+            if self._model is None:
+                raise EmbeddingError("local embedding model is not loaded yet")
         loop = asyncio.get_running_loop()
         try:
             vectors = await asyncio.wait_for(

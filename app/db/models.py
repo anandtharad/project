@@ -263,4 +263,6 @@ class UserMemorySettings(Base):
     )
     memory_enabled: Mapped[bool] = mapped_column(Boolean, server_default=text("true"))
     allow_sensitive: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
+    # Last "delete all": memories from messages sent before it are not stored.
+    memories_cleared_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

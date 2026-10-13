@@ -208,9 +208,11 @@ class MemoryService:
         retrieval: RetrievalParams,
         retention_days: int,
         max_per_turn: int = 3,
+        embedding_timeout_seconds: float = 10.0,
     ) -> None:
         self.store = store
         self._embeddings = embeddings
+        self._embedding_timeout = embedding_timeout_seconds
         # None: post-turn extraction is turned off (retrieval still works).
         self._extractor = extractor
         self._retrieval = retrieval
@@ -227,10 +229,21 @@ class MemoryService:
         if self._embeddings is None or not texts:
             return None
         try:
-            return await self._embeddings.embed(texts, kind=kind)
+            # Bounded here as well: retrieval runs inside the turn's deadline.
+            async with asyncio.timeout(self._embedding_timeout):
+                return await self._embeddings.embed(texts, kind=kind)
         except EmbeddingError as exc:
             log_event(logger, "memory.embedding_failed", level=logging.WARNING, detail=exc.message)
-            return None
+        except TimeoutError:
+            log_event(logger, "memory.embedding_failed", level=logging.WARNING, detail="timeout")
+        except Exception as exc:  # a client bug must not fail the turn
+            log_event(
+                logger,
+                "memory.embedding_failed",
+                level=logging.WARNING,
+                detail=f"unexpected:{type(exc).__name__}",
+            )
+        return None
 
     async def retrieve_for_turn(self, user_id: uuid.UUID, message: str) -> RetrievalResult:
         try:
@@ -301,7 +314,10 @@ class MemoryService:
         )
         counts: dict[str, int] = {}
         for d in decisions:
-            key = d.action if d.action != "reject" else f"reject:{d.reason}"
+            # Which sensitive category was found is itself sensitive: logs
+            # record only that something sensitive was rejected.
+            reason = "sensitive" if d.reason.startswith("sensitive:") else d.reason
+            key = d.action if d.action != "reject" else f"reject:{reason}"
             counts[key] = counts.get(key, 0) + 1
         kept = [d for d in decisions if d.action != "reject"]
         vectors = await self._embed([d.content for d in kept], "document")

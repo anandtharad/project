@@ -27,7 +27,7 @@ class MemoryType(StrEnum):
 class MemoryStatus(StrEnum):
     ACTIVE = "active"
     # Conflicts with an existing memory and the new information does not
-    # clearly supersede it: kept out of retrieval until the person confirms.
+    # clearly supersede it: retrieved only marked "unconfirmed" until confirmed.
     PENDING_CONFIRMATION = "pending_confirmation"
     SUPERSEDED = "superseded"  # replaced by a newer memory (provenance kept)
 
