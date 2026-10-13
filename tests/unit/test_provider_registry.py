@@ -264,3 +264,63 @@ def test_factory_passes_base_url_to_anthropic() -> None:
     settings = settings_for("anthropic", generation_base_url="https://gateway.example/anthropic")
     client = build_llm_client(settings, resolve_provider(settings))
     assert str(client._client.base_url).startswith("https://gateway.example/anthropic")  # type: ignore[attr-defined]
+
+
+def test_structured_output_presets_are_consistent() -> None:
+    for preset in PRESETS.values():
+        if preset.kind is AdapterKind.OPENAI_COMPATIBLE:
+            assert preset.structured_output != "adapter", preset.name
+        else:
+            assert preset.structured_output == "adapter", preset.name
+        assert preset.structured_require_parameters == (preset.name == "openrouter"), preset.name
+
+
+@pytest.mark.parametrize(
+    ("provider", "model", "expected"),
+    [
+        ("openai", None, "json_schema"),
+        ("openai", "gpt-4o-mini", "json_schema"),
+        ("openai", "gpt-4o-2024-08-06", "json_schema"),
+        ("openai", "gpt-4o-2024-05-13", "json_object"),
+        ("openai", "gpt-4-turbo", "json_object"),
+        ("openai", "gpt-3.5-turbo-0125", "json_object"),
+        ("xai", None, "json_schema"),
+        ("xai", "grok-4.7", "json_schema"),
+        ("qwen", None, "json_object"),
+        ("qwen", "qwen3.8-max", "json_object"),  # json_schema not offered in Singapore
+        ("deepseek", "deepseek-flash", "json_object"),
+        ("openrouter", "openai/gpt-oss-120b", "json_schema_best_effort"),
+        ("together", "openai/gpt-oss-120b", "json_schema_best_effort"),
+        ("mistral", None, "json_schema"),
+        ("mistral", "codestral-mamba-latest", "prompt"),
+        ("ollama", "llama3", "json_schema_best_effort"),
+        ("openai_compatible", None, "prompt"),
+        ("anthropic", None, "adapter"),
+        ("groq", None, "adapter"),
+        ("gemini", None, "adapter"),
+        ("fake", None, "adapter"),
+    ],
+)
+def test_structured_output_per_provider_and_model(
+    provider: str, model: str | None, expected: str
+) -> None:
+    overrides = {"generation_model": model} if model else {}
+    assert resolve_provider(settings_for(provider, **overrides)).structured_output == expected
+
+
+@pytest.mark.parametrize(
+    ("provider", "model", "style", "require_parameters"),
+    [
+        ("openai", "gpt-4-turbo", "json_object", False),
+        ("openrouter", "openai/gpt-oss-120b", "json_schema_best_effort", True),
+        ("openai_compatible", "m", "prompt", False),
+    ],
+)
+def test_factory_passes_structured_output_settings(
+    provider: str, model: str, style: str, require_parameters: bool
+) -> None:
+    settings = settings_for(provider, generation_model=model)
+    client = build_llm_client(settings, resolve_provider(settings))
+    assert isinstance(client, OpenAICompatibleLLMClient)
+    assert client._structured_output == style
+    assert client._structured_require_parameters is require_parameters

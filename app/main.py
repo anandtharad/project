@@ -34,9 +34,6 @@ from app.state.extractor import StateExtractor
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 COMPANION_PROMPT_ID = "companion_system"
 STATE_PROMPT_ID = "state_extraction"
-# Groq's free tier limits requests and tokens per model, so state extraction
-# uses a different (smaller, faster) model than replies by default.
-_DEFAULT_STATE_MODELS = {"groq": "openai/gpt-oss-20b"}
 
 logger = logging.getLogger("app")
 
@@ -50,11 +47,10 @@ def migration_head() -> str:
 
 
 def state_extraction_model(settings: Settings, resolved: ResolvedProvider) -> str:
-    if settings.state_extraction_model:
-        return settings.state_extraction_model
-    if settings.generation_model is None:
-        return _DEFAULT_STATE_MODELS.get(settings.generation_provider, resolved.model)
-    return resolved.model
+    # The reply model by default. A smaller model is not a safe default: on
+    # Groq, openai/gpt-oss-20b failed Groq's own schema validation
+    # (json_validate_failed) in 5 of 5 live extraction runs on 2026-10-13.
+    return settings.state_extraction_model or resolved.model
 
 
 def build_state_extractor(

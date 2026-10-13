@@ -15,7 +15,11 @@ import anthropic
 import httpx2
 import pytest
 
-from app.llm.providers.anthropic_provider import FALLBACK_BETA, AnthropicLLMClient
+from app.llm.providers.anthropic_provider import (
+    FALLBACK_BETA,
+    AnthropicLLMClient,
+    supports_json_outputs,
+)
 from app.llm.schemas import (
     ChatMessage,
     ChatRole,
@@ -25,8 +29,12 @@ from app.llm.schemas import (
     GenerationRequest,
     LLMError,
     LLMErrorCategory,
+    ResponseSchema,
+    StructuredMode,
     TraceMetadata,
 )
+from app.llm.structured import schema_instruction
+from tests.unit.structured_fixtures import STATE_JSON, STATE_SCHEMA, fenced, state_schema
 
 Handler = Callable[[httpx2.Request], httpx2.Response]
 
@@ -306,3 +314,136 @@ async def test_missing_credentials_map_to_authentication_error(
     with pytest.raises(LLMError) as info:
         await AnthropicLLMClient(client=sdk).generate(make_request())
     assert info.value.category is LLMErrorCategory.AUTHENTICATION
+
+
+# --- structured output ---
+
+JSON_FORMAT = {"type": "json_schema", "schema": STATE_SCHEMA}
+
+
+def structured_request(
+    schema: ResponseSchema, model: str = "claude-opus-5-5", **params: Any
+) -> GenerationRequest:
+    return make_request(**params).model_copy(update={"response_schema": schema, "model": model})
+
+
+def json_reply(text: str, **overrides: Any) -> Recorder:
+    content = [{"type": "text", "text": text}]
+    return Recorder(httpx2.Response(200, json=message_json(content=content, **overrides)))
+
+
+@pytest.mark.parametrize(
+    ("model", "supported"),
+    [
+        ("claude-opus-5-5", True),
+        ("claude-haiku-5-5", True),
+        ("claude-sonnet-4-5", True),
+        ("claude-sonnet-4-5-20250929", True),
+        ("claude-haiku-4-5-20251001", True),
+        ("claude-opus-4-1", False),
+        ("claude-sonnet-4-20250514", False),
+        ("claude-3-5-haiku-20241022", False),
+        ("claude-opus-5-9", False),  # not listed yet: prompted until verified
+    ],
+)
+def test_json_output_model_support(model: str, supported: bool) -> None:
+    assert supports_json_outputs(model) is supported
+
+
+async def test_json_output_request_keeps_effort_and_fallback() -> None:
+    recorder = json_reply(STATE_JSON)
+    response = await make_client(recorder).generate(
+        structured_request(state_schema(), effort="low")
+    )
+    sent = recorder.requests[-1]
+    # Structured outputs are GA: only the fallback beta header is sent.
+    assert sent.headers["anthropic-beta"] == FALLBACK_BETA
+    body = recorder.body
+    assert body["output_config"] == {"effort": "low", "format": JSON_FORMAT}
+    assert body["system"] == "SYSTEM PROMPT"
+    assert body["fallbacks"] == "default"
+    assert "output_format" not in body
+    assert response.content == STATE_JSON
+    assert response.structured_mode is StructuredMode.NATIVE_STRICT
+
+
+async def test_json_output_without_effort_or_fallback() -> None:
+    recorder = json_reply(STATE_JSON)
+    client = make_client(recorder, refusal_fallback="off")
+    await client.generate(structured_request(state_schema(), temperature=0.2))
+    body = recorder.body
+    assert body["output_config"] == {"format": JSON_FORMAT}
+    assert body["temperature"] == 0.2
+    assert "anthropic-beta" not in recorder.requests[-1].headers
+    assert "fallbacks" not in body
+
+
+@pytest.mark.parametrize(
+    ("model", "strict"), [("claude-opus-5-5", False), ("claude-opus-4-1", True)]
+)
+async def test_non_strict_or_unlisted_model_is_prompted(model: str, strict: bool) -> None:
+    recorder = json_reply(fenced(STATE_JSON), model=model)
+    response = await make_client(recorder).generate(
+        structured_request(state_schema(strict=strict), model, effort="medium")
+    )
+    body = recorder.body
+    assert body["output_config"] == {"effort": "medium"}
+    assert body["system"] == "SYSTEM PROMPT\n\n" + schema_instruction(state_schema())
+    assert response.content == STATE_JSON  # fence removed
+    assert response.structured_mode is StructuredMode.PROMPTED
+
+
+async def test_request_without_schema_is_unchanged() -> None:
+    recorder = Recorder()
+    response = await make_client(recorder).generate(make_request(effort="low"))
+    body = recorder.body
+    assert body["output_config"] == {"effort": "low"}
+    assert body["system"] == "SYSTEM PROMPT"
+    assert response.structured_mode is None
+
+
+async def test_fallback_served_json_output() -> None:
+    # Non-streaming: the fallback model answers from scratch, so the reply is
+    # the fallback model's JSON only.
+    content = [
+        {
+            "type": "fallback",
+            "from": {"model": "claude-opus-5-5"},
+            "to": {"model": "claude-opus-5"},
+            "trigger": {"type": "refusal", "category": "cyber"},
+        },
+        {"type": "text", "text": STATE_JSON},
+    ]
+    recorder = Recorder(
+        httpx2.Response(200, json=message_json(model="claude-opus-5", content=content))
+    )
+    response = await make_client(recorder).generate(structured_request(state_schema()))
+    assert response.content == STATE_JSON
+    assert response.fallback_used is True
+    assert response.model_id == "claude-opus-5"
+    assert response.structured_mode is StructuredMode.NATIVE_STRICT
+
+
+async def test_structured_refusal_is_reported() -> None:
+    recorder = json_reply("I can't help with that.", stop_reason="refusal")
+    response = await make_client(recorder).generate(structured_request(state_schema()))
+    assert response.finish_reason is FinishReason.REFUSAL
+    assert response.structured_mode is StructuredMode.NATIVE_STRICT
+
+
+async def test_too_complex_schema_is_an_invalid_request() -> None:
+    def handler(_: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(
+            400,
+            json={
+                "type": "error",
+                "error": {
+                    "type": "invalid_request_error",
+                    "message": "Schema is too complex for compilation.",
+                },
+            },
+        )
+
+    with pytest.raises(LLMError) as info:
+        await make_client(handler).generate(structured_request(state_schema()))
+    assert info.value.category is LLMErrorCategory.INVALID_REQUEST

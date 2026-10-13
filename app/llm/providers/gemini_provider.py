@@ -17,6 +17,17 @@ Verified against google-genai 2.29.0 source and an offline mock run:
   `json.JSONDecodeError`.
 - `vertexai=False` is passed explicitly so GOOGLE_GENAI_USE_VERTEXAI in the
   environment cannot switch the client to Vertex AI.
+- Structured output: `response_mime_type="application/json"` plus
+  `response_json_schema` (raw JSON Schema dict, passed through unchanged).
+  The current REST docs prefer a newer `responseFormat` field, but this SDK
+  version has none on `GenerateContentConfig` (its `ResponseFormat` type is
+  marked unsupported in the Gemini API), and the REST reference still lists
+  `responseJsonSchema` (deprecated, not removed). Gemini enforces the schema
+  (type arrays with "null", `anyOf`, string `enum`, `required`,
+  `additionalProperties`) on the 2.5 and 3.x models it lists; there is no
+  strict switch, so a non-strict request uses JSON mode (mime type only)
+  with the schema in the instruction. Other models (2.0 needs an explicit
+  `propertyOrdering`; Gemma is not listed) are prompted.
 """
 
 from __future__ import annotations
@@ -38,7 +49,16 @@ from app.llm.schemas import (
     GenerationResponse,
     LLMError,
     LLMErrorCategory,
+    ResponseSchema,
+    StructuredMode,
     TokenUsage,
+)
+from app.llm.structured import (
+    JSON_MODE_PLAN,
+    PROMPTED_PLAN,
+    StructuredPlan,
+    finish_structured,
+    system_with_schema,
 )
 
 _REFUSAL_REASONS = {
@@ -105,6 +125,16 @@ def thinking_config(
     return None  # unknown family: leave the model's default
 
 
+def structured_plan(model: str, schema: ResponseSchema) -> StructuredPlan:
+    if model_generation(model) == "other":
+        return PROMPTED_PLAN
+    if schema.strict:
+        return StructuredPlan(
+            StructuredMode.NATIVE_STRICT, native="schema", in_instruction=False, strict=True
+        )
+    return JSON_MODE_PLAN
+
+
 class GeminiLLMClient:
     def __init__(
         self,
@@ -149,12 +179,22 @@ class GeminiLLMClient:
             )
             for m in request.messages
         ]
+        schema = request.response_schema
+        plan = structured_plan(request.model, schema) if schema is not None else None
+        system = request.system
+        if schema is not None and plan is not None:
+            system = system_with_schema(request.system, schema, plan)
         config = types.GenerateContentConfig(
-            system_instruction=request.system,
+            system_instruction=system,
             max_output_tokens=request.max_output_tokens,
             temperature=request.params.temperature,
             thinking_config=thinking_config(
                 request.model, request.params.effort, request.max_output_tokens
+            ),
+            # None values are omitted from the request body.
+            response_mime_type="application/json" if plan and plan.native else None,
+            response_json_schema=(
+                schema.json_schema if schema and plan and plan.native == "schema" else None
             ),
             http_options=types.HttpOptions(
                 timeout=int(request.timeout_seconds * 1000), retry_options=self._retry
@@ -178,8 +218,11 @@ class GeminiLLMClient:
                 LLMErrorCategory.RESPONSE_INVALID, "Provider returned an unexpected response."
             ) from exc
         latency_ms = (time.perf_counter() - started) * 1000
-        return normalize_gemini_response(
-            response, requested_model=request.model, latency_ms=latency_ms
+        return finish_structured(
+            normalize_gemini_response(
+                response, requested_model=request.model, latency_ms=latency_ms
+            ),
+            plan,
         )
 
 

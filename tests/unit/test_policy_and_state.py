@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 
 from app.context.builder import ContextBuilder, render_notes
-from app.decisions.questions import CONVERSATION_MODE, QUESTIONS, RESPONSE_STRATEGY
+from app.decisions.questions import QUESTIONS, RESPONSE_STRATEGY
 from app.decisions.schemas import DecisionResult, DecisionSet, FallbackReason, ValidationStatus
 from app.llm.providers.registry import resolve_provider
 from app.llm.schemas import (
@@ -223,13 +223,10 @@ async def test_extractor_times_out() -> None:
     assert result.failure == "timeout"
 
 
-def test_groq_extraction_defaults_to_a_separate_free_tier_model() -> None:
+def test_extraction_uses_the_reply_model_unless_configured() -> None:
     groq = make_settings(generation_provider="groq", groq_api_key="gsk_x")
-    assert state_extraction_model(groq, resolve_provider(groq)) == "openai/gpt-oss-20b"
-    pinned = make_settings(
-        generation_provider="groq", groq_api_key="gsk_x", generation_model="qwen/qwen3.8-27b"
+    assert state_extraction_model(groq, resolve_provider(groq)) == "openai/gpt-oss-120b"
+    explicit = make_settings(
+        generation_provider="groq", groq_api_key="gsk_x", state_extraction_model="qwen/qwen3.8-27b"
     )
-    assert state_extraction_model(pinned, resolve_provider(pinned)) == "qwen/qwen3.8-27b"
-    explicit = make_settings(state_extraction_model="tiny")
-    assert state_extraction_model(explicit, resolve_provider(explicit)) == "tiny"
-    assert CONVERSATION_MODE.fallback == "other"
+    assert state_extraction_model(explicit, resolve_provider(explicit)) == "qwen/qwen3.8-27b"

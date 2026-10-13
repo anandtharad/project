@@ -76,6 +76,10 @@ def build_llm_client(settings: Settings, resolved: ResolvedProvider) -> LLMClien
                 if preset.effort_param in ("reasoning_effort", "enable_thinking")
                 else "none"
             ),
+            structured_output=(
+                resolved.structured_output if resolved.structured_output != "adapter" else "prompt"
+            ),
+            structured_require_parameters=preset.structured_require_parameters,
             send_openai_headers=preset.send_openai_headers,
         )
     raise ProviderConfigError(

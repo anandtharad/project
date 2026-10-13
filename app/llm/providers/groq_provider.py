@@ -15,23 +15,46 @@ Verified against groq 1.7.0 and Groq's docs (models, reasoning, errors):
 - The request ID is `x_groq.id` in the body.
 - Reasoning is never read from `message.reasoning`, and inline <think> blocks
   are stripped defensively.
+- Structured outputs (console.groq.com/docs/structured-outputs): `json_schema`
+  with `strict: true` (constrained decoding) only on the models in
+  `STRICT_SCHEMA_MODELS`; best-effort (`strict: false`) also on
+  `BEST_EFFORT_SCHEMA_MODELS`; JSON Object Mode on all models, so every other
+  model gets `json_object` with the schema in the instruction. Strict mode
+  needs every property required and `additionalProperties: false`, and
+  supports type arrays with "null", `anyOf`, `enum`, `$defs`/`$ref`.
+  Streaming and tool use are not supported with it (neither is used here).
+  The reasoning controls above stay as they are: JSON modes require
+  `reasoning_format` parsed or hidden, and qwen always sends hidden.
 """
 
 from __future__ import annotations
 
 import time
-from typing import Literal, cast
+from typing import Any, Literal, cast
 
 import groq
 from groq import omit
-from groq.types.chat import ChatCompletionMessageParam
+from groq.types.chat import ChatCompletionMessageParam, completion_create_params
 
 from app.llm.providers.chat_completions import (
     build_messages,
+    build_response_format,
     classify_sdk_error,
     normalize_chat_completion,
 )
-from app.llm.schemas import Effort, GenerationRequest, GenerationResponse
+from app.llm.schemas import (
+    Effort,
+    GenerationRequest,
+    GenerationResponse,
+    ResponseSchema,
+    StructuredMode,
+)
+from app.llm.structured import (
+    StructuredPlan,
+    chat_plan,
+    finish_structured,
+    system_with_schema,
+)
 
 GroqEffort = Literal["none", "default", "low", "medium", "high"]
 
@@ -61,6 +84,21 @@ def model_family(model: str) -> Literal["gpt-oss", "qwen", "other"]:
     if name.startswith("qwen/"):
         return "qwen"
     return "other"
+
+
+# Groq's structured-outputs model tables (strict mode / best-effort mode).
+STRICT_SCHEMA_MODELS = frozenset({"openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.8-27b"})
+BEST_EFFORT_SCHEMA_MODELS = STRICT_SCHEMA_MODELS | {"openai/gpt-oss-safeguard-20b"}
+
+
+def structured_plan(model: str, schema: ResponseSchema) -> StructuredPlan:
+    name = model.lower()
+    if name in STRICT_SCHEMA_MODELS:
+        return chat_plan("json_schema", schema)
+    if name in BEST_EFFORT_SCHEMA_MODELS:
+        # Listed for best-effort mode only, so strict is never requested.
+        return StructuredPlan(StructuredMode.NATIVE, native="schema", in_instruction=False)
+    return chat_plan("json_object", schema)
 
 
 class GroqLLMClient:
@@ -100,13 +138,21 @@ class GroqLLMClient:
             # reasoning controls rejects it (surfaced as invalid_request).
             reasoning_effort = _QWEN_EFFORT[effort]
 
+        schema = request.response_schema
+        plan = structured_plan(request.model, schema) if schema is not None else None
+        system = request.system
+        response_format: dict[str, Any] | None = None
+        if schema is not None and plan is not None:
+            system = system_with_schema(request.system, schema, plan)
+            response_format = build_response_format(schema, plan)
+
         started = time.perf_counter()
         try:
             response = await self._client.chat.completions.create(
                 model=request.model,
                 messages=cast(
                     "list[ChatCompletionMessageParam]",
-                    build_messages(request.system, request.messages),
+                    build_messages(system, request.messages),
                 ),
                 max_completion_tokens=request.max_output_tokens,
                 temperature=(
@@ -115,16 +161,24 @@ class GroqLLMClient:
                 reasoning_effort=reasoning_effort if reasoning_effort is not None else omit,
                 include_reasoning=include_reasoning if include_reasoning is not None else omit,
                 reasoning_format=reasoning_format if reasoning_format is not None else omit,
+                response_format=(
+                    cast("completion_create_params.ResponseFormat", response_format)
+                    if response_format is not None
+                    else omit
+                ),
                 timeout=request.timeout_seconds,
             )
         except groq.GroqError as exc:
             raise classify_sdk_error(exc, groq) from exc
         latency_ms = (time.perf_counter() - started) * 1000
         request_id = response.x_groq.id if response.x_groq is not None else None
-        return normalize_chat_completion(
-            response,
-            provider=self.provider,
-            requested_model=request.model,
-            latency_ms=latency_ms,
-            request_id=request_id,
+        return finish_structured(
+            normalize_chat_completion(
+                response,
+                provider=self.provider,
+                requested_model=request.model,
+                latency_ms=latency_ms,
+                request_id=request_id,
+            ),
+            plan,
         )

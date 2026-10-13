@@ -9,6 +9,15 @@ Request shape follows the SDK's typed `beta.messages.create` signature:
 - `fallbacks="default"` with the `server-side-fallback-2026-07-01` beta opts
   into provider-side retry on another model when the requested model declines
   for policy reasons. The model that actually served the request is recorded.
+- Structured output (generally available, no beta header):
+  `output_config.format = {"type": "json_schema", "schema": ...}` uses
+  constrained decoding on the models in `JSON_OUTPUT_MODELS`. Every object
+  must set `additionalProperties: false`; type arrays with "null", `anyOf`
+  and `enum` are supported (at most 16 union-typed properties per request).
+  There is no non-strict variant, so non-strict requests and other models
+  are prompted. Server-side fallback stays on: on a non-streaming request
+  the fallback model answers from scratch (the declined partial output is
+  omitted), so the reply is never a mix of two models' JSON.
 
 Transient errors (connection, 408/409/429/5xx) are retried by the SDK itself
 with backoff that honors `retry-after`; the orchestrator bounds the total time.
@@ -16,6 +25,7 @@ with backoff that honors `retry-after`; the orchestrator bounds the total time.
 
 from __future__ import annotations
 
+import re
 import time
 from typing import Literal
 
@@ -39,10 +49,57 @@ from app.llm.schemas import (
     GenerationResponse,
     LLMError,
     LLMErrorCategory,
+    ResponseSchema,
+    StructuredMode,
     TokenUsage,
+)
+from app.llm.structured import (
+    PROMPTED_PLAN,
+    StructuredPlan,
+    finish_structured,
+    system_with_schema,
 )
 
 FALLBACK_BETA = "server-side-fallback-2026-07-01"
+
+# Models documented to support JSON outputs (structured outputs page,
+# supportedModels). A dated snapshot of a listed id matches too; anything
+# else (older or not yet listed models) is prompted.
+JSON_OUTPUT_MODELS = frozenset(
+    {
+        "claude-fable-5-1",
+        "claude-fable-5",
+        "claude-mythos-5-1",
+        "claude-mythos-5",
+        "claude-mythos-preview",
+        "claude-opus-5-5",
+        "claude-opus-5",
+        "claude-opus-4-8",
+        "claude-opus-4-7",
+        "claude-opus-4-6",
+        "claude-opus-4-5",
+        "claude-sonnet-5-5",
+        "claude-sonnet-5",
+        "claude-sonnet-4-6",
+        "claude-sonnet-4-5",
+        "claude-haiku-5-5",
+        "claude-haiku-4-5",
+    }
+)
+_SNAPSHOT_SUFFIX = re.compile(r"-\d{8}\Z")
+
+
+def supports_json_outputs(model: str) -> bool:
+    return _SNAPSHOT_SUFFIX.sub("", model.lower()) in JSON_OUTPUT_MODELS
+
+
+def structured_plan(model: str, schema: ResponseSchema) -> StructuredPlan:
+    if schema.strict and supports_json_outputs(model):
+        return StructuredPlan(
+            StructuredMode.NATIVE_STRICT, native="schema", in_instruction=False, strict=True
+        )
+    return PROMPTED_PLAN
+
 
 _FINISH_REASONS: dict[str, FinishReason] = {
     "end_turn": FinishReason.STOP,
@@ -83,20 +140,27 @@ class AnthropicLLMClient:
             for m in request.messages
         ]
         effort = request.params.effort
-        # Current Claude models always think adaptively; "none" maps to the
-        # lowest effort level they accept.
-        output_config: BetaOutputConfigParam | None = (
-            {"effort": "low" if effort == "none" else effort} if effort else None
-        )
+        output_config: BetaOutputConfigParam = {}
+        if effort:
+            # Current Claude models always think adaptively; "none" maps to
+            # the lowest effort level they accept.
+            output_config["effort"] = "low" if effort == "none" else effort
+        schema = request.response_schema
+        plan = structured_plan(request.model, schema) if schema is not None else None
+        system = request.system
+        if schema is not None and plan is not None:
+            system = system_with_schema(request.system, schema, plan)
+            if plan.native == "schema":
+                output_config["format"] = {"type": "json_schema", "schema": schema.json_schema}
         use_fallback = self._refusal_fallback == "default"
         started = time.perf_counter()
         try:
             response = await self._client.beta.messages.create(
                 model=request.model,
                 max_tokens=request.max_output_tokens,
-                system=request.system,
+                system=system,
                 messages=messages,
-                output_config=output_config if output_config is not None else omit,
+                output_config=output_config if output_config else omit,
                 fallbacks="default" if use_fallback else omit,
                 betas=[FALLBACK_BETA] if use_fallback else omit,
                 extra_body=(
@@ -114,7 +178,10 @@ class AnthropicLLMClient:
                 LLMErrorCategory.AUTHENTICATION, "Provider credentials could not be resolved."
             ) from exc
         latency_ms = (time.perf_counter() - started) * 1000
-        return normalize_response(response, requested_model=request.model, latency_ms=latency_ms)
+        return finish_structured(
+            normalize_response(response, requested_model=request.model, latency_ms=latency_ms),
+            plan,
+        )
 
 
 def normalize_response(

@@ -11,6 +11,10 @@ Adapter kinds:
 - gemini: official `google-genai` SDK
 - openai_compatible: official `openai` SDK; used for OpenAI itself and for
   providers whose official docs state OpenAI SDK compatibility.
+
+Structured output (JSON Schema replies) is a preset field for
+openai_compatible presets, resolved per model; native adapters choose per
+model themselves. docs/providers.md records each choice and its source.
 """
 
 from __future__ import annotations
@@ -20,6 +24,12 @@ from enum import StrEnum
 from typing import Literal
 
 from app.config import Effort, ProviderName, Settings
+from app.llm.structured import ChatStructuredOutput
+
+# How a response_schema is requested: an openai_compatible style (see
+# app/llm/structured.py), or "adapter" for native adapters, which decide
+# per model themselves (documented in docs/providers.md).
+StructuredOutput = Literal["adapter"] | ChatStructuredOutput
 
 
 class AdapterKind(StrEnum):
@@ -68,6 +78,12 @@ class ProviderPreset:
     # OpenAI-only headers (organization, project, OPENAI_CUSTOM_HEADERS) are
     # stripped for every other endpoint so they never leak to third parties.
     send_openai_headers: bool = False
+    # Structured output support from the provider's docs; per-model
+    # exceptions live in _MODEL_STRUCTURED_OUTPUT.
+    structured_output: StructuredOutput = "adapter"
+    # OpenRouter ignores parameters an upstream endpoint lacks unless
+    # provider.require_parameters is set; structured requests set it.
+    structured_require_parameters: bool = False
 
 
 PRESETS: dict[str, ProviderPreset] = {
@@ -102,6 +118,8 @@ PRESETS: dict[str, ProviderPreset] = {
             system_role="developer",
             effort_param="reasoning_effort",
             send_openai_headers=True,
+            # Structured Outputs (strict json_schema); older models: overrides.
+            structured_output="json_schema",
         ),
         ProviderPreset(
             name="groq",
@@ -151,6 +169,8 @@ PRESETS: dict[str, ProviderPreset] = {
             # xAI rejects OpenAI-only values ("minimal", "max"); "xhigh" only on
             # some models, so it is clamped to "high".
             effort_values=("none", "low", "medium", "high"),
+            # Documented as guaranteed to match supported schema features.
+            structured_output="json_schema",
         ),
         ProviderPreset(
             name="qwen",
@@ -168,6 +188,9 @@ PRESETS: dict[str, ProviderPreset] = {
             # Covers reasoning + answer; DashScope deprecated max_tokens.
             max_tokens_param="max_completion_tokens",
             effort_param="enable_thinking",
+            # JSON Schema mode exists only for some qwen3.7/3.8 models and not
+            # in the Singapore region; JSON Object mode covers most models.
+            structured_output="json_object",
         ),
         ProviderPreset(
             name="deepseek",
@@ -182,6 +205,8 @@ PRESETS: dict[str, ProviderPreset] = {
             max_tokens_param="max_tokens",
             effort_param="reasoning_effort",
             effort_values=("none", "low", "high", "max"),
+            # response_format accepts only "text" and "json_object".
+            structured_output="json_object",
         ),
         ProviderPreset(
             name="openrouter",
@@ -194,6 +219,10 @@ PRESETS: dict[str, ProviderPreset] = {
             max_tokens_param="max_tokens",
             # OpenRouter's reasoning control is its own `reasoning` object.
             effort_param="unsupported",
+            # Enforcement varies by upstream endpoint ("not guaranteed on every
+            # endpoint"); require_parameters keeps it from being ignored.
+            structured_output="json_schema_best_effort",
+            structured_require_parameters=True,
         ),
         ProviderPreset(
             name="together",
@@ -205,6 +234,9 @@ PRESETS: dict[str, ProviderPreset] = {
             docs_url="https://docs.together.ai/docs/openai-api-compatibility",
             max_tokens_param="max_tokens",
             effort_param="unsupported",
+            # Supported models only; the docs say to also put the schema in
+            # the prompt.
+            structured_output="json_schema_best_effort",
         ),
         ProviderPreset(
             name="mistral",
@@ -212,7 +244,8 @@ PRESETS: dict[str, ProviderPreset] = {
             extra="openai",
             # Mistral documents the OpenAI SDK path (migration guide); its
             # request schema rejects unknown fields, and this adapter only
-            # sends model, messages, max_tokens, temperature, reasoning_effort.
+            # sends model, messages, max_tokens, temperature, reasoning_effort
+            # and (structured requests only) response_format.
             default_model="mistral-large-latest",
             base_url="https://api.mistral.ai/v1",
             api_key_setting="mistral_api_key",
@@ -220,6 +253,8 @@ PRESETS: dict[str, ProviderPreset] = {
             max_tokens_param="max_tokens",
             effort_param="reasoning_effort",
             effort_values=("none", "high"),
+            # JSON schema mode "guarantees" the schema (API reference).
+            structured_output="json_schema",
         ),
         ProviderPreset(
             name="ollama",
@@ -234,6 +269,9 @@ PRESETS: dict[str, ProviderPreset] = {
             max_tokens_param="max_tokens",
             effort_param="reasoning_effort",
             effort_values=("none", "low", "medium", "high", "max"),
+            # Mapped to Ollama's `format`; the docs advise repeating the schema
+            # in the prompt, and Ollama's cloud does not support it.
+            structured_output="json_schema_best_effort",
         ),
         ProviderPreset(
             name="openai_compatible",
@@ -247,6 +285,8 @@ PRESETS: dict[str, ProviderPreset] = {
             # The most widely accepted field across compatible servers.
             max_tokens_param="max_tokens",
             effort_param="unsupported",
+            # Unknown server: describe the schema in the instruction only.
+            structured_output="prompt",
         ),
         ProviderPreset(
             name="fake",
@@ -276,6 +316,7 @@ class ResolvedProvider:
     api_key: str | None = None
     effort: Effort | None = None
     warnings: tuple[str, ...] = ()
+    structured_output: StructuredOutput = "adapter"
 
     def __repr__(self) -> str:  # never expose the key
         return (
@@ -293,6 +334,28 @@ _MODEL_EFFORT_VALUES: dict[str, tuple[Effort, ...]] = {
     "gpt-6-astra": ("low", "medium", "high", "xhigh", "max"),
     "gpt-6.1-sol": ("low", "medium", "high", "xhigh", "max"),
 }
+
+
+# Models documented to lack their preset's structured output mode (matched
+# by name prefix, first match wins).
+_MODEL_STRUCTURED_OUTPUT: dict[str, tuple[tuple[str, ChatStructuredOutput], ...]] = {
+    # json_schema needs gpt-4o-mini / gpt-4o-2024-08-06 or later; JSON mode
+    # covers gpt-3.5-turbo and gpt-4-*.
+    "openai": (
+        ("gpt-3.5-turbo", "json_object"),
+        ("gpt-4-", "json_object"),
+        ("gpt-4o-2024-05-13", "json_object"),
+    ),
+    # Every current Mistral model supports both modes except codestral-mamba.
+    "mistral": (("codestral-mamba", "prompt"),),
+}
+
+
+def structured_output_for(preset: ProviderPreset, model: str) -> StructuredOutput:
+    for prefix, style in _MODEL_STRUCTURED_OUTPUT.get(preset.name, ()):
+        if model.startswith(prefix):
+            return style
+    return preset.structured_output
 
 
 def _accepted_efforts(preset: ProviderPreset, model: str) -> tuple[Effort, ...]:
@@ -395,4 +458,5 @@ def resolve_provider(settings: Settings) -> ResolvedProvider:
         api_key=api_key,
         effort=effort,
         warnings=tuple(warnings),
+        structured_output=structured_output_for(preset, model),
     )

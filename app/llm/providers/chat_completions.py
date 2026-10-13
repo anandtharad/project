@@ -21,8 +21,10 @@ from app.llm.schemas import (
     GenerationResponse,
     LLMError,
     LLMErrorCategory,
+    ResponseSchema,
     TokenUsage,
 )
+from app.llm.structured import StructuredPlan
 
 _FINISH_REASONS: dict[str, FinishReason] = {
     "stop": FinishReason.STOP,
@@ -59,6 +61,27 @@ def build_messages(
     return [{"role": system_role, "content": system}] + [
         {"role": roles[m.role], "content": m.content} for m in messages
     ]
+
+
+def build_response_format(schema: ResponseSchema, plan: StructuredPlan) -> dict[str, Any] | None:
+    """The Chat Completions `response_format` for a structured request.
+
+    Same shape in the `openai` and `groq` SDKs (and every compatible server
+    that documents structured outputs): `json_schema` carries name, schema
+    and strict; `json_object` carries nothing else.
+    """
+    if plan.native == "schema":
+        return {
+            "type": "json_schema",
+            "json_schema": {
+                "name": schema.name,
+                "schema": schema.json_schema,
+                "strict": plan.strict,
+            },
+        }
+    if plan.native == "json":
+        return {"type": "json_object"}
+    return None
 
 
 def _content_text(content: Any) -> str:

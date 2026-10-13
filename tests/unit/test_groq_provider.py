@@ -15,7 +15,7 @@ import groq
 import httpx
 import pytest
 
-from app.llm.providers.groq_provider import GroqLLMClient, model_family
+from app.llm.providers.groq_provider import GroqLLMClient, model_family, structured_plan
 from app.llm.schemas import (
     ChatMessage,
     ChatRole,
@@ -25,8 +25,12 @@ from app.llm.schemas import (
     GenerationRequest,
     LLMError,
     LLMErrorCategory,
+    ResponseSchema,
+    StructuredMode,
     TraceMetadata,
 )
+from app.llm.structured import schema_instruction
+from tests.unit.structured_fixtures import STATE_JSON, STATE_SCHEMA, fenced, state_schema
 
 Handler = Callable[[httpx.Request], httpx.Response]
 
@@ -327,3 +331,146 @@ async def test_sdk_debug_logging_never_records_message_content(
     assert "capture-sentinel" in joined  # proves DEBUG records are being captured
     assert "I had a rough day." not in joined
     assert "SYSTEM PROMPT" not in joined
+
+
+# --- structured output ---
+
+
+def structured_request(
+    schema: ResponseSchema, model: str = "openai/gpt-oss-120b", **params: Any
+) -> GenerationRequest:
+    return make_request(model, **params).model_copy(update={"response_schema": schema})
+
+
+def json_reply(content: str, model: str = "openai/gpt-oss-120b") -> Recorder:
+    return Recorder(httpx.Response(200, json=completion_json(content, model=model)))
+
+
+@pytest.mark.parametrize(
+    ("model", "strict", "expected"),
+    [
+        ("openai/gpt-oss-120b", True, ("schema", True, StructuredMode.NATIVE_STRICT)),
+        ("openai/gpt-oss-20b", True, ("schema", True, StructuredMode.NATIVE_STRICT)),
+        ("qwen/qwen3.8-27b", True, ("schema", True, StructuredMode.NATIVE_STRICT)),
+        ("openai/gpt-oss-120b", False, ("schema", False, StructuredMode.NATIVE)),
+        ("openai/gpt-oss-safeguard-20b", True, ("schema", False, StructuredMode.NATIVE)),
+        ("minimaxai/minimax-m2.7", True, ("json", False, StructuredMode.NATIVE)),
+        ("llama-3.1-8b-instant", False, ("json", False, StructuredMode.NATIVE)),
+    ],
+)
+def test_structured_plan_follows_groq_model_tables(
+    model: str, strict: bool, expected: tuple[str, bool, StructuredMode]
+) -> None:
+    plan = structured_plan(model, state_schema(strict=strict))
+    assert (plan.native, plan.strict, plan.mode) == expected
+    assert plan.in_instruction is (plan.native == "json")
+
+
+@pytest.mark.parametrize("model", ["openai/gpt-oss-120b", "openai/gpt-oss-20b"])
+async def test_strict_json_schema_request_keeps_reasoning_hidden(model: str) -> None:
+    recorder = json_reply(STATE_JSON, model)
+    response = await make_client(recorder).generate(
+        structured_request(state_schema(), model, effort="low")
+    )
+    body = recorder.body
+    assert body["response_format"] == {
+        "type": "json_schema",
+        "json_schema": {"name": "conversation_state", "schema": STATE_SCHEMA, "strict": True},
+    }
+    assert body["messages"][0] == {"role": "system", "content": "SYSTEM PROMPT"}
+    assert body["include_reasoning"] is False
+    assert body["reasoning_effort"] == "low"
+    for absent in ("reasoning_format", "stream", "tools"):
+        assert absent not in body
+    assert response.content == STATE_JSON
+    assert response.structured_mode is StructuredMode.NATIVE_STRICT
+
+
+async def test_qwen_strict_request_uses_hidden_reasoning_format() -> None:
+    recorder = json_reply(STATE_JSON, "qwen/qwen3.8-27b")
+    response = await make_client(recorder).generate(
+        structured_request(state_schema(), "qwen/qwen3.8-27b", effort="none")
+    )
+    body = recorder.body
+    assert body["response_format"]["json_schema"]["strict"] is True
+    # JSON modes need reasoning_format parsed or hidden; raw would be a 400.
+    assert body["reasoning_format"] == "hidden"
+    assert body["reasoning_effort"] == "none"
+    assert "include_reasoning" not in body
+    assert response.structured_mode is StructuredMode.NATIVE_STRICT
+
+
+async def test_non_strict_request_is_best_effort() -> None:
+    recorder = json_reply(STATE_JSON)
+    response = await make_client(recorder).generate(structured_request(state_schema(strict=False)))
+    assert recorder.body["response_format"]["json_schema"]["strict"] is False
+    assert recorder.body["messages"][0]["content"] == "SYSTEM PROMPT"
+    assert response.structured_mode is StructuredMode.NATIVE
+
+
+async def test_best_effort_only_model_never_sends_strict() -> None:
+    recorder = json_reply(STATE_JSON, "openai/gpt-oss-safeguard-20b")
+    response = await make_client(recorder).generate(
+        structured_request(state_schema(), "openai/gpt-oss-safeguard-20b")
+    )
+    assert recorder.body["response_format"] == {
+        "type": "json_schema",
+        "json_schema": {"name": "conversation_state", "schema": STATE_SCHEMA, "strict": False},
+    }
+    assert recorder.body["include_reasoning"] is False
+    assert response.structured_mode is StructuredMode.NATIVE
+
+
+async def test_other_models_use_json_object_mode_with_schema_in_instruction() -> None:
+    recorder = json_reply(fenced(STATE_JSON), "llama-3.1-8b-instant")
+    response = await make_client(recorder).generate(
+        structured_request(state_schema(), "llama-3.1-8b-instant")
+    )
+    body = recorder.body
+    assert body["response_format"] == {"type": "json_object"}
+    assert body["messages"][0] == {
+        "role": "system",
+        "content": "SYSTEM PROMPT\n\n" + schema_instruction(state_schema()),
+    }
+    assert [m["role"] for m in body["messages"][1:]] == ["user", "assistant", "user"]
+    for absent in ("reasoning_effort", "reasoning_format", "include_reasoning"):
+        assert absent not in body
+    assert response.content == STATE_JSON  # fence removed
+    assert response.structured_mode is StructuredMode.NATIVE
+
+
+async def test_request_without_schema_is_unchanged() -> None:
+    recorder = Recorder()
+    response = await make_client(recorder).generate(make_request(effort="low"))
+    body = recorder.body
+    assert "response_format" not in body
+    assert body["messages"][0] == {"role": "system", "content": "SYSTEM PROMPT"}
+    assert response.structured_mode is None
+
+
+async def test_structured_reply_has_reasoning_then_fence_removed() -> None:
+    recorder = json_reply(f"<think>PRIVATE</think>\n{fenced(STATE_JSON)}", "llama-3.1-8b-instant")
+    response = await make_client(recorder).generate(
+        structured_request(state_schema(), "llama-3.1-8b-instant")
+    )
+    assert response.content == STATE_JSON
+    assert response.reasoning_removed is True
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "Generated JSON does not match the expected schema. Please adjust your prompt.",
+        "Invalid schema for response_format.",
+    ],
+)
+async def test_schema_errors_are_invalid_requests(message: str) -> None:
+    def handler(_: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            400, json={"error": {"message": message, "type": "invalid_request_error"}}
+        )
+
+    with pytest.raises(LLMError) as info:
+        await make_client(handler).generate(structured_request(state_schema()))
+    assert info.value.category is LLMErrorCategory.INVALID_REQUEST
+    assert info.value.retryable is False

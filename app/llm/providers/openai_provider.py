@@ -20,6 +20,13 @@ a custom endpoint). Verified against openai 3.29.0 (httpx2 transport):
 Thinking controls differ: OpenAI-style `reasoning_effort`, or DashScope's
 `enable_thinking` (+ `thinking_budget`) sent as extra body fields.
 
+Structured output (`response_schema`) follows the preset's documented
+support (`structured_output`, see app/llm/structured.py): `response_format`
+json_schema (strict where enforced), json_object plus the schema in the
+instruction, or the instruction alone. OpenRouter structured requests also
+set `provider.require_parameters` so they are never routed to an endpoint
+that would silently ignore `response_format`.
+
 Credential safety: with `api_key=None` the SDK falls back to OPENAI_API_KEY
 and would send it to whatever base_url is configured; it forwards
 OPENAI_ORG_ID / OPENAI_PROJECT_ID / OPENAI_CUSTOM_HEADERS to any endpoint;
@@ -39,14 +46,21 @@ from typing import Any, Literal, cast
 import httpx2
 import openai
 from openai import omit
-from openai.types.chat import ChatCompletionMessageParam
+from openai.types.chat import ChatCompletionMessageParam, completion_create_params
 
 from app.llm.providers.chat_completions import (
     build_messages,
+    build_response_format,
     classify_sdk_error,
     normalize_chat_completion,
 )
 from app.llm.schemas import Effort, GenerationRequest, GenerationResponse
+from app.llm.structured import (
+    ChatStructuredOutput,
+    chat_plan,
+    finish_structured,
+    system_with_schema,
+)
 
 # Placeholder for keyless local servers (e.g. Ollama). Never None: a None key
 # would make the SDK pick up OPENAI_API_KEY from the environment.
@@ -112,6 +126,8 @@ class OpenAICompatibleLLMClient:
         system_role: Literal["system", "developer"] = "system",
         max_tokens_param: Literal["max_completion_tokens", "max_tokens"] = "max_completion_tokens",
         effort_style: Literal["none", "reasoning_effort", "enable_thinking"] = "none",
+        structured_output: ChatStructuredOutput = "prompt",
+        structured_require_parameters: bool = False,
         send_openai_headers: bool = False,
         http_client: httpx2.AsyncClient | None = None,
     ) -> None:
@@ -129,6 +145,8 @@ class OpenAICompatibleLLMClient:
         self._system_role = system_role
         self._max_tokens_param = max_tokens_param
         self._effort_style = effort_style
+        self._structured_output = structured_output
+        self._structured_require_parameters = structured_require_parameters
 
     @property
     def provider(self) -> str:
@@ -140,13 +158,23 @@ class OpenAICompatibleLLMClient:
     async def generate(self, request: GenerationRequest) -> GenerationResponse:
         params = request.params
         use_completion_tokens = self._max_tokens_param == "max_completion_tokens"
+        extra_body = effort_extra_body(params.effort, self._effort_style, request.max_output_tokens)
+        schema = request.response_schema
+        plan = chat_plan(self._structured_output, schema) if schema is not None else None
+        system = request.system
+        response_format: dict[str, Any] | None = None
+        if schema is not None and plan is not None:
+            system = system_with_schema(request.system, schema, plan)
+            response_format = build_response_format(schema, plan)
+            if self._structured_require_parameters:
+                extra_body = {**(extra_body or {}), "provider": {"require_parameters": True}}
         started = time.perf_counter()
         try:
             response = await self._client.chat.completions.create(
                 model=request.model,
                 messages=cast(
                     "list[ChatCompletionMessageParam]",
-                    build_messages(request.system, request.messages, system_role=self._system_role),
+                    build_messages(system, request.messages, system_role=self._system_role),
                 ),
                 max_completion_tokens=request.max_output_tokens if use_completion_tokens else omit,
                 max_tokens=omit if use_completion_tokens else request.max_output_tokens,
@@ -156,17 +184,23 @@ class OpenAICompatibleLLMClient:
                     else omit
                 ),
                 temperature=params.temperature if params.temperature is not None else omit,
-                extra_body=effort_extra_body(
-                    params.effort, self._effort_style, request.max_output_tokens
+                response_format=(
+                    cast("completion_create_params.ResponseFormat", response_format)
+                    if response_format is not None
+                    else omit
                 ),
+                extra_body=extra_body,
                 timeout=request.timeout_seconds,
             )
         except openai.OpenAIError as exc:
             raise classify_sdk_error(exc, openai) from exc
         latency_ms = (time.perf_counter() - started) * 1000
-        return normalize_chat_completion(
-            response,
-            provider=self._provider,
-            requested_model=request.model,
-            latency_ms=latency_ms,
+        return finish_structured(
+            normalize_chat_completion(
+                response,
+                provider=self._provider,
+                requested_model=request.model,
+                latency_ms=latency_ms,
+            ),
+            plan,
         )

@@ -130,8 +130,9 @@ class Settings(BaseSettings):
     # --- Conversation state (spec §8) ---------------------------------------
     # One structured LLM call before each reply updates the conversation state.
     state_extraction_enabled: bool = True
-    # Unset = the generation model, except on Groq, where openai/gpt-oss-20b
-    # is used so extraction draws on a separate free-tier rate limit.
+    # Unset = the generation model. On Groq's free tier, qwen/qwen3.8-27b
+    # (preview) is an option with its own rate limit; openai/gpt-oss-20b is
+    # not (it fails strict schema validation for this schema).
     state_extraction_model: str | None = None
     state_extraction_timeout_seconds: float = Field(default=10.0, gt=0, le=60)
     state_extraction_max_output_tokens: int = Field(default=1024, ge=256, le=8192)

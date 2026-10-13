@@ -25,8 +25,12 @@ from app.llm.schemas import (
     GenerationRequest,
     LLMError,
     LLMErrorCategory,
+    ResponseSchema,
+    StructuredMode,
     TraceMetadata,
 )
+from app.llm.structured import schema_instruction
+from tests.unit.structured_fixtures import STATE_JSON, STATE_SCHEMA, fenced, state_schema
 
 Handler = Callable[[httpx2.Request], httpx2.Response]
 
@@ -412,3 +416,177 @@ def test_thinking_budget_leaves_room_for_the_reply() -> None:
     assert body == {"enable_thinking": True, "thinking_budget": 3072}
     small = effort_extra_body("max", "enable_thinking", max_output_tokens=1000)
     assert small == {"enable_thinking": True, "thinking_budget": 256}
+
+
+# --- structured output ---
+
+STRICT_FORMAT = {
+    "type": "json_schema",
+    "json_schema": {"name": "conversation_state", "schema": STATE_SCHEMA, "strict": True},
+}
+INSTRUCTED_SYSTEM = "SYSTEM PROMPT\n\n" + schema_instruction(state_schema())
+
+
+def structured_request(
+    schema: ResponseSchema, model: str = "gpt-6-luna", **params: Any
+) -> GenerationRequest:
+    return make_request(model, **params).model_copy(update={"response_schema": schema})
+
+
+def json_reply(content: Any) -> Recorder:
+    return Recorder(httpx2.Response(200, json=completion_json(content)))
+
+
+async def test_openai_strict_structured_output() -> None:
+    recorder = json_reply(STATE_JSON)
+    client = make_client(
+        recorder,
+        system_role="developer",
+        effort_style="reasoning_effort",
+        structured_output="json_schema",
+    )
+    response = await client.generate(structured_request(state_schema(), effort="low"))
+    body = recorder.body
+    assert body["response_format"] == STRICT_FORMAT
+    assert body["messages"][0] == {"role": "developer", "content": "SYSTEM PROMPT"}
+    assert body["reasoning_effort"] == "low"
+    assert body["max_completion_tokens"] == 1000
+    assert response.content == STATE_JSON
+    assert response.structured_mode is StructuredMode.NATIVE_STRICT
+
+
+async def test_non_strict_json_schema_is_best_effort() -> None:
+    recorder = json_reply(STATE_JSON)
+    client = make_client(recorder, structured_output="json_schema")
+    response = await client.generate(structured_request(state_schema(strict=False)))
+    assert recorder.body["response_format"]["json_schema"]["strict"] is False
+    assert response.structured_mode is StructuredMode.NATIVE
+
+
+async def test_json_object_mode_puts_schema_in_instruction() -> None:
+    recorder = json_reply(STATE_JSON)
+    client = make_client(
+        recorder,
+        provider="deepseek",
+        base_url="https://api.deepseek.com",
+        max_tokens_param="max_tokens",
+        structured_output="json_object",
+    )
+    response = await client.generate(structured_request(state_schema(), "deepseek-flash"))
+    body = recorder.body
+    assert body["response_format"] == {"type": "json_object"}
+    assert body["messages"][0] == {"role": "system", "content": INSTRUCTED_SYSTEM}
+    # JSON-object modes reject requests whose messages never mention JSON.
+    assert "JSON" in body["messages"][0]["content"]
+    assert response.structured_mode is StructuredMode.NATIVE
+
+
+async def test_qwen_json_object_keeps_thinking_controls() -> None:
+    recorder = json_reply(STATE_JSON)
+    client = make_client(
+        recorder,
+        provider="qwen",
+        base_url="https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+        effort_style="enable_thinking",
+        structured_output="json_object",
+    )
+    await client.generate(structured_request(state_schema(), "qwen-plus", effort="none"))
+    body = recorder.body
+    assert body["response_format"] == {"type": "json_object"}
+    assert body["enable_thinking"] is False
+    assert "provider" not in body
+
+
+async def test_best_effort_json_schema_sends_schema_twice() -> None:
+    recorder = json_reply(STATE_JSON)
+    client = make_client(
+        recorder,
+        provider="together",
+        base_url="https://api.together.ai/v1",
+        structured_output="json_schema_best_effort",
+    )
+    response = await client.generate(structured_request(state_schema(), "openai/gpt-oss-120b"))
+    body = recorder.body
+    assert body["response_format"] == STRICT_FORMAT
+    assert body["messages"][0]["content"] == INSTRUCTED_SYSTEM
+    assert "provider" not in body
+    assert response.structured_mode is StructuredMode.NATIVE
+
+
+async def test_openrouter_requires_endpoints_that_honor_response_format() -> None:
+    recorder = json_reply(STATE_JSON)
+    client = make_client(
+        recorder,
+        provider="openrouter",
+        base_url="https://openrouter.ai/api/v1",
+        max_tokens_param="max_tokens",
+        structured_output="json_schema_best_effort",
+        structured_require_parameters=True,
+    )
+    response = await client.generate(structured_request(state_schema(), "openai/gpt-oss-120b"))
+    body = recorder.body
+    assert body["provider"] == {"require_parameters": True}
+    assert body["response_format"] == STRICT_FORMAT
+    assert response.structured_mode is StructuredMode.NATIVE
+
+
+async def test_prompted_mode_strips_a_code_fence() -> None:
+    recorder = json_reply(fenced(STATE_JSON))
+    client = make_client(
+        recorder,
+        provider="openai_compatible",
+        base_url="http://localhost:8080/v1",
+        structured_output="prompt",
+    )
+    response = await client.generate(structured_request(state_schema(), "local-model"))
+    body = recorder.body
+    assert "response_format" not in body
+    assert body["messages"][0] == {"role": "system", "content": INSTRUCTED_SYSTEM}
+    assert response.content == STATE_JSON
+    assert response.structured_mode is StructuredMode.PROMPTED
+
+
+async def test_unfenced_prompted_reply_is_left_as_is() -> None:
+    reply = '  {"topic": null, "subtopics": [], "user_goal": null}\n'
+    client = make_client(json_reply(reply), structured_output="prompt")
+    response = await client.generate(structured_request(state_schema()))
+    assert response.content == reply
+
+
+async def test_request_without_schema_is_unchanged_for_every_style() -> None:
+    recorder = Recorder()
+    client = make_client(
+        recorder,
+        provider="openrouter",
+        base_url="https://openrouter.ai/api/v1",
+        structured_output="json_schema_best_effort",
+        structured_require_parameters=True,
+    )
+    response = await client.generate(make_request("openai/gpt-oss-120b"))
+    body = recorder.body
+    for absent in ("response_format", "provider"):
+        assert absent not in body
+    assert body["messages"][0] == {"role": "system", "content": "SYSTEM PROMPT"}
+    assert response.structured_mode is None
+
+
+async def test_structured_refusal_is_reported() -> None:
+    body = completion_json(None, refusal="I can't help with that.")
+    client = make_client(Recorder(httpx2.Response(200, json=body)), structured_output="json_schema")
+    response = await client.generate(structured_request(state_schema()))
+    assert response.finish_reason is FinishReason.REFUSAL
+    assert response.content == ""
+    assert response.structured_mode is StructuredMode.NATIVE_STRICT
+
+
+async def test_unsupported_schema_is_an_invalid_request() -> None:
+    handler = coded_error(
+        400,
+        "invalid_json_schema",
+        "Invalid schema for response_format 'conversation_state': "
+        "'additionalProperties' is required to be supplied and to be false.",
+    )
+    client = make_client(handler, structured_output="json_schema")
+    with pytest.raises(LLMError) as info:
+        await client.generate(structured_request(state_schema()))
+    assert info.value.category is LLMErrorCategory.INVALID_REQUEST

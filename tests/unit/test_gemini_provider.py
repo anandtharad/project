@@ -10,7 +10,12 @@ from typing import Any
 import httpx
 import pytest
 
-from app.llm.providers.gemini_provider import GeminiLLMClient, model_generation, thinking_config
+from app.llm.providers.gemini_provider import (
+    GeminiLLMClient,
+    model_generation,
+    structured_plan,
+    thinking_config,
+)
 from app.llm.schemas import (
     ChatMessage,
     ChatRole,
@@ -20,8 +25,12 @@ from app.llm.schemas import (
     GenerationRequest,
     LLMError,
     LLMErrorCategory,
+    ResponseSchema,
+    StructuredMode,
     TraceMetadata,
 )
+from app.llm.structured import schema_instruction
+from tests.unit.structured_fixtures import STATE_JSON, STATE_SCHEMA, fenced, state_schema
 
 Handler = Callable[[httpx.Request], httpx.Response]
 
@@ -332,3 +341,97 @@ def test_gemini_25_budget_is_clamped_below_output_limit() -> None:
     config = thinking_config("gemini-2.5-flash", "max", max_output_tokens=8192)
     assert config is not None and config.thinking_budget == 7168
     assert thinking_config("gemini-2.5-flash", "none", max_output_tokens=8192).thinking_budget == 0  # type: ignore[union-attr]
+
+
+# --- structured output ---
+
+
+def structured_request(
+    schema: ResponseSchema, model: str = "gemini-3.6-flash", **params: Any
+) -> GenerationRequest:
+    return make_request(model, **params).model_copy(update={"response_schema": schema})
+
+
+def json_reply(text: str) -> Recorder:
+    body = json.loads(json.dumps(SUCCESS))
+    body["candidates"][0]["content"]["parts"][1]["text"] = text
+    return Recorder(body=body)
+
+
+@pytest.mark.parametrize(
+    ("model", "strict", "expected"),
+    [
+        ("gemini-3.6-flash", True, ("schema", StructuredMode.NATIVE_STRICT)),
+        ("gemini-2.5-flash", True, ("schema", StructuredMode.NATIVE_STRICT)),
+        ("gemini-3.6-flash", False, ("json", StructuredMode.NATIVE)),
+        ("gemini-2.0-flash", True, (None, StructuredMode.PROMPTED)),
+        ("gemma-3-27b-it", True, (None, StructuredMode.PROMPTED)),
+    ],
+)
+def test_structured_plan_by_model(
+    model: str, strict: bool, expected: tuple[str | None, StructuredMode]
+) -> None:
+    plan = structured_plan(model, state_schema(strict=strict))
+    assert (plan.native, plan.mode) == expected
+
+
+async def test_strict_request_sends_raw_json_schema() -> None:
+    recorder = json_reply(STATE_JSON)
+    response = await make_client(recorder).generate(
+        structured_request(state_schema(), effort="low")
+    )
+    body = recorder.sent
+    generation = body["generationConfig"]
+    assert generation["responseMimeType"] == "application/json"
+    assert generation["responseJsonSchema"] == STATE_SCHEMA  # passed through unchanged
+    assert "responseSchema" not in generation
+    assert generation["thinkingConfig"] == {"thinking_level": "LOW"}
+    assert body["systemInstruction"]["parts"] == [{"text": "SYSTEM PROMPT"}]
+    assert response.content == STATE_JSON  # thought part still excluded
+    assert response.structured_mode is StructuredMode.NATIVE_STRICT
+
+
+async def test_non_strict_request_uses_json_mode_with_schema_in_instruction() -> None:
+    recorder = json_reply(STATE_JSON)
+    response = await make_client(recorder).generate(structured_request(state_schema(strict=False)))
+    body = recorder.sent
+    assert body["generationConfig"]["responseMimeType"] == "application/json"
+    assert "responseJsonSchema" not in body["generationConfig"]
+    assert body["systemInstruction"]["parts"] == [
+        {"text": "SYSTEM PROMPT\n\n" + schema_instruction(state_schema(strict=False))}
+    ]
+    assert response.structured_mode is StructuredMode.NATIVE
+
+
+async def test_unlisted_model_is_prompted_and_fence_is_stripped() -> None:
+    recorder = json_reply(fenced(STATE_JSON))
+    response = await make_client(recorder).generate(
+        structured_request(state_schema(), "gemma-3-27b-it")
+    )
+    body = recorder.sent
+    for absent in ("responseMimeType", "responseJsonSchema"):
+        assert absent not in body["generationConfig"]
+    assert body["systemInstruction"]["parts"] == [
+        {"text": "SYSTEM PROMPT\n\n" + schema_instruction(state_schema())}
+    ]
+    assert response.content == STATE_JSON
+    assert response.structured_mode is StructuredMode.PROMPTED
+
+
+async def test_request_without_schema_is_unchanged() -> None:
+    recorder = Recorder()
+    response = await make_client(recorder).generate(make_request(effort="low"))
+    body = recorder.sent
+    for absent in ("responseMimeType", "responseJsonSchema", "responseSchema"):
+        assert absent not in body["generationConfig"]
+    assert body["systemInstruction"]["parts"] == [{"text": "SYSTEM PROMPT"}]
+    assert response.structured_mode is None
+
+
+async def test_rejected_schema_is_an_invalid_request() -> None:
+    body = error_body(
+        400, "INVALID_ARGUMENT", "Invalid JSON payload: response_json_schema is too complex."
+    )
+    with pytest.raises(LLMError) as info:
+        await make_client(Recorder(400, body)).generate(structured_request(state_schema()))
+    assert info.value.category is LLMErrorCategory.INVALID_REQUEST
