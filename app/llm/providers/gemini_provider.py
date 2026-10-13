@@ -172,7 +172,9 @@ class GeminiLLMClient:
             await self._http.aclose()
 
     async def generate(self, request: GenerationRequest) -> GenerationResponse:
-        contents = [
+        # Annotated as the SDK's own union: list invariance (and optional Pillow
+        # types) otherwise make a plain list[Content] fail to type-check.
+        contents: list[types.ContentUnion] = [
             types.Content(
                 role="user" if m.role is ChatRole.USER else "model",
                 parts=[types.Part.from_text(text=m.content)],
