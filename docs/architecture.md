@@ -17,7 +17,7 @@ HTTP request
   -> TurnOrchestrator           lifecycle sequencing, deadline, failure mapping
        TurnStore.begin          tx 1: authorize + idempotency + persist user msg + load history + state
        StateExtractor           structured LLM call: updated conversation state (or keep previous)
-       DecisionService          one System One request (Laya / Jev / off), validated, thresholded
+       DecisionService          one decision request (Laya / Jev / LLM / off), validated, thresholded
        choose_policy            code: safety signal > explicit request > decision > default
        ContextBuilder           system prompt + policy fragment, notes block, budgeted history
        LLMClient.generate       provider adapter, bounded by turn deadline
@@ -38,7 +38,7 @@ HTTP request
 | Response validator | `app/orchestration/validation.py` | response contract (complete, non-empty, bounded) | safety policy (Phase 5) |
 | Prompt registry | `app/prompting.py` | versioned, checksum-locked prompts and fragments | — |
 | State extractor | `app/state/*` | typed conversation state with provenance, one structured LLM call | persistence, policy |
-| Decision service | `app/decisions/*` | versioned questions, System One adapter, answer validation, thresholds, fallbacks | access control, safety handling |
+| Decision service | `app/decisions/*` | versioned questions, System One adapter, LLM decision adapter, answer validation, thresholds per calibration identity, fallbacks | access control, safety handling |
 | Response policy | `app/orchestration/policy.py` | choosing the reply approach in code | wording (prompt fragments) |
 | Memory service | `app/memory/*` | retrieval for a turn, post-turn extraction, the eligibility policy, user-scoped storage, retention | what the reply says about memories (prompt) |
 | Embeddings | `app/embeddings/*` | vectors for memory search (local fastembed, OpenAI, Gemini) | storage |

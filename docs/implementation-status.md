@@ -8,7 +8,7 @@ Last updated: 2026-10-13. Spec: COMPANION-TECH-SPEC-001 v2.1.
 |---|---|
 | 0: Foundation | **Done** |
 | 1: Basic conversation | **Done** (live LLM calls verified with Groq; other providers unverified, see below) |
-| 2: State and Jev | **Built and evaluated.** 4 of 5 acceptance criteria met; strategy decisions are wired and the policy measurably changes replies, but no decision model passes calibration yet, so decisions run in shadow mode (see Phase 2 acceptance) |
+| 2: State and Jev | **Built and evaluated.** 4 of 5 acceptance criteria met; strategy decisions are wired and the policy measurably changes replies, but no decision model passes calibration yet, so decisions run in shadow mode (see Phase 2 acceptance). An LLM decision provider (`DECISION_PROVIDER=llm`, Groq `gpt-oss-20b`) now substitutes for Jev behind the same interface; built and tested offline, not yet evaluated |
 | 3: Memory | **Built and evaluated.** All 5 acceptance criteria met on the synthetic evaluation set (see Phase 3 acceptance); retrieval and extraction quality are moderate and measured, not assumed |
 | 4: RAG | Not started |
 | 5: Safety | Not started. **Required before any real-user exposure** |
@@ -87,11 +87,11 @@ unmodified here.
 
 | Suite | Result |
 |---|---|
-| unit | 514 passed |
+| unit | 586 passed |
 | integration | 79 passed |
 | security | 53 passed |
 | live | 8 skipped (opt-in; run with `scripts/dev.py live-groq`) |
-| **total** | **646 passed, 8 skipped** (2026-10-13, after Phase 3) |
+| **total** | **718 passed, 8 skipped** (2026-10-13, after the LLM decision provider) |
 
 Live runs made from this environment once network access was allowed
 (2026-10-13): Groq live tests, strict structured state extraction, the
@@ -178,6 +178,14 @@ are clean.
   (no keys).
 - **pgvector:** verified against extension 0.6.0 (local) and 0.8.7 (the
   compose image).
+- **LLM decision provider (`DECISION_PROVIDER=llm`):** offline only: the
+  scripted LLM double, the fake provider end to end, and the real `groq`
+  SDK on a mocked transport (exact strict `json_schema` request, hidden
+  reasoning, effort, output limit). Before it was built, three live trials
+  of `gpt-oss-20b` with a decision schema returned valid JSON 3/3, and Groq
+  rejected a `logprobs` request with HTTP 400. **No live call or evaluation
+  has been run with this code**; its questions stay in shadow mode until
+  `scripts/eval_decisions.py` sets thresholds for its calibration key.
 - **Server-side refusal fallback** (`fallbacks: "default"`): request shape
   verified offline. Whether your account or organization has the beta enabled
   is unverified. If it doesn't, the provider returns 400, which shows up as
@@ -208,12 +216,28 @@ are clean.
 - **Structured generation** is a `response_schema` field on the existing
   `generate()` request rather than a separate `generate_structured` method:
   one code path per adapter, with the mode reported in `structured_mode`.
-- **Jev configuration names:** `DECISION_PROVIDER=off|jev|laya` replaces
-  `JEV_ENABLED`, because the same adapter also serves self-hosted Laya.
+- **Jev configuration names:** `DECISION_PROVIDER=off|jev|laya|llm` replaces
+  `JEV_ENABLED`, because the same interface also serves self-hosted Laya
+  and the LLM substitute.
   `JEV_API_KEY`, `JEV_MODEL` and `JEV_TIMEOUT_SECONDS` (alias of
   `DECISION_TIMEOUT_SECONDS`) keep the spec's names.
 - **Laya** was added at the user's request as a self-hosted, open-weights
   decision model that speaks Jev's protocol; it is not in the spec.
+- **An LLM substitutes for Jev** (`DECISION_PROVIDER=llm`), because there
+  is no Jev key and Laya zero-shot scored at or below the majority
+  baseline. It sits behind the same typed `DecisionBackend` interface,
+  answers the same versioned questions, and returns only typed answers
+  (validated like Jev's), never text for the person, so §7.1 "Jev is not
+  the response generator" still holds; the reply model and its prompt are
+  unchanged. Its choice probabilities are normalised integer weights the
+  model states, not Jev-style probabilities (docs/decisions.md), so its
+  thresholds are kept per model and decision prompt, and it runs in shadow
+  mode until evaluated. The default model (`openai/gpt-oss-20b`) differs
+  from the reply model so the two do not share Groq's per-model limits.
+- **Thresholds are keyed by calibration identity** (`jev:<model>`,
+  `laya:<model>`, `llm:<provider>:<model>:decision_llm@<version>`) rather
+  than by provider alone, so a model or prompt change never reuses another
+  setup's thresholds (§7.7, §7.8 item 8).
 - **Idempotency key scope** is per conversation. Each conversation has
   exactly one owner, so this satisfies "same key and owner", and it lets a
   client reuse a key across conversations.
@@ -243,7 +267,10 @@ are clean.
 - Long conversations are truncated to the most recent messages. There is no
   summarization (later phase).
 - Decisions add latency: Laya on CPU takes about 2-5 s per turn (p95 ~5 s);
-  `DECISION_TIMEOUT_SECONDS` bounds it (fallbacks after that).
+  `DECISION_TIMEOUT_SECONDS` bounds it (fallbacks after that). The LLM
+  provider adds one hosted call per turn (about 1.5K tokens on
+  `gpt-oss-20b`; on Groq's free tier about 5 turns a minute and ~130 a day
+  before decisions fall back as `rate_limited`); its latency is unmeasured.
 - State extraction adds one LLM call per turn (~0.7-1.2 s on Groq) and, on
   Groq's free tier, shares the reply model's per-minute token limit.
 - The decision evaluation set is synthetic and AI-labelled (see its dataset
@@ -260,7 +287,7 @@ are clean.
 |---|---|---|
 | Invalid decisions are rejected | Met | every answer validated against its question (label in options and most probable, probabilities over exactly the options summing to ~1, values in [0, 1]); invalid answers fall back, never repaired: `test_answers_that_do_not_fit_the_question_are_rejected` and related tests |
 | Missing fields do not crash the app | Met | all state fields optional; missing answers fall back individually; an unreadable stored state is replaced: `test_invalid_and_missing_answers_fall_back_individually`, extraction failure tests |
-| Jev outage has defined behavior | Met (offline; Laya outage also exercised) | timeout, connection, 429, 401/422, 5xx/529 and malformed responses each map to a fallback reason; the turn completes |
+| Jev outage has defined behavior | Met (offline; Laya outage also exercised) | timeout, connection, 429, 401/422, 5xx/529 and malformed responses each map to a fallback reason; the turn completes. The LLM provider maps every provider error category, truncated, unparseable and off-schema output the same way (`tests/unit/test_llm_decisions.py`) |
 | Strategy decisions measurably affect responses | **Partly met** | the policy measurably changes replies on held-out data (judge recovers the forced strategy 0.80 vs 0.33 chance, prompt 1.2.0; docs/decisions.md). It acts today on explicit requests in the message. Decision-driven strategies are wired and tested, but Laya zero-shot is below the majority baseline for conversation_mode, at chance for retrieval, and only modestly above it for response_strategy (0.27 vs 0.17 on test), with no confidence threshold reaching the target accuracy, and Jev has no key yet, so decisions stay in shadow mode |
 | No decision bypasses safety or authorization | Met | decisions run after the ownership check and only select fixed prompt fragments; `safety_response` is not selectable; a safety signal takes precedence: `test_decisions_never_run_for_a_foreign_conversation`, `test_safety_mode_signal_takes_precedence`, policy tests |
 
@@ -287,11 +314,14 @@ all built. See [memory.md](memory.md).
 
 ## Open questions and next steps
 
-1. **A decision model that passes calibration.** Options: a Jev API key
-   (`DECISION_PROVIDER=jev`, then rerun `scripts/eval_decisions.py`), or
-   fine-tuning Laya on labelled decisions (its notebook runs on Kaggle's
-   free GPUs). Either way, thresholds come from the dev split and are
-   confirmed on test before any question leaves shadow mode.
+1. **A decision model that passes calibration.** Options: evaluate the LLM
+   provider (`DECISION_PROVIDER=llm`; on Groq's free tier one split per
+   day, `scripts/eval_decisions.py --pause 2 --tokens-per-minute 7000`,
+   `--resume` to continue), a Jev API key (`DECISION_PROVIDER=jev`, then
+   rerun `scripts/eval_decisions.py`), or fine-tuning Laya on labelled
+   decisions (its notebook runs on Kaggle's free GPUs). Either way,
+   thresholds come from the dev split and are confirmed on test before any
+   question leaves shadow mode.
 2. **Human review of the evaluation labels**, at least the ambiguous and
    adversarial rows.
 3. **LLM credentials** for providers other than Groq, and the Phase 6 model

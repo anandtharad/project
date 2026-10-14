@@ -19,7 +19,7 @@ model themselves. docs/providers.md records each choice and its source.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from enum import StrEnum
 from typing import Literal
 
@@ -466,3 +466,55 @@ def resolve_provider(settings: Settings) -> ResolvedProvider:
         warnings=tuple(warnings),
         structured_output=structured_output_for(preset, model),
     )
+
+
+def resolve_decision_llm(settings: Settings) -> ResolvedProvider:
+    """The decision model for DECISION_PROVIDER=llm, resolved like the reply
+    model (same key, effort and structured-output rules) from
+    DECISION_LLM_PROVIDER, DECISION_LLM_MODEL, DECISION_LLM_EFFORT and
+    DECISION_LLM_MAX_OUTPUT_TOKENS.
+
+    It uses the provider's own key setting (e.g. GROQ_API_KEY).
+    GENERATION_API_KEY and GENERATION_BASE_URL apply only when the decision
+    provider is also the generation provider, so the reply provider's key is
+    never sent to another provider's endpoint.
+    """
+    preset = PRESETS[settings.decision_llm_provider]
+    shared = preset.name == settings.generation_provider
+    if preset.name == "openai_compatible" and not shared:
+        # Its endpoint is GENERATION_BASE_URL; without it the SDK would fall
+        # back to environment defaults.
+        raise ProviderConfigError(
+            "DECISION_LLM_PROVIDER=openai_compatible needs GENERATION_PROVIDER=openai_compatible "
+            "(it uses GENERATION_BASE_URL)"
+        )
+    own_key = getattr(settings, preset.api_key_setting) if preset.api_key_setting else None
+    if preset.requires_api_key and own_key is None and not (shared and settings.generation_api_key):
+        key_var = (preset.api_key_setting or "generation_api_key").upper()
+        raise ProviderConfigError(
+            f"DECISION_PROVIDER=llm needs an API key for DECISION_LLM_PROVIDER={preset.name}: "
+            f"set {key_var}"
+        )
+    resolved = resolve_provider(
+        settings.model_copy(
+            update={
+                "generation_provider": preset.name,
+                "generation_model": settings.decision_llm_model,
+                "generation_effort": settings.decision_llm_effort,
+                "generation_temperature": None,
+                "generation_api_key": settings.generation_api_key if shared else None,
+                "generation_base_url": settings.generation_base_url if shared else None,
+                "max_output_tokens": settings.decision_llm_max_output_tokens,
+            }
+        )
+    )
+    reply_model = settings.generation_model or PRESETS[settings.generation_provider].default_model
+    if shared and resolved.model == reply_model:
+        return replace(
+            resolved,
+            warnings=(
+                *resolved.warnings,
+                "DECISION_LLM_MODEL is the reply model: decisions share its rate limits",
+            ),
+        )
+    return resolved

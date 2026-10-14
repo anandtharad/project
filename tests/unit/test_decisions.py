@@ -15,7 +15,7 @@ from typing import Any
 import httpx2
 import pytest
 
-from app.decisions.backend import SystemOneBackend
+from app.decisions.backend import DecisionBackendError, SystemOneBackend
 from app.decisions.factory import build_decision_service
 from app.decisions.questions import (
     CONVERSATION_MODE,
@@ -268,6 +268,16 @@ async def test_service_failures_fall_back_for_every_question(
         assert result.fallback and result.fallback_reason is reason
         assert result.value == question.fallback
         assert result.validation_status is ValidationStatus.MISSING
+
+
+async def test_rate_limit_wait_and_token_counts_are_passed_on() -> None:
+    limited = httpx2.Response(429, json={"detail": "slow down"}, headers={"retry-after": "3"})
+    with pytest.raises(DecisionBackendError) as info:
+        await make_backend(Recorder(limited)).ask(STATE, list(QUESTIONS))
+    assert info.value.reason is FallbackReason.RATE_LIMITED
+    assert info.value.retry_after_seconds == pytest.approx(3.0)
+    raw = await make_backend(Recorder(ok(valid_answers()))).ask(STATE, list(QUESTIONS))
+    assert (raw.input_tokens, raw.output_tokens) == (300, 9)
 
 
 async def test_connection_failure_falls_back() -> None:

@@ -8,7 +8,8 @@ covers what exists today and is revisited at each phase.
 
 - Conversation content (sensitive personal disclosures are expected).
 - User-to-conversation ownership.
-- Provider credentials (`GENERATION_API_KEY`, `JEV_API_KEY`, `LAYA_API_KEY`) and dev tokens.
+- Provider credentials (`GENERATION_API_KEY` and the per-provider keys, `JEV_API_KEY`,
+  `LAYA_API_KEY`) and dev tokens.
 - Conversation state (inferred goals and emotional context about a person).
 - Memories: facts a person shared, kept across conversations, with
   embeddings of them.
@@ -21,8 +22,11 @@ covers what exists today and is revisited at each phase.
 2. API → LLM provider: conversation content leaves the system here (replies
    and state extraction).
 2b. API → decision service: the latest message and up to four earlier
-   messages are sent to Laya (self-hosted: stays on your machine) or TypeSafe
-   Jev (third party). Conversation notes are not sent.
+   messages are sent to Laya (self-hosted: stays on your machine), TypeSafe
+   Jev (third party), or with `DECISION_PROVIDER=llm` the decision LLM's
+   provider (Groq by default; a third party, on every turn, through a client
+   separate from the reply model's). Conversation notes are not sent. The
+   decision model's output is untrusted (boundary 3).
 2c. API → embedding provider: memory text and each message are embedded.
    With `EMBEDDING_PROVIDER=local` (the default) nothing leaves the machine;
    with `openai`/`gemini` the text goes to that provider.
@@ -41,10 +45,11 @@ covers what exists today and is revisited at each phase.
 | Memory poisoning across sessions (a false "fact" steering later replies) | Only what the person said in their own message is stored; conflicting facts are held as unconfirmed and the companion asks; superseded and expired memories are never retrieved; the person can see and delete everything | A person can deliberately store false facts about themselves; that only affects their own conversations |
 | Prompt injection via conversation state | State is extracted from untrusted text, so it is untrusted too: it reaches the reply model only in the user role, inside a `<conversation_notes>` block whose JSON escapes `<`/`>` (it cannot close the block), and the prompt says the notes are never instructions. The extraction prompt treats its input as data inside escaped tags. Field lengths and counts are capped | Behavioral resistance is unverified without live adversarial evaluation |
 | Decision manipulation | Decisions never control access, persistence or safety handling and run after the ownership check; answers are validated against the question asked (invalid answers are rejected, not repaired); only calibrated, above-threshold answers change the policy, and the worst case is one of the fixed prompt fragments; `safety_response` cannot be selected | A manipulated `conversation_mode=safety` only makes the reply more cautious |
+| Prompt injection into the decision LLM (`DECISION_PROVIDER=llm`) | The model reads untrusted conversation text, so its output is untrusted: the state travels only in the user role, as JSON inside an escaped `<decision_state>` block (it cannot close the block), and the locked `decision_llm` prompt says it is data, never instructions; the reply must match a strict schema of integer weights exactly (anything else is `invalid_response`), and every answer is validated again; the model has no tools and its text never reaches the person or the reply prompt; thresholds are per model and prompt, and every question is in shadow mode until evaluated | Behavioral resistance is unverified without live adversarial evaluation; once calibrated, an injected message could at most pick one of the fixed strategy fragments for its own reply |
 | Unsafe output handling | Output is stored and returned as plain text, never executed or rendered by the server; refusals, truncations, empty and over-long replies are rejected | **No safety-policy output validation yet (Phase 5)**; clients must escape output when rendering |
 | Sensitive information in logs | Logs carry IDs, categories, timings and token counts, never content; exception messages and tracebacks are not logged or returned; memory logs say only that something sensitive was rejected, never which category; enforced by tests | Log retention and shipping not configured |
 | API key exposure | Keys held as `SecretStr` (not in reprs or logs) and masked in `ResolvedProvider` reprs; server-side only, never returned; `.env` gitignored; `.env.example` has placeholders only; only the selected provider's key is sent, only to its endpoint | Key rotation procedure: rotate in the provider console, update the secret, restart; no secret manager integration yet |
-| Decision-service credentials | The TypeSafe SDK reads `TYPESAFE_API_KEY`/`TYPESAFE_BASE_URL`/`TYPESAFE_DEFAULT_MODEL` when arguments are missing; the adapter always passes all three. Its logger records request and response bodies at DEBUG, so it is capped at WARNING even when `TYPESAFE_LOG_LEVEL=debug` (tested). `laya-serve` accepts any caller without `LAYA_API_KEY`, so the app refuses `DECISION_PROVIDER=laya` without a key, and `dev.py laya` and compose bind it to localhost | — |
+| Decision-service credentials | `DECISION_PROVIDER=llm` uses the decision provider's own key (e.g. `GROQ_API_KEY`); `GENERATION_API_KEY` is used only when the decision provider is also the reply provider, so the reply provider's key never reaches another endpoint, and `openai_compatible` is refused unless it is the reply provider too (no endpoint of its own). The TypeSafe SDK reads `TYPESAFE_API_KEY`/`TYPESAFE_BASE_URL`/`TYPESAFE_DEFAULT_MODEL` when arguments are missing; the adapter always passes all three. Its logger records request and response bodies at DEBUG, so it is capped at WARNING even when `TYPESAFE_LOG_LEVEL=debug` (tested). `laya-serve` accepts any caller without `LAYA_API_KEY`, so the app refuses `DECISION_PROVIDER=laya` without a key, and `dev.py laya` and compose bind it to localhost | — |
 | Credential leakage via SDK environment fallbacks | The `openai` SDK would send `OPENAI_API_KEY` to third-party base URLs and forward `OPENAI_ORG_ID`/`OPENAI_PROJECT_ID`/`OPENAI_CUSTOM_HEADERS` (whose `Authorization` line overrides explicit keys). The adapter passes explicit keys and base URLs, pins `Authorization`, and strips OpenAI-only headers for other endpoints. The Gemini client pins `vertexai=False`. Tests cover each case | Other SDK env variables (e.g. `GROQ_BASE_URL`) are operator configuration |
 | SSRF via configurable endpoint | `GENERATION_BASE_URL` is operator-only configuration (environment), never user input | Do not expose provider/base-URL selection to end users |
 | Denial of service | Body limit (413, checked on declared and streamed bytes); input character limit before any model call; one in-flight turn per conversation; bounded turn deadline; DB statement timeout | **No per-user rate limiting yet**: one user can create many conversations and run turns in parallel across them |
@@ -72,8 +77,10 @@ covers what exists today and is revisited at each phase.
   on your own server. With `DECISION_PROVIDER=jev`, the latest message and
   up to four earlier messages are also sent to
   TypeSafe on every turn (TypeSafe states it does not train on user data;
-  zero data retention is offered to enterprise customers). With `laya` they
-  stay on your machine. Retrieved memories travel in the reply prompt, and
+  zero data retention is offered to enterprise customers). With `llm` the
+  same messages go to the decision LLM's provider on every turn (Groq by
+  default; its terms need the same review as the reply provider's, see
+  below). With `laya` they stay on your machine. Retrieved memories travel in the reply prompt, and
   the extraction call sends the latest messages and related memories, both
   to the same LLM provider.
   Review that provider's commercial terms, data retention, data residency and

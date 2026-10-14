@@ -5,7 +5,8 @@ V1 asks the smallest useful set, in one request about the same state:
 - conversation_mode: what kind of conversation this turn is. Recorded in the
   conversation state; `safety` is a signal only (see below).
 - response_strategy: what the next reply should mainly do. Feeds the response
-  policy when its confidence clears the per-provider threshold.
+  policy when its confidence clears the threshold calibrated for the active
+  decision model.
 - knowledge_retrieval_useful: whether outside knowledge would help. Recorded
   only until knowledge retrieval exists (Phase 4).
 

@@ -35,11 +35,13 @@ serves any server that implements `POST /v1/systemone`:
 | `off` (default) | none | every question uses its fallback |
 | `laya` | self-hosted [Laya](https://huggingface.co/convaiinnovations/laya) (`laya-serve`, Apache-2.0) | runs locally, no data leaves the machine; needs `LAYA_API_KEY` (same key on server and app) |
 | `jev` | TypeSafe Jev, `https://api.typesafe.ai` | hosted, early access; `JEV_API_KEY`; model pinned to `jev-1.13.0` |
+| `llm` | a general LLM through the provider registry; default Groq `openai/gpt-oss-20b` (Apache-2.0) | the decision provider's own key (`GROQ_API_KEY`); see [LLM decision provider](#llm-decision-provider-decision_providerllm) |
 
 `laya-serve` implements Jev's request and response shape; with
 `LAYA_JEV_STRICT=1` (set by `scripts/dev.py laya` and the compose service)
 its response matches the Jev contract exactly. Its `confidence` is computed
-differently from Jev's (normalized entropy), so thresholds are per provider.
+differently from Jev's (normalized entropy), so thresholds are per
+calibration identity (see Thresholds below).
 
 Run Laya locally (pinned `laya[serve]==0.4.6`, CPU):
 
@@ -59,6 +61,90 @@ answers carry `choice`, `confidence`, `probabilities`; Score answers carry
 `noul` (the probability of yes) - no confidence is fabricated for it.
 Errors 401/422/429/529; `jev-1.13.0` allows 255 options per Choice and a
 64k-token context; TypeSafe states it does not train on user data.
+
+## LLM decision provider (`DECISION_PROVIDER=llm`)
+
+An openly available substitute for Jev, which has no key yet, while Laya
+zero-shot scores at or below the majority baseline. It sits behind the same
+typed interface (`app/decisions/llm_backend.py`): it answers the same three
+versioned questions and returns only typed answers, never text for the
+person, so Jev's role in the spec (§7.1, "Jev is not the response
+generator") is unchanged.
+
+How it works, per turn:
+
+1. One structured request to the decision model, through its own client
+   (built by the provider registry for `DECISION_LLM_PROVIDER` /
+   `DECISION_LLM_MODEL`, with `DECISION_MAX_RETRIES`; separate from the
+   reply model's client). Default: Groq `openai/gpt-oss-20b`, effort `low`,
+   at most 1024 output tokens, within `DECISION_TIMEOUT_SECONDS`.
+2. System: the locked prompt `prompts/decision_llm/1.0.0.toml`, with each
+   question's instructions and options inserted verbatim from
+   `app/decisions/questions.py` (the per-question layout is a prompt
+   fragment, so it is locked too). User: the same decision state as Jev and
+   Laya get (latest message and up to four earlier messages), as JSON inside
+   `<decision_state>` tags, marked as untrusted data and escaped so it cannot
+   close its block.
+3. Reply: a strict JSON schema built from the questions. A choice question
+   gets an integer weight from 0 to 100 for **every** option; the noul gets
+   an integer `probability_yes` from 0 to 100. The schema uses only the
+   features Groq documents for strict mode (no `minimum`/`maximum`); the
+   range and integer type are checked in code. Any other shape, truncated
+   output or invalid JSON is `invalid_response` for the whole turn.
+4. Conversion to the answer the service validates: choice = the
+   highest-weight option (the first in option order on ties), `probabilities`
+   = weights divided by their sum, `confidence` = the top normalised weight;
+   noul = `probability_yes / 100`. If every option of a question gets weight
+   0 there is nothing to normalise: the answer has no confidence and is
+   rejected (`invalid_answer`), never invented.
+
+**The numbers are normalised weights the model states, not calibrated
+probabilities.** Asking the model for probabilities directly does not work:
+no structured-output mode can require numbers to sum to 1, and in live
+trials `gpt-oss-20b`'s stated probabilities summed to 0.90-1.11, which the
+service's sum check (within 0.02) rejects; renormalising them would be
+repairing an answer, which this layer never does. Independent weights with a
+fixed, documented normalisation avoid both. What makes the result usable is
+a threshold chosen for this exact model and prompt on the dev split and
+confirmed on the held-out split. **No evaluation has run yet, so every
+question runs in shadow mode** with this provider too: answers are validated
+and stored (`turn_decisions.returned_value`), and the policy ignores them.
+Groq returns no log-probabilities for any model (HTTP 400), so token
+probabilities are not an option there.
+
+Failures map to the same fallback reasons as Jev's: timeout -> `timeout`;
+connection, overload, 5xx, unknown -> `unavailable`; 429 and used-up quota
+-> `rate_limited`; schema failures (Groq's `json_validate_failed`),
+unparseable or truncated output -> `invalid_response`; authentication,
+permission, unknown model, invalid request, provider moderation or a refusal
+-> `rejected`. Neither the state nor the model's output is logged or put in
+an error message (tested).
+
+Cost and limits: about 1.5K tokens per turn on `gpt-oss-20b` (a ~1K-token
+system prompt, the state, a ~150-token JSON reply and low-effort hidden
+reasoning). Groq's free tier gives `gpt-oss-20b` its own limits (30 requests
+and 8K tokens per minute, 1K requests and 200K tokens per day), separate
+from the reply model's: about 5 turns a minute and ~130 a day. The default
+is deliberately not the reply model (`openai/gpt-oss-120b` on Groq); using
+the reply model for decisions logs a startup warning because they would
+share its limits. `DECISION_TIMEOUT_SECONDS=5` leaves room for a hosted
+model's latency.
+
+Privacy: with this provider the latest message and up to four earlier
+messages (each earlier one cut to 600 characters) go to the decision
+provider (Groq by default) on every turn, in addition to what the reply and
+state calls already send there. Conversation notes are not sent.
+
+Configuration (`.env.example`): `DECISION_PROVIDER=llm`,
+`DECISION_LLM_PROVIDER=groq`, `DECISION_LLM_MODEL=openai/gpt-oss-20b`,
+`DECISION_LLM_EFFORT=low` (`off` for models without reasoning controls),
+`DECISION_LLM_MAX_OUTPUT_TOKENS=1024`, `DECISION_PROMPT_VERSION=1.0.0`, and
+the provider's own key. Startup refuses `DECISION_PROVIDER=llm` without that
+key; `GENERATION_API_KEY` is used only when the decision provider is also
+the reply provider, so the reply provider's key is never sent elsewhere.
+Any registry provider works except `openai_compatible` with a different
+reply provider (it has no endpoint of its own); a model change needs
+`DECISION_LLM_MODEL` too.
 
 ## Questions (V1)
 
@@ -84,12 +170,29 @@ the options and sum to about 1, confidence and probabilities must be in
 
 ## Thresholds and shadow mode
 
-A threshold is per question and provider (`app/decisions/thresholds.py`).
-Without one, the question runs in **shadow mode**: its answer is validated
-and stored (`returned_value`), but the application uses the fallback
-(`fallback_reason = not_calibrated`). Thresholds are chosen on the dev split
-of the evaluation set and confirmed on the held-out test split; see
-Evaluation below.
+A threshold is per question and **calibration identity**
+(`app/decisions/thresholds.py`): the exact setup it was measured with, not
+just the provider, because another model or prompt produces differently
+distributed numbers. Keys:
+
+| Provider | Calibration key |
+|---|---|
+| `jev` | `jev:<JEV_MODEL>`, e.g. `jev:jev-1.13.0` |
+| `laya` | `laya:<LAYA_MODEL>`, e.g. `laya:english` |
+| `llm` | `llm:<DECISION_LLM_PROVIDER>:<DECISION_LLM_MODEL>:decision_llm@<DECISION_PROMPT_VERSION>`, e.g. `llm:groq:openai/gpt-oss-20b:decision_llm@1.0.0` |
+
+Changing the model or the decision prompt version therefore selects another
+(empty) entry; it never silently reuses another model's thresholds. Effort
+and the output limit are not part of the key but are recorded with every
+evaluation, and `--thresholds-from` refuses dev results made with other
+values: re-evaluate after changing `DECISION_LLM_EFFORT` or
+`DECISION_LLM_MAX_OUTPUT_TOKENS`. Every entry is empty today.
+
+Without a threshold, the question runs in **shadow mode**: its answer is
+validated and stored (`returned_value`), but the application uses the
+fallback (`fallback_reason = not_calibrated`). Thresholds are chosen on the
+dev split of the evaluation set and confirmed on the held-out test split;
+see Evaluation below.
 
 ## Response policy
 
@@ -155,10 +258,36 @@ uv run python scripts/eval_policy_effect.py --examples 12
 ```
 
 Results are written to `eval/results/` with the dataset checksum, question
-checksums, and the served model. The evaluation builds the decision state
-exactly as a live turn does (latest message and up to four earlier
-messages; conversation notes are not sent to the decision model), so
-thresholds chosen on dev apply unchanged to live turns.
+checksums, the requested and served models, and for `DECISION_PROVIDER=llm`
+the decision provider, effort, output limit, decision prompt key and
+checksum (plus a checksum of the rendered system prompt and schema) and the
+calibration key (spec §7.8 item 8, §19.3). `--thresholds-from` refuses a
+file that is not a dev result or whose provider, model, decision prompt,
+effort, output limit or question checksums differ from the current run. The
+evaluation builds the decision state exactly as a live turn does (latest
+message and up to four earlier messages; conversation notes are not sent to
+the decision model), so thresholds chosen on dev apply unchanged to live
+turns.
+
+On a free tier, pace the run and continue it later if a daily limit stops
+it (125 examples x ~1.5K tokens is close to Groq's 200K tokens per day for
+`gpt-oss-20b`, so plan one split per day):
+
+```
+uv run python scripts/eval_decisions.py --split dev --pause 2 --tokens-per-minute 7000
+uv run python scripts/eval_decisions.py --split dev --pause 2 --tokens-per-minute 7000 --resume
+```
+
+Each answer is cached in `eval/results/.cache/` as it arrives, keyed by the
+run identity, dataset and split. A rate limit is waited out when its
+`retry-after` is at most `--max-wait` (120 s); a longer wait, a used-up
+quota or five limits in a row stop the run (exit code 2) instead of being
+recorded as failures, which would silently lower accuracy and coverage.
+Timeouts, outages and invalid responses are still recorded as failures,
+because a live turn falls back on them. `--resume` skips the examples
+already answered; `--start N` begins at example N (with `--limit` to run a
+fixed part per day), taking the earlier examples from the cache. The result
+file is written once every example in range has an answer.
 
 ## Results (2026-10-12/13, live)
 
@@ -184,9 +313,11 @@ current JSON state (0.12, 0.26) and of the majority baseline, so the JSON
 state (also Jev's documented shape) is kept.
 
 What would change this: fine-tuning Laya on labelled decisions (its
-fine-tuned checkpoint reaches 0.77 on its own benchmark), or Jev
-(`DECISION_PROVIDER=jev`), re-evaluated with the same scripts. Jev has not
-been evaluated: no API key yet.
+fine-tuned checkpoint reaches 0.77 on its own benchmark), Jev
+(`DECISION_PROVIDER=jev`), or the LLM provider (`DECISION_PROVIDER=llm`),
+each re-evaluated with the same scripts. Jev has not been evaluated (no API
+key yet), and the LLM provider has not been evaluated yet either: it is
+built and tested offline only.
 
 Files: `eval/results/decisions-laya-english-{dev,test}-*.json`.
 

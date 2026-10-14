@@ -171,7 +171,7 @@ is the source of truth. Important ones:
 | `TURN_DEADLINE_SECONDS` / `STALE_TURN_SECONDS` | overall turn budget / when a pending turn counts as abandoned |
 | `MAX_INPUT_CHARACTERS`, `MAX_REQUEST_BYTES` | input limits enforced before any model call |
 | `STATE_EXTRACTION_ENABLED`, `STATE_EXTRACTION_MODEL` | conversation-state update before each reply (default on; the reply model) |
-| `DECISION_PROVIDER` | `off` (default), `laya` (self-hosted, `LAYA_API_KEY`) or `jev` (`JEV_API_KEY`) |
+| `DECISION_PROVIDER` | `off` (default), `laya` (self-hosted, `LAYA_API_KEY`), `jev` (`JEV_API_KEY`) or `llm` (a separate LLM, default Groq `openai/gpt-oss-20b`; `DECISION_LLM_*`, see docs/decisions.md) |
 | `MEMORY_ENABLED`, `MEMORY_EXTRACTION_MODEL` | memory across conversations (default on; extraction uses the reply model) |
 | `EMBEDDING_PROVIDER`, `EMBEDDING_CACHE_DIR` | `local` (default, no key), `openai`, `gemini` or `none`; where the local model is cached |
 | `MEMORY_MIN_SEMANTIC`, `MEMORY_RETENTION_DAYS` | retrieval threshold (0.49, tuned for the local model) and the longest a memory is kept (365 days) |

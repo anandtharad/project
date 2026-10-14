@@ -26,8 +26,13 @@ def _missing_sdk(resolved: ResolvedProvider, exc: ImportError) -> ProviderConfig
     )
 
 
-def build_llm_client(settings: Settings, resolved: ResolvedProvider) -> LLMClient:
+def build_llm_client(
+    settings: Settings, resolved: ResolvedProvider, *, max_retries: int | None = None
+) -> LLMClient:
+    """`max_retries` defaults to GENERATION_MAX_RETRIES (the decision model
+    passes DECISION_MAX_RETRIES)."""
     kind = resolved.preset.kind
+    retries = settings.generation_max_retries if max_retries is None else max_retries
     if kind is AdapterKind.FAKE:
         from app.llm.providers.fake import FakeLLMClient
 
@@ -40,7 +45,7 @@ def build_llm_client(settings: Settings, resolved: ResolvedProvider) -> LLMClien
         return AnthropicLLMClient(
             api_key=resolved.api_key,
             base_url=resolved.base_url,
-            max_retries=settings.generation_max_retries,
+            max_retries=retries,
             refusal_fallback=settings.generation_refusal_fallback,
         )
     if kind is AdapterKind.GROQ:
@@ -51,7 +56,7 @@ def build_llm_client(settings: Settings, resolved: ResolvedProvider) -> LLMClien
         return GroqLLMClient(
             api_key=resolved.api_key,
             base_url=resolved.base_url,
-            max_retries=settings.generation_max_retries,
+            max_retries=retries,
         )
     if kind is AdapterKind.GEMINI:
         try:
@@ -63,7 +68,7 @@ def build_llm_client(settings: Settings, resolved: ResolvedProvider) -> LLMClien
         return GeminiLLMClient(
             api_key=resolved.api_key,
             base_url=resolved.base_url,
-            max_retries=settings.generation_max_retries,
+            max_retries=retries,
         )
     if kind is AdapterKind.OPENAI_COMPATIBLE:
         try:
@@ -75,7 +80,7 @@ def build_llm_client(settings: Settings, resolved: ResolvedProvider) -> LLMClien
             provider=preset.name,
             api_key=resolved.api_key,
             base_url=resolved.base_url,
-            max_retries=settings.generation_max_retries,
+            max_retries=retries,
             system_role=preset.system_role,
             max_tokens_param=preset.max_tokens_param,
             effort_style=(

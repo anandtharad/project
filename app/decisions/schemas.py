@@ -1,10 +1,11 @@
 """Typed decision questions and results (spec §7.4, §7.6).
 
-A decision model (Jev, or a self-hosted Laya server speaking the same
-protocol) answers bounded questions about the current turn. Application code
-owns everything around it: which questions are asked, validation of every
-answer against the question asked, confidence thresholds, and the fallback
-used when no valid, confident answer is available.
+A decision model (Jev, a self-hosted Laya server speaking the same
+protocol, or a general LLM behind the same typed interface) answers bounded
+questions about the current turn. Application code owns everything around
+it: which questions are asked, validation of every answer against the
+question asked, confidence thresholds, and the fallback used when no valid,
+confident answer is available.
 """
 
 from __future__ import annotations
@@ -18,7 +19,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 DecisionKind = Literal["choice", "score", "noul"]
-DecisionProvider = Literal["off", "jev", "laya"]
+DecisionProvider = Literal["off", "jev", "laya", "llm"]
 
 
 class QuestionSpec(BaseModel):
@@ -94,14 +95,16 @@ class FallbackReason(StrEnum):
     DISABLED = "disabled"  # DECISION_PROVIDER=off
     TIMEOUT = "timeout"
     UNAVAILABLE = "unavailable"  # connection failure, 5xx, overload
-    RATE_LIMITED = "rate_limited"
-    REJECTED = "rejected"  # 4xx: authentication, permission, request validation
+    RATE_LIMITED = "rate_limited"  # per-minute rate limit or used-up quota
+    # 4xx: authentication, permission, request validation, provider moderation
+    REJECTED = "rejected"
     INVALID_RESPONSE = "invalid_response"  # the response body does not match the protocol
     INVALID_ANSWER = "invalid_answer"
     MISSING_ANSWER = "missing_answer"
     LOW_CONFIDENCE = "low_confidence"  # valid, but below the policy threshold
     # Valid, but no threshold has been chosen from evaluation data for this
-    # question and provider yet: recorded, not acted on (shadow mode).
+    # question and calibration identity (provider, model and, for an LLM, the
+    # decision prompt) yet: recorded, not acted on (shadow mode).
     NOT_CALIBRATED = "not_calibrated"
 
 

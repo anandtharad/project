@@ -3,11 +3,13 @@
 `DecisionService.decide` never raises. Every question gets a result: a
 valid, confident model answer, or its documented fallback with the reason.
 
-Thresholds are per question *and* provider, because a Jev confidence and a
-Laya confidence are computed differently. A question with no threshold for
-the active provider runs in shadow mode: its answer is validated and stored,
-but the application uses the fallback (reason `not_calibrated`) until an
-evaluation on labelled data justifies acting on it (spec §7.7, §7.8).
+Thresholds are per question *and* calibration identity (provider, model
+and, for an LLM, the decision prompt; `app/decisions/thresholds.py`), because
+a Jev confidence, a Laya confidence and an LLM's normalised weights are
+computed differently. A question with no threshold for the active identity
+runs in shadow mode: its answer is validated and stored, but the application
+uses the fallback (reason `not_calibrated`) until an evaluation on labelled
+data justifies acting on it (spec §7.7, §7.8).
 """
 
 from __future__ import annotations
@@ -147,15 +149,18 @@ class DecisionService:
         questions: Sequence[QuestionSpec],
         thresholds: Mapping[str, float | None],
         timeout_seconds: float,
+        calibration_key: str | None = None,
     ) -> None:
         if (provider == "off") != (backend is None):
             raise ValueError("a backend is required unless the provider is 'off'")
         self.provider = provider
         self._backend = backend
         self._questions = list(questions)
-        # question key (id@version) -> minimum certainty for this provider
+        # question key (id@version) -> minimum certainty for this calibration
+        # identity (logged as `calibration`)
         self._thresholds = dict(thresholds)
         self._timeout = timeout_seconds
+        self.calibration_key = calibration_key
 
     @property
     def questions(self) -> list[QuestionSpec]:
@@ -183,8 +188,10 @@ class DecisionService:
             "decisions.resolved",
             provider=self.provider,
             model_id=raw.model_id,
+            calibration=self.calibration_key,
             latency_ms=round(raw.latency_ms, 2),
             input_tokens=raw.input_tokens,
+            output_tokens=raw.output_tokens,
             acted_on=sorted(k for k, r in results.items() if not r.fallback),
             fallbacks={
                 k: r.fallback_reason.value

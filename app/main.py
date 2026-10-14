@@ -21,6 +21,7 @@ from app.config import AppEnv, Effort, Settings, get_settings
 from app.context.builder import ContextBuilder
 from app.db.session import create_engine, create_session_factory
 from app.decisions.factory import build_decision_service
+from app.decisions.llm_backend import DECISION_PROMPT_ID
 from app.decisions.questions import QUESTIONS, verify_locked
 from app.decisions.service import DecisionBackend
 from app.embeddings.factory import build_embedding_client
@@ -169,6 +170,8 @@ def create_app(
     prompt = registry.get(COMPANION_PROMPT_ID, settings.companion_prompt_version)
     state_prompt = registry.get(STATE_PROMPT_ID, settings.state_prompt_version)
     memory_prompt = registry.get(MEMORY_PROMPT_ID, settings.memory_prompt_version)
+    if settings.decision_provider == "llm":
+        registry.get(DECISION_PROMPT_ID, settings.decision_prompt_version)
     verify_locked(QUESTIONS)
     dev_tokens = settings.dev_token_map()
     head = migration_head()
@@ -233,6 +236,7 @@ def create_app(
             prompt=prompt.key,
             migration_head=head,
             decision_provider=settings.decision_provider,
+            decision_calibration=decisions.calibration_key,
             state_model=state_extractor.model if state_extractor else None,
             memory_enabled=memory is not None,
             embedding_model=memory.embedding_model if memory else None,

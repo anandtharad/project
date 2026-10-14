@@ -172,8 +172,10 @@ class Settings(BaseSettings):
 
     # --- Decisions (spec §7) -------------------------------------------------
     # "jev": TypeSafe's hosted API. "laya": a self-hosted Laya server
-    # (laya-serve) speaking the same protocol. "off": documented fallbacks only.
-    decision_provider: Literal["off", "jev", "laya"] = "off"
+    # (laya-serve) speaking the same protocol. "llm": a general LLM answers the
+    # same typed questions (app/decisions/llm_backend.py). "off": documented
+    # fallbacks only.
+    decision_provider: Literal["off", "jev", "laya", "llm"] = "off"
     jev_api_key: SecretStr | None = Field(
         default=None, validation_alias=AliasChoices("jev_api_key", "typesafe_api_key")
     )
@@ -191,6 +193,18 @@ class Settings(BaseSettings):
         validation_alias=AliasChoices("decision_timeout_seconds", "jev_timeout_seconds"),
     )
     decision_max_retries: int = Field(default=1, ge=0, le=3)
+    # DECISION_PROVIDER=llm: any provider preset, with that provider's own key
+    # (e.g. GROQ_API_KEY). The default is deliberately not the reply model
+    # (Groq's default is openai/gpt-oss-120b), so decisions do not share its
+    # per-model rate limit. Changing the provider, model or prompt version
+    # selects other thresholds (app/decisions/thresholds.py).
+    decision_llm_provider: ProviderName = "groq"
+    decision_llm_model: str = Field(default="openai/gpt-oss-20b", min_length=1)
+    # As GENERATION_EFFORT: mapped per provider; "off" sends no effort parameter.
+    decision_llm_effort: Effort | Literal["off"] = "low"
+    # Includes hidden reasoning tokens on reasoning models.
+    decision_llm_max_output_tokens: int = Field(default=1024, ge=256, le=8192)
+    decision_prompt_version: str = "1.0.0"
 
     # --- Turn limits --------------------------------------------------------
     turn_deadline_seconds: float = Field(default=90.0, gt=0)
@@ -239,6 +253,13 @@ class Settings(BaseSettings):
             raise ValueError(
                 "DECISION_PROVIDER=laya requires LAYA_API_KEY (set the same on laya-serve)"
             )
+        if self.decision_provider == "llm":
+            # Imported here because the registry imports this module. Resolves the
+            # decision model exactly as the reply model is resolved, so a missing
+            # key (e.g. GROQ_API_KEY) fails at startup, not on the first turn.
+            from app.llm.providers.registry import resolve_decision_llm
+
+            resolve_decision_llm(self)
         if self.app_env is AppEnv.PRODUCTION:
             if self.auth_mode == "dev":
                 raise ValueError(
@@ -247,6 +268,8 @@ class Settings(BaseSettings):
                 )
             if self.generation_provider == "fake":
                 raise ValueError("GENERATION_PROVIDER=fake is a development stub")
+            if self.decision_provider == "llm" and self.decision_llm_provider == "fake":
+                raise ValueError("DECISION_LLM_PROVIDER=fake is a development stub")
             if self.embedding_provider == "fake":
                 raise ValueError("EMBEDDING_PROVIDER=fake is a development stub")
             if self.expose_timing_metadata:

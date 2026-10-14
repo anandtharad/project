@@ -96,6 +96,9 @@ EMPTY_EXTRACTION = json.dumps(
 
 NO_MEMORIES = json.dumps({"candidates": []})
 
+# Not a valid decision reply: decision tests queue the reply they need.
+NO_DECISIONS = "{}"
+
 
 class ScriptedLLMClient:
     """Deterministic LLM test double.
@@ -104,26 +107,31 @@ class ScriptedLLMClient:
     it replies "reply to: <last user message>" so tests can trace which
     context was used. Every request is recorded.
 
-    State-extraction and memory-extraction calls are recorded separately
-    (`state_requests`, `memory_requests`) and consume their own queues
-    (`queue_state`, `queue_memory`); by default they return an empty state and
-    no memory candidates, so scripted conversation replies are unaffected.
+    State-extraction, memory-extraction and decision calls are recorded
+    separately (`state_requests`, `memory_requests`, `decision_requests`) and
+    consume their own queues (`queue_state`, `queue_memory`,
+    `queue_decision`); by default they return an empty state, no memory
+    candidates and an empty (invalid) decision reply, so scripted conversation
+    replies are unaffected.
     """
 
     def __init__(self) -> None:
         self.requests: list[GenerationRequest] = []
         self.state_requests: list[GenerationRequest] = []
         self.memory_requests: list[GenerationRequest] = []
+        self.decision_requests: list[GenerationRequest] = []
+        self.closed = False
         self._steps: deque[Step] = deque()
         self._state_steps: deque[Step] = deque()
         self._memory_steps: deque[Step] = deque()
+        self._decision_steps: deque[Step] = deque()
 
     @property
     def provider(self) -> str:
         return "scripted"
 
     async def aclose(self) -> None:
-        return None
+        self.closed = True
 
     def queue(self, *steps: Step) -> None:
         self._steps.extend(steps)
@@ -134,6 +142,9 @@ class ScriptedLLMClient:
     def queue_memory(self, *steps: Step) -> None:
         self._memory_steps.extend(steps)
 
+    def queue_decision(self, *steps: Step) -> None:
+        self._decision_steps.extend(steps)
+
     async def generate(self, request: GenerationRequest) -> GenerationResponse:
         step: Step
         if request.trace.purpose is GenerationPurpose.STATE_EXTRACTION:
@@ -142,6 +153,9 @@ class ScriptedLLMClient:
         elif request.trace.purpose is GenerationPurpose.MEMORY_EXTRACTION:
             self.memory_requests.append(request)
             step = self._memory_steps.popleft() if self._memory_steps else NO_MEMORIES
+        elif request.trace.purpose is GenerationPurpose.DECISION:
+            self.decision_requests.append(request)
+            step = self._decision_steps.popleft() if self._decision_steps else NO_DECISIONS
         else:
             self.requests.append(request)
             step = (

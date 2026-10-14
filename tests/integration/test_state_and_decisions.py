@@ -85,7 +85,7 @@ def calibrated(monkeypatch: pytest.MonkeyPatch) -> None:
     """Pretend an evaluation justified acting on both choice questions."""
     monkeypatch.setitem(
         thresholds_module.THRESHOLDS,
-        "laya",
+        "laya:english",  # the calibration key of laya_client's settings
         {CONVERSATION_MODE.key: 0.5, RESPONSE_STRATEGY.key: 0.5},
     )
 

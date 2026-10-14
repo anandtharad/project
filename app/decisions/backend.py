@@ -8,6 +8,9 @@ One adapter serves two providers that speak the same wire protocol
         request and response shape. Run it with LAYA_JEV_STRICT=1 so the
         response matches the Jev contract exactly.
 
+The third provider, llm, is a general LLM behind the same interface
+(`app/decisions/llm_backend.py`).
+
 The SDK reads TYPESAFE_API_KEY / TYPESAFE_BASE_URL / TYPESAFE_DEFAULT_MODEL
 when an argument is missing; this adapter always passes all three, so no
 ambient variable can redirect a request or attach another key. The SDK logs
@@ -31,15 +34,29 @@ SDK_LOGGER = "typesafe_sdk"
 
 
 class DecisionBackendError(Exception):
-    """The request produced no usable response. `reason` is safe to log."""
+    """The request produced no usable response. `reason` and `message` are safe
+    to log (never content).
+
+    For rate limits, `retry_after_seconds` is the provider's requested wait and
+    `quota_exhausted` says a daily or billing quota is used up (retrying soon
+    will not help); the evaluation script uses both to pace a run.
+    """
 
     def __init__(
-        self, reason: FallbackReason, message: str, *, status_code: int | None = None
+        self,
+        reason: FallbackReason,
+        message: str,
+        *,
+        status_code: int | None = None,
+        retry_after_seconds: float | None = None,
+        quota_exhausted: bool = False,
     ) -> None:
         super().__init__(message)
         self.reason = reason
         self.message = message
         self.status_code = status_code
+        self.retry_after_seconds = retry_after_seconds
+        self.quota_exhausted = quota_exhausted
 
 
 @dataclass(frozen=True)
@@ -51,6 +68,7 @@ class BackendAnswers:
     latency_ms: float
     request_id: str | None
     input_tokens: int | None
+    output_tokens: int | None = None
 
 
 def cap_sdk_logger() -> None:
@@ -116,7 +134,12 @@ class SystemOneBackend:
             ) from exc
         except sdk.TypeSafeRateLimitError as exc:
             raise DecisionBackendError(
-                FallbackReason.RATE_LIMITED, "decision service rate limit", status_code=exc.status
+                FallbackReason.RATE_LIMITED,
+                "decision service rate limit",
+                status_code=exc.status,
+                retry_after_seconds=(
+                    exc.retry_after_ms / 1000 if exc.retry_after_ms is not None else None
+                ),
             ) from exc
         except sdk.TypeSafeAPIError as exc:
             # 529 (overloaded) and other 5xx are outages; 4xx are rejections.
@@ -138,6 +161,7 @@ class SystemOneBackend:
             latency_ms=latency_ms,
             request_id=request_id,
             input_tokens=response.usage.input_tokens,
+            output_tokens=response.usage.output_tokens,
         )
 
     async def aclose(self) -> None:
