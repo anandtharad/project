@@ -168,6 +168,7 @@ class DecisionService:
 
     async def decide(self, state: Mapping[str, Any]) -> DecisionSet:
         if self._backend is None:
+            log_event(logger, "decisions.skipped", reason="disabled")
             return self._all_fallback(FallbackReason.DISABLED)
         try:
             async with asyncio.timeout(self._timeout):

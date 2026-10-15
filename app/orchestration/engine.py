@@ -162,6 +162,12 @@ class TurnOrchestrator:
         trace.mark(TurnStage.AUTHORIZED)
         trace.mark(TurnStage.USER_MESSAGE_PERSISTED)
         trace.mark(TurnStage.CONTEXT_LOADED)
+        log_event(
+            logger,
+            "turn.accepted",
+            conversation_id=str(conversation_id),
+            history_messages=len(begun.history),
+        )
         try:
             return await self._run(begun, trace, trace_id, user_id, conversation_id, content)
         except (AppError, TurnAttemptLost):
@@ -216,6 +222,14 @@ class TurnOrchestrator:
         if lookup is not None and (is_safety_pathway(safety) or policy.safety_signal):
             # No reference passages on a safety pathway (docs/rag.md).
             lookup = lookup.skipped_for_safety()
+        if lookup is not None and lookup.status in ("not_needed", "skipped_safety"):
+            log_event(
+                logger,
+                "knowledge.skipped",
+                status=lookup.status,
+                route=lookup.route.kind,
+                reason=lookup.route.reason,
+            )
         trace.mark(TurnStage.POLICY_CREATED)
 
         context = self._context_builder.build(
@@ -373,8 +387,31 @@ class TurnOrchestrator:
             output_tokens=response.usage.output_tokens,
             generation_ms=round(response.latency_ms, 2),
             total_ms=round(trace.elapsed_seconds() * 1000, 2),
+            versions=self._versions(assessment),
+            knowledge=lookup.status if lookup is not None else "disabled",
+            citations=len(citations.citations),
         )
         return TurnResult(turn=completed, timings_ms=trace.timings_ms())
+
+    def _versions(self, assessment: SafetyAssessment | None) -> dict[str, str | None]:
+        """Component versions for the turn's log record (spec §19.1)."""
+        settings = self._settings
+        knowledge = self._knowledge
+        return {
+            "prompt": self._prompt.key,
+            "state_prompt": settings.state_prompt_version if self._state_extractor else None,
+            "memory_prompt": settings.memory_prompt_version if self._memory else None,
+            "decisions": self._decisions.calibration_key,
+            "safety_policy": assessment.policy_version if assessment else None,
+            "safety_patterns": assessment.patterns_version if assessment else None,
+            "embedding_model": (
+                knowledge.retriever.embedding_model
+                if knowledge is not None
+                else self._memory.embedding_model
+                if self._memory is not None
+                else None
+            ),
+        }
 
     async def _look_up(self, content: str, begun: StartedTurn) -> KnowledgeLookup | None:
         if self._knowledge is None:

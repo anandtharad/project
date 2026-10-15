@@ -62,4 +62,9 @@ def configure_logging(level: str) -> None:
 
 
 def log_event(logger: logging.Logger, event: str, level: int = logging.INFO, **fields: Any) -> None:
+    # The trace ID is taken when the event happens, not when it is formatted:
+    # a handler may format later, outside the request's context.
+    trace_id = trace_id_var.get()
+    if trace_id is not None and "trace_id" not in fields:
+        fields = {"trace_id": trace_id, **fields}
     logger.log(level, event, extra={_FIELDS_ATTR: fields})

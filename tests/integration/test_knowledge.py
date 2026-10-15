@@ -6,6 +6,7 @@ retrieval for casual conversation."""
 from __future__ import annotations
 
 import json
+import logging
 import uuid
 from collections.abc import AsyncIterator
 from pathlib import Path
@@ -18,6 +19,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 
 from app.embeddings.base import FakeEmbeddingClient
+from app.observability import JsonFormatter
 from app.rag.chunking import ChunkParams
 from app.rag.extract import Block, ExtractedPage
 from app.rag.ingest import IngestReport, ingest
@@ -427,3 +429,38 @@ async def test_knowledge_can_be_switched_off(
         response = await send(c, cid, "how much sleep do adults need?")
     assert evidence_of(llm) is None
     assert response.json()["assistant_content"] == "Seven or more hours, usually."
+
+
+async def test_a_turn_emits_the_observability_events(
+    client: httpx.AsyncClient, llm: ScriptedLLMClient, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Spec §19.1: acceptance, safety analysis, decisions, retrieval execution
+    or skip, generation, validation and completion, with a trace id and
+    component versions, and no message text."""
+    caplog.set_level(logging.INFO)
+    llm.queue_safety(no_risk(), no_risk())
+    llm.queue("Seven or more hours [S1].", "Morning!")
+    cid = await create_conversation(client, ALICE)
+    await send(client, cid, "how much sleep do adults need? private-note-5521")
+    await send(client, cid, "good morning")
+    formatter = JsonFormatter()
+    events = [json.loads(formatter.format(r)) for r in caplog.records]
+    names = {e["event"] for e in events}
+    assert names & {"decisions.resolved", "decisions.skipped", "decisions.unavailable"}
+    for expected in (
+        "turn.accepted",
+        "safety.assessed",
+        "knowledge.retrieved",
+        "knowledge.skipped",
+        "generation.completed",
+        "response.validated",
+        "turn.completed",
+    ):
+        assert expected in names, expected
+    completed = [e for e in events if e["event"] == "turn.completed"]
+    assert all(e.get("trace_id") for e in completed)
+    versions = completed[0]["versions"]
+    assert versions["prompt"].startswith("companion_system@")
+    assert versions["safety_policy"] and versions["embedding_model"]
+    assert completed[0]["knowledge"] == "ok" and completed[0]["citations"] == 1
+    assert "private-note-5521" not in json.dumps(events)
