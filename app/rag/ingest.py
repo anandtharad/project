@@ -102,7 +102,7 @@ def normalized_blocks(blocks: tuple[Block, ...]) -> tuple[Block, ...]:
 
 
 async def _ingest_source(
-    entry: SourceEntry, store: KnowledgeStore, params: ChunkParams
+    entry: SourceEntry, store: KnowledgeStore, params: ChunkParams, min_words: int
 ) -> SourceReport:
     key = entry.meta.key
     try:
@@ -113,7 +113,7 @@ async def _ingest_source(
         return SourceReport(key, "failed", failure="snapshot does not match the manifest entry")
     blocks = normalized_blocks(snapshot.page.blocks)
     words = sum(len(b.text.split()) for b in blocks if b.level == 0)
-    if words < MIN_DOCUMENT_WORDS:
+    if words < min_words:
         return SourceReport(key, "failed", words=words, failure="too little text")
     chunks = chunk_page(entry.meta.title, blocks, params)
     if not chunks:
@@ -190,6 +190,7 @@ async def ingest(
     retriever: KnowledgeRetriever | None = None,
     prune: bool = False,
     only: set[str] | None = None,
+    min_document_words: int = MIN_DOCUMENT_WORDS,
 ) -> IngestReport:
     started = time.monotonic()
     report = IngestReport(
@@ -201,7 +202,7 @@ async def ingest(
     for entry in manifest.sources:
         if only is not None and entry.meta.key not in only:
             continue
-        report.sources.append(await _ingest_source(entry, store, params))
+        report.sources.append(await _ingest_source(entry, store, params, min_document_words))
     if prune and only is None:
         report.retired = await store.retire_missing({s.meta.key for s in manifest.sources})
     if embeddings is not None:
