@@ -7,7 +7,7 @@ from collections.abc import AsyncIterator
 
 import pytest
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker
 
 from app.evaluation.metadata import diff, experiment_metadata
 from app.evaluation.runs import ItemResult, RunRecorder

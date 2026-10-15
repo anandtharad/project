@@ -23,13 +23,21 @@ def upgrade() -> None:
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("suite", sa.String(length=64), nullable=False),
         sa.Column("name", sa.String(length=200), nullable=False),
-        sa.Column("status", sa.String(length=16), server_default=sa.text("'running'"), nullable=False),
+        sa.Column(
+            "status", sa.String(length=16), server_default=sa.text("'running'"), nullable=False
+        ),
         sa.Column("metadata", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
         sa.Column("metrics", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
-        sa.Column("started_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column(
+            "started_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
         sa.Column("finished_at", sa.DateTime(timezone=True), nullable=True),
         sa.CheckConstraint(
-            "status IN ('running', 'completed', 'failed')", name="ck_evaluation_runs_evaluation_status_valid"
+            "status IN ('running', 'completed', 'failed')",
+            name="ck_evaluation_runs_evaluation_status_valid",
         ),
         sa.PrimaryKeyConstraint("id", name="pk_evaluation_runs"),
     )
@@ -40,12 +48,30 @@ def upgrade() -> None:
         sa.Column("run_id", sa.Uuid(), nullable=False),
         sa.Column("item_id", sa.String(length=128), nullable=False),
         sa.Column("passed", sa.Boolean(), nullable=True),
-        sa.Column("metrics", postgresql.JSONB(astext_type=sa.Text()), server_default=sa.text("'{}'::jsonb"), nullable=False),
-        sa.Column("labels", postgresql.JSONB(astext_type=sa.Text()), server_default=sa.text("'{}'::jsonb"), nullable=False),
+        sa.Column(
+            "metrics",
+            postgresql.JSONB(astext_type=sa.Text()),
+            server_default=sa.text("'{}'::jsonb"),
+            nullable=False,
+        ),
+        sa.Column(
+            "labels",
+            postgresql.JSONB(astext_type=sa.Text()),
+            server_default=sa.text("'{}'::jsonb"),
+            nullable=False,
+        ),
         sa.Column("error", sa.String(length=200), nullable=True),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("now()"),
+            nullable=False,
+        ),
         sa.ForeignKeyConstraint(
-            ["run_id"], ["evaluation_runs.id"], name="fk_evaluation_results_run_id_evaluation_runs", ondelete="CASCADE"
+            ["run_id"],
+            ["evaluation_runs.id"],
+            name="fk_evaluation_results_run_id_evaluation_runs",
+            ondelete="CASCADE",
         ),
         sa.PrimaryKeyConstraint("id", name="pk_evaluation_results"),
         sa.UniqueConstraint("run_id", "item_id", name="uq_evaluation_results_run_item"),
