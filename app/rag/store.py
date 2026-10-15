@@ -315,7 +315,8 @@ class KnowledgeStore:
                 .join(KnowledgeDocument)
                 .options(defer(KnowledgeChunk.embedding))
                 .where(*conditions)
-                .order_by(order, KnowledgeChunk.id)
+                # Content, not ids, breaks ties: the same corpus, the same order.
+                .order_by(order, KnowledgeChunk.text_checksum)
                 .limit(limit)
             )
             return [

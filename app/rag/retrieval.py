@@ -101,7 +101,17 @@ def merge(
         s_rank, l_rank = semantic_rank.get(chunk_id), lexical_rank.get(chunk_id)
         score = sum(1.0 / (params.rrf_k + r) for r in (s_rank, l_rank) if r is not None)
         kept.append(Passage(candidate, score, s_rank, l_rank))
-    kept.sort(key=lambda p: (-p.score, str(p.candidate.chunk_id)))
+    # Ties broken by content, not by ids (which differ between databases), so
+    # the same corpus always gives the same order.
+    kept.sort(
+        key=lambda p: (
+            -p.score,
+            -(p.candidate.semantic or 0.0),
+            -(p.candidate.lexical or 0.0),
+            p.candidate.source_key,
+            p.candidate.text_checksum,
+        )
+    )
 
     selected: list[Passage] = []
     seen_text: set[str] = set()

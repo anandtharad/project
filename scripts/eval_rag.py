@@ -41,6 +41,7 @@ import re
 import sys
 import uuid
 from collections import Counter, defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
@@ -262,7 +263,15 @@ def _norm(text: str) -> str:
     return " ".join(re.sub(r"[^\w\s]", " ", text.lower()).split())
 
 
-def score(items: list[Scored], params: RetrievalParams, *, lexical_only: bool) -> dict[str, Any]:
+def score(
+    items: list[Scored],
+    params: RetrievalParams,
+    *,
+    lexical_only: bool,
+    select: Callable[[Scored], list[Candidate]] | None = None,
+) -> dict[str, Any]:
+    """Metrics for one configuration. `select` replaces the app's merge (the
+    reranker experiment)."""
     answerable = [s for s in items if s.query["type"] == "answerable"]
     negative = [s for s in items if s.query["type"] != "answerable"]
     hits = recall = precision = rr = facts = 0.0
@@ -270,8 +279,14 @@ def score(items: list[Scored], params: RetrievalParams, *, lexical_only: bool) -
     per_query: list[dict[str, Any]] = []
     abstained = 0
     for s in items:
-        passages, _ = merge(s.lexical, None if lexical_only else s.semantic, params)
-        keys = [p.candidate.source_key for p in passages]
+        if select is not None:
+            passages = select(s)
+        else:
+            passages = [
+                p.candidate
+                for p in merge(s.lexical, None if lexical_only else s.semantic, params)[0]
+            ]
+        keys = [p.source_key for p in passages]
         relevant = set(s.query["relevant_sources"])
         record: dict[str, Any] = {"id": s.query["id"], "type": s.query["type"], "retrieved": keys}
         if s.query["type"] == "answerable":
@@ -284,7 +299,7 @@ def score(items: list[Scored], params: RetrievalParams, *, lexical_only: bool) -
             first = next((i for i, k in enumerate(keys, 1) if k in relevant), None)
             rr += 1 / first if first else 0.0
             wanted = [_norm(f) for f in s.query["expected_facts"]]
-            fact = any(any(f in _norm(p.candidate.text) for f in wanted) for p in passages)
+            fact = any(any(f in _norm(p.text) for f in wanted) for p in passages)
             facts += fact
             record["fact_hit"] = fact
         else:
@@ -384,6 +399,63 @@ async def candidates_for(
         await drop_database(base_url, url)
 
 
+RERANK_THRESHOLDS = [round(-6.0 + 0.25 * i, 2) for i in range(57)]  # -6 .. 8 (logits)
+
+
+def rerank_scores(model_name: str, scored: list[Scored]) -> dict[tuple[str, object], float]:
+    """Cross-encoder score for every (query id, chunk id) candidate."""
+    from fastembed.rerank.cross_encoder import TextCrossEncoder
+
+    settings = get_settings()
+    model = TextCrossEncoder(model_name=model_name, cache_dir=settings.embedding_cache_dir)
+    out: dict[tuple[str, object], float] = {}
+    for s in scored:
+        pool = {c.chunk_id: c for c in [*(s.semantic or ()), *s.lexical]}
+        if not pool:
+            continue
+        ids = list(pool)
+        texts = [f"{pool[i].heading}\n{pool[i].text}" for i in ids]
+        for chunk_id, value in zip(ids, model.rerank(s.query["query"], texts), strict=True):
+            out[(s.query["id"], chunk_id)] = float(value)
+    return out
+
+
+def reranked(
+    scores: dict[tuple[str, object], float],
+    params: RetrievalParams,
+    *,
+    threshold: float,
+    semantic_gate: float | None,
+) -> Callable[[Scored], list[Candidate]]:
+    """Order by the reranker; gate on its score, or on similarity when
+    `semantic_gate` is set; then de-duplicate and cap as the app does."""
+
+    def select(s: Scored) -> list[Candidate]:
+        pool = {c.chunk_id: c for c in [*(s.semantic or ()), *s.lexical]}
+        semantic = {c.chunk_id: c.semantic for c in (s.semantic or ())}
+        ranked = sorted(pool, key=lambda i: -scores.get((s.query["id"], i), -99.0))
+        chosen: list[Candidate] = []
+        texts: set[str] = set()
+        per_doc: Counter[object] = Counter()
+        for i in ranked:
+            c = pool[i]
+            if semantic_gate is not None:
+                if (semantic.get(i) or 0.0) < semantic_gate:
+                    continue
+            elif scores.get((s.query["id"], i), -99.0) < threshold:
+                continue
+            if c.text_checksum in texts or per_doc[c.document_id] >= params.max_per_document:
+                continue
+            texts.add(c.text_checksum)
+            per_doc[c.document_id] += 1
+            chosen.append(c)
+            if len(chosen) == params.max_results:
+                break
+        return chosen
+
+    return select
+
+
 async def eval_retrieval(args: argparse.Namespace) -> int:
     settings = get_settings()
     path = DATASET_DIR / "retrieval.jsonl"
@@ -416,7 +488,7 @@ async def eval_retrieval(args: argparse.Namespace) -> int:
                     "min_semantic": fixed.min_semantic,
                     **score(scored, fixed, lexical_only=embeddings is None),
                 }
-            if embeddings is not None:
+            if embeddings is not None and args.min_semantic is None:
                 sweep = {
                     t: score(scored, replace(base, min_semantic=t), lexical_only=False)
                     for t in THRESHOLDS
@@ -425,9 +497,47 @@ async def eval_retrieval(args: argparse.Namespace) -> int:
                 run["sweep"] = {str(t): r["metrics"] for t, r in sweep.items()}
                 run["selected_min_semantic"] = best
                 run["selected"] = sweep[best]
+            if args.reranker:
+                scores = rerank_scores(args.reranker, scored)
+                gate = {
+                    t: score(
+                        scored,
+                        base,
+                        lexical_only=False,
+                        select=reranked(scores, base, threshold=t, semantic_gate=None),
+                    )
+                    for t in RERANK_THRESHOLDS
+                }
+                best_gate = select(gate)
+                ordering = score(
+                    scored,
+                    base,
+                    lexical_only=False,
+                    select=reranked(
+                        scores,
+                        base,
+                        threshold=0.0,
+                        semantic_gate=args.min_semantic or base.min_semantic,
+                    ),
+                )
+                run["reranker"] = {
+                    "model": args.reranker,
+                    "gate_selected": best_gate,
+                    "gate_metrics": gate[best_gate]["metrics"],
+                    "gate_sweep": {str(t): r["metrics"] for t, r in gate.items()},
+                    "ordering_only": ordering["metrics"],
+                }
+                print(
+                    f"   reranker {args.reranker}: gate {best_gate}",
+                    json.dumps(gate[best_gate]["metrics"]),
+                )
+                print("   reranker ordering only:", json.dumps(ordering["metrics"]))
+            lexical_values = (
+                [args.min_lexical] if args.min_lexical is not None else LEXICAL_THRESHOLDS
+            )
             lexical = {
                 t: score(scored, replace(base, min_lexical=t), lexical_only=True)
-                for t in LEXICAL_THRESHOLDS
+                for t in lexical_values
             }
             best_lexical = select(lexical)
             run["lexical_fallback"] = {
@@ -673,6 +783,10 @@ def main() -> int:
     retrieval.add_argument("--split", choices=["dev", "test", "all"], default="dev")
     retrieval.add_argument("--chunking", nargs="*", help="max/overlap/min words, e.g. 180/30/25")
     retrieval.add_argument("--min-semantic", type=float, help="evaluate this threshold as is")
+    retrieval.add_argument(
+        "--min-lexical", type=float, help="evaluate this full-text fallback threshold as is"
+    )
+    retrieval.add_argument("--reranker", help="experiment: a fastembed cross-encoder model")
     generation = sub.add_parser("generation")
     generation.add_argument("--split", choices=["dev", "test", "all"], default="test")
     generation.add_argument("--limit", type=int, help="at most this many queries")

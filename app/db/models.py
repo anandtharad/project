@@ -378,3 +378,45 @@ class KnowledgeChunk(Base):
     # Vectors from different models are never compared; dimensions vary by model.
     embedding: Mapped[list[float] | None] = mapped_column(Vector())
     embedding_model: Mapped[str | None] = mapped_column(String(128))
+
+
+class EvaluationRun(Base):
+    """One evaluation run (spec §15.1, §19.3): its suite, the experiment
+    metadata that decided its behaviour (app/evaluation/metadata.py) and its
+    summary metrics. No secrets, and no conversation content."""
+
+    __tablename__ = "evaluation_runs"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('running', 'completed', 'failed')", name="evaluation_status_valid"
+        ),
+        Index("ix_evaluation_runs_suite_started", "suite", "started_at"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    suite: Mapped[str] = mapped_column(String(64))
+    name: Mapped[str] = mapped_column(String(200))
+    status: Mapped[str] = mapped_column(String(16), server_default=text("'running'"))
+    run_metadata: Mapped[dict[str, Any]] = mapped_column("metadata", JSONB)
+    metrics: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class EvaluationResult(Base):
+    """One item's outcome in a run: ids, labels and metrics, so a failure can
+    be traced to the item and the run's versions."""
+
+    __tablename__ = "evaluation_results"
+    __table_args__ = (UniqueConstraint("run_id", "item_id", name="uq_evaluation_results_run_item"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    run_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("evaluation_runs.id", ondelete="CASCADE"), index=True
+    )
+    item_id: Mapped[str] = mapped_column(String(128))
+    passed: Mapped[bool | None] = mapped_column(Boolean)
+    metrics: Mapped[dict[str, Any]] = mapped_column(JSONB, server_default=text("'{}'::jsonb"))
+    labels: Mapped[dict[str, Any]] = mapped_column(JSONB, server_default=text("'{}'::jsonb"))
+    error: Mapped[str | None] = mapped_column(String(200))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
