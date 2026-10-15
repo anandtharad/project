@@ -169,7 +169,7 @@ def _clip(text: str, limit: int) -> str:
     if len(text) <= limit:
         return text
     head = (limit * 2) // 3
-    return f"{text[:head]} [...] {text[-(limit - head):]}"
+    return f"{text[:head]} [...] {text[-(limit - head) :]}"
 
 
 def build_conversation(message: str, history: Sequence[ChatMessage] = ()) -> dict[str, Any]:
@@ -306,9 +306,7 @@ class SafetyClassifier:
             response_schema=self._schema,
         )
 
-    async def classify(
-        self, message: str, history: Sequence[ChatMessage] = ()
-    ) -> ClassifierResult:
+    async def classify(self, message: str, history: Sequence[ChatMessage] = ()) -> ClassifierResult:
         """`history`: the earlier messages, oldest first, without `message`."""
         call = await run_label_request(
             self._llm,

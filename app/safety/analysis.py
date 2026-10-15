@@ -26,6 +26,7 @@ import logging
 import time
 from collections.abc import Sequence
 from dataclasses import dataclass, replace
+from typing import Any
 
 from app.llm.schemas import ChatMessage, ChatRole
 from app.observability import log_event
@@ -73,7 +74,7 @@ class SafetyAssessment:
             decision_signal=True,
         )
 
-    def summary(self) -> dict[str, object]:
+    def summary(self) -> dict[str, Any]:
         """Labels and statuses for provenance metadata and logs (no content)."""
         return {
             "category": self.category.value,

@@ -48,41 +48,41 @@ Strength = Literal["explicit", "concern"]
 
 # --- normalisation ------------------------------------------------------------
 
-# Look-alike letters from other alphabets used to dodge filters ("kіll" with
-# a Cyrillic і), and quote marks phones and word processors type.
+# Look-alike letters from other alphabets used to dodge filters ("kill" spelt
+# with a Cyrillic i), and quote marks phones and word processors type.
 _CONFUSABLES = str.maketrans(
     {
-        "а": "a",  # Cyrillic а
-        "е": "e",  # е
-        "о": "o",  # о
-        "р": "p",  # р
-        "с": "c",  # с
-        "у": "y",  # у
-        "х": "x",  # х
-        "і": "i",  # і
-        "ј": "j",  # ј
-        "ѕ": "s",  # ѕ
-        "к": "k",  # к
-        "м": "m",  # м
-        "т": "t",  # т
-        "н": "h",  # н
-        "в": "b",  # в
-        "α": "a",  # Greek α
-        "ο": "o",  # ο
-        "ι": "i",  # ι
-        "κ": "k",  # κ
-        "ν": "v",  # ν
-        "ρ": "p",  # ρ
-        "ɩ": "i",  # ɩ
-        "‘": "'",
-        "’": "'",
-        "‛": "'",
-        "′": "'",
-        "ʼ": "'",
-        "`": "'",
-        "´": "'",
-        "“": '"',
-        "”": '"',
+        "\u0430": "a",  # Cyrillic Small Letter A
+        "\u0435": "e",  # Cyrillic Small Letter Ie
+        "\u043e": "o",  # Cyrillic Small Letter O
+        "\u0440": "p",  # Cyrillic Small Letter Er
+        "\u0441": "c",  # Cyrillic Small Letter Es
+        "\u0443": "y",  # Cyrillic Small Letter U
+        "\u0445": "x",  # Cyrillic Small Letter Ha
+        "\u0456": "i",  # Cyrillic Small Letter Byelorussian-Ukrainian I
+        "\u0458": "j",  # Cyrillic Small Letter Je
+        "\u0455": "s",  # Cyrillic Small Letter Dze
+        "\u043a": "k",  # Cyrillic Small Letter Ka
+        "\u043c": "m",  # Cyrillic Small Letter Em
+        "\u0442": "t",  # Cyrillic Small Letter Te
+        "\u043d": "h",  # Cyrillic Small Letter En
+        "\u0432": "b",  # Cyrillic Small Letter Ve
+        "\u03b1": "a",  # Greek Small Letter Alpha
+        "\u03bf": "o",  # Greek Small Letter Omicron
+        "\u03b9": "i",  # Greek Small Letter Iota
+        "\u03ba": "k",  # Greek Small Letter Kappa
+        "\u03bd": "v",  # Greek Small Letter Nu
+        "\u03c1": "p",  # Greek Small Letter Rho
+        "\u0269": "i",  # Latin Small Letter Iota
+        "\u2018": "'",  # Left Single Quotation Mark
+        "\u2019": "'",  # Right Single Quotation Mark
+        "\u201b": "'",  # Single High-Reversed-9 Quotation Mark
+        "\u2032": "'",  # Prime
+        "\u02bc": "'",  # Modifier Letter Apostrophe
+        "`": "'",  # Grave Accent
+        "\u00b4": "'",  # Acute Accent
+        "\u201c": '"',  # Left Double Quotation Mark
+        "\u201d": '"',  # Right Double Quotation Mark
     }
 )
 _LEET = {"0": "o", "3": "e", "4": "a", "5": "s", "7": "t", "@": "a", "$": "s"}
@@ -434,8 +434,8 @@ RULES: tuple[Rule, ...] = (
         "dep.reliance",
         _C.DEPENDENCY,
         "explicit",
-        r"\b(?:you'?(?:re| are)?|ur) (?:the|my) only (?:one|person|friend|thing) (?:i have|i'?ve got|"
-        r"i can talk to|i talk to|who (?:understands|gets|cares|listens|knows)|"
+        r"\b(?:you'?(?:re| are)?|ur) (?:the|my) only (?:one|person|friend|thing) "
+        r"(?:i have|i'?ve got|i can talk to|i talk to|who (?:understands|gets|cares|listens|knows)|"
         r"that (?:understands|gets|cares|listens)|i trust|i need)\b",
         r"\b(?:you'?(?:re| are)|ur) my only friend\b",
         r"\bi (?:don'?t|do not|dont) need (?:anyone|anybody|people|friends|other people|"

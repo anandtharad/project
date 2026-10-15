@@ -99,6 +99,10 @@ NO_MEMORIES = json.dumps({"candidates": []})
 # Not a valid decision reply: decision tests queue the reply they need.
 NO_DECISIONS = "{}"
 
+# The safety classifier's and the output check's default answers.
+NO_SAFETY_RISK = json.dumps({"category": "none", "rationale": "Ordinary conversation."})
+OUTPUT_PASSES = json.dumps({"verdict": "pass", "rationale": "Meets the pathway."})
+
 
 class ScriptedLLMClient:
     """Deterministic LLM test double.
@@ -107,12 +111,14 @@ class ScriptedLLMClient:
     it replies "reply to: <last user message>" so tests can trace which
     context was used. Every request is recorded.
 
-    State-extraction, memory-extraction and decision calls are recorded
-    separately (`state_requests`, `memory_requests`, `decision_requests`) and
-    consume their own queues (`queue_state`, `queue_memory`,
-    `queue_decision`); by default they return an empty state, no memory
-    candidates and an empty (invalid) decision reply, so scripted conversation
-    replies are unaffected.
+    State-extraction, memory-extraction, decision and safety calls are
+    recorded separately (`state_requests`, `memory_requests`,
+    `decision_requests`, `safety_requests`, `safety_output_requests`) and
+    consume their own queues (`queue_state`, `queue_memory`, `queue_decision`,
+    `queue_safety`, `queue_safety_output`); by default they return an empty
+    state, no memory candidates, an empty (invalid) decision reply, the
+    category "none" and the verdict "pass", so scripted conversation replies
+    are unaffected.
     """
 
     def __init__(self) -> None:
@@ -120,11 +126,15 @@ class ScriptedLLMClient:
         self.state_requests: list[GenerationRequest] = []
         self.memory_requests: list[GenerationRequest] = []
         self.decision_requests: list[GenerationRequest] = []
+        self.safety_requests: list[GenerationRequest] = []
+        self.safety_output_requests: list[GenerationRequest] = []
         self.closed = False
         self._steps: deque[Step] = deque()
         self._state_steps: deque[Step] = deque()
         self._memory_steps: deque[Step] = deque()
         self._decision_steps: deque[Step] = deque()
+        self._safety_steps: deque[Step] = deque()
+        self._safety_output_steps: deque[Step] = deque()
 
     @property
     def provider(self) -> str:
@@ -145,6 +155,12 @@ class ScriptedLLMClient:
     def queue_decision(self, *steps: Step) -> None:
         self._decision_steps.extend(steps)
 
+    def queue_safety(self, *steps: Step) -> None:
+        self._safety_steps.extend(steps)
+
+    def queue_safety_output(self, *steps: Step) -> None:
+        self._safety_output_steps.extend(steps)
+
     async def generate(self, request: GenerationRequest) -> GenerationResponse:
         step: Step
         if request.trace.purpose is GenerationPurpose.STATE_EXTRACTION:
@@ -156,6 +172,14 @@ class ScriptedLLMClient:
         elif request.trace.purpose is GenerationPurpose.DECISION:
             self.decision_requests.append(request)
             step = self._decision_steps.popleft() if self._decision_steps else NO_DECISIONS
+        elif request.trace.purpose is GenerationPurpose.SAFETY_CLASSIFICATION:
+            self.safety_requests.append(request)
+            step = self._safety_steps.popleft() if self._safety_steps else NO_SAFETY_RISK
+        elif request.trace.purpose is GenerationPurpose.SAFETY_OUTPUT_CHECK:
+            self.safety_output_requests.append(request)
+            step = (
+                self._safety_output_steps.popleft() if self._safety_output_steps else OUTPUT_PASSES
+            )
         else:
             self.requests.append(request)
             step = (
