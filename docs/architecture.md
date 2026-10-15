@@ -16,13 +16,19 @@ HTTP request
   -> Route (FastAPI)            schema validation, dev auth, input length check
   -> TurnOrchestrator           lifecycle sequencing, deadline, failure mapping
        TurnStore.begin          tx 1: authorize + idempotency + persist user msg + load history + state
-       StateExtractor           structured LLM call: updated conversation state (or keep previous)
+       StateExtractor  ┐        structured LLM call: updated conversation state (or keep previous)
+       MemoryService   ├ concurrent: memories for this message
+       SafetyAnalyzer  ┘        patterns + safety classifier -> category (degraded if it fails)
        DecisionService          one decision request (Laya / Jev / LLM / off), validated, thresholded
+       SafetyPolicy             category -> pathway; a safety pathway overrides the strategy
        choose_policy            code: safety signal > explicit request > decision > default
-       ContextBuilder           system prompt + policy fragment, notes block, budgeted history
+       ContextBuilder           system prompt + policy or pathway fragment (+ verified contacts),
+                                notes and memories blocks, budgeted history
        LLMClient.generate       provider adapter, bounded by turn deadline
        ResponseValidator        response contract
-       TurnStore.complete       tx 2: persist reply + decisions + versioned state, mark completed
+       SafetyOutputValidator    content checks (+ semantic check on safety pathways);
+                                one regeneration, then the pathway's fixed fallback
+       TurnStore.complete       tx 2: persist reply + decisions + state + turn_safety, mark completed
   -> JSON response
 ```
 
@@ -35,7 +41,8 @@ HTTP request
 | Turn store | `app/orchestration/persistence.py` | transactions, ordering, idempotency, in-flight rule | generation |
 | Context builder | `app/context/builder.py` | what the model sees, history budget | storage |
 | LLM adapter | `app/llm/*` | provider requests, normalized responses and errors | authorization, persistence |
-| Response validator | `app/orchestration/validation.py` | response contract (complete, non-empty, bounded) | safety policy (Phase 5) |
+| Response validator | `app/orchestration/validation.py` | response contract (complete, non-empty, bounded) | reply content (the safety layer) |
+| Safety layer | `app/safety/*`, `app/orchestration/safety_flow.py` | risk taxonomy, pattern screen, safety classifier, degraded mode, pathways, verified resources, output checks, fallbacks, `turn_safety` records (docs/safety.md) | clinical judgement; it is not clinically validated |
 | Prompt registry | `app/prompting.py` | versioned, checksum-locked prompts and fragments | — |
 | State extractor | `app/state/*` | typed conversation state with provenance, one structured LLM call | persistence, policy |
 | Decision service | `app/decisions/*` | versioned questions, System One adapter, LLM decision adapter, answer validation, thresholds per calibration identity, fallbacks | access control, safety handling |
@@ -193,6 +200,5 @@ and a test enforces this. SDK/HTTP debug loggers are capped at WARNING.
 | Spec component | Phase | Integration point |
 |---|---|---|
 | Knowledge RAG (pgvector) | 4 | the extension is enabled by migration `0003`; reuse `app/embeddings` |
-| Input safety analysis, safety pathway, policy output checks | 5 | before `CONTEXT_BUILT` and inside `ResponseValidator` |
 | Evaluation runner, experiment tables | 6 | `evaluation_runs` / `evaluation_results` |
 | SFT data pipeline | 7 | offline tooling under `data/training` and `scripts/` |

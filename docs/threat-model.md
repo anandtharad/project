@@ -27,6 +27,12 @@ covers what exists today and is revisited at each phase.
    provider (Groq by default; a third party, on every turn, through a client
    separate from the reply model's). Conversation notes are not sent. The
    decision model's output is untrusted (boundary 3).
+2d. API → safety classifier: the latest message and up to four earlier
+   messages are sent to the safety classifier's provider on every turn
+   (default Groq `openai/gpt-oss-safeguard-20b` when `GROQ_API_KEY` is set;
+   off otherwise), and on safety pathways the reply is sent once more for
+   the semantic output check. Its output is untrusted (boundary 3); the
+   classifier's rationale, which can quote the message, is discarded.
 2c. API → embedding provider: memory text and each message are embedded.
    With `EMBEDDING_PROVIDER=local` (the default) nothing leaves the machine;
    with `openai`/`gemini` the text goes to that provider.
@@ -104,10 +110,26 @@ covers what exists today and is revisited at each phase.
 - **Encryption:** relies on infrastructure (disk encryption, TLS termination
   in front of the app). Compose binds ports to 127.0.0.1 only.
 
-## Safety boundary (not yet implemented)
+## Safety boundary (Phase 5, docs/safety.md)
 
-The companion prompt includes basic guidance for danger situations, but
-**prompts are not a safety mechanism**. Phase 5 adds independent input
-analysis, a constrained safety pathway, output policy validation, and
-separately reported safety metrics. Until then the system must not be used
-with real users.
+Prompts are not a safety mechanism on their own. The safety layer adds:
+
+- **Independent input analysis:** a pattern screen plus an LLM classifier.
+- **Pathways:** constrained replies that override the ordinary strategy.
+- **Verified resources:** rendered by code; the reply may offer no other
+  contacts.
+- **Output checks with bounded recovery.**
+- **Per-turn records** without text.
+
+A failed classifier is degraded mode, never "safe". Injected instructions in
+the message cannot switch off a pathway: the classifier treats the
+conversation as data, and explicit pattern hits are not downgraded.
+
+**Remaining gaps:**
+
+- The layer is not clinically validated.
+- Its evaluation barely covers imminent danger and abuse disclosures.
+- The person-facing texts need review by a qualified person.
+- The classifier model is a provider preview.
+
+The system must not be used with real users until that review is done.

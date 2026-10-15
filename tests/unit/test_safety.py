@@ -313,3 +313,12 @@ def test_context_dependent_hits_defer_to_a_working_classifier() -> None:
 
 def test_game_commands_are_not_self_harm() -> None:
     assert screen("in minecraft i just /kill myself to respawn at home").explicit == ()
+
+
+def test_resources_are_not_past_their_review_date() -> None:
+    from datetime import UTC, datetime
+
+    due = default_resources().review_due
+    assert datetime.now(UTC).date() <= due, (
+        "re-check app/safety/resources_v1.toml against its official sources and bump its version"
+    )

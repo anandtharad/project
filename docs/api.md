@@ -75,6 +75,13 @@ Response, `201` for a new turn or `200` for a replay:
 production). Internal reasoning, safety analysis and prompts are never
 returned.
 
+`safety` (object or null): present when the reply followed a safety pathway
+(docs/safety.md). `{"pathway": "crisis_support", "resources": [{"name",
+"contact", "hours"}]}` lists the verified support contacts for the configured
+`SAFETY_REGION`, for a client to show; gentle pathways (`safety_check_in`,
+`encourage_connection`) list none. It is null on ordinary turns and is
+returned unchanged on an idempotent replay.
+
 ### `GET /v1/conversations/{conversation_id}/messages?after_sequence=0&limit=50`
 Messages in conversation order (`limit` is 1–200). Each item has
 `message_id`, `sequence`, `role` (`user`/`assistant`), `content`,

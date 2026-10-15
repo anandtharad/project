@@ -1,9 +1,10 @@
 """Turn orchestrator: sequences one conversational turn end to end.
 
-Lifecycle (spec §9.1; safety analysis arrives in Phase 5, retrieval in 3-4):
+Lifecycle (spec §9.1; knowledge retrieval arrives in Phase 4):
 RECEIVED -> VALIDATED -> AUTHORIZED -> USER_MESSAGE_PERSISTED -> CONTEXT_LOADED
--> STATE_UPDATED -> DECISIONS_RESOLVED -> POLICY_CREATED -> CONTEXT_BUILT
--> RESPONSE_GENERATED -> RESPONSE_VALIDATED -> ASSISTANT_MESSAGE_PERSISTED
+-> SAFETY_ASSESSED / MEMORIES_RETRIEVED / STATE_UPDATED (concurrent)
+-> DECISIONS_RESOLVED -> POLICY_CREATED -> CONTEXT_BUILT -> RESPONSE_GENERATED
+-> RESPONSE_VALIDATED -> SAFETY_CHECKED -> ASSISTANT_MESSAGE_PERSISTED
 -> COMPLETED
 
 Failure behavior (the user message is always preserved once persisted):
@@ -14,13 +15,16 @@ Failure behavior (the user message is always preserved once persisted):
 - provider error                  -> turn marked failed, 503 dependency_unavailable
 - turn deadline exceeded          -> turn marked failed, 504 timeout
 - response fails validation       -> turn marked failed, 503 (no partial reply stored)
+- safety classifier fails         -> degraded mode (patterns only), recorded, never "safe"
+- reply fails the safety checks   -> one regeneration, then the pathway's fixed fallback
 - assistant persistence fails     -> turn not reported complete, 503
 - stale state write               -> reply kept, state write skipped and logged
 Retrying with the same idempotency key re-attempts a failed turn without
 creating a second user message.
 
 Decisions run only after the ownership check in `begin`, and never control
-access, persistence or safety handling (spec §3.3, §7.3).
+access or persistence (spec §3.3, §7.3); a calibrated safety mode can only
+raise the safety category, never lower it.
 """
 
 from __future__ import annotations

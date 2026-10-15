@@ -11,7 +11,7 @@ Last updated: 2026-10-13. Spec: COMPANION-TECH-SPEC-001 v2.1.
 | 2: State and Jev | **Built and evaluated.** 4 of 5 acceptance criteria met; strategy decisions are wired and the policy measurably changes replies, but no decision model passes calibration yet, so decisions run in shadow mode (see Phase 2 acceptance). An LLM decision provider (`DECISION_PROVIDER=llm`, Groq `gpt-oss-20b`) now substitutes for Jev behind the same interface; evaluated live on dev (mode 0.70, strategy 0.58, retrieval AUROC 0.95, vs Laya 0.11 / 0.29 / 0.37), but no threshold reaches the 0.80 acted-on target, so it also runs in shadow mode (docs/decisions.md) |
 | 3: Memory | **Built and evaluated.** All 5 acceptance criteria met on the synthetic evaluation set (see Phase 3 acceptance); retrieval and extraction quality are moderate and measured, not assumed |
 | 4: RAG | Not started |
-| 5: Safety | Not started. **Required before any real-user exposure** |
+| 5: Safety | **Built and wired into every turn** (docs/safety.md): pattern screen + LLM classifier, degraded mode, pathway policy overriding the strategy, verified regional resources, output checks with bounded recovery, `turn_safety` records. Not clinically validated; the person-facing texts need qualified review before real use |
 | 6: Evaluation and observability | Not started (structured logging and provenance already exist) |
 | 7: Fine-tuning preparation | Not started |
 
@@ -138,7 +138,7 @@ are clean.
 | Unauthorized conversation | 404, no content | `test_access_control.py` |
 | LLM timeout | 504, user message kept | `test_turn_deadline_exceeded` |
 | Database transaction failure | Not reported complete | `test_persistence_failure_is_not_reported_as_complete`, `test_double_database_failure_leaves_turn_recoverable`, `test_database_outage_returns_dependency_error` |
-| Output validation failure | Safe failure, nothing stored | `test_invalid_generations_are_not_persisted` |
+| Output validation failure | Contract failure: safe failure, nothing stored. Safety checks: one regeneration, then the pathway's fixed fallback | `test_invalid_generations_are_not_persisted`, `test_a_failing_reply_is_regenerated_once`, `test_a_reply_failing_twice_on_a_crisis_pathway_gets_the_fallback` |
 | Duplicate request | Resolved, no duplicate turn | `test_idempotency.py`, `test_concurrency.py` |
 | Jev timeout / malformed result | Documented fallback per question, turn completes | `test_service_failures_fall_back_for_every_question`, `test_slow_service_is_cut_off_at_the_decision_timeout`, `test_decision_outage_falls_back_and_the_turn_completes` |
 | State extraction failure | Previous state kept, turn completes | `test_extraction_failure_keeps_previous_state_and_the_turn_completes`, `test_extractor_failures_keep_the_previous_state` |
@@ -147,7 +147,7 @@ are clean.
 | Memory store unavailable | No memories in the prompt, flagged; turn completes | `test_an_unavailable_memory_store_means_no_memories_and_the_turn_succeeds` |
 | Memory extraction failure | Nothing stored; turn unaffected; one retry when the provider reports a schema failure or rejects the structured request | `test_a_failed_extraction_does_not_affect_the_turn`, `test_a_failed_structured_extraction_is_retried_once` |
 | RAG unavailable | Phase 4 | — |
-| Safety dependency unavailable | Phase 5 | — |
+| Safety dependency unavailable | Degraded mode: patterns only, recorded; with no hit the turn is `unassessed`, never safe; strict output checks | `test_classifier_failure_is_degraded_mode_and_explicit_risk_still_routes`, `test_classifier_failure_with_no_signal_is_recorded_as_unassessed_not_safe`, `test_a_failed_semantic_check_does_not_block_the_reply` |
 
 ## Verified vs unverified integrations
 
@@ -209,8 +209,7 @@ are clean.
   the per-decision records §7.6/§7.8 require.
 - **Response validator location:** `app/orchestration/validation.py` rather
   than `app/safety/validation.py`. Phase 1 validates the response *contract*
-  only. Putting it under `safety/` would suggest safety checks exist. Phase 5
-  adds the safety package.
+  only; the Phase 5 safety checks of reply content are `app/safety/output.py`.
 - **Structured generation** is a `response_schema` field on the existing
   `generate()` request rather than a separate `generate_structured` method:
   one code path per adapter, with the mode reported in `structured_mode`.
@@ -247,7 +246,10 @@ are clean.
 
 ## Known limitations
 
-- No independent safety layer (Phase 5). Do not use with real users.
+- The safety layer (Phase 5) is not clinically validated, its evaluation is
+  indicative (AI-labelled and public benchmark data; imminent danger and abuse
+  disclosures are barely covered), and its person-facing texts need review by
+  a qualified person. Do not use with real users until that review is done.
 - Per-user message limits (`USER_MESSAGES_PER_MINUTE`, `USER_MESSAGES_PER_DAY`)
   guard against runaway use; they are approximate under concurrent first
   messages in different conversations, and there is no token or cost quota
