@@ -113,6 +113,11 @@ class CachedClassifier:
         self.pause = pause
         self.max_wait = max_wait
         self.calls = 0
+        # Set after a live call; the caller waits outside the timed assessment.
+        self.owes_pause = False
+        # The provider call's own latency for the last item (recorded when it
+        # was made, so a cached rerun reports the real value).
+        self.last_latency_ms: float | None = None
 
     def key(self, message: str, history: Sequence[ChatMessage]) -> str:
         payload = json.dumps([message, [m.model_dump() for m in history]], sort_keys=True)
@@ -122,6 +127,7 @@ class CachedClassifier:
         key = self.key(message, history)
         if key in self.cache:
             cached = self.cache[key]
+            self.last_latency_ms = cached["latency_ms"]
             return ClassifierResult(
                 ClassifierStatus(cached["status"]),
                 category=cached["category"] and _category(cached["category"]),
@@ -148,8 +154,15 @@ class CachedClassifier:
             }
             CACHE.mkdir(parents=True, exist_ok=True)
             self.cache_path.write_text(json.dumps(self.cache, indent=1), "utf-8")
-        await asyncio.sleep(self.pause)
+        self.owes_pause = True
+        self.last_latency_ms = result.latency_ms
         return result
+
+    async def rest(self) -> None:
+        """The pause between live calls (rate limits), kept out of latencies."""
+        if self.owes_pause:
+            self.owes_pause = False
+            await asyncio.sleep(self.pause)
 
     async def aclose(self) -> None:
         await self.inner.aclose()
@@ -189,7 +202,24 @@ def metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def row_for(item: dict[str, Any], a: SafetyAssessment) -> dict[str, Any]:
+def latency_summary(rows: list[dict[str, Any]]) -> dict[str, float] | None:
+    values = sorted(
+        r["classifier_latency_ms"]
+        for r in rows
+        if r["classifier_latency_ms"] is not None and r["classifier_status"] == "ok"
+    )
+    if not values:
+        return None
+    return {
+        "p50": values[len(values) // 2],
+        "p90": values[min(len(values) - 1, int(len(values) * 0.9))],
+        "max": values[-1],
+    }
+
+
+def row_for(
+    item: dict[str, Any], a: SafetyAssessment, classifier_ms: float | None = None
+) -> dict[str, Any]:
     return {
         "id": item["id"],
         "source": item["source"],
@@ -205,7 +235,9 @@ def row_for(item: dict[str, Any], a: SafetyAssessment) -> dict[str, Any]:
         "routed": a.pathway is not Pathway.NORMAL,
         "crisis": a.pathway in CRISIS,
         "category_ok": a.category.value in item["categories"],
-        "latency_ms": round(a.latency_ms, 1),
+        # The classifier call itself (None in patterns mode); the assessment's
+        # wall time would include cache lookups on a rerun.
+        "classifier_latency_ms": round(classifier_ms, 1) if classifier_ms is not None else None,
     }
 
 
@@ -229,7 +261,10 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
     try:
         for n, item in enumerate(items, 1):
             assessment = await analyzer.assess(item["message"], history_of(item))
-            rows.append(row_for(item, assessment))
+            classifier_ms = classifier.last_latency_ms if classifier is not None else None
+            rows.append(row_for(item, assessment, classifier_ms))
+            if classifier is not None:
+                await classifier.rest()
             if n % 25 == 0:
                 print(f"  {n}/{len(items)}")
     finally:
@@ -248,6 +283,7 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             else None
         ),
         "classifier_calls": classifier.calls if classifier else 0,
+        "classifier_latency_ms": latency_summary(rows),
         "seconds": round(time.monotonic() - started, 1),
         "overall": metrics(rows),
         "by_source": {s: metrics(r) for s, r in sorted(by_source.items())},

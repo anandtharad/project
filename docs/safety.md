@@ -191,7 +191,56 @@ uv run python scripts/eval_safety.py --mode classifier --split dev --pause 21
 Missed risk and false positives are reported separately, per source and per
 category.
 
-Results: see "Results" below.
+## Results (dev split, 2026-10-15)
+
+The full layer (patterns plus the `openai/gpt-oss-safeguard-20b` classifier,
+policy `safety_policy@1.0.0`) on the 172 dev items, against patterns alone
+(degraded mode) on the same items.
+
+**Files:** `eval/results/safety-classifier-dev-20261015T162330.json` and
+`safety-patterns-all-20261015T162345.json`. Ids and labels only, no text.
+
+| | Patterns only | Patterns + classifier |
+|---|---|---|
+| Risk items missed (63 items, sent down no safety pathway) | 73.0% | **23.8%** |
+| Clear items sent to a crisis or refusal pathway (93) | 1.1% | **10.8%** |
+| Lower-category items (ambiguous concern, dependency) given a safety pathway (16) | 6.2% | 37.5% |
+| Category exactly right | 46.5% | 78.2% |
+
+**What was missed (15 risk items).**
+
+- 11 were requests for harmful information aimed at others, from
+  SimpleSafetyTests, XSTest's unsafe prompts and OR-Bench-Toxic, that the
+  classifier labelled `none`.
+- 4 had an invalid classifier answer (see Degraded mode below), and the
+  patterns did not catch them.
+- 2 were decision-set danger rows (one labelled `distress`, one `none`).
+- Explicit first-person self-harm statements were not among the misses.
+- For these requests the reply model's own refusal training and the
+  `dangerous_details` output check still apply. Neither is measured here.
+
+**False positives (10 of 93).**
+
+- 8 went to `refuse_harmful`, mostly OR-Bench-Hard prompts. That benchmark is
+  built to sound harmful while being benign; 6 of its 20 items went to a
+  safety pathway.
+- 1 went to `crisis_support` and 1 to `harm_to_others`.
+- On XSTest's safe prompts the false-positive rate was 4% (1 of 25).
+
+**Degraded mode.** 8 of 172 classifier answers (4.7%) were not valid JSON
+(the model is a preview with best-effort JSON). Those turns ran in degraded
+mode; 6 of them had no pattern hit and were recorded as unassessed.
+
+**Latency.** The classifier call took 0.66 s at the median, 0.85 s at the
+90th percentile and 2.7 s at most, within the 4 s timeout. It runs alongside
+state extraction and memory retrieval, so it adds little to a turn.
+
+**Reading these numbers.**
+
+- They come from benchmark and AI-authored prompts, not real conversations.
+- Immediate danger and abuse are almost absent from the data (see Limits).
+- The test split has not been run. It is kept for a later check, after which
+  nothing is tuned.
 
 ## Limits
 

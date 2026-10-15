@@ -1,0 +1,280 @@
+{"id": "authored-1-001", "text": "what is wrong with me, I can't even get out of bed", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-002", "text": "what's the point of trying anymore", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-003", "text": "what does it mean that I can't stop crying at work?", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-004", "text": "what does it even mean to be happy", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-005", "text": "explain to me why he would say that to my face", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-006", "text": "can you explain why I always ruin things?", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-007", "text": "tell me about your day!", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-008", "text": "tell me about it, the commute was hell", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-009", "text": "how does he not see how much this hurts", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-010", "text": "how do you even cope with losing a parent", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-011", "text": "how long does this feeling last? it's been three weeks since she left", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-012", "text": "is it true that you care about me or are you just a program", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-013", "text": "I don't need tips, I just want to vent about my sleep", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-014", "text": "no advice please. I slept 3 hours again and I'm just done", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-015", "text": "I read that stress shortens your life and now I'm stressed about being stressed lol", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-016", "text": "my therapist says I have anxiety. I don't know how I feel about that label", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-017", "text": "I tried the breathing thing you mentioned. it kind of helped?", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-018", "text": "how many times do I have to tell him", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-019", "text": "what is love anyway", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-020", "text": "what are we even doing, me and him", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-021", "text": "why do I always feel like this on Sundays", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-022", "text": "is there any point in apologising if she won't read it?", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-023", "text": "good morning! slept like a log for once", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-024", "text": "haha what is this weather", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-025", "text": "what's the latest with you?", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-026", "text": "I've been reading the news too much and it's making me anxious", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-027", "text": "is it normal to feel this tired after a breakup?", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-028", "text": "my mum keeps sending me articles about mindfulness and it's driving me mad", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-029", "text": "Any tips? Nah, never mind, I just wanted to say it out loud.", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-030", "text": "how much longer can I keep doing this", "retrieve": false, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-031", "text": "any tips for sleeping better? I keep waking at 4am", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-032", "text": "what is sleep hygiene?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-033", "text": "what's a good wind-down routine before bed?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-034", "text": "how does caffeine affect sleep?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-035", "text": "is it true that you shouldn't use your phone before bed?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-036", "text": "explain box breathing", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-037", "text": "can you explain what mindfulness actually is?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-038", "text": "what are the signs of burnout?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-039", "text": "what's the difference between stress and anxiety?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-040", "text": "is there any evidence that journaling helps with stress?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-041", "text": "what does the research say about meditation and anxiety?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-042", "text": "how many hours of sleep does a teenager need?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-043", "text": "are there techniques for calming down during a panic attack?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-044", "text": "what are some ways to deal with stress at work?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-045", "text": "how do I fall asleep faster?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-046", "text": "what is cognitive behavioural therapy for insomnia?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-047", "text": "what does 'emotional regulation' mean?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-048", "text": "is exercise actually good for mood or is that a myth?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-049", "text": "source?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-050", "text": "where did you get that from?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-051", "text": "what are the latest NHS guidelines on sleep?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-052", "text": "tell me about progressive muscle relaxation", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-053", "text": "I'm so stressed about exams. any advice on how to stop procrastinating?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-054", "text": "how does mindfulness work?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-1-055", "text": "what happens to your body when you're stressed?", "retrieve": true, "kind": "unlabelled", "source": "authored-1", "split": "dev"}
+{"id": "authored-2-001", "text": "what is happening to me lately, I snap at everyone", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-002", "text": "what does that say about me as a person?", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-003", "text": "explain how I'm supposed to forgive her", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-004", "text": "can you explain why my dad never calls", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-005", "text": "tell me about a time you were scared", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-006", "text": "how do people just move on like nothing happened", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-007", "text": "how long does it take to stop missing someone?", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-008", "text": "is it true that you remember everything I say?", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-009", "text": "I just need to rant about my flatmate for a sec", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-010", "text": "don't give me tips, I've tried every sleep tip on the internet", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-011", "text": "what are the odds, my ex was at the same party", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-012", "text": "why does this always happen to me", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-013", "text": "how many more nights like this before I crack", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-014", "text": "lol what is my life", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-015", "text": "what's the deal with my boss today, he was so weird", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-016", "text": "thanks, that actually helps a lot", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-017", "text": "heading to bed, night!", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-018", "text": "I used to meditate every day, now I can't sit still for two minutes", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-019", "text": "is it bad that I'm relieved he's gone?", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-020", "text": "my sister explained mindfulness to me once and I just laughed", "retrieve": false, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-021", "text": "what does 'rumination' mean? my counsellor keeps saying it", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-022", "text": "how much exercise do adults need each week?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-023", "text": "are there any breathing exercises for anxiety?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-024", "text": "is it a myth that warm milk helps you sleep?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-025", "text": "what is the 4-7-8 breathing technique?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-026", "text": "explain what a stress response is", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-027", "text": "is there research on gratitude journaling?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-028", "text": "what are the symptoms of burnout?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-029", "text": "how does alcohol affect sleep quality?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-030", "text": "any tips on talking to my partner about chores without it becoming a fight?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-031", "text": "what happens during REM sleep?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-032", "text": "what's the difference between sadness and depression?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-033", "text": "can you back that up?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-034", "text": "how do I meditate if I've never done it before?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "authored-2-035", "text": "what are some good ways to build a habit?", "retrieve": true, "kind": "unlabelled", "source": "authored-2", "split": "dev"}
+{"id": "rt-001", "text": "sir can you suggest how to manage study stress during board exams", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-002", "text": "recommend a good thriller series to binge", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-003", "text": "how much screen time before bed is too much", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-004", "text": "i don't want tips rn, just wanna talk about my day", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-005", "text": "got a good recipe for chicken tikka masala?", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-006", "text": "my wifi keeps dropping every few mins, how do i fix it", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-007", "text": "what's the latest guidance on how much sleep teenagers need", "retrieve": true, "kind": "current_info", "source": "blind-1", "split": "dev"}
+{"id": "rt-008", "text": "can u convert 150 pounds to euros", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-009", "text": "my boss said my presentation was 'fine' and now i can't stop replaying it", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-010", "text": "do you think i should tell him how i feel or just leave it", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-011", "text": "how can i feel less lonely after moving to a new city? general ideas, nothing fancy", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-012", "text": "how does stress affect your immune system", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-013", "text": "heyyy how's ur day going", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-014", "text": "so i've been super stressed with deadlines and my sleep is a mess, can you tell me what actually helps people wind down at night? proper evidence-based stuff not just have a bath", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-015", "text": "how much exercise do adults need in a week", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-016", "text": "stress eating a whole packet of biscuits rn, no regrets", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-017", "text": "is that from an actual study or just something people say", "retrieve": true, "kind": "source_followup", "source": "blind-1", "split": "dev"}
+{"id": "rt-018", "text": "what does emotional regulation mean", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-019", "text": "are there any updated recommendations this year on how much we should exercise", "retrieve": true, "kind": "current_info", "source": "blind-1", "split": "dev"}
+{"id": "rt-020", "text": "what are good sources of protein if im vegetarian", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-021", "text": "hey", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-022", "text": "what is mindfulness exactly? everyone at my office keeps banging on about it", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-023", "text": "why do i always end up the one who gets left out", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-024", "text": "how do i file my ITR online", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-025", "text": "has anything new come out lately about screen time and kids' mood?", "retrieve": true, "kind": "current_info", "source": "blind-1", "split": "dev"}
+{"id": "rt-026", "text": "do you remember what i told you yesterday", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-027", "text": "went for a walk after work and it was actually lovely, sun was out for once", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-028", "text": "my counsellor showed me 4-7-8 breathing and tbh it's been helping a lot", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-029", "text": "hang on where did you get that from, i wanna show my sister", "retrieve": true, "kind": "source_followup", "source": "blind-1", "split": "dev"}
+{"id": "rt-030", "text": "does meditation really work or is it all hype", "retrieve": true, "kind": "evidence", "source": "blind-1", "split": "dev"}
+{"id": "rt-031", "text": "how do you set boundaries with colleagues without feeling guilty, any general tips", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-032", "text": "how do u build self esteem when u keep comparing urself to everyone on insta", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-033", "text": "why did priya bring up my results in front of everyone, what was that about", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-034", "text": "keep putting off my dissertation and it's driving me mad", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-035", "text": "i feel so on edge today and i don't even know why", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-036", "text": "i miss my nan so much today, it would've been her birthday this week", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-037", "text": "Kindly tell me some relaxation techniques for before interviews, i get very nervous", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-038", "text": "who said that? any reference i can look up", "retrieve": true, "kind": "source_followup", "source": "blind-1", "split": "dev"}
+{"id": "rt-039", "text": "are you a real person or a bot?", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-040", "text": "what's the use, nothing i do at work gets noticed", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-041", "text": "what time is the premier league game on saturday", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-042", "text": "how do i build a habit that actually sticks, i always drop things after 2 weeks", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-043", "text": "what are the signs of burnout", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-044", "text": "i've been so lonely since uni ended, everyone's moved away", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-045", "text": "weather in manchester tomorrow?", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-046", "text": "got a source for that one", "retrieve": true, "kind": "source_followup", "source": "blind-1", "split": "dev"}
+{"id": "rt-047", "text": "what's your favourite kind of weather lol", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-048", "text": "only got like 4 hrs sleep again lol", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-049", "text": "what's the current nhs advice for dealing with work stress, has it changed recently", "retrieve": true, "kind": "current_info", "source": "blind-1", "split": "dev"}
+{"id": "rt-050", "text": "morning! slept like a log for once", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-051", "text": "my mum keeps telling me to eat more veg, she's relentless", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-052", "text": "wat r the stages of grief, is there like an order to them", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-053", "text": "how long do i boil an egg for a runny yolk", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-054", "text": "is the 21 days to form a habit thing actually real", "retrieve": true, "kind": "evidence", "source": "blind-1", "split": "dev"}
+{"id": "rt-055", "text": "should i take the job in pune or stay in bangalore near my family", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-056", "text": "what actually happens in your body when you get anxious", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-057", "text": "thx, night night", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-058", "text": "just finished my first 5k!! legs are jelly", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-059", "text": "feeling really low since the weekend, can't explain it", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-060", "text": "ugh my viva is in ten days and i keep scrolling instead of revising, how do people actually get themselves to start", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-061", "text": "write me a cover letter for a marketing assistant job", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-062", "text": "cheapest way to get from delhi to jaipur this weekend?", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-063", "text": "any ways to calm down quickly when i feel a panic coming on in a crowded train", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-064", "text": "i don't need articles or tips right now, i just want someone to listen", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-065", "text": "should i tell my flatmate i'm moving out now or wait till the lease thing is sorted?", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-066", "text": "saw on tiktok that exercise works as well as meds for low mood, is that legit", "retrieve": true, "kind": "evidence", "source": "blind-1", "split": "dev"}
+{"id": "rt-067", "text": "lol ok thanks, that made me laugh", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-068", "text": "how do you make small talk less awkward at work? any techniques", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-069", "text": "which organisation says that, nhs or someone else?", "retrieve": true, "kind": "source_followup", "source": "blind-1", "split": "dev"}
+{"id": "rt-070", "text": "how do i reverse a string in python", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-071", "text": "will giving up coffee after lunch actually help me sleep better", "retrieve": true, "kind": "evidence", "source": "blind-1", "split": "dev"}
+{"id": "rt-072", "text": "why does my brother always turn everything into an argument", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-073", "text": "can't believe i snapped at my mum again, feel awful", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-074", "text": "whats the difference between feeling sad and being depressed, genuinely asking", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-075", "text": "my best friend hasn't replied in 3 days, do you think she's mad at me?", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-076", "text": "is sugar really bad for your mood or is that overblown", "retrieve": true, "kind": "evidence", "source": "blind-1", "split": "dev"}
+{"id": "rt-077", "text": "whats a good index fund for a complete beginner", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-078", "text": "cried at an advert today lol, been that kind of week", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-079", "text": "no advice please, i just need to moan about my group project", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-080", "text": "started meditating last week, day 4 i fell asleep halfway through haha. anyway how are you", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-081", "text": "why am i like this", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-082", "text": "is it true you need 8 hours of sleep or is that a myth", "retrieve": true, "kind": "evidence", "source": "blind-1", "split": "dev"}
+{"id": "rt-083", "text": "who won the india vs australia match last night", "retrieve": false, "kind": "off_topic", "source": "blind-1", "split": "dev"}
+{"id": "rt-084", "text": "can you explain what box breathing is", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-085", "text": "tips for falling asleep faster pls", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-086", "text": "does a late afternoon nap mess up sleeping at night?", "retrieve": true, "kind": "factual", "source": "blind-1", "split": "dev"}
+{"id": "rt-087", "text": "ugh work has been SO much this week, i'm drained", "retrieve": false, "kind": "reflection", "source": "blind-1", "split": "dev"}
+{"id": "rt-088", "text": "do you ever get tired of listening to me ramble?", "retrieve": false, "kind": "casual", "source": "blind-1", "split": "dev"}
+{"id": "rt-089", "text": "what does the research say about journaling for anxiety", "retrieve": true, "kind": "evidence", "source": "blind-1", "split": "dev"}
+{"id": "rt-090", "text": "any evidence that gratitude lists help? feels cheesy to me", "retrieve": true, "kind": "evidence", "source": "blind-1", "split": "dev"}
+{"id": "rt2-001", "text": "studies say walking helps mood?? how strong is the evidence tho", "retrieve": true, "kind": "evidence", "source": "blind-2", "split": "test"}
+{"id": "rt2-002", "text": "any tips to relax before a big presentation?? 😬🙏", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-003", "text": "what's a good film to watch tonight, something light", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-004", "text": "how do i make masala dosa batter from scratch", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-005", "text": "been doing 5 mins of meditation every morning for a week now, feels odd but kinda nice", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-006", "text": "i think i'll quit the gym, i hate it there. is that the right call for me?", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-007", "text": "need to understand what a body scan meditation even is, someone mentioned it at work", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-008", "text": "how to fix a leaking tap w/o calling a plumber", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-009", "text": "ok but pls don't send me another article about sleep, i just wanted to moan 😅", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-010", "text": "bhai raat ko overthinking kaise band karu, koi technique hai kya? 😩", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-011", "text": "how do i support a mate who's going through a rough patch without saying the wrong thing", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-012", "text": "sleep tips pls 🌙", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-013", "text": "ugh it's 2am and i'm wide awake again", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-014", "text": "does my best friend hate me?? she left me on read for two days", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-015", "text": "how do you make healthy habits actually stick? like what works for sticking with a change", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-016", "text": "ok thanks, talk later", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-017", "text": "Any advice on resetting my sleep routine after a run of night shifts? Properly knackered.", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-018", "text": "anything new from the last year or two about loneliness and health?", "retrieve": true, "kind": "current_info", "source": "blind-2", "split": "test"}
+{"id": "rt2-019", "text": "had a proper good cry earlier and honestly feel lighter now", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-020", "text": "ive been snappy w/ my kids this week and i feel awful about it", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-021", "text": "heyyy how's ur day going", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-022", "text": "explain box breathing step by step pls", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-023", "text": "thanks that helped a lot ❤️", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-024", "text": "is that from an actual study or just general advice? where's it from", "retrieve": true, "kind": "source_followup", "source": "blind-2", "split": "test"}
+{"id": "rt2-025", "text": "what does loneliness do to your health in the long run", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-026", "text": "lol that's actually hilarious", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-027", "text": "idk how to start walking regularly, any advice on building that habit", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-028", "text": "my colleague swears by chamomile tea for sleep, any proof that works?", "retrieve": true, "kind": "evidence", "source": "blind-2", "split": "test"}
+{"id": "rt2-029", "text": "what's the 4-7-8 breathing method and how do you do it", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-030", "text": "solve 3x + 7 = 22 pls", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-031", "text": "do you think i'm a bad friend for not replying for 3 days?", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-032", "text": "why does everything feel like so much effort right now", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-033", "text": "what's the latest guidance on how much sleep adults should get", "retrieve": true, "kind": "current_info", "source": "blind-2", "split": "test"}
+{"id": "rt2-034", "text": "what's ur favourite season haha", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-035", "text": "who won the cricket match yesterday?", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-036", "text": "how do i get from heathrow to central london cheaply", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-037", "text": "please no tips today, i just need to rant", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-038", "text": "what's taylor swift's newest album called", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-039", "text": "do u ever get tired of chatting?", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-040", "text": "is it a myth that everyone needs 8 hours of sleep? what does the research actually say", "retrieve": true, "kind": "evidence", "source": "blind-2", "split": "test"}
+{"id": "rt2-041", "text": "what's a good way to handle anger in the moment, before it boils over?", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-042", "text": "what's 15% of 240", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-043", "text": "is it actually true that venting makes anger worse? heard that somewhere", "retrieve": true, "kind": "evidence", "source": "blind-2", "split": "test"}
+{"id": "rt2-044", "text": "can u remember what i told u yesterday?", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-045", "text": "is there real evidence that mindfulness helps with low mood?", "retrieve": true, "kind": "evidence", "source": "blind-2", "split": "test"}
+{"id": "rt2-046", "text": "pls tell me some ways to cope w/ exam stress, tbh i have no clue where to start", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-047", "text": "i feel so alone lately, everyone seems to have their people except me", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-048", "text": "my nani wakes up at 3am every single night, is that normal as people get older? what actually helps older folks sleep through", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-049", "text": "morning! slept in a bit today so feeling a bit slow", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-050", "text": "write me a python function to reverse a string", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-051", "text": "hey!", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-052", "text": "why do i always end up like this lol", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-053", "text": "are you a real person or a bot?", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-054", "text": "how many hours of sleep do teens need", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-055", "text": "can you explain how photosynthesis works, its for my homework", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-056", "text": "Where did that bit about short walks come from? Is there an article I can look at?", "retrieve": true, "kind": "source_followup", "source": "blind-2", "split": "test"}
+{"id": "rt2-057", "text": "hang on, where did you get that from?", "retrieve": true, "kind": "source_followup", "source": "blind-2", "split": "test"}
+{"id": "rt2-058", "text": "don't give me advice, i just want someone to listen", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-059", "text": "should i go to my cousin's wedding or stay home and rest? idk", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-060", "text": "Why do I even bother trying", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-061", "text": "are there updated recommendations on physical activity this year or is it still the same old 150 mins", "retrieve": true, "kind": "current_info", "source": "blind-2", "split": "test"}
+{"id": "rt2-062", "text": "brb making tea", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-063", "text": "does being around people more really make you less lonely or is that just something people say. what do studies show", "retrieve": true, "kind": "evidence", "source": "blind-2", "split": "test"}
+{"id": "rt2-064", "text": "sources pls?? wanna show my mum", "retrieve": true, "kind": "source_followup", "source": "blind-2", "split": "test"}
+{"id": "rt2-065", "text": "feeling really down since the weather turned grey", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-066", "text": "so work has been mental this quarter, manager keeps shifting deadlines, i skipped lunch twice this week, my partner says i'm snappy, and i've been meaning to google this for ages but what does chronic stress actually do to your body", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-067", "text": "how do i centre a div in css", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-068", "text": "hm who says that tho, which source is that from", "retrieve": true, "kind": "source_followup", "source": "blind-2", "split": "test"}
+{"id": "rt2-069", "text": "ways to make new friends as an adult when u wfh?", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-070", "text": "how come i'm completely drained after a stressful day even tho i barely moved? like why does stress wipe u out", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-071", "text": "how do i start investing in mutual funds as a beginner", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-072", "text": "what is the offside rule in football", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-073", "text": "how do i write a cover letter for a marketing job", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-074", "text": "i keep replaying what he said at dinner and it's making me angry all over again", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-075", "text": "wondering whether yoga actually does anything for stress or if it's just hype", "retrieve": true, "kind": "evidence", "source": "blind-2", "split": "test"}
+{"id": "rt2-076", "text": "any grounding techniques for when i get panicky on the tube?", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-077", "text": "my boss keeps piling work on me and now she's cc'ing the whole team on my mistakes, what is her problem", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-078", "text": "best time to visit kerala? thinking december", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-079", "text": "hmm", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-080", "text": "my sister and i had another fight about the same thing. she never listens to me", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-081", "text": "what's the capital of canada?", "retrieve": false, "kind": "off_topic", "source": "blind-2", "split": "test"}
+{"id": "rt2-082", "text": "do breathing exercises really lower stress or is it just placebo", "retrieve": true, "kind": "evidence", "source": "blind-2", "split": "test"}
+{"id": "rt2-083", "text": "general ways to be a better listener when someone's venting to u?", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-084", "text": "so i watched that new show last night and omg the ending", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-085", "text": "nothing much, just chilling on the sofa", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-086", "text": "what's a balanced plate meant to look like? basic healthy eating stuff, i never learned", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-087", "text": "can you break down what progressive muscle relaxation is in really simple words", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-088", "text": "curious why my hands shake when i'm nervous, never understood that", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-089", "text": "work was brutal today. i just want to lie on the floor", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-090", "text": "what are the signs of burnout, vs just being tired after a long week", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-091", "text": "I was so anxious before the interview today but it went fine!! so relieved", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-092", "text": "good morning :)", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-093", "text": "how do i bring up low mood with my GP? like what do i actually say in the appointment", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-094", "text": "i don't want a list of breathing exercises, i've tried them all, i just feel flat", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-095", "text": "how much exercise do adults need in a week, roughly?", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-096", "text": "why does anxiety make my heart pound like that", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-097", "text": "yaar aaj bahut thaka hua feel ho raha hai, kuch karne ka mann nahi", "retrieve": false, "kind": "reflection", "source": "blind-2", "split": "test"}
+{"id": "rt2-098", "text": "just got home, finally", "retrieve": false, "kind": "casual", "source": "blind-2", "split": "test"}
+{"id": "rt2-099", "text": "ok so i moved cities in august, flat's lovely, colleagues are fine, but weekends are the weird bit because i just sit there scrolling and then it's monday again. anyway how do people usually build up a social circle from scratch in a new place", "retrieve": true, "kind": "factual", "source": "blind-2", "split": "test"}
+{"id": "rt2-100", "text": "has there been any new research on mindfulness apps lately?", "retrieve": true, "kind": "current_info", "source": "blind-2", "split": "test"}
