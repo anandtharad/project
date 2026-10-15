@@ -1,35 +1,33 @@
 """When to look things up (spec §11.7): deterministic routing on the form of
 the message.
 
-A lookup runs only for an explicit information request: a general question
-("what is sleep hygiene?", "how do I fall asleep faster"), a request for
-tips, an explanation or evidence, or a question about where an answer came
-from. Casual conversation, venting, rhetorical questions and questions about
-the companion or about particular people never trigger one. The router does
-not decide whether the library covers the topic: the retrieval's relevance
-threshold does (app/rag/retrieval.py), so an off-topic question ("how do I
-make chai?") runs a lookup that finds nothing, and no evidence reaches the
-prompt. A word list of covered topics was measured and rejected: it missed
-40% of requests on a blind test set (docs/rag.md). The kinds:
+A lookup runs for an information or advice request: a question ("what is
+sleep hygiene?", "my dad's 72, how should he bring this up with his GP?"),
+a request for tips, an explanation or evidence, or a question about where an
+answer came from. Personal context does not stop a question from being one.
+Never looked up: casual chat and venting without a question, rhetorical
+questions ("what's the point", "why did she do that", "lol what is my life"),
+questions to the companion itself, retractions ("any tips? nah, never
+mind"), and messages that say they don't want advice.
 
-- casual:            greetings, small talk, anything without a request
-- reflection:        the person talking about themselves, others or their
-                     feelings, including rhetorical questions ("what's the
-                     point", "why do I always ruin things")
-- factual:           a general question or request ("what is sleep
-                     hygiene?", "any tips for falling asleep?")
-- evidence:          asks for evidence or sources on a topic ("is there any
-                     research on journaling?", "is that a myth?")
-- source_followup:   asks where the last answer came from ("source?"); the
-                     query is the person's previous message
-- current_info:      asks for the latest or current information; the
-                     library is offline, so the reply says the passages may
-                     not be current (no web browsing in this phase)
+The router does not decide whether the library covers the question: the
+retrieval's relevance threshold does (app/rag/retrieval.py). So an
+off-topic question ("how do I make chai?") or an emotional one ("is it bad
+that I'm relieved he's gone?") runs a lookup that, measured on blind test
+sets, puts no passage into the prompt. Two earlier designs were measured
+and replaced: a list of covered topic words (missed 40% of requests on a
+blind set), and treating personal words as "not a request" (missed half of
+the retrieval set's requests). See docs/rag.md. The kinds:
 
-Never retrieved: safety pathways (the engine drops results there), and
-messages that say they don't want advice. A decision model is not used:
-none passes calibration yet (docs/decisions.md), and these patterns are
-measured on their own labelled set (eval/datasets/rag/v1/routing.jsonl).
+- casual:            greetings, small talk, questions to the companion
+- reflection:        no request (venting, rhetorical questions, retractions)
+- factual:           a question or request for information or advice
+- evidence:          asks for evidence or sources ("is there any research on
+                     journaling?", "is that a myth?")
+- source_followup:   asks where the last answer came from ("source?", "is
+                     that true?"); the query is the person's previous message
+- current_info:      asks for the latest information; the library is offline,
+                     so the reply says the passages may not be current
 """
 
 from __future__ import annotations
@@ -73,22 +71,28 @@ _REFLECTIVE = re.compile(
     r"|\bwhat are we\b"
     r"|\bwhy do i (?:always|keep|feel)\b"
     r"|\bis there (?:any|a|even a) point\b"
-    r"|\bhow many times\b"
+    r"|\bhow many (?:more )?times (?:do|did|have|has|must|am|will|can|should) "
+    r"(?:i|he|she|they|you|we)\b"
     r"|\bis it (?:normal|ok|okay) (?:to|that) (?:feel|be|i|i'm)\b.*\b(?:this|so|after)\b"
     # "why" about the person or their situation is rarely a request for facts.
     r"|\bwhy (?:am i|do i|did i|can't i|cant i|is it always|does this|does it always|"
     r"is this|is everything|does everything|me)\b"
     r"|\bwhy (?:is|does|did|won't|wont|can't) (?:he|she|they|my)\b"
     r"|\bwhat(?:'s| is) the (?:use|deal with)\b|\bwhat are the odds\b"
+    # "why did..." asks about a particular event or person, not how things work.
+    r"|\bwhy did\b|\bwhy would (?:he|she|they|someone|anyone|my)\b"
     r"|\bhow do (?:people|you) just\b",
     re.IGNORECASE,
 )
 
 # Questions to or about the companion itself.
 _COMPANION = re.compile(
-    r"^\W*(?:and )?(?:are|were|do|did|can|could|will|would|have) you\b"
-    r"(?! (?:please )?(?:explain|tell|give|recommend|suggest|help|share|describe|list|"
-    r"summari[sz]e|cite|link|back)\b)"
+    r"^\W*(?:and )?(?:are|were) you\b"
+    # "can you get anxious when..." is generic "you"; these verbs ask about the companion.
+    r"|^\W*(?:and )?(?:do|did|can|could|will|would|have) you (?:ever |even |really |actually )?"
+    r"(?:like|love|care|feel|think|remember|know me|understand me|get (?:bored|lonely|tired|sad)|"
+    r"have (?:feelings|friends|a (?:name|body|family))|miss|dream|sleep|eat|mind|promise|"
+    r"judge|hate|forget|talk to anyone|get it)\b"
     r"|\b(?:how|who|what) (?:are|were) you\b|\bhow(?:'s| is| was) your\b"
     r"|\bwhat(?:'s| is) (?:new|up|the latest) with you\b|\babout you(?:rself)?\b"
     r"|\bdo you (?:like|love|care|feel|think|remember|ever|have|know me)\b"
@@ -192,6 +196,12 @@ _PERSONAL = re.compile(
     r"this(?! (?:year|month|week|decade|season)\b)|lol|lmao|haha+|smh|anyway)\b",
     re.IGNORECASE,
 )
+# Marks a question as rhetorical or a joke rather than a request.
+_RHETORICAL = re.compile(
+    r"\b(?:lol|lmao|haha+|smh|anyway|even mean|before i (?:crack|lose it|snap)|"
+    r"what's the use|why bother)\b",
+    re.IGNORECASE,
+)
 # "me" as the person asking for something ("tell me about", "help me sleep").
 _ASKING_ME = re.compile(r"\b(?:tell|teach|show|give|help|remind|let|send|explain to)\s+me\b", re.I)
 
@@ -214,21 +224,54 @@ def _clean(message: str) -> str:
     return text
 
 
-def _clauses(text: str) -> list[str]:
-    parts = re.split(r"[.?!;\n]+|,\s+|\s+(?:but|and so|so)\s+", text)
-    return [p.strip() for p in parts if p.strip()]
+# A clause that opens with one of these is a question. Negative forms are
+# left out: texting drops the subject ("can't sleep", "don't know why").
+_INTERROGATIVE = re.compile(
+    r"^\W*(?:(?:and|so|also|ok|okay|honestly|hey|ugh|hmm|anyway|like|yaar|but|or)\W+)*"
+    r"(?:what|what's|whats|how|how's|why|when|which|where|who|whose|is|are|was|"
+    r"does|do|did|can|could|should|would|will|may|might|any|at what)(?![\w'])",
+    re.IGNORECASE,
+)
+# A "?" counts only with a question word somewhere in the clause: uptalk
+# ("it kind of helped?") is a statement.
+_QUESTION_WORD = re.compile(
+    r"\b(?:what|what's|whats|how|why|when|which|where|who|is|are|does|do|can|could|should|"
+    r"would|will|any)\b",
+    re.IGNORECASE,
+)
+
+
+def _clauses(text: str) -> list[tuple[str, bool]]:
+    """(clause, is it a question): it ends with "?" or starts with an
+    interrogative word."""
+    out: list[tuple[str, bool]] = []
+    for match in re.finditer(r"[^.?!;\n]+(?:[.?!;\n]+|$)", text):
+        sentence = match.group(0)
+        asked = "?" in sentence
+        for part in re.split(r",\s+|\s+(?:but|and so|so)\s+", sentence.rstrip(".?!;\n ")):
+            part = part.strip()
+            if part:
+                question = bool(_INTERROGATIVE.match(part)) or (
+                    asked and bool(_QUESTION_WORD.search(part))
+                )
+                out.append((part, question))
+    return out
 
 
 def _request(text: str) -> RouteKind | None:
     """The kind of information request in the message, or None."""
     found: list[RouteKind] = []
-    for clause in _clauses(text):
+    for clause, question in _clauses(text):
         general = not _PERSONAL.search(_ASKING_ME.sub(" ", clause))
-        if _CURRENT.search(clause) and general:
+        # A question may carry personal context ("my dad is 72, how should he
+        # raise this with his GP?"); whether the library answers it is the
+        # relevance threshold's call. Rhetorical markers still rule it out.
+        asked = question and not _RHETORICAL.search(clause)
+        if _CURRENT.search(clause) and (general or asked):
             found.append("current_info")
-        elif _EVIDENCE.search(clause) and general:
+        elif _EVIDENCE.search(clause) and (general or asked):
             found.append("evidence")
-        elif _HOW_TO.search(clause) or (_EXPLAIN.search(clause) and general):
+        elif _HOW_TO.search(clause) or (_EXPLAIN.search(clause) and general) or asked:
             found.append("factual")
     if not found and "?" in text:
         # A short question with no personal words ("sleep hygiene?").

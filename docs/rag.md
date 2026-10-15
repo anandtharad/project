@@ -194,30 +194,39 @@ if a source failed or a probe missed.
 
 ## Routing (spec §11.7)
 
-`app/rag/routing.py` decides, in code, whether a message is an information
-request:
+`app/rag/routing.py` decides, in code, whether a message asks for
+information or advice:
 
-- **How-to and advice forms count even with personal context**: "how can I
-  improve my sleep?", "I'm so stressed, any tips?", "what can I try".
-- **Questions about how things are count only when the clause is general**:
-  "what happens to your body when you're stressed?" counts; "what is
-  happening to me", "is it bad that I'm relieved he's gone" and "nights
-  like this" do not.
-- **Never**: questions to the companion ("are you real?", "your
-  favourite..."), retractions ("any tips? nah, never mind"), rhetorical
-  idioms ("what's the point", "what are the odds"), venting, and any
-  message that says they don't want advice.
+- **A question counts, personal context included**: "how can I improve my
+  sleep?", "my dad's 72, how should he bring this up with his GP?",
+  "I'm so stressed, any tips?". So do requests ("explain box breathing",
+  "tips for sleep?") and evidence questions ("does journaling actually
+  help?").
+- **Never**:
+  - casual chat and venting without a question;
+  - rhetorical questions ("what's the point", "why did she do that", "lol
+    what is my life");
+  - questions to the companion ("are you real?", "do you ever get lonely?");
+  - retractions ("any tips? nah, never mind");
+  - any message that says they don't want advice.
 - **Source follow-ups** ("source?", "where's that from?", "is that true?")
   look up the person's previous message.
 - **Kinds** are recorded: factual, evidence, current information (the
   library is offline, so the reply says passages may not be the newest),
   source follow-up, reflection, casual.
 
-The router does not decide whether the library covers the topic; the
-relevance threshold does. "How do I make chai?" runs a lookup that finds
-nothing. An earlier version gated on a list of covered topic words. On a
-blind test set it missed 40% of requests, and adding a page would have
-meant updating the list.
+**The relevance threshold decides coverage, not the router.** An off-topic
+or emotional question ("how do I make chai?", "is it bad that I'm relieved
+he's gone?") runs a lookup. On the blind test set, every such lookup ended
+with no passage in the prompt.
+
+**Two earlier designs were measured and replaced:**
+
+1. A list of covered topic words missed 40% of requests on a blind set, and
+   adding a page would have meant updating the list.
+2. Treating any personal word in a question as "not a request" missed half
+   of the retrieval set's requests ("my mum's had insomnia for a year, which
+   is the better long-term option?").
 
 A decision model is not used for routing: none passes calibration yet
 (docs/decisions.md).
@@ -302,21 +311,22 @@ labels, source keys and scores only.
 ### Routing
 
 Blind test set: 100 messages, 45 of them requests. The texts were never
-read; only results are looked at.
+read; only results are looked at. v3 and v4 were each run on it once.
 
-| Router | Requests missed | Lookups run for non-requests | Evidence reaching the prompt for non-requests |
-|---|---|---|---|
-| v2: covered-topic word list | 40.0% (18/45) | 0% | 0% |
-| **v3: request form only (current)** | **24.4% (11/45)** | 23.6% (13/55, all off-topic) | **0% (0/55)** |
+| Router | Requests missed | Lookups run for non-requests | Evidence reaching the prompt for non-requests | Requests that got evidence |
+|---|---|---|---|---|
+| v2: covered-topic word list | 40.0% | 0% | 0% | not measured |
+| v3: request form, personal words block explanatory questions | 24.4% | 23.6% | 0% | 62.2% |
+| **v4: any question or request (current)** | **11.1% (5/45)** | 30.9% (17/55) | **0% (0/55)** | **73.3%** |
 
-- **No conversational message triggered anything.** All 16 casual and 23
-  reflective messages ran no lookup. The 13 off-topic questions ran one,
-  and the relevance threshold rejected every passage.
-- **Requests that got evidence:** 62.2% (28/45), router recall times what
-  the library covers.
-- **Misses** are mostly phrasings the patterns don't know. The earlier
-  blind set (now development data) had shown the same 60% recall for v2,
-  before v3.
+- **What runs a lookup.** Under v4 the lookups for non-requests are mostly
+  off-topic questions, plus a few emotional ones. The relevance threshold
+  rejected every passage for all of them.
+- **Retrieval queries.** They are written as real chat messages, often with
+  personal context. v3 sent only 52% of them (45 of 87 answerable) to a
+  lookup; v4 sends 98% of the dev ones.
+- **End to end** (router, then retrieval) on the retrieval test split: hit
+  rate 69.8%, against 72.1% for retrieval alone.
 
 ### Retrieval
 

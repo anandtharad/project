@@ -481,6 +481,15 @@ async def eval_retrieval(args: argparse.Namespace) -> int:
             scored, info = await candidates_for(
                 settings.database_url, chunking, embeddings, queries
             )
+            if args.through_router:
+                # As in a turn: no lookup, no passages.
+                for item in scored:
+                    chosen = route(item.query["query"], previous_user_message="x")
+                    if not chosen.retrieve:
+                        item.lexical, item.semantic = [], [] if item.semantic is not None else None
+                    item.query = {**item.query, "routed": chosen.retrieve}
+                info["through_router"] = True
+                info["routed"] = sum(1 for item in scored if item.query["routed"])
             run: dict[str, Any] = {**info}
             if args.min_semantic is not None or embeddings is None:
                 fixed = replace(base, min_semantic=args.min_semantic or base.min_semantic)
@@ -789,6 +798,11 @@ def main() -> int:
         "--min-lexical", type=float, help="evaluate this full-text fallback threshold as is"
     )
     retrieval.add_argument("--reranker", help="experiment: a fastembed cross-encoder model")
+    retrieval.add_argument(
+        "--through-router",
+        action="store_true",
+        help="end to end: a query the router does not send to a lookup gets nothing",
+    )
     generation = sub.add_parser("generation")
     generation.add_argument("--split", choices=["dev", "test", "all"], default="test")
     generation.add_argument("--limit", type=int, help="at most this many queries")

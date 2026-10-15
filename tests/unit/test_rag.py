@@ -211,8 +211,10 @@ NO_RETRIEVE = [
     "my therapist taught me box breathing and it helps",
     "why do I always feel like this on Sundays",
     "is it true that you care about me",
-    "what should I cook tonight?",
     "explain to me why he would say that to my face",
+    "can't believe i snapped at my mum again, feel awful",
+    "I tried the breathing thing you mentioned. it kind of helped?",
+    "why did priya bring up my results in front of everyone",
 ]
 
 
@@ -226,11 +228,10 @@ def test_conversation_is_not_looked_up(message: str) -> None:
     assert not route(message).retrieve, route(message)
 
 
-def test_personal_and_companion_questions_are_not_requests() -> None:
+def test_rhetorical_and_companion_questions_are_not_requests() -> None:
     for message in (
-        "what is happening to me lately, I snap at everyone",
-        "is it bad that I'm relieved he's gone?",
         "how many more nights like this before I crack",
+        "lol what is my life",
         "what's your favourite kind of weather lol",
         "tell me about a time you were scared",
         "any tips? nah, never mind, I just wanted to say it out loud",
@@ -250,10 +251,19 @@ def test_how_to_requests_keep_their_personal_context() -> None:
         assert route(message).retrieve, message
 
 
-def test_off_topic_questions_are_left_to_the_relevance_threshold() -> None:
-    # The router judges the form of the message, not the topic: the lookup
-    # runs and the retrieval threshold finds nothing (docs/rag.md).
-    assert route("how do i reverse a string in python").retrieve
+def test_questions_with_personal_context_are_left_to_the_relevance_threshold() -> None:
+    # The router judges the form of the message, not the topic or whose life
+    # it is about: these run a lookup, and the retrieval threshold decides
+    # whether any passage is relevant (docs/rag.md; evaluated at evidence level).
+    for message in (
+        "how do i reverse a string in python",
+        "what should I cook tonight?",
+        "my dad's 72 and gets muddled, how should he bring this up with his GP?",
+        "is heart rate biofeedback legit for stress",
+        "my mum's had insomnia for a year. which is the better long term option?",
+        "can u get anxious even when nothing bad is going on?",
+    ):
+        assert route(message).retrieve, message
 
 
 def test_route_kinds_and_source_followups() -> None:
