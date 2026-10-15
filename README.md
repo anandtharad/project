@@ -169,6 +169,7 @@ is the source of truth. Important ones:
 | `GENERATION_EFFORT` | `none`…`max` reasoning/thinking depth, mapped per provider; unset = provider default |
 | `MAX_OUTPUT_TOKENS`, `MAX_CONTEXT_TOKENS` | optional; provider defaults (Groq's are sized for its free tier) |
 | `TURN_DEADLINE_SECONDS` / `STALE_TURN_SECONDS` | overall turn budget / when a pending turn counts as abandoned |
+| `USER_MESSAGES_PER_MINUTE` / `USER_MESSAGES_PER_DAY` | per-user message limits across all conversations (20 / 1000; `0` turns a limit off); over the limit, `429 too_many_messages` with `Retry-After` |
 | `MAX_INPUT_CHARACTERS`, `MAX_REQUEST_BYTES` | input limits enforced before any model call |
 | `STATE_EXTRACTION_ENABLED`, `STATE_EXTRACTION_MODEL` | conversation-state update before each reply (default on; the reply model) |
 | `DECISION_PROVIDER` | `off` (default), `laya` (self-hosted, `LAYA_API_KEY`), `jev` (`JEV_API_KEY`) or `llm` (a separate LLM, default Groq `openai/gpt-oss-20b`; `DECISION_LLM_*`, see docs/decisions.md) |

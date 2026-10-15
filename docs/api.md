@@ -145,6 +145,7 @@ never included.
 | 409 | `conflict` | `turn_in_progress`, `turn_superseded`, `idempotency_key_reused` |
 | 413 | `invalid_request` | `request_too_large` (body over `MAX_REQUEST_BYTES`) |
 | 422 | `invalid_request` | `validation_failed` (with field `details`), `content_too_long` |
+| 429 | `rate_limited` | `too_many_messages` (per-user limit, `USER_MESSAGES_PER_MINUTE` / `USER_MESSAGES_PER_DAY`; nothing is stored; `Retry-After` says when the oldest counted message leaves the window) |
 | 500 | `internal_error` | `internal_error` |
 | 503 | `dependency_unavailable` | `generation_unavailable`, `invalid_generation`, `persistence_failed`, `database_unavailable` |
 | 504 | `timeout` | `generation_timeout` |
@@ -154,5 +155,5 @@ saved (status `failed`) and no assistant reply was stored. Retrying with the
 same idempotency key re-attempts the turn. `Retry-After` is set when retrying
 is likely to help.
 
-The `forbidden` and `rate_limited` categories are reserved for later phases.
-No endpoint returns them yet.
+The `forbidden` category is reserved for later phases; no endpoint returns
+it yet.

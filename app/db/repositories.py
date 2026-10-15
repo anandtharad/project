@@ -5,12 +5,13 @@ queries take a conversation ID that has already passed that check."""
 from __future__ import annotations
 
 import uuid
+from datetime import datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Conversation, Message, TurnStatus, User
+from app.db.models import Conversation, Message, MessageRole, TurnStatus, User
 
 
 async def get_or_create_user(session: AsyncSession, external_id: str) -> uuid.UUID:
@@ -74,6 +75,25 @@ async def find_pending_turn(session: AsyncSession, conversation_id: uuid.UUID) -
             Message.turn_status == TurnStatus.PENDING,
         )
     )
+
+
+async def user_messages_since(
+    session: AsyncSession, user_id: uuid.UUID, since: datetime
+) -> tuple[int, datetime | None]:
+    """(count, oldest created_at) of the user's own messages after `since`,
+    across all of their conversations."""
+    row = (
+        await session.execute(
+            select(func.count(), func.min(Message.created_at))
+            .join(Conversation, Conversation.id == Message.conversation_id)
+            .where(
+                Conversation.user_id == user_id,
+                Message.role == MessageRole.USER,
+                Message.created_at > since,
+            )
+        )
+    ).one()
+    return int(row[0] or 0), row[1]
 
 
 async def get_reply(session: AsyncSession, user_message_id: uuid.UUID) -> Message | None:

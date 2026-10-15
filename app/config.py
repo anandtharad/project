@@ -211,6 +211,11 @@ class Settings(BaseSettings):
     # A pending turn older than this is considered abandoned (process crash,
     # cancelled request) and may be taken over. Must exceed the turn deadline.
     stale_turn_seconds: float = Field(default=150.0, gt=0)
+    # Per-user message limits (spec §18, §22.3), counted from stored user
+    # messages across all of the user's conversations, so they hold across
+    # workers and restarts. 0 disables a limit.
+    user_messages_per_minute: int = Field(default=20, ge=0)
+    user_messages_per_day: int = Field(default=1000, ge=0)
     max_input_characters: int = Field(default=8_000, ge=1, le=100_000)
     max_request_bytes: int = Field(default=64 * 1024, ge=1024)
     # Unset = the provider preset's default.

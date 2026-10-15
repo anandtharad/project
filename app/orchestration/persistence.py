@@ -30,6 +30,8 @@ Concurrency rules (one in-flight turn per conversation):
 from __future__ import annotations
 
 import hashlib
+import logging
+import math
 import uuid
 from collections.abc import Sequence
 from dataclasses import dataclass, field
@@ -53,7 +55,10 @@ from app.db.models import (
 from app.decisions.schemas import DecisionResult
 from app.errors import AppError, ErrorCategory, conversation_not_found
 from app.llm.schemas import ChatMessage, ChatRole
+from app.observability import log_event
 from app.state.schemas import STATE_SCHEMA_VERSION, ConversationState, StoredState
+
+logger = logging.getLogger("app.turn")
 
 
 class TurnAttemptLost(Exception):
@@ -127,10 +132,21 @@ class TurnStore:
         *,
         stale_turn_seconds: float,
         history_limit: int,
+        messages_per_minute: int = 0,
+        messages_per_day: int = 0,
     ) -> None:
         self._sessions = session_factory
         self._stale_after = timedelta(seconds=stale_turn_seconds)
         self._history_limit = history_limit
+        # (limit, window); a limit of 0 is off.
+        self._rate_limits = [
+            (limit, window)
+            for limit, window in (
+                (messages_per_minute, timedelta(minutes=1)),
+                (messages_per_day, timedelta(days=1)),
+            )
+            if limit > 0
+        ]
 
     async def begin(
         self,
@@ -168,6 +184,8 @@ class TurnStore:
                     pending.failure_category = "abandoned"
                     await session.flush()
 
+                # Only new messages count: an idempotent retry returned above.
+                await self._enforce_rate_limits(session, user_id, db_now)
                 conversation.last_sequence += 1
                 conversation.updated_at = db_now
                 message = Message(
@@ -287,6 +305,25 @@ class TurnStore:
                     raise turn_in_progress()
             await session.delete(conversation)
         return True
+
+    async def _enforce_rate_limits(
+        self, session: AsyncSession, user_id: uuid.UUID, db_now: datetime
+    ) -> None:
+        # Concurrent first messages in two different conversations can both
+        # pass (each holds only its own conversation lock); the limit is a
+        # guard against runaway use, not an exact quota.
+        for limit, window in self._rate_limits:
+            count, oldest = await repo.user_messages_since(session, user_id, db_now - window)
+            if count >= limit:
+                frees_at = (oldest or db_now) + window
+                retry = max(1, math.ceil((frees_at - db_now).total_seconds()))
+                log_event(logger, "turn.rate_limited", window_seconds=int(window.total_seconds()))
+                raise AppError(
+                    ErrorCategory.RATE_LIMITED,
+                    "too_many_messages",
+                    "You've sent a lot of messages in a short time. Please wait a moment.",
+                    retry_after_seconds=retry,
+                )
 
     def _is_stale(self, message: Message, db_now: datetime) -> bool:
         started = message.attempt_started_at

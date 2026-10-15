@@ -209,6 +209,8 @@ def create_app(
             session_factory,
             stale_turn_seconds=settings.stale_turn_seconds,
             history_limit=settings.history_max_messages,
+            messages_per_minute=settings.user_messages_per_minute,
+            messages_per_day=settings.user_messages_per_day,
         )
         app.state.orchestrator = TurnOrchestrator(
             settings=settings,

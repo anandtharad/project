@@ -248,8 +248,10 @@ are clean.
 ## Known limitations
 
 - No independent safety layer (Phase 5). Do not use with real users.
-- No per-user rate limiting or cost quotas. Concurrency is limited only per
-  conversation.
+- Per-user message limits (`USER_MESSAGES_PER_MINUTE`, `USER_MESSAGES_PER_DAY`)
+  guard against runaway use; they are approximate under concurrent first
+  messages in different conversations, and there is no token or cost quota
+  per user.
 - No retention period for conversations yet (memories have one);
   conversations are deleted only on request
   (`DELETE /v1/conversations/{id}`, which keeps memories). Deleting a memory
