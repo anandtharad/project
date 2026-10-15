@@ -36,6 +36,8 @@ from app.orchestration.engine import TurnOrchestrator
 from app.orchestration.persistence import TurnStore
 from app.orchestration.validation import ResponseValidator
 from app.prompting import PromptRegistry, PromptTemplate
+from app.safety.factory import build_safety_layer
+from app.safety.policy import PATHWAY_RULES
 from app.state.extractor import StateExtractor
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -162,6 +164,7 @@ def create_app(
     *,
     llm_client: LLMClient | None = None,
     decision_backend: DecisionBackend | None = None,
+    safety_llm: LLMClient | None = None,
 ) -> FastAPI:
     settings = settings or get_settings()
     configure_logging(settings.log_level)
@@ -183,6 +186,7 @@ def create_app(
         session_factory = create_session_factory(engine)
         llm = llm_client or build_llm_client(settings, resolved)
         decisions = build_decision_service(settings, backend=decision_backend)
+        safety = build_safety_layer(settings, llm=safety_llm)
         state_extractor = build_state_extractor(settings, resolved, llm, state_prompt)
         memory_store = MemoryStore(session_factory, retention_days=settings.memory_retention_days)
         memory = build_memory_service(settings, resolved, llm, memory_prompt, memory_store)
@@ -229,6 +233,7 @@ def create_app(
             state_extractor=state_extractor,
             memory=memory,
             background=background,
+            safety=safety,
         )
         log_event(
             logger,
@@ -243,7 +248,24 @@ def create_app(
             state_model=state_extractor.model if state_extractor else None,
             memory_enabled=memory is not None,
             embedding_model=memory.embedding_model if memory else None,
+            safety_enabled=safety is not None,
+            safety_classifier=(
+                safety.analyzer.classifier.model
+                if safety is not None and safety.analyzer.classifier is not None
+                else None
+            ),
+            safety_region=safety.region if safety is not None else None,
         )
+        if safety is not None and not {
+            rule.fragment for rule in PATHWAY_RULES.values() if rule.fragment
+        } <= set(prompt.fragments):
+            log_event(
+                logger,
+                "config.warning",
+                level=logging.WARNING,
+                detail=f"{prompt.key} has no safety pathway fragments; safety pathways use "
+                "its danger guidance only (use companion_system 1.6.0 or later)",
+            )
         for warning in resolved.warnings:
             log_event(logger, "config.warning", level=logging.WARNING, detail=warning)
         try:
@@ -255,6 +277,8 @@ def create_app(
             if memory is not None:
                 await memory.aclose()
             await decisions.aclose()
+            if safety is not None:
+                await safety.aclose()
             await llm.aclose()
             await engine.dispose()
 

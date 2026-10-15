@@ -206,6 +206,27 @@ class Settings(BaseSettings):
     decision_llm_max_output_tokens: int = Field(default=1024, ge=256, le=8192)
     decision_prompt_version: str = "1.0.0"
 
+    # --- Safety (spec §12, Phase 5) -----------------------------------------
+    # The safety layer runs on every turn: a deterministic pattern screen, plus
+    # an LLM risk classifier when one is configured. "auto": the classifier
+    # runs on Groq when GROQ_API_KEY is set, otherwise it is off and every turn
+    # runs in degraded mode (patterns only, recorded as such). The default
+    # model is not the reply model, so it has its own free-tier limits.
+    safety_enabled: bool = True
+    safety_classifier_provider: ProviderName | Literal["auto", "off"] = "auto"
+    safety_classifier_model: str = Field(default="openai/gpt-oss-safeguard-20b", min_length=1)
+    safety_classifier_effort: Effort | Literal["off"] = "low"
+    safety_classifier_max_output_tokens: int = Field(default=300, ge=64, le=4096)
+    safety_classifier_timeout_seconds: float = Field(default=4.0, gt=0, le=30)
+    safety_policy_version: str = "1.0.0"
+    # Crisis resources: "" = generic (no numbers), or IN, US, GB
+    # (app/safety/resources_v1.toml, verified official sources).
+    safety_region: str = ""
+    # A semantic check of replies on safety pathways only, with the
+    # classifier's model; its failure never blocks a reply.
+    safety_output_llm_check: bool = True
+    safety_output_policy_version: str = "1.0.0"
+
     # --- Turn limits --------------------------------------------------------
     turn_deadline_seconds: float = Field(default=90.0, gt=0)
     # A pending turn older than this is considered abandoned (process crash,
@@ -224,7 +245,7 @@ class Settings(BaseSettings):
     max_response_characters: int = Field(default=8_000, ge=100)
 
     # --- Prompts ------------------------------------------------------------
-    companion_prompt_version: str = "1.5.0"
+    companion_prompt_version: str = "1.6.0"
 
     # --- Diagnostics --------------------------------------------------------
     expose_timing_metadata: bool = True
@@ -265,7 +286,13 @@ class Settings(BaseSettings):
             from app.llm.providers.registry import resolve_decision_llm
 
             resolve_decision_llm(self)
+        if self.safety_enabled:
+            from app.safety.resources import normalize_region
+
+            normalize_region(self.safety_region)  # unknown codes fail at startup
         if self.app_env is AppEnv.PRODUCTION:
+            if not self.safety_enabled:
+                raise ValueError("SAFETY_ENABLED=false is not allowed in production")
             if self.auth_mode == "dev":
                 raise ValueError(
                     "Development authentication cannot run with APP_ENV=production; "

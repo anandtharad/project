@@ -42,7 +42,7 @@ from typing import Literal
 
 from app.safety.taxonomy import SafetyCategory, max_category
 
-PATTERNS_VERSION = "1.0.0"
+PATTERNS_VERSION = "1.1.0"
 
 Strength = Literal["explicit", "concern"]
 
@@ -233,6 +233,12 @@ RULES: tuple[Rule, ...] = (
         _C.SELF_HARM,
         "explicit",
         rf"\b(?:kill|killing|killed|off|offing|unalive|unaliving) ?{_SELF}\b",
+    ),
+    # Slang that is often hyperbole ("kms I sent it to the wrong chat").
+    _rule(
+        "sh.slang",
+        _C.SELF_HARM,
+        "explicit",
         r"\bkms\b",
         r"\bunaliv(?:e|ing)\b",
     ),
@@ -524,6 +530,13 @@ RULES: tuple[Rule, ...] = (
     ),
 )
 
+# Explicit hits whose meaning depends on context: slang that is often
+# hyperbole, and self-injury words that also describe accidents or the past
+# ("I used to self-harm at 15", "my therapist asked if I hurt myself"). When
+# the classifier works and labels the message as no risk, these count as
+# concern only (app/safety/analysis.py); in degraded mode they stay explicit.
+CONTEXTUAL_RULES = frozenset({"sh.slang", "sh.self_injury"})
+
 # Imminence cues: explicit imminent_danger, but only together with an
 # explicit self-harm / harm-to-others hit in this or the previous message.
 CUES: tuple[Rule, ...] = (
@@ -612,6 +625,13 @@ _GUARDS: tuple[tuple[str, re.Pattern[str], str | None], ...] = tuple(
             None,
         ),
         ("g.kill_it", r"\bkill(?:ing|ed|s)? it\b", None),
+        (
+            "g.game_command",
+            rf"\bin (?:minecraft|roblox|terraria|fortnite|the game|this game|game)\b.{{0,40}}?"
+            rf"\bkill ?{_SELF}\b|\bkill ?{_SELF}\b(?=.{{0,40}}\b(?:respawn|spawn point|"
+            r"in (?:minecraft|roblox|terraria|the game|game)\b))",
+            None,
+        ),
         (
             "g.kill_thing",
             rf"\bkill(?:ing|ed|s)? (?:a |an |the |this |that |my |your |all |all the |every )?"

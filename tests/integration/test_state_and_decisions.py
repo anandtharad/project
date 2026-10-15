@@ -248,10 +248,18 @@ async def test_safety_mode_signal_takes_precedence(
 ) -> None:
     backend.answers = answers(mode="safety", strategy="plan")
     cid = await create_conversation(laya_client, ALICE)
-    await send(laya_client, cid, "Help me plan my week, nothing matters anyway.")
-    system = llm.requests[-1].system
-    assert PROMPT.fragment("safety_signal") in system
+    response = await send(laya_client, cid, "Help me plan my week, nothing matters anyway.")
+    # A calibrated safety mode raises the safety assessment to self-harm: the
+    # crisis-support pathway replaces the ordinary strategy (Phase 5).
+    system = llm.requests[0].system
+    assert PROMPT.fragment("safety_crisis_support") in system
     assert PROMPT.fragment("plan") not in system
+    # The scripted reply offers no help, so it is regenerated once and then
+    # replaced by the pathway's fixed fallback.
+    assert len(llm.requests) == 2
+    assert "was not sent because" in llm.requests[1].system
+    assert response.status_code == 201
+    assert "so do you" in response.json()["assistant_content"]
 
 
 @pytest.mark.usefixtures("calibrated")

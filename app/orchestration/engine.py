@@ -54,6 +54,7 @@ from app.orchestration.lifecycle import TurnStage, TurnTrace
 from app.orchestration.persistence import (
     AssistantProvenance,
     CompletedTurn,
+    SafetyWrite,
     StartedTurn,
     StateWrite,
     TurnAttemptLost,
@@ -61,8 +62,19 @@ from app.orchestration.persistence import (
     turn_superseded,
 )
 from app.orchestration.policy import ResponsePolicy, choose_policy
+from app.orchestration.safety_flow import (
+    guidance_for,
+    is_safety_pathway,
+    regeneration_note,
+    safety_write,
+)
 from app.orchestration.validation import ResponseValidator
 from app.prompting import PromptTemplate
+from app.safety.analysis import SafetyAssessment
+from app.safety.factory import SafetyLayer
+from app.safety.fallbacks import fallback_reply
+from app.safety.output import OutputCheck
+from app.safety.policy import SafetyDecision
 from app.state.extractor import ExtractionResult, ExtractionStatus, StateExtractor
 from app.state.schemas import ConversationState
 
@@ -92,6 +104,7 @@ class TurnOrchestrator:
         state_extractor: StateExtractor | None = None,
         memory: MemoryService | None = None,
         background: BackgroundTasks | None = None,
+        safety: SafetyLayer | None = None,
     ) -> None:
         self._settings = settings
         self._model = model
@@ -111,6 +124,7 @@ class TurnOrchestrator:
         self._state_extractor = state_extractor
         self._memory = memory
         self._background = background
+        self._safety = safety
 
     async def submit_message(
         self,
@@ -157,11 +171,13 @@ class TurnOrchestrator:
         content: str,
     ) -> TurnResult:
         previous = begun.state.state if begun.state is not None else None
-        # Independent, so they run concurrently; neither can fail the turn.
-        extraction, recalled = await asyncio.gather(
+        # Independent, so they run concurrently; none can fail the turn.
+        extraction, recalled, assessment = await asyncio.gather(
             self._update_state(previous, begun, trace, trace_id),
             self._recall(user_id, content),
+            self._assess(content, begun),
         )
+        trace.mark(TurnStage.SAFETY_ASSESSED)
         trace.mark(TurnStage.MEMORIES_RETRIEVED)
         state = extraction.state if extraction is not None and extraction.state else previous
         trace.mark(TurnStage.STATE_UPDATED)
@@ -176,11 +192,17 @@ class TurnOrchestrator:
             )
         trace.mark(TurnStage.DECISIONS_RESOLVED)
 
+        safety: SafetyDecision | None = None
+        if self._safety is not None and assessment is not None:
+            if mode is not None and mode.value == "safety":
+                assessment = assessment.with_decision_signal()
+            safety = self._safety.policy.decide(assessment, self._safety.region)
+        # Safety overrides the ordinary strategy (spec Phase 5 acceptance).
         policy = choose_policy(content, decisions)
         trace.mark(TurnStage.POLICY_CREATED)
 
         context = self._context_builder.build(
-            system=self._system_prompt(policy),
+            system=self._system_prompt(policy, safety),
             history=begun.history,
             notes=state.notes() if state is not None and not state.is_empty() else None,
             memories=_memories_for_context(recalled),
@@ -221,6 +243,14 @@ class TurnOrchestrator:
             )
         trace.mark(TurnStage.RESPONSE_VALIDATED)
 
+        content = response.content
+        safety_record: SafetyWrite | None = None
+        if self._safety is not None and assessment is not None and safety is not None:
+            content, response, safety_record = await self._check_reply(
+                response, request, assessment, safety, trace
+            )
+        trace.mark(TurnStage.SAFETY_CHECKED)
+
         provenance = AssistantProvenance(
             provider=response.provider,
             model_id=response.model_id,
@@ -250,6 +280,7 @@ class TurnOrchestrator:
                 "decisions": _decisions_summary(decisions),
                 "state": _state_summary(extraction, self._state_extractor),
                 "memory": _memory_summary(recalled),
+                "safety": _safety_summary(assessment, safety, safety_record),
                 "trace_id": trace_id,
             },
         )
@@ -259,10 +290,11 @@ class TurnOrchestrator:
                 conversation_id=begun.conversation_id,
                 user_message_id=begun.user_message_id,
                 attempt_id=begun.attempt_id,
-                content=response.content,
+                content=content,
                 provenance=provenance,
                 state_write=state_write,
                 decisions=list(decisions.results.values()),
+                safety=safety_record,
             )
         except TurnAttemptLost as exc:
             log_event(logger, "turn.attempt_lost", level=logging.WARNING)
@@ -312,11 +344,95 @@ class TurnOrchestrator:
             return None
         return await self._memory.retrieve_for_turn(user_id, content)
 
-    def _system_prompt(self, policy: ResponsePolicy) -> str:
+    def _system_prompt(self, policy: ResponsePolicy, safety: SafetyDecision | None = None) -> str:
         if not self._policy_enabled:
             return self._prompt.render()
-        guidance = "\n\n".join(self._prompt.fragment(name) for name in policy.fragments)
+        if safety is not None and safety.overrides_strategy:
+            guidance = guidance_for(self._prompt, safety)
+        else:
+            guidance = "\n\n".join(self._prompt.fragment(name) for name in policy.fragments)
         return self._prompt.render(response_guidance=guidance)
+
+    async def _assess(self, content: str, begun: StartedTurn) -> SafetyAssessment | None:
+        if self._safety is None:
+            return None
+        # The history ends with this message; the analyzer takes the earlier ones.
+        return await self._safety.analyzer.assess(content, begun.history[:-1])
+
+    async def _output_check(
+        self, reply: str, system: str, assessment: SafetyAssessment, safety: SafetyDecision
+    ) -> tuple[OutputCheck, str | None]:
+        """Deterministic checks on every reply; the semantic check only on a
+        safety pathway, only when those pass, and never blocking on failure."""
+        assert self._safety is not None
+        check = self._safety.validator.check(reply, safety, assessment, system_prompt=system)
+        status: str | None = None
+        checker = self._safety.output_checker
+        if check.ok and is_safety_pathway(safety) and checker is not None:
+            result = await checker.check(reply, safety)
+            if result is not None:
+                status = result.status.value
+                if result.violation is not None:
+                    check = OutputCheck((result.violation,))
+        return check, status
+
+    async def _check_reply(
+        self,
+        response: GenerationResponse,
+        request: GenerationRequest,
+        assessment: SafetyAssessment,
+        safety: SafetyDecision,
+        trace: TurnTrace,
+    ) -> tuple[str, GenerationResponse, SafetyWrite]:
+        """Bounded recovery (spec §23): a reply that fails the checks is
+        regenerated once with a note naming the problems; if that fails too,
+        or cannot be generated in time, the pathway's fixed fallback is stored.
+        A failed regeneration never fails the turn."""
+        check, status = await self._output_check(
+            response.content, request.system, assessment, safety
+        )
+        content, recovery = response.content, "none"
+        if not check.ok:
+            log_event(
+                logger,
+                "safety.output_violation",
+                level=logging.WARNING,
+                codes=list(check.codes),
+                pathway=safety.pathway.value,
+            )
+            retry_request = request.model_copy(
+                update={"system": f"{request.system}\n\n{regeneration_note(check.codes)}"}
+            )
+            retried: GenerationResponse | None = None
+            remaining = self._settings.turn_deadline_seconds - trace.elapsed_seconds()
+            try:
+                if remaining > 0:
+                    async with asyncio.timeout(remaining):
+                        retried = await self._llm.generate(retry_request)
+            except (TimeoutError, LLMError) as exc:
+                log_event(
+                    logger,
+                    "safety.regeneration_failed",
+                    level=logging.WARNING,
+                    exc_type=type(exc).__name__,
+                )
+            if retried is not None and self._validator.validate(retried).accepted:
+                second, status = await self._output_check(
+                    retried.content, request.system, assessment, safety
+                )
+                if second.ok:
+                    response, content, recovery = retried, retried.content, "regenerated"
+            if recovery == "none":
+                content, recovery = fallback_reply(safety), "fallback"
+            log_event(logger, "safety.recovered", recovery=recovery, pathway=safety.pathway.value)
+        record = safety_write(
+            assessment,
+            safety,
+            violations=check.codes,
+            output_check_status=status,
+            recovery=recovery,
+        )
+        return content, response, record
 
     async def _update_state(
         self,
@@ -410,6 +526,22 @@ class TurnOrchestrator:
             )
         except (SQLAlchemyError, OSError):
             log_event(logger, "persistence.failed", level=logging.ERROR, stage="mark_failed")
+
+
+def _safety_summary(
+    assessment: SafetyAssessment | None,
+    safety: SafetyDecision | None,
+    record: SafetyWrite | None,
+) -> dict[str, object] | None:
+    if assessment is None or safety is None or record is None:
+        return None
+    return {
+        **assessment.summary(),
+        **safety.summary(),
+        "output_violations": record.output_violations,
+        "output_check_status": record.output_check_status,
+        "recovery": record.recovery,
+    }
 
 
 def _decisions_summary(decisions: DecisionSet) -> dict[str, object]:

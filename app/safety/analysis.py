@@ -3,13 +3,18 @@
 Combination (design §2.4), in order of authority:
 
     category = max_severity(
-        explicit pattern hits      (never downgraded by the classifier),
+        explicit pattern hits      (never downgraded by the classifier, except
+                                    context-dependent ones, below),
         classifier category        (only when its status is ok),
         self_harm                  (only when the decision signal is acted on),
     )
 
 - Classifier ok: concern-only pattern hits do not override a classifier
-  `none` or `distress` (fewer false positives) but are recorded.
+  `none` or `distress` (fewer false positives) but are recorded. The same
+  holds for explicit hits from context-dependent rules
+  (`patterns.CONTEXTUAL_RULES`: slang such as "kms", self-injury words that
+  also describe accidents or the past). Unambiguous first-person statements
+  are never downgraded.
 - Classifier not ok (any failure, or disabled): degraded mode. The category
   is the most severe explicit hit, or `ambiguous_concern` if there is any
   concern hit, and `degraded` is set. With no hits at all the category is
@@ -37,8 +42,8 @@ from app.safety.classifier import (
     ClassifierResult,
     ClassifierStatus,
 )
-from app.safety.patterns import PATTERNS_VERSION, PatternResult, screen
-from app.safety.taxonomy import Pathway, SafetyCategory, max_category, pathway_for
+from app.safety.patterns import CONTEXTUAL_RULES, PATTERNS_VERSION, PatternResult, screen
+from app.safety.taxonomy import Pathway, SafetyCategory, is_risk, max_category, pathway_for
 
 logger = logging.getLogger("app.safety")
 
@@ -101,6 +106,11 @@ def combine(
     """The combination rule of the module docstring."""
     explicit = [hit.category for hit in patterns.explicit]
     if classifier.ok:
+        if classifier.category is not None and not is_risk(classifier.category):
+            # Context-dependent rules defer to a working classifier's "no risk".
+            explicit = [
+                hit.category for hit in patterns.explicit if hit.rule_id not in CONTEXTUAL_RULES
+            ]
         category = max_category((*explicit, classifier.category))
         degraded = False
     else:

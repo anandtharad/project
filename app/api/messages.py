@@ -6,13 +6,24 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, Request, Response, status
 
 from app.api.auth import AuthenticatedUser, authenticate
-from app.api.schemas import MessageList, MessageOut, SubmitMessageRequest, SubmitMessageResponse
+from app.api.schemas import (
+    MessageList,
+    MessageOut,
+    SafetyNotice,
+    SubmitMessageRequest,
+    SubmitMessageResponse,
+    SupportContact,
+)
 from app.config import Settings
 from app.db import repositories as repo
 from app.db.models import MessageRole
 from app.errors import AppError, ErrorCategory, conversation_not_found
 from app.observability import trace_id_var
 from app.orchestration.engine import TurnOrchestrator
+from app.orchestration.persistence import CompletedTurn
+from app.safety.policy import PATHWAY_RULES
+from app.safety.resources import default_resources
+from app.safety.taxonomy import Pathway
 
 router = APIRouter(prefix="/v1/conversations/{conversation_id}/messages", tags=["messages"])
 
@@ -58,6 +69,18 @@ async def submit_message(
         created_at=turn.created_at,
         replayed=turn.replayed,
         timing_ms=result.timings_ms if settings.expose_timing_metadata else None,
+        safety=_safety_notice(turn),
+    )
+
+
+def _safety_notice(turn: CompletedTurn) -> SafetyNotice | None:
+    if turn.safety_pathway is None or turn.safety_pathway == Pathway.NORMAL:
+        return None
+    pathway = Pathway(turn.safety_pathway)
+    chosen = default_resources().select(turn.safety_region, PATHWAY_RULES[pathway].resource_kinds)
+    return SafetyNotice(
+        pathway=pathway.value,
+        resources=[SupportContact(name=r.name, contact=r.contact, hours=r.hours) for r in chosen],
     )
 
 

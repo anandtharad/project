@@ -503,8 +503,7 @@ def resolve_auxiliary_llm(
     if preset.requires_api_key and own_key is None and not (shared and settings.generation_api_key):
         key_var = (preset.api_key_setting or "generation_api_key").upper()
         raise ProviderConfigError(
-            f"{feature} needs an API key for {setting_prefix}_PROVIDER={preset.name}: "
-            f"set {key_var}"
+            f"{feature} needs an API key for {setting_prefix}_PROVIDER={preset.name}: set {key_var}"
         )
     resolved = resolve_provider(
         settings.model_copy(

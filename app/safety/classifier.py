@@ -286,6 +286,11 @@ class SafetyClassifier:
     def policy_version(self) -> str:
         return self.prompt.version
 
+    @property
+    def client(self) -> LLMClient:
+        """The classifier's client (the semantic output check can share it)."""
+        return self._llm
+
     def build_request(self, message: str, history: Sequence[ChatMessage] = ()) -> GenerationRequest:
         return GenerationRequest(
             model=self.model,
@@ -349,14 +354,15 @@ def build_safety_classifier(
     timeout_seconds: float = DEFAULT_TIMEOUT_SECONDS,
     max_retries: int = 0,
     temperature: float | None = None,
+    llm: LLMClient | None = None,
 ) -> SafetyClassifier:
-    """A classifier with a dedicated client for `resolved` (see
+    """A classifier with a dedicated client for `resolved` (or `llm`; see
     `resolve_auxiliary_llm`). No retries by default: on a 3-requests-per-minute
     limit a retry rarely helps, and degraded mode is the fallback."""
     from app.llm.factory import build_llm_client
 
     return SafetyClassifier(
-        llm=build_llm_client(settings, resolved, max_retries=max_retries),
+        llm=llm or build_llm_client(settings, resolved, max_retries=max_retries),
         llm_provider=resolved.preset.name,
         model=resolved.model,
         prompt=PromptRegistry().get(SAFETY_POLICY_PROMPT_ID, policy_version),

@@ -205,6 +205,44 @@ class TurnDecision(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
+class TurnSafety(Base):
+    """The safety layer's record for one completed turn (spec §12, design in
+    docs/safety.md): labels, statuses and rule ids only, never message text
+    or classifier rationale. Deleted with its conversation."""
+
+    __tablename__ = "turn_safety"
+    __table_args__ = (
+        CheckConstraint("recovery IN ('none', 'regenerated', 'fallback')", name="recovery_valid"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    conversation_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("conversations.id", ondelete="CASCADE"), index=True
+    )
+    user_message_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("messages.id", ondelete="CASCADE"), unique=True
+    )
+    category: Mapped[str] = mapped_column(String(32))
+    pathway: Mapped[str] = mapped_column(String(32))
+    # False: the classifier failed and no pattern matched ("unassessed").
+    assessed: Mapped[bool] = mapped_column(Boolean)
+    degraded: Mapped[bool] = mapped_column(Boolean)
+    classifier_status: Mapped[str] = mapped_column(String(16))
+    classifier_model: Mapped[str | None] = mapped_column(String(128))
+    classifier_category: Mapped[str | None] = mapped_column(String(32))
+    pattern_rules: Mapped[list[str]] = mapped_column(JSONB)
+    decision_signal: Mapped[bool] = mapped_column(Boolean)
+    policy_version: Mapped[str] = mapped_column(String(32))
+    patterns_version: Mapped[str] = mapped_column(String(32))
+    region: Mapped[str] = mapped_column(String(8))
+    # Violation codes of the stored reply's first draft (empty: none).
+    output_violations: Mapped[list[str]] = mapped_column(JSONB)
+    output_check_status: Mapped[str | None] = mapped_column(String(16))
+    recovery: Mapped[str] = mapped_column(String(16))
+    latency_ms: Mapped[float | None] = mapped_column(Float)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
 class MemoryRecord(Base):
     """A memory about a user (spec §10.4). Owned by the user, not by a
     conversation: deleting a conversation keeps its memories (the person

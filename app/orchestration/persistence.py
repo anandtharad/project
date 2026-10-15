@@ -29,6 +29,7 @@ Concurrency rules (one in-flight turn per conversation):
 
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import logging
 import math
@@ -50,6 +51,7 @@ from app.db.models import (
     Message,
     MessageRole,
     TurnDecision,
+    TurnSafety,
     TurnStatus,
 )
 from app.decisions.schemas import DecisionResult
@@ -97,6 +99,32 @@ class CompletedTurn:
     # Version of the stored state after this turn; None when the write was
     # rejected as stale, not requested, or on replay.
     state_version: int | None = None
+    # The safety pathway and resource region (None: no safety record, e.g.
+    # the safety layer is off or the turn predates it).
+    safety_pathway: str | None = None
+    safety_region: str = ""
+
+
+@dataclass(frozen=True)
+class SafetyWrite:
+    """The turn_safety row for a completed turn (labels and statuses only)."""
+
+    category: str
+    pathway: str
+    assessed: bool
+    degraded: bool
+    classifier_status: str
+    classifier_model: str | None
+    classifier_category: str | None
+    pattern_rules: list[str]
+    decision_signal: bool
+    policy_version: str
+    patterns_version: str
+    region: str
+    output_violations: list[str]
+    output_check_status: str | None
+    recovery: str
+    latency_ms: float | None
 
 
 @dataclass(frozen=True)
@@ -225,6 +253,9 @@ class TurnStore:
             reply = await repo.get_reply(session, existing.id)
             if reply is None:  # pragma: no cover - guarded by the completion transaction
                 raise AppError(ErrorCategory.INTERNAL_ERROR, "turn_inconsistent", "Internal error.")
+            record = await session.scalar(
+                select(TurnSafety).where(TurnSafety.user_message_id == existing.id)
+            )
             return CompletedTurn(
                 conversation_id=conversation.id,
                 user_message_id=existing.id,
@@ -232,6 +263,8 @@ class TurnStore:
                 assistant_content=reply.content,
                 created_at=reply.created_at,
                 replayed=True,
+                safety_pathway=record.pathway if record is not None else None,
+                safety_region=record.region if record is not None else "",
             )
         if existing.turn_status == TurnStatus.PENDING and not self._is_stale(existing, db_now):
             raise turn_in_progress()
@@ -339,6 +372,7 @@ class TurnStore:
         provenance: AssistantProvenance,
         state_write: StateWrite | None = None,
         decisions: Sequence[DecisionResult] = (),
+        safety: SafetyWrite | None = None,
     ) -> CompletedTurn:
         async with self._sessions() as session, session.begin():
             conversation = await session.get(Conversation, conversation_id, with_for_update=True)
@@ -372,6 +406,14 @@ class TurnStore:
             session.add_all(
                 _decision_row(conversation.id, user_message.id, result) for result in decisions
             )
+            if safety is not None:
+                session.add(
+                    TurnSafety(
+                        conversation_id=conversation.id,
+                        user_message_id=user_message.id,
+                        **dataclasses.asdict(safety),
+                    )
+                )
             state_version = (
                 await self._write_state(session, conversation.id, user_message.id, state_write)
                 if state_write is not None
@@ -385,6 +427,8 @@ class TurnStore:
                 assistant_content=assistant.content,
                 created_at=assistant.created_at,
                 state_version=state_version,
+                safety_pathway=safety.pathway if safety is not None else None,
+                safety_region=safety.region if safety is not None else "",
             )
 
     async def _write_state(

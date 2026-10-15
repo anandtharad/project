@@ -92,11 +92,13 @@ async def test_response_payload_contract(client: httpx.AsyncClient) -> None:
         "created_at",
         "replayed",
         "timing_ms",
+        "safety",
     }
     assert body["conversation_id"] == cid
     assert body["assistant_content"] == "reply to: Hello there"
     assert body["replayed"] is False
     assert "completed" in body["timing_ms"]
+    assert body["safety"] is None  # an ordinary turn followed no safety pathway
 
 
 async def test_generation_request_uses_configured_settings(

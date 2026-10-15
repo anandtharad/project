@@ -12,6 +12,7 @@ class TurnStage(StrEnum):
     AUTHORIZED = "authorized"
     USER_MESSAGE_PERSISTED = "user_message_persisted"
     CONTEXT_LOADED = "context_loaded"
+    SAFETY_ASSESSED = "safety_assessed"
     STATE_UPDATED = "state_updated"
     MEMORIES_RETRIEVED = "memories_retrieved"
     DECISIONS_RESOLVED = "decisions_resolved"
@@ -19,6 +20,7 @@ class TurnStage(StrEnum):
     CONTEXT_BUILT = "context_built"
     RESPONSE_GENERATED = "response_generated"
     RESPONSE_VALIDATED = "response_validated"
+    SAFETY_CHECKED = "safety_checked"
     ASSISTANT_MESSAGE_PERSISTED = "assistant_message_persisted"
     COMPLETED = "completed"
 

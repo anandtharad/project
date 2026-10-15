@@ -211,9 +211,15 @@ def blocking_step(release: asyncio.Event, entered: asyncio.Event | None = None) 
 
 @asynccontextmanager
 async def running_app(
-    settings: Settings, llm: ScriptedLLMClient, decision_backend: DecisionBackend | None = None
+    settings: Settings,
+    llm: ScriptedLLMClient,
+    decision_backend: DecisionBackend | None = None,
+    *,
+    safety_llm: ScriptedLLMClient | None = None,
 ) -> AsyncIterator[tuple[FastAPI, httpx.AsyncClient]]:
-    app = create_app(settings, llm_client=llm, decision_backend=decision_backend)
+    app = create_app(
+        settings, llm_client=llm, decision_backend=decision_backend, safety_llm=safety_llm
+    )
     async with app.router.lifespan_context(app):
         transport = httpx.ASGITransport(app=app, raise_app_exceptions=False)
         async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:

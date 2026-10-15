@@ -45,6 +45,22 @@ class SubmitMessageRequest(BaseModel):
         return value
 
 
+class SupportContact(BaseModel):
+    name: str
+    contact: str
+    hours: str
+
+
+class SafetyNotice(BaseModel):
+    pathway: str = Field(
+        description="The safety pathway the reply followed (docs/safety.md), e.g. crisis_support."
+    )
+    resources: list[SupportContact] = Field(
+        description="Verified support contacts for the configured region (SAFETY_REGION); "
+        "a client may show them alongside the reply. Empty for gentle pathways."
+    )
+
+
 class SubmitMessageResponse(BaseModel):
     conversation_id: uuid.UUID
     user_message_id: uuid.UUID
@@ -57,6 +73,10 @@ class SubmitMessageResponse(BaseModel):
     )
     timing_ms: dict[str, float] | None = Field(
         default=None, description="Development only: elapsed time at each turn stage."
+    )
+    safety: SafetyNotice | None = Field(
+        default=None,
+        description="Present only when the reply followed a safety pathway (not the ordinary one).",
     )
 
 
