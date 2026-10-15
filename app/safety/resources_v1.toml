@@ -1,0 +1,199 @@
+# Crisis and emergency resources shown by the safety layer (app/safety/resources.py).
+#
+# Every entry comes from the crisis-resource research of 2026-10-13, which
+# checked each one against the official page or document named in
+# source_url ("verification" says how: official_page, official_doc, or
+# search_index when the official page blocked the research environment and
+# its content was seen through a search index only). No entry comes from
+# Find A Helpline (findahelpline.com): its terms forbid using its data.
+#
+# The application, never the model, puts these strings into the reply
+# guidance and fallback replies. Contacts are application text: a change of
+# any value needs a new file version and a fresh check against the source.
+#
+# Region codes: ISO 3166-1 alpha-2 (IN, US, GB); "generic" is used when no
+# region is configured. Generic entries contain no numbers: there is no
+# number that works everywhere.
+
+version = "1.0.0"
+verified_on = 2026-10-13
+# A unit test fails after this date, so the data cannot silently go stale.
+review_due = 2027-01-11
+changelog = ["1.0.0 (2026-10-13): Initial IN, US and GB set and a generic fallback."]
+
+# ---------------- India ----------------
+
+[[resource]]
+id = "in.emergency"
+region = "IN"
+kind = "emergency"
+name = "Emergency Response Support System"
+contact = "call or SMS 112"
+hours = "not stated by the source"
+source_url = "https://mospi.gov.in/sites/default/files/announcements/Awareness%20of%20National%20emegency.....pdf"
+checked = 2026-10-13
+verification = "official_doc"
+notes = "Ministry of Home Affairs OM F.No.15011/03/2023-WS4 (March 2023): police, fire and ambulance, operational in all States/UTs. 112.gov.in was unreachable from the research environment."
+
+[[resource]]
+id = "in.telemanas"
+region = "IN"
+kind = "crisis_line"
+name = "Tele-MANAS"
+contact = "call 14416 or 1-800-891-4416"
+hours = "24/7"
+source_url = "https://telemanas.mohfw.gov.in/"
+checked = 2026-10-13
+verification = "official_page"
+notes = "Ministry of Health and Family Welfare; free tele-counselling in 20 Indian languages. PIB 11 Feb 2026 confirms 1-800-891-4416 (the 2022 launch release misprinted it)."
+
+[[resource]]
+id = "in.women_helpline"
+region = "IN"
+kind = "abuse_support"
+name = "Women Helpline"
+contact = "call 181"
+hours = "not stated by the source"
+source_url = "https://wcd.gov.in/"
+checked = 2026-10-13
+verification = "official_page"
+notes = "Ministry of Women and Child Development: 'Women Helpline Toll free No. - 181'."
+
+[[resource]]
+id = "in.child_helpline"
+region = "IN"
+kind = "abuse_support"
+name = "Child Helpline"
+contact = "call 1098"
+hours = "not stated by the source"
+source_url = "https://wcd.gov.in/"
+checked = 2026-10-13
+verification = "official_page"
+notes = "Ministry of Women and Child Development: 'Child Helpline Toll free No. - 1098'."
+
+# ---------------- United States ----------------
+
+[[resource]]
+id = "us.emergency"
+region = "US"
+kind = "emergency"
+name = "Emergency services"
+contact = "call 911"
+hours = "not stated by the source"
+source_url = "https://www.fcc.gov/consumers/guides/what-you-need-know-about-text-911"
+checked = 2026-10-13
+verification = "search_index"
+notes = "fcc.gov returned 403 to the research environment; seen through a search index. Text-to-911 works only where the local 911 centre supports it, so the contact says call."
+
+[[resource]]
+id = "us.988"
+region = "US"
+kind = "crisis_line"
+name = "988 Suicide & Crisis Lifeline"
+contact = "call or text 988, or chat at https://988lifeline.org/chat/"
+hours = "24/7"
+source_url = "https://988lifeline.org/faq/"
+checked = 2026-10-13
+verification = "official_page"
+notes = "Free and confidential; English and Spanish. Veterans: 988 then press 1. SAMHSA page https://www.samhsa.gov/mental-health/988 (last updated 09/26/2025)."
+
+[[resource]]
+id = "us.crisis_text_line"
+region = "US"
+kind = "text_line"
+name = "Crisis Text Line"
+contact = "text HOME to 741741"
+hours = "24/7"
+source_url = "https://www.crisistextline.org/"
+checked = 2026-10-13
+verification = "official_page"
+notes = "Free and confidential. The shortcode is blocked on many T-Mobile prepaid plans (CTL FAQ); web chat at https://connect.crisistextline.org/chat works instead."
+
+# ---------------- United Kingdom ----------------
+
+[[resource]]
+id = "gb.emergency"
+region = "GB"
+kind = "emergency"
+name = "Emergency services"
+contact = "call 999, or go to A&E if a life is at risk"
+hours = "not stated by the source"
+source_url = "https://www.nhs.uk/nhs-services/mental-health-services/where-to-get-urgent-help-for-mental-health/"
+checked = 2026-10-13
+verification = "official_page"
+notes = "NHS: 'Call 999 or go to A&E now if someone's life is at risk'. Relay UK 18000 for deaf or speech-impaired callers."
+
+[[resource]]
+id = "gb.samaritans"
+region = "GB"
+kind = "crisis_line"
+name = "Samaritans"
+contact = "call 116 123 (free from any phone)"
+hours = "24/7"
+source_url = "https://www.samaritans.org/how-we-can-help/contact-samaritan/"
+checked = 2026-10-13
+verification = "official_page"
+notes = "UK and Ireland. The email service closed on 30 Sep 2026 (see [[outdated]])."
+
+[[resource]]
+id = "gb.shout"
+region = "GB"
+kind = "text_line"
+name = "Shout"
+contact = "text SHOUT to 85258"
+hours = "24/7"
+source_url = "https://giveusashout.org/about-us/faq/"
+checked = 2026-10-13
+verification = "official_page"
+notes = "Mental Health Innovations; anyone in the UK. Not reachable from Lyca Mobile, Spusu or EcoTalk."
+
+# ---------------- No region configured ----------------
+
+[[resource]]
+id = "generic.emergency"
+region = "generic"
+kind = "emergency"
+name = "Emergency services"
+contact = "call your local emergency number, or go to the nearest emergency department"
+hours = "not stated by the source"
+checked = 2026-10-13
+generic = true
+notes = "No number: none works everywhere (911, 999 and 112 are regional)."
+
+[[resource]]
+id = "generic.befrienders"
+region = "generic"
+kind = "directory"
+name = "Befrienders Worldwide helpline finder"
+contact = "https://befrienders.org/find-support-now/"
+hours = "not stated by the source"
+source_url = "https://befrienders.org/"
+checked = 2026-10-13
+verification = "official_page"
+notes = "Link to the finder's root page only: one of its listing pages carried injected spam on 2026-10-13."
+
+# ---------------- Outdated: never shown; the output validator rejects them ----------------
+
+[[outdated]]
+id = "gb.samaritans_email"
+name = "Samaritans email service"
+values = ["jo@samaritans.org"]
+reason = "The UK email service closed on 30 Sep 2026; emails get an automated reply pointing to 116 123."
+source_url = "https://www.samaritans.org/how-we-can-help/email-service-closed/"
+checked = 2026-10-13
+
+[[outdated]]
+id = "in.kiran"
+name = "KIRAN mental health helpline"
+values = ["1800-599-0019"]
+reason = "Merged into Tele-MANAS: PIB (15 Feb 2024) says calls were diverted for three months and the line then phased out."
+source_url = "https://www.pib.gov.in/PressReleaseIframePage.aspx?PRID=2006265"
+checked = 2026-10-13
+
+[[outdated]]
+id = "in.telemanas_misprint"
+name = "Tele-MANAS number as misprinted in the 2022 launch release"
+values = ["1-800-91-4416"]
+reason = "The PIB launch release (10 Oct 2022) printed 1-800-91-4416; the Tele-MANAS site and PIB (Feb 2026) give 1-800-891-4416."
+source_url = "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2226319"
+checked = 2026-10-13
