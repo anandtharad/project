@@ -129,6 +129,33 @@ def load_jsonl(path: Path, split: str) -> list[dict[str, Any]]:
 # --- routing ---------------------------------------------------------------------
 
 
+async def evidence_for(
+    lookups: list[dict[str, Any]], min_semantic: float | None
+) -> dict[str, bool]:
+    """Whether each lookup would put any passage into the prompt (by id)."""
+    settings = get_settings()
+    embeddings = build_embedding_client(settings)
+    if embeddings is not None:
+        await ready(embeddings)
+    params = RetrievalParams(
+        max_results=settings.knowledge_max_results,
+        min_semantic=min_semantic if min_semantic is not None else settings.knowledge_min_semantic,
+        min_lexical=settings.knowledge_min_lexical,
+        max_per_document=settings.knowledge_max_per_document,
+    )
+    chunking = ChunkParams(
+        max_words=settings.knowledge_chunk_max_words,
+        overlap_words=settings.knowledge_chunk_overlap_words,
+        min_words=settings.knowledge_chunk_min_words,
+    )
+    try:
+        scored, _ = await candidates_for(settings.database_url, chunking, embeddings, lookups)
+    finally:
+        if embeddings is not None:
+            await embeddings.aclose()
+    return {s.query["id"]: bool(merge(s.lexical, s.semantic, params)[0]) for s in scored}
+
+
 def eval_routing(args: argparse.Namespace) -> int:
     path = DATASET_DIR / "routing.jsonl"
     rows = load_jsonl(path, args.split)
@@ -160,6 +187,38 @@ def eval_routing(args: argparse.Namespace) -> int:
                 }
             )
     positives, negatives = tp + fn, fp + tn
+    evidence: dict[str, Any] | None = None
+    if args.with_retrieval:
+        # What reaches the prompt: a lookup whose passages pass the threshold.
+        lookups = []
+        for row in rows:
+            chosen = route(row["text"], previous_user_message="how much sleep do adults need?")
+            if chosen.retrieve:
+                lookups.append({"id": row["id"], "query": chosen.query})
+        given = asyncio.run(evidence_for(lookups, args.min_semantic))
+        by_kind: dict[str, Counter[str]] = defaultdict(Counter)
+        for row in rows:
+            by_kind[row["kind"]]["n"] += 1
+            by_kind[row["kind"]]["evidence"] += given.get(row["id"], False)
+        pos_rows = [r for r in rows if r["retrieve"]]
+        neg_rows = [r for r in rows if not r["retrieve"]]
+        evidence = {
+            "min_semantic": args.min_semantic,
+            "evidence_on_negatives": round(
+                sum(given.get(r["id"], False) for r in neg_rows) / len(neg_rows), 4
+            )
+            if neg_rows
+            else None,
+            "evidence_on_positives": round(
+                sum(given.get(r["id"], False) for r in pos_rows) / len(pos_rows), 4
+            )
+            if pos_rows
+            else None,
+            "by_kind": {k: dict(v) for k, v in sorted(by_kind.items())},
+            "negatives_with_evidence": [
+                {"id": r["id"], "kind": r["kind"]} for r in neg_rows if given.get(r["id"])
+            ],
+        }
     metrics = {
         "n": len(rows),
         "positives": positives,
@@ -169,6 +228,9 @@ def eval_routing(args: argparse.Namespace) -> int:
         "precision": round(tp / (tp + fp), 4) if tp + fp else None,
         "recall": round(tp / positives, 4) if positives else None,
         "per_kind": {k: dict(v) for k, v in sorted(per_kind.items())},
+        # Lookups run; the retrieval threshold decides what reaches the prompt.
+        "lookups_on_negatives": round(fp / negatives, 4) if negatives else None,
+        "evidence": evidence,
     }
     payload = {
         "eval": "rag-routing",
@@ -603,6 +665,10 @@ def main() -> int:
     sub = parser.add_subparsers(dest="mode", required=True)
     routing = sub.add_parser("routing")
     routing.add_argument("--split", choices=["dev", "test", "all"], default="dev")
+    routing.add_argument(
+        "--with-retrieval", action="store_true", help="also check what reaches the prompt"
+    )
+    routing.add_argument("--min-semantic", type=float, help="threshold for --with-retrieval")
     retrieval = sub.add_parser("retrieval")
     retrieval.add_argument("--split", choices=["dev", "test", "all"], default="dev")
     retrieval.add_argument("--chunking", nargs="*", help="max/overlap/min words, e.g. 180/30/25")

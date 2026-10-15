@@ -226,6 +226,36 @@ def test_conversation_is_not_looked_up(message: str) -> None:
     assert not route(message).retrieve, route(message)
 
 
+def test_personal_and_companion_questions_are_not_requests() -> None:
+    for message in (
+        "what is happening to me lately, I snap at everyone",
+        "is it bad that I'm relieved he's gone?",
+        "how many more nights like this before I crack",
+        "what's your favourite kind of weather lol",
+        "tell me about a time you were scared",
+        "any tips? nah, never mind, I just wanted to say it out loud",
+        "thanks, that actually helps a lot",
+    ):
+        assert not route(message).retrieve, message
+
+
+def test_how_to_requests_keep_their_personal_context() -> None:
+    for message in (
+        "can you explain what box breathing is",
+        "how can I improve my sleep?",
+        "tell me about progressive muscle relaxation",
+        "my dad can't sleep since retiring, what helps older people sleep?",
+        "will giving up coffee after lunch actually help me sleep better",
+    ):
+        assert route(message).retrieve, message
+
+
+def test_off_topic_questions_are_left_to_the_relevance_threshold() -> None:
+    # The router judges the form of the message, not the topic: the lookup
+    # runs and the retrieval threshold finds nothing (docs/rag.md).
+    assert route("how do i reverse a string in python").retrieve
+
+
 def test_route_kinds_and_source_followups() -> None:
     assert route("what are the latest guidelines on sleep?").kind == "current_info"
     assert route("is exercise good for mood or is that a myth?").kind == "evidence"
@@ -233,6 +263,8 @@ def test_route_kinds_and_source_followups() -> None:
     assert followup.kind == "source_followup" and followup.retrieve
     assert followup.query == "how much sleep do teens need?"
     assert not route("where did you get that from?").retrieve  # nothing to source
+    check = route("really? is that true?", previous_user_message="does yoga help stress?")
+    assert check.kind == "source_followup" and check.query == "does yoga help stress?"
     # Curly apostrophes from phones.
     assert not route("I don\u2019t want advice, any tips on sleep are pointless").retrieve
 
