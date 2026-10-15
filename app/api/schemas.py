@@ -61,6 +61,17 @@ class SafetyNotice(BaseModel):
     )
 
 
+class CitedSource(BaseModel):
+    marker: str = Field(description="The marker used in the reply text, e.g. S1 for [S1].")
+    title: str
+    publisher: str
+    url: str
+    section: str = Field(description="Heading path of the cited passage.")
+    document_id: uuid.UUID
+    chunk_id: uuid.UUID
+    version: int = Field(description="Version of the source document that was cited.")
+
+
 class SubmitMessageResponse(BaseModel):
     conversation_id: uuid.UUID
     user_message_id: uuid.UUID
@@ -78,6 +89,11 @@ class SubmitMessageResponse(BaseModel):
         default=None,
         description="Present only when the reply followed a safety pathway (not the ordinary one).",
     )
+    sources: list[CitedSource] = Field(
+        default_factory=list,
+        description="Reference passages cited in the reply ([S1] markers), from the reviewed "
+        "knowledge library. Empty when the reply cites nothing.",
+    )
 
 
 class MessageOut(BaseModel):
@@ -88,6 +104,9 @@ class MessageOut(BaseModel):
     created_at: datetime
     status: Literal["pending", "completed", "failed"] | None = Field(
         default=None, description="Turn status; present on user messages only."
+    )
+    sources: list[CitedSource] = Field(
+        default_factory=list, description="Sources cited in an assistant reply."
     )
 
 

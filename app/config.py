@@ -170,6 +170,25 @@ class Settings(BaseSettings):
     # default, FASTEMBED_CACHE_PATH or the OS temp folder, which cleanup tools may empty.
     embedding_cache_dir: str | None = None
 
+    # --- Knowledge retrieval (spec §11, docs/rag.md) ---------------------------
+    # Runs only for explicit information requests (app/rag/routing.py), never
+    # on safety pathways. Needs an ingested corpus (scripts/ingest_knowledge.py);
+    # with none, lookups find nothing and replies go ahead without evidence.
+    knowledge_enabled: bool = True
+    knowledge_max_results: int = Field(default=3, ge=1, le=8)
+    # Minimum cosine similarity, calibrated for the default local embedding
+    # model on the retrieval evaluation's dev split (docs/rag.md); another
+    # embedding model needs its own value.
+    knowledge_min_semantic: float = Field(default=0.70, ge=0.0, le=1.0)
+    # Minimum full-text rank, used only when no query embedding is available.
+    knowledge_min_lexical: float = Field(default=0.10, ge=0.0, le=1.0)
+    knowledge_max_per_document: int = Field(default=2, ge=1, le=8)
+    knowledge_timeout_seconds: float = Field(default=3.0, gt=0, le=30)
+    # Chunking for ingestion; a change re-chunks every source on the next run.
+    knowledge_chunk_max_words: int = Field(default=180, ge=20, le=400)
+    knowledge_chunk_overlap_words: int = Field(default=30, ge=0, le=150)
+    knowledge_chunk_min_words: int = Field(default=25, ge=0, le=200)
+
     # --- Decisions (spec §7) -------------------------------------------------
     # "jev": TypeSafe's hosted API. "laya": a self-hosted Laya server
     # (laya-serve) speaking the same protocol. "llm": a general LLM answers the
@@ -245,7 +264,7 @@ class Settings(BaseSettings):
     max_response_characters: int = Field(default=8_000, ge=100)
 
     # --- Prompts ------------------------------------------------------------
-    companion_prompt_version: str = "1.6.0"
+    companion_prompt_version: str = "1.7.0"
 
     # --- Diagnostics --------------------------------------------------------
     expose_timing_metadata: bool = True

@@ -103,6 +103,14 @@ class CompletedTurn:
     # the safety layer is off or the turn predates it).
     safety_pathway: str | None = None
     safety_region: str = ""
+    # Sources cited in the reply (app/rag/evidence.py Citation.to_dict()).
+    sources: tuple[dict[str, Any], ...] = ()
+
+
+def cited_sources(metadata: dict[str, Any] | None) -> tuple[dict[str, Any], ...]:
+    """The citations stored with a reply's generation metadata."""
+    knowledge = (metadata or {}).get("knowledge") or {}
+    return tuple(knowledge.get("citations") or ())
 
 
 @dataclass(frozen=True)
@@ -265,6 +273,7 @@ class TurnStore:
                 replayed=True,
                 safety_pathway=record.pathway if record is not None else None,
                 safety_region=record.region if record is not None else "",
+                sources=cited_sources(reply.generation_metadata),
             )
         if existing.turn_status == TurnStatus.PENDING and not self._is_stale(existing, db_now):
             raise turn_in_progress()
@@ -429,6 +438,7 @@ class TurnStore:
                 state_version=state_version,
                 safety_pathway=safety.pathway if safety is not None else None,
                 safety_region=safety.region if safety is not None else "",
+                sources=cited_sources(provenance.metadata),
             )
 
     async def _write_state(

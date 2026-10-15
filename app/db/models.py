@@ -335,9 +335,12 @@ class KnowledgeDocument(Base):
     licence_url: Mapped[str | None] = mapped_column(Text)
     attribution: Mapped[str | None] = mapped_column(Text)
     reviewed_on: Mapped[date | None] = mapped_column(Date)
+    # Publication or last-updated date stated by the source, where it has one.
+    published_on: Mapped[date | None] = mapped_column(Date)
     topics: Mapped[list[str]] = mapped_column(JSONB)
     review_status: Mapped[str] = mapped_column(String(16))
-    # SHA-256 of the normalised extracted text: unchanged text, no new version.
+    # SHA-256 of the normalised extracted text and the chunking settings
+    # (app/rag/ingest.py): when neither changed, re-ingestion is a no-op.
     content_checksum: Mapped[str] = mapped_column(String(64))
     ingested_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()

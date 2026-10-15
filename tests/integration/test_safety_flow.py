@@ -27,7 +27,7 @@ from tests.helpers import (
     send,
 )
 
-PROMPT = PromptRegistry().get("companion_system", "1.6.0")
+PROMPT = PromptRegistry().get("companion_system", "1.7.0")
 GOOD_CRISIS_REPLY = (
     "I'm really glad you told me, and you matter. Are you safe right now? Please reach "
     "Tele-MANAS on 14416, and tell someone you trust what's going on. I'm here with you."

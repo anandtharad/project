@@ -7,8 +7,10 @@ user-role messages; it is never spliced into the system instruction. The
 notes open the first included user message inside a <conversation_notes>
 block whose JSON escapes "<" and ">", so nothing in it can close the block.
 Retrieved memories (also untrusted) open the current user message inside a
-<memories> block, escaped the same way, following the spec's context order
-(§13.1: state, recent messages, memories, current message).
+<memories> block, escaped the same way, followed by retrieved reference
+passages in an <evidence> block (app/rag/evidence.py), following the spec's
+context order (§13.1: state, recent messages, memories, evidence, current
+message).
 
 Token counts are estimated (≈4 characters per token plus per-message
 overhead). This is a budgeting heuristic, not an exact provider count.
@@ -54,6 +56,7 @@ class BuiltContext:
     estimated_tokens: int
     notes_included: bool = False
     memories_included: int = 0
+    evidence_included: bool = False
 
 
 class ContextBuilder:
@@ -68,7 +71,9 @@ class ContextBuilder:
         history: Sequence[ChatMessage],
         notes: Mapping[str, Any] | None = None,
         memories: Sequence[Mapping[str, Any]] | None = None,
+        evidence: str | None = None,
     ) -> BuiltContext:
+        """`evidence` is an already rendered, escaped <evidence> block."""
         """`history` is ordered oldest-first and ends with the current user message."""
         if not history or history[-1].role is not ChatRole.USER:
             raise ValueError("history must end with the current user message")
@@ -80,6 +85,8 @@ class ContextBuilder:
         memories_block = render_memories(memories) if memories else None
         if memories_block is not None:
             used += estimate_tokens(memories_block)
+        if evidence is not None:
+            used += estimate_tokens(evidence)
         selected: list[ChatMessage] = []
         # Walk backwards from the current message; it is always included.
         for message in reversed(history):
@@ -99,9 +106,10 @@ class ContextBuilder:
             selected.pop(0)
 
         merged = _merge_consecutive(selected)
-        if memories_block is not None:
+        prefix = [b for b in (memories_block, evidence) if b is not None]
+        if prefix:
             last = merged[-1]
-            merged[-1] = ChatMessage(role=last.role, content=f"{memories_block}\n\n{last.content}")
+            merged[-1] = ChatMessage(role=last.role, content="\n\n".join([*prefix, last.content]))
         if notes_block is not None:
             first = merged[0]
             merged[0] = ChatMessage(role=first.role, content=f"{notes_block}\n\n{first.content}")
@@ -113,6 +121,7 @@ class ContextBuilder:
             estimated_tokens=used,
             notes_included=notes_block is not None,
             memories_included=len(memories) if memories else 0,
+            evidence_included=evidence is not None,
         )
 
 

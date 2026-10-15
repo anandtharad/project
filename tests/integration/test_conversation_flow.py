@@ -93,6 +93,7 @@ async def test_response_payload_contract(client: httpx.AsyncClient) -> None:
         "replayed",
         "timing_ms",
         "safety",
+        "sources",
     }
     assert body["conversation_id"] == cid
     assert body["assistant_content"] == "reply to: Hello there"

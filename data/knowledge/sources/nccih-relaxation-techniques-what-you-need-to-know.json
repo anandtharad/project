@@ -1,0 +1,382 @@
+{
+ "format": 1,
+ "key": "nccih-relaxation-techniques-what-you-need-to-know",
+ "url": "https://www.nccih.nih.gov/health/relaxation-techniques-what-you-need-to-know",
+ "fetched_at": "2026-10-15T11:30:57+00:00",
+ "raw_sha256": "67a57e3c80549ac7bc44fc8c2418d1708b7cf977fba9095f39c6b46e903e0c48",
+ "page_title": "Relaxation Techniques: What You Need To Know | NCCIH",
+ "blocks": [
+  [
+   1,
+   "Relaxation Techniques: What You Need To Know"
+  ],
+  [
+   2,
+   "What are relaxation techniques?"
+  ],
+  [
+   0,
+   "Relaxation techniques are practices to help bring about the body’s “relaxation response,” which is characterized by slower breathing, lower blood pressure, and a reduced heart rate. The relaxation response is the opposite of the stress response."
+  ],
+  [
+   0,
+   "Some of the studies discussed in this fact sheet compare relaxation techniques to cognitive behavioral therapy. Cognitive behavioral therapy is a type of psychological treatment that helps a person become aware of ways of thinking that may be automatic but are inaccurate and harmful. The therapy involves efforts to change thinking patterns and usually behavioral patterns as well."
+  ],
+  [
+   2,
+   "What are the different types of relaxation techniques?"
+  ],
+  [
+   0,
+   "Listed below are some of the different types of relaxation techniques."
+  ],
+  [
+   0,
+   "- Progressive Relaxation: Also called progressive muscle relaxation, this technique involves tensing different muscles in your body and then releasing the tension."
+  ],
+  [
+   0,
+   "- Autogenic Training: Through a series of mental exercises involving relaxation and ideas you suggest to yourself (autosuggestion), your mind focuses on your body’s experience of relaxation."
+  ],
+  [
+   0,
+   "- Guided Imagery or “Visualization”: In guided imagery, you picture objects, scenes, or events that are associated with relaxation or calmness and attempt to produce a similar feeling in your body."
+  ],
+  [
+   0,
+   "- Biofeedback-Assisted Relaxation: Through feedback that is usually provided by an electronic device, you learn how to recognize and manage how your body responds. The electronic device lets you see how your heart rate, blood pressure, or muscle tension changes in response to feeling stressed or relaxed."
+  ],
+  [
+   0,
+   "- Self-Hypnosis: In self-hypnosis programs, people learn to produce the relaxation response when prompted by a phrase or nonverbal cue (called a “suggestion”) of their own."
+  ],
+  [
+   0,
+   "- Breathing Exercises: For breathing exercises, you might focus on taking slow, deep breaths—also called diaphragmatic breathing."
+  ],
+  [
+   0,
+   "Other complementary health practices such as massage therapy, meditation, yoga, tai chi, and qigong can produce several beneficial effects in the body, including the relaxation response; however, these practices are not discussed in this fact sheet. For more detailed information on these practices, see “Massage Therapy: What You Need To Know,” “Meditation,” “Yoga: What You Need To Know,” “Tai Chi: In Depth,” and “Qigong: What You Need To Know.”"
+  ],
+  [
+   2,
+   "How popular are relaxation techniques?"
+  ],
+  [
+   0,
+   "The National Health Interview Survey, a nationally representative U.S. survey, found that 6.4 percent of U.S. adults used guided imagery and/or progressive muscle relaxation in 2022; in 2002, only 3.8 percent used these techniques."
+  ],
+  [
+   2,
+   "Can relaxation techniques help during labor and childbirth?"
+  ],
+  [
+   0,
+   "Many women would like to use nondrug options for pain relief during labor and childbirth."
+  ],
+  [
+   0,
+   "- A 2018 review included 5 studies (total of 1,248 participants) that used various relaxation techniques and measured women’s pain intensity during labor. Overall, the studies found that relaxation techniques might help women manage labor pain, but the quality of the research varied between low and very low. Also, because different relaxation techniques were used, it’s hard to say which specific techniques might help."
+  ],
+  [
+   0,
+   "- A 2019 review compared women’s views and experiences of using pain medicine (epidurals, opioids) and nondrug methods (relaxation, massage) for pain relief options during labor and childbirth. Eight studies (99 women) looked at relaxation. The overall findings showed mixed experiences for both methods of pain relief. Some women who used the nondrug methods reported that they were less effective than anticipated."
+  ],
+  [
+   2,
+   "Can children and adolescents benefit from relaxation techniques?"
+  ],
+  [
+   0,
+   "Some relaxation techniques may help children and adolescents with pain, anxiety and depression, headaches, or difficulty with needle-related procedures. But much of the supporting research was rated as low quality, so we don’t have a completely clear picture yet of the possible benefits."
+  ],
+  [
+   4,
+   "Pain"
+  ],
+  [
+   0,
+   "- A 2017 review on recurrent abdominal pain in children and adolescents found that guided imagery and hypnotherapy may be helpful in reducing pain in the short term, but the quality of the research was low. The review included 2 small studies on guided imagery and 2 small studies on practitioner-led hypnotherapy (plus homework), with a total of 146 participants."
+  ],
+  [
+   0,
+   "- A 2019 review of 10 studies with 697 participants looked at the effect that remotely delivered psychological therapies had on chronic pain in children and adolescents. Nine of the studies included a relaxation component in the treatment. “Remotely delivered” meant flexible, self-guided treatments that were typically internet-based and didn’t usually involve contact with a clinician. The review found that psychological therapies delivered remotely were helpful at reducing headache pain right after treatment but not later at follow up. No benefit was found for the other types of pain that were studied. Overall, the research was considered to be of very low quality."
+  ],
+  [
+   4,
+   "Anxiety and depression"
+  ],
+  [
+   0,
+   "- A 2018 review included 9 studies—278 participants total—on biofeedback for anxiety and depression in children and adolescents with long-term physical conditions such as chronic pain, asthma, cancer, and headache. The review found that, although biofeedback appears promising, at this point it can’t be recommended for clinical use in place of or in addition to current treatments."
+  ],
+  [
+   4,
+   "Headache"
+  ],
+  [
+   0,
+   "- A 2019 review of 7 studies involving 571 children looked at the effects of relaxation training on migraine headaches, tension-type headache, or both. Although some studies reported decreased headache frequency, duration, and intensity after relaxation training, other studies did not. Overall, the results were inconsistent, and the research was of very low quality."
+  ],
+  [
+   0,
+   "- A 2016 review of 5 studies involving 137 children and adolescents found that biofeedback seemed to be helpful with migraines, especially with reducing their frequency. The number of participants in the studies, however, was small."
+  ],
+  [
+   0,
+   "- A 2019 review indicated that self-relaxation, biofeedback, and self-hypnosis may be reasonable alternatives to using medicine in managing childhood migraine, particularly in adolescents. According to this review, however, some of the best evidence seen in any pediatric migraine therapy study has been for cognitive behavioral therapy added to treatment with standard antimigraine medicines."
+  ],
+  [
+   4,
+   "Pain and distress related to needle procedures"
+  ],
+  [
+   0,
+   "- A 2018 review looked at various psychological strategies for reducing pain and distress in children and teens getting a needle procedure, such as a vaccination or blood draw. The review found that hypnosis, cognitive behavioral therapy combined with other strategies including relaxation techniques, and breathing exercises were all helpful. Two of the eight hypnosis studies were on self-hypnosis, and two were on hypnosis plus additional relaxation techniques. The quality of the overall research in the review was low to very low, but the possible benefits were deemed to be enough to recommend using the strategies in clinical practice."
+  ],
+  [
+   2,
+   "Can relaxation techniques lower blood pressure?"
+  ],
+  [
+   0,
+   "High blood pressure can lead to serious health problems, such as heart attack, stroke, heart failure, and kidney failure. Having a healthy lifestyle can help to prevent high blood pressure. One part of a healthy lifestyle is learning how to relax and manage stress."
+  ],
+  [
+   0,
+   "- A 2019 review of 17 studies involving 1,165 participants indicated that slow breathing exercises led to a modest reduction in blood pressure and may be a reasonable first treatment for people with prehypertension or low-risk high blood pressure. The studies in this review, however, differed in how they were done and had short follow-up periods and high risk of bias. Also, the studies didn’t look at whether slow breathing exercises ultimately influenced health outcomes, such as stroke or heart attack."
+  ],
+  [
+   0,
+   "- A 2018 review found that relaxation therapies and biofeedback might be helpful for reducing blood pressure, but only weak recommendations were made for their use because the quality of data from the 29 studies ranged from low to very low."
+  ],
+  [
+   0,
+   "- If you have high blood pressure, it’s important to follow the treatment plan prescribed by your health care provider. Following your treatment plan is important because it can prevent or delay serious complications of high blood pressure. If you’re considering a complementary or integrative approach for your high blood pressure, discuss it with your health care provider."
+  ],
+  [
+   2,
+   "Do relaxation techniques help anxiety?"
+  ],
+  [
+   4,
+   "General stress and anxiety"
+  ],
+  [
+   0,
+   "- A 2017 review looked at 24 studies—484 participants total—on heart rate variability (HRV) biofeedback and general stress and anxiety. HRV biofeedback involves receiving data on your heart rate from a device and then using breathing techniques to change your heart rate pattern. The review found that HRV biofeedback is helpful for reducing self-reported stress and anxiety, and the researchers saw it as a promising approach with further development of wearable devices like a fitness tracker."
+  ],
+  [
+   0,
+   "- A 2019 review of 3 studies, with a total of 880 participants, found preliminary evidence suggesting that diaphragmatic breathing exercises may help to reduce stress. Promising positive changes were seen in mental health self-evaluations and in certain physical measures, such as cortisol levels and blood pressure."
+  ],
+  [
+   4,
+   "Anxiety after a stroke"
+  ],
+  [
+   0,
+   "- About 20 percent of stroke patients have anxiety at some point after their stroke. A 2017 review looked at interventions for anxiety after stroke. The review included one study on 21 stroke survivors with diagnosed anxiety. The participants used a relaxation CD five times a week for a month. After 3 months, the participants had reduced anxiety. Because there was only one small study, the overall research isn’t enough to say whether this type of relaxation technique can help people with anxiety after a stroke."
+  ],
+  [
+   4,
+   "Anxiety related to surgery or dental procedures"
+  ],
+  [
+   0,
+   "Anxiety before an operation or procedure can lead to an increase in pain levels and use of pain medicine afterwards. People who have dental anxiety may refuse or delay treatment, which can cause problems with oral health."
+  ],
+  [
+   0,
+   "- A 2017 study included 159 adolescents who were randomly assigned to nature sounds, relaxation exercises, or silent rest before undergoing scoliosis surgery. The results showed that nature sounds or relaxation exercises on the day of the surgery helped to reduce participants’ anxiety before surgery."
+  ],
+  [
+   0,
+   "- A 2019 study included 68 periodontal patients with dental anxiety. Patients received either progressive muscle relaxation and oral health education or only oral health education before periodontal treatment once a week for 4 weeks. The people who received progressive muscle relaxation had reduced dental anxiety and depression symptoms 4 weeks and 3 months after treatment. An earlier review (2013) on dental anxiety included 12 studies—679 participants total—on relaxation training or relaxation training combined with other treatments like cognitive behavioral therapy or graduated exposure. The review found that relaxation training increased patients’ sense of control over dental care and helped reduce dental anxiety, but it worked best when combined with repeated, slowly increased exposure to dental situations. The researchers noted, however, that many of the studies were small and poorly designed, and the study designs differed from each other."
+  ],
+  [
+   4,
+   "Anxiety disorders"
+  ],
+  [
+   0,
+   "- A 2018 review of 16 studies that included 856 people with anxiety disorders (generalized anxiety disorder, social anxiety disorder, and panic disorder) found that relaxation therapy reduced symptoms of anxiety, depression, phobia, and worry. This review found relaxation therapy to be more effective than cognitive behavioral therapy for reducing anxiety."
+  ],
+  [
+   0,
+   "- Another 2018 review of 50 studies and 2,801 people found that relaxation therapy seemed to be less effective than cognitive behavioral therapy for post-traumatic stress disorder and obsessive-compulsive disorder. No difference was found between relaxation therapy and cognitive behavioral therapy for other anxiety disorders, including generalized anxiety disorder, panic disorder, social anxiety disorder, and specific phobias. The review noted, however, that most studies had a high risk of bias, and there was a small number of studies for some of the individual disorders."
+  ],
+  [
+   2,
+   "Can relaxation techniques relieve pain?"
+  ],
+  [
+   0,
+   "Relaxation techniques might help with pain after surgery, headache, low-back pain, and arthritis-related pain. Some of the supporting evidence, however, has been rated as low quality. Whether relaxation techniques help with pain related to fibromyalgia remains unclear."
+  ],
+  [
+   4,
+   "Pain after surgery"
+  ],
+  [
+   0,
+   "- A 2016 review looked at various interventions done before surgery on pain after surgery in people who had elective surgery with general anesthesia. An analysis of 13 studies that involved relaxation techniques as part of the intervention found that relaxation techniques helped reduce pain after surgery."
+  ],
+  [
+   0,
+   "- Two 2019 reviews looked at the effect of relaxation techniques for postsurgical pain—one on abdominal surgery and the other on total knee replacement surgery. In most of the included studies, the interventions were done after surgery; in a few, the interventions were done both before and after surgery; one intervention was done during surgery. Because of a lack of high-quality studies, neither review found evidence to support the use of relaxation techniques for postsurgical pain."
+  ],
+  [
+   4,
+   "Headache"
+  ],
+  [
+   0,
+   "- In a 2018 review of 6 studies (274 participants), 5 studies found that autogenic training or biofeedback-assisted autogenic training helped to reduce headache pain. But because there were few studies and limitations within the studies, the review authors said the findings should be viewed cautiously."
+  ],
+  [
+   0,
+   "- In a 2018 review, five of eight studies found that hypnosis—usually self-hypnosis and often paired with guided imagery—resulted in less headache activity in people diagnosed with migraine or chronic headache disorder. None of the studies in this review, however, were rated high quality."
+  ],
+  [
+   0,
+   "- A 2016 review looked at 19 studies (2,600 total participants) on psychological interventions for migraine and tension-type headache. Most of the interventions involved relaxation training, cognitive behavioral therapy, or biofeedback—either individually or in some combination. Fifteen of the studies saw headache improvements, but the amount of improvement differed among the studies. Depending on the study, participants reported a decrease in daily headache frequency ranging from 20 to 67 percent. While relaxation training paired with cognitive behavioral therapy appeared to have the most supportive research, the review authors said that the overall research was lacking in quality."
+  ],
+  [
+   4,
+   "Low-back pain"
+  ],
+  [
+   0,
+   "- The American College of Physicians recommends using nondrug methods for the initial treatment of chronic low-back pain. (Chronic back pain is defined as back pain that lasts more than 12 weeks.) Progressive muscle relaxation and biofeedback are two of several nondrug approaches suggested in the most recent guideline. The guideline was based on a 2017 review that found that progressive muscle relaxation resulted in moderate improvement of low-back pain and function and that biofeedback led to a moderate reduction in low-back pain, though the evidence was rated as low."
+  ],
+  [
+   0,
+   "- A 2018 study of 58 people with chronic low-back pain found that progressive muscle relaxation helped with pain, anxiety, depression, quality of life, and sleep. Participants had taken opioid medicines without any beneficial changes in the 3 months before starting the study."
+  ],
+  [
+   4,
+   "Arthritis"
+  ],
+  [
+   0,
+   "- A 2015 review of 7 studies—306 participants total—found that guided imagery may be beneficial for adults with arthritis and other rheumatic diseases. The guided imagery was delivered by audio technology and ranged from a one-time exposure to twice daily for 16 weeks. Four of the studies, with a total of 180 participants, looked specifically at pain."
+  ],
+  [
+   4,
+   "Fibromyalgia"
+  ],
+  [
+   0,
+   "- An evaluation done in 2020 looking at nondrug treatments for chronic musculoskeletal pain found insufficient evidence for progressive muscle relaxation and no clear benefit from biofeedback for fibromyalgia."
+  ],
+  [
+   0,
+   "- A 2015 review found that it’s unclear whether biofeedback and relaxation-based therapy are helpful for fibromyalgia-related pain because the quality of research is very low for biofeedback and low for relaxation-based therapy. This was based on 2 studies of biofeedback (95 participants total) and 3 studies of relaxation techniques (106 participants total)."
+  ],
+  [
+   0,
+   "- A 2019 review evaluated the research on heart rate variability biofeedback to treat fibromyalgia. The review included 6 studies (312 participants) of chronic musculoskeletal pain and found that heart rate variability biofeedback was related to decreased pain. Although the review saw biofeedback as a promising treatment for chronic pain, only one study looked specifically at fibromyalgia-related pain."
+  ],
+  [
+   0,
+   "- A 2015 review suggested that a single session of guided imagery was helpful for an immediate reduction in fibromyalgia-related pain, but results on the effects of prolonged guided imagery programs were conflicting. The review included 6 studies on guided imagery, with a total of 357 participants. The review’s findings on other relaxation techniques, such as progressive muscle relaxation and autogenic training, were inconclusive."
+  ],
+  [
+   2,
+   "Can relaxation techniques help during and after cancer treatment?"
+  ],
+  [
+   0,
+   "Relaxation techniques are recommended by two professional associations for use during and after breast cancer treatment. Not as much research has been done on other types of cancer, and some of the research results have been conflicting."
+  ],
+  [
+   0,
+   "- In 2017, the Society for Integrative Oncology updated its clinical practice guidelines on using integrative therapies during and after breast cancer treatment. The American Society of Clinical Oncology endorsed the updated guidelines. In the guidelines, relaxation techniques were recommended for improving mood and depression. The guidelines also said that relaxation techniques might help to reduce stress and anxiety and to control nausea and vomiting during chemotherapy in some individuals and could be offered to them."
+  ],
+  [
+   2,
+   "Can relaxation techniques help you sleep?"
+  ],
+  [
+   0,
+   "The American College of Physicians practice guidelines (2016) strongly recommend the use of cognitive behavioral therapy for insomnia (also called CBT-I) as the initial treatment for chronic insomnia. Relaxation techniques can sometimes be one part of CBT-I. But relaxation techniques on their own don’t seem to be especially promising for sleep."
+  ],
+  [
+   0,
+   "- According to practice guidelines from the American College of Physicians (2016), research is insufficient to understand how relaxation techniques might affect the sleep of the general population and older adults with chronic insomnia."
+  ],
+  [
+   0,
+   "- A 2018 review looked at 27 studies of psychological interventions to try to improve sleep. The studies involved 2,776 college students who ranged from healthy sleepers to those with a diagnosed sleep disorder. About 22 percent of the studies investigated “relaxation, mindfulness, hypnotherapy” treatments. Similar to the guidelines from the American College of Physicians, this review recommended cognitive behavioral therapy to improve sleep in college students. The review also found that relaxation approaches helped somewhat with sleep quality and sleep problems but especially with mental health. The authors recommended that “relaxation, mindfulness, hypnotherapy” treatments be combined with cognitive behavioral therapy as a way to enhance mental health benefits."
+  ],
+  [
+   0,
+   "- A 2015 review found that autogenic training or guided imagery helped shorten the time to fall asleep but that the treatments were no better than a placebo. Seven studies involving a total of 284 participants were considered. Because the studies were small and their quality was low, the review authors thought that the positive results were doubtful and couldn’t be generalized to other people."
+  ],
+  [
+   2,
+   "What does the research say about relaxation techniques and other conditions?"
+  ],
+  [
+   4,
+   "Irritable bowel syndrome"
+  ],
+  [
+   0,
+   "- A 2020 review on psychotherapeutic interventions for irritable bowel syndrome (IBS) included one small study that involved relaxation techniques. Sixty-nine adults with IBS participated in a 5-week course that had an educational component, psychological component, and training in progressive muscle relaxation and diaphragmatic breathing. Compared to a wait-list control, the course led to improvements in IBS symptoms, depression, and quality of life. A single small study, however, does not provide much evidence."
+  ],
+  [
+   0,
+   "- A 2017 systematic review found that relaxation techniques and cognitive behavioral therapy both helped improve mental health in adults with irritable bowel syndrome. But whereas cognitive behavioral therapy helped to improve daily functioning, relaxation techniques did not. The review included 2 studies on relaxation techniques, with a total of 181 adults. Similar to the prior review, this review had a small number of studies, so it does not provide a clear understanding."
+  ],
+  [
+   4,
+   "Menopause"
+  ],
+  [
+   0,
+   "- A 2019 review found overall evidence that paced breathing could significantly improve hot flashes. This was based on 4 studies that included a total of 398 participants."
+  ],
+  [
+   0,
+   "- Researchers of a 2013 study found that five weekly sessions of clinical hypnosis delivered by a therapist reduced hot flashes in post-menopausal women. The National Center for Complementary and Integrative Health (NCCIH) is funding an ongoing study by the same researchers on self-administered hypnosis for hot flashes."
+  ],
+  [
+   4,
+   "Temporomandibular disorder (TMD)"
+  ],
+  [
+   0,
+   "- A 2016 review looked at various noninvasive treatments for TMD and included 2 studies (181 participants total) that involved biofeedback. One study paired biofeedback with stress management and the other paired it with cognitive behavioral therapy. The review found inconclusive evidence on biofeedback, but suggested that cognitive behavioral therapy, intraoral myofascial therapy, and self-care management were treatment options. Relaxation techniques were one part of the cognitive behavioral therapy and self-care management treatments."
+  ],
+  [
+   0,
+   "- A 2015 review found low-quality evidence that hypnosis/relaxation therapy may have a beneficial effect on pain and active maximum mouth opening in people with TMD but not on pain or the minimum amount of pressure that leads to pain. The review included 3 studies, with a total of 159 participants."
+  ],
+  [
+   2,
+   "Do relaxation techniques have any side effects?"
+  ],
+  [
+   0,
+   "- Relaxation techniques are generally considered safe for healthy people. In most research studies, there have been no reported negative side effects. However, occasionally, people report negative experiences such as increased anxiety, intrusive thoughts, or fear of losing control."
+  ],
+  [
+   0,
+   "- There have been rare reports that certain relaxation techniques might cause or worsen symptoms in people with epilepsy or certain psychiatric conditions, or with a history of abuse or trauma."
+  ],
+  [
+   2,
+   "More To Consider"
+  ],
+  [
+   0,
+   "- If you have severe or long-lasting symptoms of any kind, see your health care provider. You might have a condition that needs to be treated promptly. For example, if depression or anxiety persists, it’s important to seek help from a qualified health care professional."
+  ],
+  [
+   0,
+   "- Take charge of your health—talk with your health care providers about any complementary health approaches you use. Together, you can make shared, well-informed decisions."
+  ]
+ ]
+}

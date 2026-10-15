@@ -1,0 +1,450 @@
+{
+ "format": 1,
+ "key": "odphp-manage-stress",
+ "url": "https://odphp.health.gov/myhealthfinder/health-conditions/heart-health/manage-stress",
+ "fetched_at": "2026-10-15T11:31:46+00:00",
+ "raw_sha256": "3bea566c7d32c2ac1b1ba8f76fe1520b08c7ac4ea500d2d86bddfa48e21e9164",
+ "page_title": "Manage Stress - MyHealthfinder | odphp.health.gov",
+ "blocks": [
+  [
+   1,
+   "Manage Stress"
+  ],
+  [
+   2,
+   "The Basics"
+  ],
+  [
+   3,
+   "Overview"
+  ],
+  [
+   0,
+   "Stress is the body’s physical and emotional response to challenges. Not all stress is bad. But too much stress, or feeling stressed for a long time, can lead to health problems — and it can raise your risk of health conditions like heart disease, obesity, high blood pressure, and depression."
+  ],
+  [
+   0,
+   "You can prevent or reduce stress by:"
+  ],
+  [
+   0,
+   "- Planning ahead"
+  ],
+  [
+   0,
+   "- Deciding which tasks to do first"
+  ],
+  [
+   0,
+   "- Preparing for stressful events"
+  ],
+  [
+   0,
+   "- Thinking about whether there are ways to solve ongoing problems that are causing you stress"
+  ],
+  [
+   0,
+   "- Limiting your contact with stressors if you can — like by taking breaks from the news or social media or avoiding situations that cause you stress"
+  ],
+  [
+   0,
+   "But some stress is hard to avoid, so it’s important to find healthy ways to manage your stress when it does happen. Healthy ways to manage stress include:"
+  ],
+  [
+   0,
+   "- Noticing signs of stress in your mind and body"
+  ],
+  [
+   0,
+   "- Taking time to slow down and relax"
+  ],
+  [
+   0,
+   "- Getting active, eating healthy, and sticking to a sleep routine"
+  ],
+  [
+   0,
+   "- Taking time for yourself to do things you enjoy"
+  ],
+  [
+   0,
+   "- Talking to friends and family"
+  ],
+  [
+   0,
+   "- Seeking help from a doctor or mental health professional if managing stress on your own is difficult"
+  ],
+  [
+   0,
+   "Read more about ways to prevent and manage stress:"
+  ],
+  [
+   0,
+   "- Learn to manage stress"
+  ],
+  [
+   0,
+   "- Managing stress"
+  ],
+  [
+   0,
+   "- Get enough sleep"
+  ],
+  [
+   3,
+   "Signs and Health Effects"
+  ],
+  [
+   4,
+   "What are the signs of stress?"
+  ],
+  [
+   0,
+   "When you're under stress, you may feel:"
+  ],
+  [
+   0,
+   "- Worried"
+  ],
+  [
+   0,
+   "- Angry"
+  ],
+  [
+   0,
+   "- Irritable"
+  ],
+  [
+   0,
+   "- Depressed"
+  ],
+  [
+   0,
+   "- Unable to focus"
+  ],
+  [
+   0,
+   "Stress also affects your body. Physical signs of stress include:"
+  ],
+  [
+   0,
+   "- Headaches"
+  ],
+  [
+   0,
+   "- Changes in blood pressure"
+  ],
+  [
+   0,
+   "- Trouble sleeping or sleeping too much"
+  ],
+  [
+   0,
+   "- Upset stomach"
+  ],
+  [
+   0,
+   "- Weight gain or loss"
+  ],
+  [
+   0,
+   "- Tense muscles"
+  ],
+  [
+   0,
+   "- Fatigue (feeling very tired)"
+  ],
+  [
+   0,
+   "Stress can also lead to a weakened immune system (the system in the body that fights infections), which can make you more likely to get sick."
+  ],
+  [
+   0,
+   "Stress is different for everyone. Take this quiz to better understand your stress."
+  ],
+  [
+   3,
+   "Causes of Stress"
+  ],
+  [
+   4,
+   "What causes stress?"
+  ],
+  [
+   0,
+   "Stress is how the brain and body react to a challenge or demand."
+  ],
+  [
+   0,
+   "Change is often a cause of stress. Even positive changes, like having a baby or getting a job promotion, can be stressful."
+  ],
+  [
+   0,
+   "Stress can be short-term or long-term."
+  ],
+  [
+   0,
+   "Common causes of short-term stress include:"
+  ],
+  [
+   0,
+   "- Having a lot to do in a short amount of time or feeling rushed, like when you have a busy day or you’re running late"
+  ],
+  [
+   0,
+   "- Being in a situation that feels out of your control, like getting stuck in a traffic jam"
+  ],
+  [
+   0,
+   "- Preparing for a work or school presentation or a job interview"
+  ],
+  [
+   0,
+   "- Having an argument"
+  ],
+  [
+   0,
+   "Common causes of long-term stress include:"
+  ],
+  [
+   0,
+   "- Having problems at work or at home"
+  ],
+  [
+   0,
+   "- Having money problems"
+  ],
+  [
+   0,
+   "- Managing a long-term illness"
+  ],
+  [
+   0,
+   "- Taking care of someone with an illness"
+  ],
+  [
+   0,
+   "- Dealing with the death of a loved one"
+  ],
+  [
+   0,
+   "- Trauma from an experience like a car accident, war, or natural disaster"
+  ],
+  [
+   0,
+   "Social determinants of health — like racism, where you live, and your income — can also affect your stress level."
+  ],
+  [
+   3,
+   "Benefits of Lowering Your Stress Level"
+  ],
+  [
+   4,
+   "What are the benefits of managing stress?"
+  ],
+  [
+   0,
+   "Over time, long-term stress can lead to health problems. Managing stress can help you:"
+  ],
+  [
+   0,
+   "- Sleep better"
+  ],
+  [
+   0,
+   "- Have more energy"
+  ],
+  [
+   0,
+   "- Control your weight"
+  ],
+  [
+   0,
+   "- Have less muscle tension"
+  ],
+  [
+   0,
+   "- Be in a better mood"
+  ],
+  [
+   0,
+   "- Get along better with family and friends"
+  ],
+  [
+   2,
+   "Take Action"
+  ],
+  [
+   3,
+   "Plan and Prepare"
+  ],
+  [
+   0,
+   "You can’t always avoid stress, but you can take steps to deal with stress in a positive way. Follow these tips for preventing and managing stress."
+  ],
+  [
+   4,
+   "Plan your time."
+  ],
+  [
+   0,
+   "Think ahead about how you're going to use your time. Write a to-do list and figure out what’s most important — then do that thing first. Be realistic about how long each task will take."
+  ],
+  [
+   4,
+   "Prepare yourself."
+  ],
+  [
+   0,
+   "Being prepared and feeling in control of your situation might help lower your stress."
+  ],
+  [
+   0,
+   "Prepare ahead for stressful events, like a busy travel day or a hard conversation with a loved one. You can:"
+  ],
+  [
+   0,
+   "- Picture yourself in the situation and think through what you’ll do or say"
+  ],
+  [
+   0,
+   "- Think about different ways the situation could go — and how you could respond"
+  ],
+  [
+   0,
+   "- Have a plan for how to lower your stress during the event"
+  ],
+  [
+   0,
+   "- Think about whether there are people who can support you or resources you can use"
+  ],
+  [
+   3,
+   "Relax"
+  ],
+  [
+   4,
+   "Relax with deep breathing or meditation."
+  ],
+  [
+   0,
+   "Deep breathing and meditation can help relax your muscles and clear your mind. Learn about breathing, meditation, and other ways to ease stress."
+  ],
+  [
+   4,
+   "Relax your muscles."
+  ],
+  [
+   0,
+   "Stress causes tension in your muscles. Try stretching or taking a hot shower to help you relax. Check out these stretches you can do."
+  ],
+  [
+   3,
+   "Get Active"
+  ],
+  [
+   0,
+   "Regular physical activity can help prevent and manage stress. It can also help relax your muscles and improve your mood. Try to:"
+  ],
+  [
+   0,
+   "- Aim for 150 minutes a week of moderate-intensity aerobic activity — try going for a bike ride or taking a walk"
+  ],
+  [
+   0,
+   "- Do muscle-strengthening activities — like push-ups or lifting weights — at least 2 days a week"
+  ],
+  [
+   0,
+   "Remember, any amount of physical activity is better than none!"
+  ],
+  [
+   0,
+   "Read more about:"
+  ],
+  [
+   0,
+   "- How to get active"
+  ],
+  [
+   0,
+   "- How physical activity can help prevent and manage stress"
+  ],
+  [
+   3,
+   "Make Healthy Choices About Food, Alcohol, and Tobacco"
+  ],
+  [
+   4,
+   "Eat healthy."
+  ],
+  [
+   0,
+   "Give your body plenty of energy by eating healthy — including vegetables, fruits, grains, and proteins. Get tips for healthy eating."
+  ],
+  [
+   0,
+   "Limiting caffeine (from drinks like coffee, tea, and soda) may also help you feel less stressed."
+  ],
+  [
+   4,
+   "Don’t use alcohol, tobacco, or drugs to cope with stress."
+  ],
+  [
+   0,
+   "Some people turn to alcohol, tobacco, or other drugs to manage stress. But using these substances can cause health problems."
+  ],
+  [
+   0,
+   "Avoid using alcohol to try to change your mood. If you do choose to drink, limit your alcoholic beverages."
+  ],
+  [
+   0,
+   "Learn more about limiting your alcoholic beverages."
+  ],
+  [
+   0,
+   "Quitting smoking is one of the most important things you can do for your health. Read about how to quit."
+  ],
+  [
+   0,
+   "Don’t use illegal drugs or misuse prescription or over-the-counter drugs. Talk to your doctor if you’re worried about your drug use."
+  ],
+  [
+   3,
+   "Get Support"
+  ],
+  [
+   4,
+   "Talk to friends and family."
+  ],
+  [
+   0,
+   "Tell your friends and family if you're feeling stressed. They may be able to help. Read more about getting support from loved ones and other ways to manage stress."
+  ],
+  [
+   4,
+   "Get help if you need it."
+  ],
+  [
+   0,
+   "Stress is a normal part of life. But if your stress doesn’t go away or keeps getting worse, you may need help. Lots of people need help dealing with stress — it’s nothing to be ashamed of. Over time, stress that’s not treated can lead to serious problems like depression or anxiety."
+  ],
+  [
+   0,
+   "- If you're feeling down or hopeless, talk with your doctor about depression"
+  ],
+  [
+   0,
+   "- If you're feeling anxious, talk with your doctor about anxiety"
+  ],
+  [
+   0,
+   "- If you've lived through a traumatic event (like a major accident, crime, or natural disaster), find out about treatment for PTSD, or post-traumatic stress disorder"
+  ],
+  [
+   0,
+   "Your doctor or nurse or a mental health professional (like a psychologist or social worker) can help treat these conditions. For example, your treatment plan may include talk therapy (also called psychotherapy) or medicine. Learn more about talk therapy."
+  ]
+ ]
+}

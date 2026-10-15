@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, Query, Request, Response, status
 
 from app.api.auth import AuthenticatedUser, authenticate
 from app.api.schemas import (
+    CitedSource,
     MessageList,
     MessageOut,
     SafetyNotice,
@@ -20,7 +21,7 @@ from app.db.models import MessageRole
 from app.errors import AppError, ErrorCategory, conversation_not_found
 from app.observability import trace_id_var
 from app.orchestration.engine import TurnOrchestrator
-from app.orchestration.persistence import CompletedTurn
+from app.orchestration.persistence import CompletedTurn, cited_sources
 from app.safety.policy import PATHWAY_RULES
 from app.safety.resources import default_resources
 from app.safety.taxonomy import Pathway
@@ -70,6 +71,7 @@ async def submit_message(
         replayed=turn.replayed,
         timing_ms=result.timings_ms if settings.expose_timing_metadata else None,
         safety=_safety_notice(turn),
+        sources=[CitedSource.model_validate(s) for s in turn.sources],
     )
 
 
@@ -111,6 +113,9 @@ async def list_messages(
                 content=row.content,
                 created_at=row.created_at,
                 status=row.turn_status,
+                sources=[
+                    CitedSource.model_validate(s) for s in cited_sources(row.generation_metadata)
+                ],
             )
             for row in rows
         ],

@@ -24,6 +24,7 @@ from app.decisions.factory import build_decision_service
 from app.decisions.llm_backend import DECISION_PROMPT_ID
 from app.decisions.questions import QUESTIONS, verify_locked
 from app.decisions.service import DecisionBackend
+from app.embeddings.base import EmbeddingClient
 from app.embeddings.factory import build_embedding_client
 from app.llm.base import LLMClient
 from app.llm.factory import build_llm_client
@@ -36,6 +37,7 @@ from app.orchestration.engine import TurnOrchestrator
 from app.orchestration.persistence import TurnStore
 from app.orchestration.validation import ResponseValidator
 from app.prompting import PromptRegistry, PromptTemplate
+from app.rag.factory import build_knowledge_service
 from app.safety.factory import build_safety_layer
 from app.safety.policy import PATHWAY_RULES
 from app.state.extractor import StateExtractor
@@ -96,12 +98,13 @@ def build_memory_service(
     llm: LLMClient,
     prompt: PromptTemplate,
     store: MemoryStore,
+    embeddings: EmbeddingClient | None,
 ) -> MemoryService | None:
     if not settings.memory_enabled:
         return None
     return MemoryService(
         store=store,
-        embeddings=build_embedding_client(settings),
+        embeddings=embeddings,
         extractor=build_memory_extractor(settings, resolved, llm, prompt),
         retrieval=RetrievalParams(
             limit=settings.memory_max_retrieved, min_semantic=settings.memory_min_semantic
@@ -189,13 +192,22 @@ def create_app(
         safety = build_safety_layer(settings, llm=safety_llm)
         state_extractor = build_state_extractor(settings, resolved, llm, state_prompt)
         memory_store = MemoryStore(session_factory, retention_days=settings.memory_retention_days)
-        memory = build_memory_service(settings, resolved, llm, memory_prompt, memory_store)
+        # One embedding client (one local model in memory) for memories and knowledge.
+        embeddings = (
+            build_embedding_client(settings)
+            if settings.memory_enabled or settings.knowledge_enabled
+            else None
+        )
+        memory = build_memory_service(
+            settings, resolved, llm, memory_prompt, memory_store, embeddings
+        )
+        knowledge = build_knowledge_service(settings, session_factory, embeddings)
         background = BackgroundTasks()
         app.state.memory_store = memory_store
         app.state.memory = memory
         app.state.background = background
-        if memory is not None:
-            memory.start()  # loads a local embedding model in the background
+        if embeddings is not None:
+            embeddings.start()  # loads a local embedding model in the background
         maintenance_task = asyncio.create_task(
             maintain_memories_periodically(
                 memory_store, memory, settings.memory_maintenance_interval_seconds
@@ -234,6 +246,7 @@ def create_app(
             memory=memory,
             background=background,
             safety=safety,
+            knowledge=knowledge,
         )
         log_event(
             logger,
@@ -255,6 +268,7 @@ def create_app(
                 else None
             ),
             safety_region=safety.region if safety is not None else None,
+            knowledge_enabled=knowledge is not None,
         )
         if safety is not None and not {
             rule.fragment for rule in PATHWAY_RULES.values() if rule.fragment
@@ -275,7 +289,9 @@ def create_app(
             await asyncio.gather(maintenance_task, return_exceptions=True)
             await background.aclose()
             if memory is not None:
-                await memory.aclose()
+                await memory.aclose()  # closes the shared embedding client
+            elif embeddings is not None:
+                await embeddings.aclose()
             await decisions.aclose()
             if safety is not None:
                 await safety.aclose()

@@ -1,11 +1,11 @@
 """Turn orchestrator: sequences one conversational turn end to end.
 
-Lifecycle (spec §9.1; knowledge retrieval arrives in Phase 4):
+Lifecycle (spec §9.1):
 RECEIVED -> VALIDATED -> AUTHORIZED -> USER_MESSAGE_PERSISTED -> CONTEXT_LOADED
--> SAFETY_ASSESSED / MEMORIES_RETRIEVED / STATE_UPDATED (concurrent)
--> DECISIONS_RESOLVED -> POLICY_CREATED -> CONTEXT_BUILT -> RESPONSE_GENERATED
--> RESPONSE_VALIDATED -> SAFETY_CHECKED -> ASSISTANT_MESSAGE_PERSISTED
--> COMPLETED
+-> SAFETY_ASSESSED / MEMORIES_RETRIEVED / KNOWLEDGE_RETRIEVED / STATE_UPDATED
+   (concurrent) -> DECISIONS_RESOLVED -> POLICY_CREATED -> CONTEXT_BUILT
+-> RESPONSE_GENERATED -> RESPONSE_VALIDATED -> SAFETY_CHECKED
+-> CITATIONS_CHECKED -> ASSISTANT_MESSAGE_PERSISTED -> COMPLETED
 
 Failure behavior (the user message is always preserved once persisted):
 - unknown / foreign conversation -> 404, nothing persisted, no model call
@@ -17,6 +17,8 @@ Failure behavior (the user message is always preserved once persisted):
 - response fails validation       -> turn marked failed, 503 (no partial reply stored)
 - safety classifier fails         -> degraded mode (patterns only), recorded, never "safe"
 - reply fails the safety checks   -> one regeneration, then the pathway's fixed fallback
+- knowledge lookup fails          -> reply without evidence; never claims a source
+- citation that does not resolve  -> marker removed from the reply, counted
 - assistant persistence fails     -> turn not reported complete, 503
 - stale state write               -> reply kept, state write skipped and logged
 Retrying with the same idempotency key re-attempts a failed turn without
@@ -44,6 +46,8 @@ from app.decisions.service import DecisionService, build_decision_state
 from app.errors import AppError, ErrorCategory
 from app.llm.base import LLMClient
 from app.llm.schemas import (
+    ChatMessage,
+    ChatRole,
     GenerationParams,
     GenerationPurpose,
     GenerationRequest,
@@ -74,6 +78,8 @@ from app.orchestration.safety_flow import (
 )
 from app.orchestration.validation import ResponseValidator
 from app.prompting import PromptTemplate
+from app.rag.evidence import check_citations, strip_markers
+from app.rag.service import KnowledgeLookup, KnowledgeService
 from app.safety.analysis import SafetyAssessment
 from app.safety.factory import SafetyLayer
 from app.safety.fallbacks import fallback_reply
@@ -109,6 +115,7 @@ class TurnOrchestrator:
         memory: MemoryService | None = None,
         background: BackgroundTasks | None = None,
         safety: SafetyLayer | None = None,
+        knowledge: KnowledgeService | None = None,
     ) -> None:
         self._settings = settings
         self._model = model
@@ -129,6 +136,7 @@ class TurnOrchestrator:
         self._memory = memory
         self._background = background
         self._safety = safety
+        self._knowledge = knowledge
 
     async def submit_message(
         self,
@@ -176,13 +184,15 @@ class TurnOrchestrator:
     ) -> TurnResult:
         previous = begun.state.state if begun.state is not None else None
         # Independent, so they run concurrently; none can fail the turn.
-        extraction, recalled, assessment = await asyncio.gather(
+        extraction, recalled, assessment, lookup = await asyncio.gather(
             self._update_state(previous, begun, trace, trace_id),
             self._recall(user_id, content),
             self._assess(content, begun),
+            self._look_up(content, begun),
         )
         trace.mark(TurnStage.SAFETY_ASSESSED)
         trace.mark(TurnStage.MEMORIES_RETRIEVED)
+        trace.mark(TurnStage.KNOWLEDGE_RETRIEVED)
         state = extraction.state if extraction is not None and extraction.state else previous
         trace.mark(TurnStage.STATE_UPDATED)
 
@@ -203,13 +213,17 @@ class TurnOrchestrator:
             safety = self._safety.policy.decide(assessment, self._safety.region)
         # Safety overrides the ordinary strategy (spec Phase 5 acceptance).
         policy = choose_policy(content, decisions)
+        if lookup is not None and (is_safety_pathway(safety) or policy.safety_signal):
+            # No reference passages on a safety pathway (docs/rag.md).
+            lookup = lookup.skipped_for_safety()
         trace.mark(TurnStage.POLICY_CREATED)
 
         context = self._context_builder.build(
             system=self._system_prompt(policy, safety),
-            history=begun.history,
+            history=_history_for_model(begun.history),
             notes=state.notes() if state is not None and not state.is_empty() else None,
             memories=_memories_for_context(recalled),
+            evidence=lookup.evidence_block() if lookup is not None else None,
         )
         trace.mark(TurnStage.CONTEXT_BUILT)
         request = GenerationRequest(
@@ -255,6 +269,18 @@ class TurnOrchestrator:
             )
         trace.mark(TurnStage.SAFETY_CHECKED)
 
+        # Every citation shown must resolve to a passage given in this turn.
+        citations = check_citations(content, lookup.items if lookup is not None else ())
+        if citations.invalid:
+            log_event(
+                logger,
+                "knowledge.invalid_citations",
+                level=logging.WARNING,
+                count=citations.invalid,
+            )
+        content = citations.content
+        trace.mark(TurnStage.CITATIONS_CHECKED)
+
         provenance = AssistantProvenance(
             provider=response.provider,
             model_id=response.model_id,
@@ -279,12 +305,19 @@ class TurnOrchestrator:
                     "omitted_messages": context.omitted_messages,
                     "estimated_tokens": context.estimated_tokens,
                     "notes_included": context.notes_included,
+                    "evidence_included": context.evidence_included,
                 },
                 "policy": policy.summary() if self._policy_enabled else None,
                 "decisions": _decisions_summary(decisions),
                 "state": _state_summary(extraction, self._state_extractor),
                 "memory": _memory_summary(recalled),
                 "safety": _safety_summary(assessment, safety, safety_record),
+                "knowledge": {
+                    **(lookup.summary() if lookup is not None else {"status": "disabled"}),
+                    "citations": [c.to_dict() for c in citations.citations],
+                    "invalid_citations": citations.invalid,
+                    "uncited": list(citations.uncited),
+                },
                 "trace_id": trace_id,
             },
         )
@@ -342,6 +375,11 @@ class TurnOrchestrator:
             total_ms=round(trace.elapsed_seconds() * 1000, 2),
         )
         return TurnResult(turn=completed, timings_ms=trace.timings_ms())
+
+    async def _look_up(self, content: str, begun: StartedTurn) -> KnowledgeLookup | None:
+        if self._knowledge is None:
+            return None
+        return await self._knowledge.lookup(content, begun.history)
 
     async def _recall(self, user_id: uuid.UUID, content: str) -> RetrievalResult | None:
         if self._memory is None:
@@ -584,6 +622,17 @@ def _state_summary(
 
 
 _PENDING = MemoryStatus.PENDING_CONFIRMATION
+
+
+def _history_for_model(history: list[ChatMessage]) -> list[ChatMessage]:
+    """Earlier replies without their citation markers: [S1] in an old reply
+    referred to that turn's evidence, not this one's."""
+    return [
+        ChatMessage(role=m.role, content=strip_markers(m.content))
+        if m.role is ChatRole.ASSISTANT
+        else m
+        for m in history
+    ]
 
 
 def _memories_for_context(recalled: RetrievalResult | None) -> list[dict[str, str]] | None:

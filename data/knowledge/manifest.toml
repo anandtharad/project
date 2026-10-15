@@ -1,0 +1,417 @@
+# Reviewed knowledge sources (spec §11.2-11.3). See docs/rag.md and data/knowledge/README.md.
+# Edit, then: uv run python scripts/fetch_knowledge.py --only <key> && uv run python scripts/ingest_knowledge.py
+manifest_version = 1
+review_note = "Selected and checked on 2026-10-15 by the developer's AI coding assistant for topic fit, licence and reuse terms, and content extraction. Not clinically reviewed: general wellbeing information only."
+
+[defaults]
+stop_headings = ["Reprints", "More Resources", "Learn more", "Learn More", "Featured videos", "Share this infographic", "You may also be interested in", "For More Information", "NCCIH Clearinghouse", "Know the Science", "PubMed®", "References", "Key References", "Selected References", "Acknowledgments", "Resources", "Related Resources", "More Information", "Spread the word about social isolation", "Watch our Emotional Well-Being video series", "Share", "Related", "See also"]
+drop_text = ["This publication is not copyrighted.*", "Download (?:PDF|Publications).*", "Print this page\\.?"]
+
+[profiles.nimh]
+content = ["article#main_content_inner"]
+drop = ["ul.pub_links", "div.pub-cover", "li.pagenav_item"]
+drop_text = ["Esta p.gina tambi.n est. disponible en espa.ol\\.?", "View the related infographic.*", "Download PDF", "En espa.ol"]
+
+[profiles.nccih]
+content = ["main"]
+
+[profiles.nia]
+content = ["article.content_main"]
+
+[profiles.cdc]
+content = ["div.cdc-page-title h1, div.cdc-dfe-body__top, div.cdc-dfe-body__center"]
+
+[profiles.medlineplus]
+content = ["#topic .page-title h1, section#topsum_section"]
+
+[profiles.odphp]
+content = ["div.r-topic-content-container h1.node-title, div.r-topic-content-container div.c-panel__content"]
+
+[profiles.niddk]
+content = ["article.dk-content > h1, article.dk-content > div.health-detail-content"]
+
+[[sources]]
+key = "nimh-so-stressed-out-fact-sheet"
+profile = "nimh"
+url = "https://www.nimh.nih.gov/health/publications/so-stressed-out-fact-sheet"
+title = "I’m So Stressed Out! Fact Sheet"
+publisher = "National Institute of Mental Health (NIMH)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nimh.nih.gov/site-info/policies"
+attribution = "National Institute of Mental Health. (2020). I’m So Stressed Out! Fact Sheet. U.S. Department of Health and Human Services, National Institutes of Health. Retrieved October 15, 2026, from https://www.nimh.nih.gov/health/publications/so-stressed-out-fact-sheet"
+date_shown = "not shown (Publication No. 20-MH-8125)"
+reviewed_on = 2026-10-15
+topics = ["stress", "anxiety", "emotional_regulation"]
+probes = ["what's the difference between stress and anxiety"]
+
+[[sources]]
+key = "nimh-caring-for-your-mental-health"
+profile = "nimh"
+url = "https://www.nimh.nih.gov/health/topics/caring-for-your-mental-health"
+title = "Caring for Your Mental Health"
+publisher = "National Institute of Mental Health (NIMH)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nimh.nih.gov/site-info/policies"
+attribution = "National Institute of Mental Health. (2026). Caring for Your Mental Health. U.S. Department of Health and Human Services, National Institutes of Health. Retrieved October 15, 2026, from https://www.nimh.nih.gov/health/topics/caring-for-your-mental-health"
+published_on = 2026-04-01
+date_shown = "Last Reviewed: April 2026"
+reviewed_on = 2026-10-15
+topics = ["wellbeing", "stress", "sleep"]
+probes = ["how can I take care of my mental health day to day"]
+
+[[sources]]
+key = "nimh-tips-for-talking-with-your-health-care-provider"
+profile = "nimh"
+url = "https://www.nimh.nih.gov/health/publications/tips-for-talking-with-your-health-care-provider"
+title = "Tips for Talking With a Health Care Provider About Your Mental Health"
+publisher = "National Institute of Mental Health (NIMH)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nimh.nih.gov/site-info/policies"
+attribution = "National Institute of Mental Health. (2022). Tips for Talking With a Health Care Provider About Your Mental Health. U.S. Department of Health and Human Services, National Institutes of Health. Retrieved October 15, 2026, from https://www.nimh.nih.gov/health/publications/tips-for-talking-with-your-health-care-provider"
+date_shown = "not shown (Publication No. 22-MH-8094)"
+reviewed_on = 2026-10-15
+topics = ["communication"]
+probes = ["how do I prepare to talk to a health care provider about my mental health"]
+
+[[sources]]
+key = "nccih-stress"
+profile = "nccih"
+url = "https://www.nccih.nih.gov/health/stress"
+title = "Stress"
+publisher = "National Center for Complementary and Integrative Health (NCCIH)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nccih.nih.gov/tools/privacy"
+attribution = "Source: National Center for Complementary and Integrative Health (NCCIH). Stress. Last updated April 2022. https://www.nccih.nih.gov/health/stress"
+published_on = 2022-04-01
+date_shown = "Last Updated: April 2022"
+reviewed_on = 2026-10-15
+topics = ["stress", "relaxation", "mindfulness"]
+probes = ["does yoga help with stress"]
+
+[[sources]]
+key = "nccih-relaxation-techniques-what-you-need-to-know"
+profile = "nccih"
+url = "https://www.nccih.nih.gov/health/relaxation-techniques-what-you-need-to-know"
+title = "Relaxation Techniques: What You Need To Know"
+publisher = "National Center for Complementary and Integrative Health (NCCIH)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nccih.nih.gov/tools/privacy"
+attribution = "Source: National Center for Complementary and Integrative Health (NCCIH). Relaxation Techniques: What You Need To Know. Last updated June 2021. https://www.nccih.nih.gov/health/relaxation-techniques-what-you-need-to-know"
+published_on = 2021-06-01
+date_shown = "Last Updated: June 2021"
+reviewed_on = 2026-10-15
+topics = ["relaxation", "stress", "anxiety", "emotional_regulation"]
+probes = ["what are the different types of relaxation techniques"]
+
+[[sources]]
+key = "nccih-meditation-and-mindfulness-effectiveness-and-safety"
+profile = "nccih"
+url = "https://www.nccih.nih.gov/health/meditation-and-mindfulness-effectiveness-and-safety"
+title = "Meditation and Mindfulness: Effectiveness and Safety"
+publisher = "National Center for Complementary and Integrative Health (NCCIH)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nccih.nih.gov/tools/privacy"
+attribution = "Source: National Center for Complementary and Integrative Health (NCCIH). Meditation and Mindfulness: Effectiveness and Safety. Last updated June 2022. https://www.nccih.nih.gov/health/meditation-and-mindfulness-effectiveness-and-safety"
+published_on = 2022-06-01
+date_shown = "Last Updated: June 2022"
+reviewed_on = 2026-10-15
+topics = ["mindfulness", "anxiety", "stress"]
+probes = ["are meditation and mindfulness practices safe"]
+
+[[sources]]
+key = "nccih-8-things-to-know-about-meditation-and-mindfulness"
+profile = "nccih"
+url = "https://www.nccih.nih.gov/health/tips/8-things-to-know-about-meditation-and-mindfulness"
+title = "8 Things to Know About Meditation and Mindfulness"
+publisher = "National Center for Complementary and Integrative Health (NCCIH)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nccih.nih.gov/tools/privacy"
+attribution = "Source: National Center for Complementary and Integrative Health (NCCIH). 8 Things to Know About Meditation and Mindfulness. https://www.nccih.nih.gov/health/tips/8-things-to-know-about-meditation-and-mindfulness"
+date_shown = "not shown"
+reviewed_on = 2026-10-15
+topics = ["mindfulness"]
+probes = ["things to know before trying meditation"]
+
+[[sources]]
+key = "nccih-wellness-and-well-being"
+profile = "nccih"
+url = "https://www.nccih.nih.gov/health/wellness-and-well-being"
+title = "Wellness and Well-Being"
+publisher = "National Center for Complementary and Integrative Health (NCCIH)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nccih.nih.gov/tools/privacy"
+attribution = "Source: National Center for Complementary and Integrative Health (NCCIH). Wellness and Well-Being. Last updated October 2018. https://www.nccih.nih.gov/health/wellness-and-well-being"
+published_on = 2018-10-01
+date_shown = "Last Updated: October 2018"
+reviewed_on = 2026-10-15
+topics = ["wellbeing"]
+probes = ["what does wellness mean"]
+
+[[sources]]
+key = "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders"
+profile = "nccih"
+url = "https://www.nccih.nih.gov/health/tips/things-to-know-about-mind-and-body-practices-for-sleep-disorders"
+title = "6 Things To Know About Mind and Body Practices for Sleep Disorders"
+publisher = "National Center for Complementary and Integrative Health (NCCIH)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nccih.nih.gov/tools/privacy"
+attribution = "Source: National Center for Complementary and Integrative Health (NCCIH). 6 Things To Know About Mind and Body Practices for Sleep Disorders. https://www.nccih.nih.gov/health/tips/things-to-know-about-mind-and-body-practices-for-sleep-disorders"
+date_shown = "not shown"
+reviewed_on = 2026-10-15
+topics = ["sleep", "mindfulness", "relaxation"]
+probes = ["can mind and body practices help with insomnia"]
+
+[[sources]]
+key = "nia-sleep-and-older-adults"
+profile = "nia"
+url = "https://www.nia.nih.gov/health/sleep/sleep-and-older-adults"
+title = "Sleep and Older Adults"
+publisher = "National Institute on Aging (NIA)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nia.nih.gov/about/policies"
+attribution = "Source: National Institute on Aging, National Institutes of Health. \"Sleep and Older Adults\". https://www.nia.nih.gov/health/sleep/sleep-and-older-adults"
+published_on = 2025-02-06
+date_shown = "Content reviewed: February 6, 2025"
+reviewed_on = 2026-10-15
+topics = ["sleep"]
+probes = ["how does aging affect sleep"]
+
+[[sources]]
+key = "nia-loneliness-and-social-isolation-tips-staying-connected"
+profile = "nia"
+url = "https://www.nia.nih.gov/health/loneliness-and-social-isolation/loneliness-and-social-isolation-tips-staying-connected"
+title = "Loneliness and Social Isolation — Tips for Staying Connected"
+publisher = "National Institute on Aging (NIA)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nia.nih.gov/about/policies"
+attribution = "Source: National Institute on Aging, National Institutes of Health. \"Loneliness and Social Isolation — Tips for Staying Connected\". https://www.nia.nih.gov/health/loneliness-and-social-isolation/loneliness-and-social-isolation-tips-staying-connected"
+published_on = 2024-07-11
+date_shown = "Content reviewed: July 11, 2024"
+reviewed_on = 2026-10-15
+topics = ["loneliness", "relationships", "wellbeing"]
+probes = ["what is the difference between loneliness and social isolation"]
+
+[[sources]]
+key = "nia-tips-getting-and-staying-active-you-age"
+profile = "nia"
+url = "https://www.nia.nih.gov/health/exercise-and-physical-activity/tips-getting-and-staying-active-you-age"
+title = "Tips for Getting and Staying Active as You Age"
+publisher = "National Institute on Aging (NIA)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nia.nih.gov/about/policies"
+attribution = "Source: National Institute on Aging, National Institutes of Health. \"Tips for Getting and Staying Active as You Age\". https://www.nia.nih.gov/health/exercise-and-physical-activity/tips-getting-and-staying-active-you-age"
+published_on = 2025-01-14
+date_shown = "Content reviewed: January 14, 2025"
+reviewed_on = 2026-10-15
+topics = ["physical_activity", "behaviour_change"]
+probes = ["how can I stay physically active as I get older"]
+
+[[sources]]
+key = "nia-how-talk-your-doctor-about-sensitive-issues"
+profile = "nia"
+url = "https://www.nia.nih.gov/health/medical-care-and-appointments/how-talk-your-doctor-about-sensitive-issues"
+title = "How To Talk With Your Doctor About Sensitive Issues"
+publisher = "National Institute on Aging (NIA)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://www.nia.nih.gov/about/policies"
+attribution = "Source: National Institute on Aging, National Institutes of Health. \"How To Talk With Your Doctor About Sensitive Issues\". https://www.nia.nih.gov/health/medical-care-and-appointments/how-talk-your-doctor-about-sensitive-issues"
+published_on = 2020-02-03
+date_shown = "Content reviewed: February 3, 2020"
+reviewed_on = 2026-10-15
+topics = ["communication"]
+probes = ["how do I talk with my doctor about sensitive issues"]
+
+[[sources]]
+key = "cdc-sleep-about"
+profile = "cdc"
+url = "https://www.cdc.gov/sleep/about/index.html"
+title = "About Sleep"
+publisher = "Centers for Disease Control and Prevention (CDC)"
+licence = "Public domain (U.S. government work), CDC reuse conditions"
+licence_url = "https://www.cdc.gov/other/agencymaterials.html"
+attribution = "Source: CDC. \"About Sleep\", https://www.cdc.gov/sleep/about/index.html. This material is otherwise available on the CDC website for no charge. Use of this material does not imply endorsement by CDC, ATSDR, HHS or the United States Government."
+published_on = 2024-05-15
+date_shown = "May 15, 2024 (unlabeled date under page title; equals cdc:last_updated meta; cdc:last_reviewed meta = n/a)"
+reviewed_on = 2026-10-15
+topics = ["sleep"]
+probes = ["what are common sleep disorders"]
+
+[[sources]]
+key = "cdc-emotional-well-being-about"
+profile = "cdc"
+url = "https://www.cdc.gov/emotional-well-being/about/index.html"
+title = "About Emotional Well-Being"
+publisher = "Centers for Disease Control and Prevention (CDC)"
+licence = "Public domain (U.S. government work), CDC reuse conditions"
+licence_url = "https://www.cdc.gov/other/agencymaterials.html"
+attribution = "Source: CDC. \"About Emotional Well-Being\", https://www.cdc.gov/emotional-well-being/about/index.html. This material is otherwise available on the CDC website for no charge. Use of this material does not imply endorsement by CDC, ATSDR, HHS or the United States Government."
+published_on = 2024-05-15
+date_shown = "May 15, 2024 (unlabeled date under page title; equals cdc:last_updated meta; cdc:last_reviewed meta = n/a)"
+reviewed_on = 2026-10-15
+topics = ["wellbeing", "emotional_regulation", "stress"]
+probes = ["why is emotional well-being important"]
+
+[[sources]]
+key = "cdc-improve-your-emotional-well-being"
+profile = "cdc"
+url = "https://www.cdc.gov/emotional-well-being/improve-your-emotional-well-being/index.html"
+title = "Improve Your Emotional Well-Being"
+publisher = "Centers for Disease Control and Prevention (CDC)"
+licence = "Public domain (U.S. government work), CDC reuse conditions"
+licence_url = "https://www.cdc.gov/other/agencymaterials.html"
+attribution = "Source: CDC. \"Improve Your Emotional Well-Being\", https://www.cdc.gov/emotional-well-being/improve-your-emotional-well-being/index.html. This material is otherwise available on the CDC website for no charge. Use of this material does not imply endorsement by CDC, ATSDR, HHS or the United States Government."
+published_on = 2024-08-26
+date_shown = "August 26, 2024 (unlabeled date under page title; equals cdc:last_updated meta; cdc:last_reviewed meta = n/a)"
+reviewed_on = 2026-10-15
+topics = ["wellbeing", "behaviour_change", "mindfulness"]
+probes = ["ways to boost emotional well-being"]
+
+[[sources]]
+key = "cdc-managing-difficult-emotions"
+profile = "cdc"
+url = "https://www.cdc.gov/emotional-well-being/managing-difficult-emotions/index.html"
+title = "Managing Difficult Emotions"
+publisher = "Centers for Disease Control and Prevention (CDC)"
+licence = "Public domain (U.S. government work), CDC reuse conditions"
+licence_url = "https://www.cdc.gov/other/agencymaterials.html"
+attribution = "Source: CDC. \"Managing Difficult Emotions\", https://www.cdc.gov/emotional-well-being/managing-difficult-emotions/index.html. This material is otherwise available on the CDC website for no charge. Use of this material does not imply endorsement by CDC, ATSDR, HHS or the United States Government."
+published_on = 2024-10-01
+date_shown = "October 1, 2024 (unlabeled date under page title; equals cdc:last_updated meta; cdc:last_reviewed meta = n/a)"
+reviewed_on = 2026-10-15
+topics = ["emotional_regulation", "anxiety", "low_mood"]
+probes = ["how can I manage anger and sadness"]
+
+[[sources]]
+key = "cdc-conversations-matter"
+profile = "cdc"
+url = "https://www.cdc.gov/emotional-well-being/conversations-matter/index.html"
+title = "How to Listen and Support Someone in Need"
+publisher = "Centers for Disease Control and Prevention (CDC)"
+licence = "Public domain (U.S. government work), CDC reuse conditions"
+licence_url = "https://www.cdc.gov/other/agencymaterials.html"
+attribution = "Source: CDC. \"How to Listen and Support Someone in Need\", https://www.cdc.gov/emotional-well-being/conversations-matter/index.html. This material is otherwise available on the CDC website for no charge. Use of this material does not imply endorsement by CDC, ATSDR, HHS or the United States Government."
+published_on = 2024-08-26
+date_shown = "August 26, 2024 (unlabeled date under page title; equals cdc:last_updated meta; cdc:last_reviewed meta = n/a)"
+reviewed_on = 2026-10-15
+topics = ["communication", "relationships"]
+probes = ["how can I listen and support someone who is struggling"]
+
+[[sources]]
+key = "cdc-social-connectedness-improving"
+profile = "cdc"
+url = "https://www.cdc.gov/social-connectedness/improving/index.html"
+title = "Improving Social Connectedness"
+publisher = "Centers for Disease Control and Prevention (CDC)"
+licence = "Public domain (U.S. government work), CDC reuse conditions"
+licence_url = "https://www.cdc.gov/other/agencymaterials.html"
+attribution = "Source: CDC. \"Improving Social Connectedness\", https://www.cdc.gov/social-connectedness/improving/index.html. This material is otherwise available on the CDC website for no charge. Use of this material does not imply endorsement by CDC, ATSDR, HHS or the United States Government."
+published_on = 2024-05-15
+date_shown = "May 15, 2024 (unlabeled date under page title; equals cdc:last_updated meta; cdc:last_reviewed meta = n/a)"
+reviewed_on = 2026-10-15
+topics = ["loneliness", "relationships", "wellbeing"]
+probes = ["how do I build social connections"]
+
+[[sources]]
+key = "cdc-physical-activity-overcoming-barriers"
+profile = "cdc"
+url = "https://www.cdc.gov/physical-activity-basics/overcoming-barriers/index.html"
+title = "Overcoming Barriers to Physical Activity"
+publisher = "Centers for Disease Control and Prevention (CDC)"
+licence = "Public domain (U.S. government work), CDC reuse conditions"
+licence_url = "https://www.cdc.gov/other/agencymaterials.html"
+attribution = "Source: CDC. \"Overcoming Barriers to Physical Activity\", https://www.cdc.gov/physical-activity-basics/overcoming-barriers/index.html. This material is otherwise available on the CDC website for no charge. Use of this material does not imply endorsement by CDC, ATSDR, HHS or the United States Government."
+published_on = 2025-02-05
+date_shown = "Feb. 5, 2025 (unlabeled date under page title; equals cdc:last_updated meta; cdc:last_reviewed meta = n/a)"
+reviewed_on = 2026-10-15
+topics = ["physical_activity", "behaviour_change"]
+probes = ["I don't have time or energy to exercise, how do I get past that"]
+
+[[sources]]
+key = "medlineplus-stress"
+profile = "medlineplus"
+url = "https://medlineplus.gov/stress.html"
+title = "Stress"
+publisher = "MedlinePlus, National Library of Medicine"
+licence = "Public domain (MedlinePlus health topic summary)"
+licence_url = "https://medlineplus.gov/about/using/usingcontent/"
+attribution = "Courtesy of MedlinePlus from the National Library of Medicine: \"Stress\" (health topic summary), https://medlineplus.gov/stress.html"
+published_on = 2023-10-20
+date_shown = "Last updated October 20, 2023"
+reviewed_on = 2026-10-15
+topics = ["stress"]
+probes = ["how can long-term stress harm my health"]
+
+[[sources]]
+key = "medlineplus-healthy-sleep"
+profile = "medlineplus"
+url = "https://medlineplus.gov/healthysleep.html"
+title = "Healthy Sleep"
+publisher = "MedlinePlus, National Library of Medicine"
+licence = "Public domain (MedlinePlus health topic summary)"
+licence_url = "https://medlineplus.gov/about/using/usingcontent/"
+attribution = "Courtesy of MedlinePlus from the National Library of Medicine: \"Healthy Sleep\" (health topic summary), https://medlineplus.gov/healthysleep.html"
+published_on = 2025-12-09
+date_shown = "Last updated December 9, 2025"
+reviewed_on = 2026-10-15
+topics = ["sleep"]
+probes = ["what are the health effects of not getting enough sleep"]
+
+[[sources]]
+key = "odphp-manage-stress"
+profile = "odphp"
+url = "https://odphp.health.gov/myhealthfinder/health-conditions/heart-health/manage-stress"
+title = "Manage Stress"
+publisher = "Office of Disease Prevention and Health Promotion (ODPHP)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://odphp.health.gov/myhealthfinder/copyright-policy"
+attribution = "Source: Office of Disease Prevention and Health Promotion (ODPHP), MyHealthfinder: \"Manage Stress\", https://odphp.health.gov/myhealthfinder/health-conditions/heart-health/manage-stress (content last updated July 6, 2026)."
+published_on = 2026-07-06
+date_shown = "Content last updated on July 6, 2026"
+reviewed_on = 2026-10-15
+topics = ["stress", "behaviour_change"]
+probes = ["what are the signs of stress"]
+
+[[sources]]
+key = "odphp-get-enough-sleep"
+profile = "odphp"
+url = "https://odphp.health.gov/myhealthfinder/healthy-living/mental-health-and-relationships/get-enough-sleep"
+title = "Get Enough Sleep"
+publisher = "Office of Disease Prevention and Health Promotion (ODPHP)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://odphp.health.gov/myhealthfinder/copyright-policy"
+attribution = "Source: Office of Disease Prevention and Health Promotion (ODPHP), MyHealthfinder: \"Get Enough Sleep\", https://odphp.health.gov/myhealthfinder/healthy-living/mental-health-and-relationships/get-enough-sleep (content last updated July 6, 2026)."
+published_on = 2026-07-06
+date_shown = "Content last updated on July 6, 2026"
+reviewed_on = 2026-10-15
+topics = ["sleep"]
+probes = ["how much sleep do children need"]
+
+[[sources]]
+key = "odphp-get-active"
+profile = "odphp"
+url = "https://odphp.health.gov/myhealthfinder/health-conditions/diabetes/get-active"
+title = "Get Active"
+publisher = "Office of Disease Prevention and Health Promotion (ODPHP)"
+licence = "Public domain (U.S. government work)"
+licence_url = "https://odphp.health.gov/myhealthfinder/copyright-policy"
+attribution = "Source: Office of Disease Prevention and Health Promotion (ODPHP), MyHealthfinder: \"Get Active\", https://odphp.health.gov/myhealthfinder/health-conditions/diabetes/get-active (content last updated October 2, 2026)."
+published_on = 2026-10-02
+date_shown = "Content last updated on October 2, 2026"
+reviewed_on = 2026-10-15
+topics = ["physical_activity", "behaviour_change"]
+probes = ["what kinds of physical activity should adults do"]
+
+[[sources]]
+key = "niddk-changing-habits-better-health"
+profile = "niddk"
+url = "https://www.niddk.nih.gov/health-information/diet-nutrition/changing-habits-better-health"
+title = "Changing Your Habits for Better Health"
+publisher = "National Institute of Diabetes and Digestive and Kidney Diseases (NIDDK)"
+licence = "Copyright free (NIDDK copyright policy)"
+licence_url = "https://www.niddk.nih.gov/copyright"
+attribution = "Source: National Institute of Diabetes and Digestive and Kidney Diseases (NIDDK), National Institutes of Health. \"Changing Your Habits for Better Health\". https://www.niddk.nih.gov/health-information/diet-nutrition/changing-habits-better-health"
+published_on = 2020-11-01
+date_shown = "Last Reviewed November 2020"
+reviewed_on = 2026-10-15
+topics = ["behaviour_change", "nutrition", "physical_activity"]
+probes = ["what are the stages of changing a habit"]
