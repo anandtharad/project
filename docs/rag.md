@@ -189,7 +189,8 @@ if a source failed or a probe missed.
    chunks per page, top `KNOWLEDGE_MAX_RESULTS` (3).
 5. **Source filtering.** By topic, source key or publisher
    (`KnowledgeFilter`); the evaluation and tests use it, turns do not.
-6. **No reranker.** The spec allows one only if evaluation shows a benefit.
+6. **No reranker.** Two cross-encoders were evaluated. Their dev gain did
+   not hold on test (see Results).
 
 ## Routing (spec §11.7)
 
@@ -263,8 +264,8 @@ publisher, URL, section, document and chunk ids, and version.
 |---|---|---|
 | `KNOWLEDGE_ENABLED` | `true` | Off: no lookups; invalid markers are still removed |
 | `KNOWLEDGE_MAX_RESULTS`, `..._MAX_PER_DOCUMENT` | 3, 2 | |
-| `KNOWLEDGE_MIN_SEMANTIC` | see Results | Calibrated for the default local model (bge-small-en-v1.5); another embedding model needs its own value |
-| `KNOWLEDGE_MIN_LEXICAL` | see Results | Full-text fallback only |
+| `KNOWLEDGE_MIN_SEMANTIC` | 0.70 | Chosen on dev for the default local model (bge-small-en-v1.5); another embedding model needs its own value |
+| `KNOWLEDGE_MIN_LEXICAL` | 0.46 | Full-text fallback only (chosen on dev) |
 | `KNOWLEDGE_TIMEOUT_SECONDS` | 3 | |
 | `KNOWLEDGE_CHUNK_*` | 180 / 30 / 25 | A change re-chunks every source on the next ingestion |
 
@@ -285,9 +286,90 @@ uv run python scripts/eval_rag.py generation --split test --limit 30 --pause 25
 Retrieval runs against a temporary database with the committed corpus, so
 results do not depend on a developer's data.
 
-## Results
+## Results (2026-10-15)
 
-To be filled in from the runs below.
+Measured with the default local embedding model (`BAAI/bge-small-en-v1.5`)
+and chunking 180/30/25. Choices were made on dev; test was run once with
+them unchanged. Files: `eval/results/rag-*-20261015T*.json`. They hold ids,
+labels, source keys and scores only.
+
+### Ingestion
+
+- 26 sources became 274 chunks, all embedded, and all 26 probe queries
+  found their source.
+- A second run reported 26 unchanged, wrote no chunks and embedded nothing.
+
+### Routing
+
+Blind test set: 100 messages, 45 of them requests. The texts were never
+read; only results are looked at.
+
+| Router | Requests missed | Lookups run for non-requests | Evidence reaching the prompt for non-requests |
+|---|---|---|---|
+| v2: covered-topic word list | 40.0% (18/45) | 0% | 0% |
+| **v3: request form only (current)** | **24.4% (11/45)** | 23.6% (13/55, all off-topic) | **0% (0/55)** |
+
+- **No conversational message triggered anything.** All 16 casual and 23
+  reflective messages ran no lookup. The 13 off-topic questions ran one,
+  and the relevance threshold rejected every passage.
+- **Requests that got evidence:** 62.2% (28/45), router recall times what
+  the library covers.
+- **Misses** are mostly phrasings the patterns don't know. The earlier
+  blind set (now development data) had shown the same 60% recall for v2,
+  before v3.
+
+### Retrieval
+
+**Choices on dev** (44 answerable, 16 unanswerable, 8 off-topic queries).
+Each row is that chunking setting at its own best threshold (balanced =
+mean of hit rate and abstention):
+
+| Chunking | Chunks | Threshold | Hit rate | Fact hit | MRR | Abstention | Balanced |
+|---|---|---|---|---|---|---|---|
+| 120/20/20 | 357 | 0.72 | 72.7% | 68.2% | 0.66 | 100% | 0.864 |
+| **180/30/25** | 274 | **0.70** | 77.3% | 72.7% | 0.73 | 95.8% | 0.866 |
+| 260/40/30 | 241 | 0.71 | 75.0% | 70.5% | 0.71 | 100% | 0.875 |
+
+- **Chunking.** 180 and 260 words differ by one dev query, and their
+  threshold curves are almost identical. 180 was kept: it puts about 30%
+  fewer evidence tokens into each prompt.
+- **The threshold window is narrow.** Below 0.68 unanswerable queries start
+  getting passages; above 0.73 hits fall fast (0.75: 50%). This is a
+  property of the small embedding model.
+- **Lexical fallback.** For the full-text-only fallback, 0.46 was chosen.
+
+**Test** (43 answerable, 16 unanswerable, 8 off-topic):
+
+| | Hit rate | Source recall | Precision | MRR | Fact hit | Abstention (unanswerable / off-topic) |
+|---|---|---|---|---|---|---|
+| Hybrid, threshold 0.70 | **72.1%** | 60.5% | 72.0% | 0.71 | 62.8% | **87.5%** (81.3% / 100%) |
+| Full-text fallback, 0.46 | 67.4% | 54.7% | 53.4% | 0.53 | 46.5% | 66.7% (50.0% / 100%) |
+
+- Dev to test, the hit rate fell from 77% to 72%, and abstention on
+  unanswerable queries from 94% to 81%: 3 of 16 unanswerable test queries
+  got passages. On those turns the prompt tells the model to say the
+  passages don't answer the question; whether it does is measured under
+  Generation.
+- **Fact hit.** "Fact hit" means an expected answer phrase appears in a
+  passage that was given. It is lower than the hit rate, because the right
+  page is sometimes found through a section that doesn't hold the answer.
+
+**Reranker (spec: only if it helps).** Cross-encoders `Xenova/ms-marco-MiniLM-L-6-v2`
+and `L-12-v2` were tried two ways:
+
+- *As the relevance gate:* worse on dev (balanced 0.82 and 0.80, against
+  0.866).
+- *To order passages that pass the similarity threshold:* better on dev
+  (hit 81.8% vs 77.3%, MRR 0.80 vs 0.73). On test, L-6 gave the same hit
+  rate and fact hit, and slightly lower source recall (57.9% vs 60.5%) and
+  MRR.
+
+The dev gain did not hold, so **no reranker is used**. The experiment is
+reproducible with `--reranker`.
+
+### Generation
+
+To be filled in from the live run.
 
 ## Limits
 

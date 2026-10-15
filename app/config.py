@@ -181,7 +181,7 @@ class Settings(BaseSettings):
     # embedding model needs its own value.
     knowledge_min_semantic: float = Field(default=0.70, ge=0.0, le=1.0)
     # Minimum full-text rank, used only when no query embedding is available.
-    knowledge_min_lexical: float = Field(default=0.10, ge=0.0, le=1.0)
+    knowledge_min_lexical: float = Field(default=0.46, ge=0.0, le=1.0)
     knowledge_max_per_document: int = Field(default=2, ge=1, le=8)
     knowledge_timeout_seconds: float = Field(default=3.0, gt=0, le=30)
     # Chunking for ingestion; a change re-chunks every source on the next run.

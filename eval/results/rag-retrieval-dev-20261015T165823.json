@@ -1,0 +1,3503 @@
+{
+  "eval": "rag-retrieval",
+  "split": "dev",
+  "dataset": "eval/datasets/rag/v1/retrieval.jsonl",
+  "dataset_sha256": "ec0e6f392d11ab1fbd8a352fd63e0aa0f3685db004b90363d2a56592ae31a79a",
+  "manifest_sha256": "5c6624f76eaef812df3914a5b9bcd1c7f1982b67383fdd12eb06d2a1a9452c45",
+  "embedding_model": "local:BAAI/bge-small-en-v1.5:384",
+  "max_results": 3,
+  "max_per_document": 2,
+  "runs": [
+    {
+      "chunking": "chunker1:120/20/20",
+      "chunks": 357,
+      "documents": 26,
+      "sweep": {
+        "0.5": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.6686,
+          "precision": 0.5606,
+          "mrr": 0.7841,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.1667,
+          "abstention_by_type": {
+            "unanswerable": 0.0,
+            "off_topic": 0.5
+          },
+          "balanced": 0.5151
+        },
+        "0.51": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.6686,
+          "precision": 0.5606,
+          "mrr": 0.7841,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.1667,
+          "abstention_by_type": {
+            "unanswerable": 0.0,
+            "off_topic": 0.5
+          },
+          "balanced": 0.5151
+        },
+        "0.52": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.6686,
+          "precision": 0.5606,
+          "mrr": 0.7841,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.1667,
+          "abstention_by_type": {
+            "unanswerable": 0.0,
+            "off_topic": 0.5
+          },
+          "balanced": 0.5151
+        },
+        "0.53": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.6686,
+          "precision": 0.5606,
+          "mrr": 0.7841,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.25,
+          "abstention_by_type": {
+            "unanswerable": 0.0625,
+            "off_topic": 0.625
+          },
+          "balanced": 0.5568
+        },
+        "0.54": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.6686,
+          "precision": 0.5606,
+          "mrr": 0.7841,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.2917,
+          "abstention_by_type": {
+            "unanswerable": 0.0625,
+            "off_topic": 0.75
+          },
+          "balanced": 0.5776
+        },
+        "0.55": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.6686,
+          "precision": 0.5606,
+          "mrr": 0.7841,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.375,
+          "abstention_by_type": {
+            "unanswerable": 0.125,
+            "off_topic": 0.875
+          },
+          "balanced": 0.6193
+        },
+        "0.56": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.6686,
+          "precision": 0.5606,
+          "mrr": 0.7841,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.375,
+          "abstention_by_type": {
+            "unanswerable": 0.125,
+            "off_topic": 0.875
+          },
+          "balanced": 0.6193
+        },
+        "0.57": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.6686,
+          "precision": 0.5606,
+          "mrr": 0.7841,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.375,
+          "abstention_by_type": {
+            "unanswerable": 0.125,
+            "off_topic": 0.875
+          },
+          "balanced": 0.6193
+        },
+        "0.58": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.6686,
+          "precision": 0.5606,
+          "mrr": 0.7841,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.4583,
+          "abstention_by_type": {
+            "unanswerable": 0.1875,
+            "off_topic": 1.0
+          },
+          "balanced": 0.661
+        },
+        "0.59": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.6686,
+          "precision": 0.5682,
+          "mrr": 0.7841,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.5,
+          "abstention_by_type": {
+            "unanswerable": 0.25,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6818
+        },
+        "0.6": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.6686,
+          "precision": 0.5682,
+          "mrr": 0.7727,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.5,
+          "abstention_by_type": {
+            "unanswerable": 0.25,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6818
+        },
+        "0.61": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.6686,
+          "precision": 0.5682,
+          "mrr": 0.7727,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.5417,
+          "abstention_by_type": {
+            "unanswerable": 0.3125,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7026
+        },
+        "0.62": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8409,
+          "source_recall": 0.6534,
+          "precision": 0.5833,
+          "mrr": 0.7614,
+          "fact_hit_rate": 0.6364,
+          "abstention_rate": 0.5833,
+          "abstention_by_type": {
+            "unanswerable": 0.375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7121
+        },
+        "0.63": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8409,
+          "source_recall": 0.6686,
+          "precision": 0.6202,
+          "mrr": 0.7765,
+          "fact_hit_rate": 0.6591,
+          "abstention_rate": 0.5833,
+          "abstention_by_type": {
+            "unanswerable": 0.375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7121
+        },
+        "0.64": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7955,
+          "source_recall": 0.6383,
+          "precision": 0.6179,
+          "mrr": 0.7424,
+          "fact_hit_rate": 0.6364,
+          "abstention_rate": 0.625,
+          "abstention_by_type": {
+            "unanswerable": 0.4375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7103
+        },
+        "0.65": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7955,
+          "source_recall": 0.6383,
+          "precision": 0.6341,
+          "mrr": 0.7273,
+          "fact_hit_rate": 0.6591,
+          "abstention_rate": 0.6667,
+          "abstention_by_type": {
+            "unanswerable": 0.5,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7311
+        },
+        "0.66": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7955,
+          "source_recall": 0.6496,
+          "precision": 0.6504,
+          "mrr": 0.7273,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.6667,
+          "abstention_by_type": {
+            "unanswerable": 0.5,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7311
+        },
+        "0.67": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7727,
+          "source_recall": 0.6155,
+          "precision": 0.6423,
+          "mrr": 0.7008,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.7083,
+          "abstention_by_type": {
+            "unanswerable": 0.5625,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7405
+        },
+        "0.68": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.75,
+          "source_recall": 0.6042,
+          "precision": 0.6581,
+          "mrr": 0.6894,
+          "fact_hit_rate": 0.7045,
+          "abstention_rate": 0.8333,
+          "abstention_by_type": {
+            "unanswerable": 0.75,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7916
+        },
+        "0.69": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7727,
+          "source_recall": 0.6383,
+          "precision": 0.7477,
+          "mrr": 0.7235,
+          "fact_hit_rate": 0.7273,
+          "abstention_rate": 0.875,
+          "abstention_by_type": {
+            "unanswerable": 0.8125,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8238
+        },
+        "0.7": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7273,
+          "source_recall": 0.5871,
+          "precision": 0.7714,
+          "mrr": 0.6932,
+          "fact_hit_rate": 0.7045,
+          "abstention_rate": 0.9583,
+          "abstention_by_type": {
+            "unanswerable": 0.9375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8428
+        },
+        "0.71": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7045,
+          "source_recall": 0.5871,
+          "precision": 0.8039,
+          "mrr": 0.6705,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8522
+        },
+        "0.72": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7273,
+          "source_recall": 0.572,
+          "precision": 0.7929,
+          "mrr": 0.6629,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8637
+        },
+        "0.73": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.6818,
+          "source_recall": 0.5208,
+          "precision": 0.7849,
+          "mrr": 0.6098,
+          "fact_hit_rate": 0.6364,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8409
+        },
+        "0.74": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.5682,
+          "source_recall": 0.447,
+          "precision": 0.7321,
+          "mrr": 0.5227,
+          "fact_hit_rate": 0.5682,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7841
+        },
+        "0.75": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.5455,
+          "source_recall": 0.4053,
+          "precision": 0.8141,
+          "mrr": 0.5114,
+          "fact_hit_rate": 0.5455,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7728
+        },
+        "0.76": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.5,
+          "source_recall": 0.3561,
+          "precision": 0.8841,
+          "mrr": 0.4886,
+          "fact_hit_rate": 0.5,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.75
+        },
+        "0.77": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.4773,
+          "source_recall": 0.3333,
+          "precision": 0.8939,
+          "mrr": 0.4659,
+          "fact_hit_rate": 0.4545,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7387
+        },
+        "0.78": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.3636,
+          "source_recall": 0.2557,
+          "precision": 0.9479,
+          "mrr": 0.3523,
+          "fact_hit_rate": 0.3636,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6818
+        },
+        "0.79": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.2045,
+          "source_recall": 0.1269,
+          "precision": 1.0,
+          "mrr": 0.2045,
+          "fact_hit_rate": 0.2045,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6022
+        },
+        "0.8": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.1818,
+          "source_recall": 0.0928,
+          "precision": 1.0,
+          "mrr": 0.1818,
+          "fact_hit_rate": 0.1818,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5909
+        },
+        "0.81": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.1364,
+          "source_recall": 0.0587,
+          "precision": 1.0,
+          "mrr": 0.1364,
+          "fact_hit_rate": 0.1136,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5682
+        },
+        "0.82": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0682,
+          "source_recall": 0.0246,
+          "precision": 1.0,
+          "mrr": 0.0682,
+          "fact_hit_rate": 0.0682,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5341
+        },
+        "0.83": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0455,
+          "source_recall": 0.0189,
+          "precision": 1.0,
+          "mrr": 0.0455,
+          "fact_hit_rate": 0.0455,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5228
+        },
+        "0.84": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0227,
+          "source_recall": 0.0076,
+          "precision": 1.0,
+          "mrr": 0.0227,
+          "fact_hit_rate": 0.0227,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5113
+        },
+        "0.85": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.86": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.87": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.88": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.89": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.9": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        }
+      },
+      "selected_min_semantic": 0.72,
+      "selected": {
+        "metrics": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7273,
+          "source_recall": 0.572,
+          "precision": 0.7929,
+          "mrr": 0.6629,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8637
+        },
+        "per_query": [
+          {
+            "id": "rq-001",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-stress",
+              "odphp-manage-stress",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-003",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-enough-sleep",
+              "nia-sleep-and-older-adults",
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-005",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-007",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-active"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-009",
+            "type": "answerable",
+            "retrieved": [
+              "niddk-changing-habits-better-health",
+              "odphp-get-active",
+              "odphp-get-active"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-011",
+            "type": "answerable",
+            "retrieved": [
+              "nimh-caring-for-your-mental-health",
+              "medlineplus-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-013",
+            "type": "answerable",
+            "retrieved": [
+              "nia-how-talk-your-doctor-about-sensitive-issues"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-015",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-017",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-enough-sleep",
+              "odphp-get-enough-sleep",
+              "medlineplus-healthy-sleep"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-019",
+            "type": "answerable",
+            "retrieved": [
+              "nimh-caring-for-your-mental-health",
+              "nimh-so-stressed-out-fact-sheet",
+              "medlineplus-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-021",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-023",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-025",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-enough-sleep",
+              "cdc-sleep-about"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-027",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-029",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-conversations-matter"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-031",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-manage-stress",
+              "nimh-so-stressed-out-fact-sheet",
+              "nimh-so-stressed-out-fact-sheet"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-033",
+            "type": "answerable",
+            "retrieved": [
+              "nia-how-talk-your-doctor-about-sensitive-issues"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-035",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-wellness-and-well-being",
+              "nccih-wellness-and-well-being"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-037",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-039",
+            "type": "answerable",
+            "retrieved": [
+              "nia-sleep-and-older-adults",
+              "nia-sleep-and-older-adults"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-041",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep",
+              "odphp-get-enough-sleep",
+              "cdc-sleep-about"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-043",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-managing-difficult-emotions",
+              "nia-how-talk-your-doctor-about-sensitive-issues",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-045",
+            "type": "answerable",
+            "retrieved": [
+              "nia-tips-getting-and-staying-active-you-age",
+              "odphp-get-active",
+              "cdc-physical-activity-overcoming-barriers"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-047",
+            "type": "answerable",
+            "retrieved": [
+              "nimh-so-stressed-out-fact-sheet",
+              "odphp-manage-stress",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-049",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-enough-sleep",
+              "odphp-get-enough-sleep"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-051",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-manage-stress",
+              "odphp-manage-stress",
+              "cdc-improve-your-emotional-well-being"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-053",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-055",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-wellness-and-well-being",
+              "nccih-wellness-and-well-being"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-057",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-059",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-061",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders",
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-063",
+            "type": "answerable",
+            "retrieved": [
+              "nia-how-talk-your-doctor-about-sensitive-issues"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-065",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders",
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-067",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-069",
+            "type": "answerable",
+            "retrieved": [
+              "nia-tips-getting-and-staying-active-you-age"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-071",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-073",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-075",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-077",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-079",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-081",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-083",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-085",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-stress",
+              "odphp-manage-stress",
+              "cdc-physical-activity-overcoming-barriers"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-087",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-stress",
+              "odphp-manage-stress",
+              "nccih-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-088",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-090",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-092",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-094",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-096",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-098",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-100",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-102",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-104",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-106",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-108",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-110",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-112",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-114",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-116",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-118",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-120",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-122",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-124",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-126",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-128",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-130",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-132",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-134",
+            "type": "off_topic",
+            "retrieved": []
+          }
+        ]
+      },
+      "lexical_fallback": {
+        "selected_min_lexical": 0.4,
+        "metrics": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.6364,
+          "source_recall": 0.5038,
+          "precision": 0.4187,
+          "mrr": 0.5038,
+          "fact_hit_rate": 0.3864,
+          "abstention_rate": 0.75,
+          "abstention_by_type": {
+            "unanswerable": 0.6875,
+            "off_topic": 0.875
+          },
+          "balanced": 0.6932
+        }
+      }
+    },
+    {
+      "chunking": "chunker1:180/30/25",
+      "chunks": 274,
+      "documents": 26,
+      "sweep": {
+        "0.5": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.7027,
+          "precision": 0.5227,
+          "mrr": 0.7955,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.1667,
+          "abstention_by_type": {
+            "unanswerable": 0.0,
+            "off_topic": 0.5
+          },
+          "balanced": 0.5151
+        },
+        "0.51": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.7027,
+          "precision": 0.5227,
+          "mrr": 0.7955,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.25,
+          "abstention_by_type": {
+            "unanswerable": 0.0,
+            "off_topic": 0.75
+          },
+          "balanced": 0.5568
+        },
+        "0.52": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.7027,
+          "precision": 0.5227,
+          "mrr": 0.7955,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.25,
+          "abstention_by_type": {
+            "unanswerable": 0.0,
+            "off_topic": 0.75
+          },
+          "balanced": 0.5568
+        },
+        "0.53": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.7027,
+          "precision": 0.5227,
+          "mrr": 0.7955,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.25,
+          "abstention_by_type": {
+            "unanswerable": 0.0,
+            "off_topic": 0.75
+          },
+          "balanced": 0.5568
+        },
+        "0.54": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.7027,
+          "precision": 0.5227,
+          "mrr": 0.7955,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.2917,
+          "abstention_by_type": {
+            "unanswerable": 0.0625,
+            "off_topic": 0.75
+          },
+          "balanced": 0.5776
+        },
+        "0.55": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.7027,
+          "precision": 0.5227,
+          "mrr": 0.7955,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.375,
+          "abstention_by_type": {
+            "unanswerable": 0.125,
+            "off_topic": 0.875
+          },
+          "balanced": 0.6193
+        },
+        "0.56": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.7027,
+          "precision": 0.5227,
+          "mrr": 0.7955,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.375,
+          "abstention_by_type": {
+            "unanswerable": 0.125,
+            "off_topic": 0.875
+          },
+          "balanced": 0.6193
+        },
+        "0.57": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.7027,
+          "precision": 0.5227,
+          "mrr": 0.7955,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.375,
+          "abstention_by_type": {
+            "unanswerable": 0.125,
+            "off_topic": 0.875
+          },
+          "balanced": 0.6193
+        },
+        "0.58": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.7027,
+          "precision": 0.5227,
+          "mrr": 0.7955,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.4583,
+          "abstention_by_type": {
+            "unanswerable": 0.1875,
+            "off_topic": 1.0
+          },
+          "balanced": 0.661
+        },
+        "0.59": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.7027,
+          "precision": 0.5227,
+          "mrr": 0.7955,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.4583,
+          "abstention_by_type": {
+            "unanswerable": 0.1875,
+            "off_topic": 1.0
+          },
+          "balanced": 0.661
+        },
+        "0.6": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8409,
+          "source_recall": 0.6799,
+          "precision": 0.5227,
+          "mrr": 0.7955,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.5,
+          "abstention_by_type": {
+            "unanswerable": 0.25,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6704
+        },
+        "0.61": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8409,
+          "source_recall": 0.6799,
+          "precision": 0.5227,
+          "mrr": 0.7955,
+          "fact_hit_rate": 0.6136,
+          "abstention_rate": 0.5833,
+          "abstention_by_type": {
+            "unanswerable": 0.375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7121
+        },
+        "0.62": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8182,
+          "source_recall": 0.6686,
+          "precision": 0.5581,
+          "mrr": 0.7841,
+          "fact_hit_rate": 0.6591,
+          "abstention_rate": 0.5833,
+          "abstention_by_type": {
+            "unanswerable": 0.375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7007
+        },
+        "0.63": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8182,
+          "source_recall": 0.6761,
+          "precision": 0.5714,
+          "mrr": 0.7727,
+          "fact_hit_rate": 0.6591,
+          "abstention_rate": 0.625,
+          "abstention_by_type": {
+            "unanswerable": 0.4375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7216
+        },
+        "0.64": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8182,
+          "source_recall": 0.6761,
+          "precision": 0.5894,
+          "mrr": 0.7727,
+          "fact_hit_rate": 0.6591,
+          "abstention_rate": 0.625,
+          "abstention_by_type": {
+            "unanswerable": 0.4375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7216
+        },
+        "0.65": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8182,
+          "source_recall": 0.6761,
+          "precision": 0.5976,
+          "mrr": 0.7689,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.6667,
+          "abstention_by_type": {
+            "unanswerable": 0.5,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7425
+        },
+        "0.66": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8182,
+          "source_recall": 0.6875,
+          "precision": 0.6057,
+          "mrr": 0.7689,
+          "fact_hit_rate": 0.6591,
+          "abstention_rate": 0.6667,
+          "abstention_by_type": {
+            "unanswerable": 0.5,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7425
+        },
+        "0.67": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7955,
+          "source_recall": 0.6648,
+          "precision": 0.6179,
+          "mrr": 0.7462,
+          "fact_hit_rate": 0.6364,
+          "abstention_rate": 0.75,
+          "abstention_by_type": {
+            "unanswerable": 0.625,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7728
+        },
+        "0.68": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7727,
+          "source_recall": 0.6534,
+          "precision": 0.6581,
+          "mrr": 0.7273,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.8333,
+          "abstention_by_type": {
+            "unanswerable": 0.75,
+            "off_topic": 1.0
+          },
+          "balanced": 0.803
+        },
+        "0.69": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7727,
+          "source_recall": 0.6648,
+          "precision": 0.7117,
+          "mrr": 0.7386,
+          "fact_hit_rate": 0.7273,
+          "abstention_rate": 0.8333,
+          "abstention_by_type": {
+            "unanswerable": 0.75,
+            "off_topic": 1.0
+          },
+          "balanced": 0.803
+        },
+        "0.7": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7727,
+          "source_recall": 0.6591,
+          "precision": 0.7315,
+          "mrr": 0.7348,
+          "fact_hit_rate": 0.7273,
+          "abstention_rate": 0.9583,
+          "abstention_by_type": {
+            "unanswerable": 0.9375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8655
+        },
+        "0.71": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7273,
+          "source_recall": 0.6023,
+          "precision": 0.7843,
+          "mrr": 0.6894,
+          "fact_hit_rate": 0.7045,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8637
+        },
+        "0.72": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.6818,
+          "source_recall": 0.5227,
+          "precision": 0.7656,
+          "mrr": 0.6477,
+          "fact_hit_rate": 0.6364,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8409
+        },
+        "0.73": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7045,
+          "source_recall": 0.5265,
+          "precision": 0.8073,
+          "mrr": 0.6591,
+          "fact_hit_rate": 0.6591,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8522
+        },
+        "0.74": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.6136,
+          "source_recall": 0.464,
+          "precision": 0.7586,
+          "mrr": 0.5568,
+          "fact_hit_rate": 0.5682,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8068
+        },
+        "0.75": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.5,
+          "source_recall": 0.375,
+          "precision": 0.8077,
+          "mrr": 0.5,
+          "fact_hit_rate": 0.4773,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.75
+        },
+        "0.76": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.4545,
+          "source_recall": 0.3295,
+          "precision": 0.8636,
+          "mrr": 0.4545,
+          "fact_hit_rate": 0.4318,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7272
+        },
+        "0.77": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.4091,
+          "source_recall": 0.2765,
+          "precision": 0.9815,
+          "mrr": 0.4091,
+          "fact_hit_rate": 0.3636,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7046
+        },
+        "0.78": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.2727,
+          "source_recall": 0.1951,
+          "precision": 0.9722,
+          "mrr": 0.2727,
+          "fact_hit_rate": 0.25,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6363
+        },
+        "0.79": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.2045,
+          "source_recall": 0.1307,
+          "precision": 1.0,
+          "mrr": 0.2045,
+          "fact_hit_rate": 0.1818,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6022
+        },
+        "0.8": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.1591,
+          "source_recall": 0.0663,
+          "precision": 1.0,
+          "mrr": 0.1591,
+          "fact_hit_rate": 0.1591,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5796
+        },
+        "0.81": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.1364,
+          "source_recall": 0.0549,
+          "precision": 1.0,
+          "mrr": 0.1364,
+          "fact_hit_rate": 0.1364,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5682
+        },
+        "0.82": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0682,
+          "source_recall": 0.0246,
+          "precision": 1.0,
+          "mrr": 0.0682,
+          "fact_hit_rate": 0.0682,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5341
+        },
+        "0.83": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0227,
+          "source_recall": 0.0076,
+          "precision": 1.0,
+          "mrr": 0.0227,
+          "fact_hit_rate": 0.0227,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5113
+        },
+        "0.84": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0227,
+          "source_recall": 0.0076,
+          "precision": 1.0,
+          "mrr": 0.0227,
+          "fact_hit_rate": 0.0227,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5113
+        },
+        "0.85": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.86": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.87": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.88": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.89": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.9": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        }
+      },
+      "selected_min_semantic": 0.7,
+      "selected": {
+        "metrics": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7727,
+          "source_recall": 0.6591,
+          "precision": 0.7315,
+          "mrr": 0.7348,
+          "fact_hit_rate": 0.7273,
+          "abstention_rate": 0.9583,
+          "abstention_by_type": {
+            "unanswerable": 0.9375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8655
+        },
+        "per_query": [
+          {
+            "id": "rq-001",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-stress",
+              "nccih-stress",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-003",
+            "type": "answerable",
+            "retrieved": [
+              "nia-sleep-and-older-adults",
+              "odphp-get-enough-sleep",
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-005",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep",
+              "medlineplus-healthy-sleep"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-007",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-active",
+              "odphp-get-active"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-009",
+            "type": "answerable",
+            "retrieved": [
+              "niddk-changing-habits-better-health",
+              "odphp-get-active",
+              "odphp-get-active"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-011",
+            "type": "answerable",
+            "retrieved": [
+              "nimh-caring-for-your-mental-health",
+              "medlineplus-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-013",
+            "type": "answerable",
+            "retrieved": [
+              "nia-how-talk-your-doctor-about-sensitive-issues",
+              "nia-how-talk-your-doctor-about-sensitive-issues"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-015",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-017",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-enough-sleep",
+              "medlineplus-healthy-sleep",
+              "odphp-get-enough-sleep"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-019",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-manage-stress",
+              "nimh-caring-for-your-mental-health",
+              "nimh-so-stressed-out-fact-sheet"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-021",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-023",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-stress",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-025",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-enough-sleep",
+              "cdc-sleep-about",
+              "cdc-sleep-about"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-027",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-029",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-conversations-matter",
+              "cdc-managing-difficult-emotions",
+              "cdc-conversations-matter"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-031",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-manage-stress",
+              "cdc-managing-difficult-emotions",
+              "nimh-so-stressed-out-fact-sheet"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-033",
+            "type": "answerable",
+            "retrieved": [
+              "nia-how-talk-your-doctor-about-sensitive-issues"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-035",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-wellness-and-well-being",
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-037",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-stress",
+              "nccih-stress",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-039",
+            "type": "answerable",
+            "retrieved": [
+              "nia-sleep-and-older-adults",
+              "nia-sleep-and-older-adults"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-041",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep",
+              "medlineplus-healthy-sleep",
+              "odphp-get-enough-sleep"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-043",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-managing-difficult-emotions",
+              "nia-how-talk-your-doctor-about-sensitive-issues",
+              "nia-how-talk-your-doctor-about-sensitive-issues"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-045",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-active",
+              "odphp-get-active",
+              "cdc-physical-activity-overcoming-barriers"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-047",
+            "type": "answerable",
+            "retrieved": [
+              "nimh-so-stressed-out-fact-sheet",
+              "nccih-stress",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-049",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-enough-sleep",
+              "odphp-get-enough-sleep",
+              "cdc-sleep-about"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-051",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-manage-stress",
+              "cdc-improve-your-emotional-well-being",
+              "nccih-stress"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-053",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-055",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-wellness-and-well-being",
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-057",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-059",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-061",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders",
+              "odphp-get-enough-sleep",
+              "nia-sleep-and-older-adults"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-063",
+            "type": "answerable",
+            "retrieved": [
+              "nia-how-talk-your-doctor-about-sensitive-issues"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-065",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-067",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-069",
+            "type": "answerable",
+            "retrieved": [
+              "nia-tips-getting-and-staying-active-you-age",
+              "odphp-manage-stress",
+              "odphp-get-active"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-071",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-073",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-075",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-077",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-social-connectedness-improving",
+              "cdc-improve-your-emotional-well-being"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-079",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-081",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-improve-your-emotional-well-being",
+              "nimh-caring-for-your-mental-health"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-083",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-085",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-stress",
+              "odphp-manage-stress",
+              "cdc-physical-activity-overcoming-barriers"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-087",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-stress",
+              "nccih-stress",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-088",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-090",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-092",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-094",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-096",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-098",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-100",
+            "type": "unanswerable",
+            "retrieved": [
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ]
+          },
+          {
+            "id": "rq-102",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-104",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-106",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-108",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-110",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-112",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-114",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-116",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-118",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-120",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-122",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-124",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-126",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-128",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-130",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-132",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-134",
+            "type": "off_topic",
+            "retrieved": []
+          }
+        ]
+      },
+      "lexical_fallback": {
+        "selected_min_lexical": 0.46,
+        "metrics": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.5909,
+          "source_recall": 0.4527,
+          "precision": 0.4017,
+          "mrr": 0.5152,
+          "fact_hit_rate": 0.3864,
+          "abstention_rate": 0.8333,
+          "abstention_by_type": {
+            "unanswerable": 0.75,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7121
+        }
+      }
+    },
+    {
+      "chunking": "chunker1:260/40/30",
+      "chunks": 241,
+      "documents": 26,
+      "sweep": {
+        "0.5": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.733,
+          "precision": 0.5227,
+          "mrr": 0.8144,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.1667,
+          "abstention_by_type": {
+            "unanswerable": 0.0,
+            "off_topic": 0.5
+          },
+          "balanced": 0.5151
+        },
+        "0.51": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.733,
+          "precision": 0.5227,
+          "mrr": 0.8144,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.25,
+          "abstention_by_type": {
+            "unanswerable": 0.0,
+            "off_topic": 0.75
+          },
+          "balanced": 0.5568
+        },
+        "0.52": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.733,
+          "precision": 0.5227,
+          "mrr": 0.8144,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.25,
+          "abstention_by_type": {
+            "unanswerable": 0.0,
+            "off_topic": 0.75
+          },
+          "balanced": 0.5568
+        },
+        "0.53": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.733,
+          "precision": 0.5227,
+          "mrr": 0.8144,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.2917,
+          "abstention_by_type": {
+            "unanswerable": 0.0625,
+            "off_topic": 0.75
+          },
+          "balanced": 0.5776
+        },
+        "0.54": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.733,
+          "precision": 0.5227,
+          "mrr": 0.8144,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.2917,
+          "abstention_by_type": {
+            "unanswerable": 0.0625,
+            "off_topic": 0.75
+          },
+          "balanced": 0.5776
+        },
+        "0.55": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.733,
+          "precision": 0.5227,
+          "mrr": 0.8144,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.375,
+          "abstention_by_type": {
+            "unanswerable": 0.125,
+            "off_topic": 0.875
+          },
+          "balanced": 0.6193
+        },
+        "0.56": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.733,
+          "precision": 0.5227,
+          "mrr": 0.8144,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.375,
+          "abstention_by_type": {
+            "unanswerable": 0.125,
+            "off_topic": 0.875
+          },
+          "balanced": 0.6193
+        },
+        "0.57": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.733,
+          "precision": 0.5227,
+          "mrr": 0.8144,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.4167,
+          "abstention_by_type": {
+            "unanswerable": 0.125,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6401
+        },
+        "0.58": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.733,
+          "precision": 0.5227,
+          "mrr": 0.8144,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.5,
+          "abstention_by_type": {
+            "unanswerable": 0.25,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6818
+        },
+        "0.59": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8636,
+          "source_recall": 0.733,
+          "precision": 0.5227,
+          "mrr": 0.8144,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.5,
+          "abstention_by_type": {
+            "unanswerable": 0.25,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6818
+        },
+        "0.6": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8409,
+          "source_recall": 0.7102,
+          "precision": 0.5227,
+          "mrr": 0.803,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.5,
+          "abstention_by_type": {
+            "unanswerable": 0.25,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6704
+        },
+        "0.61": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8409,
+          "source_recall": 0.7102,
+          "precision": 0.5303,
+          "mrr": 0.803,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.5833,
+          "abstention_by_type": {
+            "unanswerable": 0.375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7121
+        },
+        "0.62": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8409,
+          "source_recall": 0.7102,
+          "precision": 0.5492,
+          "mrr": 0.803,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.5833,
+          "abstention_by_type": {
+            "unanswerable": 0.375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7121
+        },
+        "0.63": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8182,
+          "source_recall": 0.6951,
+          "precision": 0.5659,
+          "mrr": 0.7803,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.625,
+          "abstention_by_type": {
+            "unanswerable": 0.4375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7216
+        },
+        "0.64": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8182,
+          "source_recall": 0.6837,
+          "precision": 0.5813,
+          "mrr": 0.7652,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.625,
+          "abstention_by_type": {
+            "unanswerable": 0.4375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7216
+        },
+        "0.65": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.8182,
+          "source_recall": 0.6837,
+          "precision": 0.5976,
+          "mrr": 0.7765,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.6667,
+          "abstention_by_type": {
+            "unanswerable": 0.5,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7425
+        },
+        "0.66": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7955,
+          "source_recall": 0.6837,
+          "precision": 0.6016,
+          "mrr": 0.7576,
+          "fact_hit_rate": 0.6591,
+          "abstention_rate": 0.7083,
+          "abstention_by_type": {
+            "unanswerable": 0.5625,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7519
+        },
+        "0.67": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7955,
+          "source_recall": 0.6951,
+          "precision": 0.6179,
+          "mrr": 0.7576,
+          "fact_hit_rate": 0.6591,
+          "abstention_rate": 0.75,
+          "abstention_by_type": {
+            "unanswerable": 0.625,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7728
+        },
+        "0.68": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7955,
+          "source_recall": 0.6837,
+          "precision": 0.641,
+          "mrr": 0.7576,
+          "fact_hit_rate": 0.6818,
+          "abstention_rate": 0.8333,
+          "abstention_by_type": {
+            "unanswerable": 0.75,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8144
+        },
+        "0.69": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7955,
+          "source_recall": 0.6951,
+          "precision": 0.7072,
+          "mrr": 0.7424,
+          "fact_hit_rate": 0.75,
+          "abstention_rate": 0.8333,
+          "abstention_by_type": {
+            "unanswerable": 0.75,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8144
+        },
+        "0.7": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7727,
+          "source_recall": 0.6553,
+          "precision": 0.7269,
+          "mrr": 0.7197,
+          "fact_hit_rate": 0.7273,
+          "abstention_rate": 0.9583,
+          "abstention_by_type": {
+            "unanswerable": 0.9375,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8655
+        },
+        "0.71": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.75,
+          "source_recall": 0.6326,
+          "precision": 0.7685,
+          "mrr": 0.7121,
+          "fact_hit_rate": 0.7045,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.875
+        },
+        "0.72": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.7045,
+          "source_recall": 0.5568,
+          "precision": 0.7813,
+          "mrr": 0.6553,
+          "fact_hit_rate": 0.6591,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8522
+        },
+        "0.73": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.6818,
+          "source_recall": 0.5265,
+          "precision": 0.8118,
+          "mrr": 0.6364,
+          "fact_hit_rate": 0.6364,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8409
+        },
+        "0.74": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.6136,
+          "source_recall": 0.464,
+          "precision": 0.7701,
+          "mrr": 0.5568,
+          "fact_hit_rate": 0.5682,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.8068
+        },
+        "0.75": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.5,
+          "source_recall": 0.375,
+          "precision": 0.8077,
+          "mrr": 0.5,
+          "fact_hit_rate": 0.4773,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.75
+        },
+        "0.76": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.4545,
+          "source_recall": 0.3295,
+          "precision": 0.8636,
+          "mrr": 0.4545,
+          "fact_hit_rate": 0.4091,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7272
+        },
+        "0.77": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.3864,
+          "source_recall": 0.2538,
+          "precision": 0.9804,
+          "mrr": 0.3864,
+          "fact_hit_rate": 0.3409,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6932
+        },
+        "0.78": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.25,
+          "source_recall": 0.1723,
+          "precision": 0.9697,
+          "mrr": 0.25,
+          "fact_hit_rate": 0.2273,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.625
+        },
+        "0.79": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.2045,
+          "source_recall": 0.1193,
+          "precision": 1.0,
+          "mrr": 0.2045,
+          "fact_hit_rate": 0.1818,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6022
+        },
+        "0.8": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.1364,
+          "source_recall": 0.0549,
+          "precision": 1.0,
+          "mrr": 0.1364,
+          "fact_hit_rate": 0.1364,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5682
+        },
+        "0.81": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.1136,
+          "source_recall": 0.0436,
+          "precision": 1.0,
+          "mrr": 0.1136,
+          "fact_hit_rate": 0.1136,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5568
+        },
+        "0.82": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0682,
+          "source_recall": 0.0246,
+          "precision": 1.0,
+          "mrr": 0.0682,
+          "fact_hit_rate": 0.0682,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5341
+        },
+        "0.83": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0227,
+          "source_recall": 0.0076,
+          "precision": 1.0,
+          "mrr": 0.0227,
+          "fact_hit_rate": 0.0227,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5113
+        },
+        "0.84": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0227,
+          "source_recall": 0.0076,
+          "precision": 1.0,
+          "mrr": 0.0227,
+          "fact_hit_rate": 0.0227,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5113
+        },
+        "0.85": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.86": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.87": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.88": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.89": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        },
+        "0.9": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.0,
+          "source_recall": 0.0,
+          "precision": null,
+          "mrr": 0.0,
+          "fact_hit_rate": 0.0,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.5
+        }
+      },
+      "selected_min_semantic": 0.71,
+      "selected": {
+        "metrics": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.75,
+          "source_recall": 0.6326,
+          "precision": 0.7685,
+          "mrr": 0.7121,
+          "fact_hit_rate": 0.7045,
+          "abstention_rate": 1.0,
+          "abstention_by_type": {
+            "unanswerable": 1.0,
+            "off_topic": 1.0
+          },
+          "balanced": 0.875
+        },
+        "per_query": [
+          {
+            "id": "rq-001",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-stress",
+              "odphp-manage-stress",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-003",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders",
+              "nia-sleep-and-older-adults",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-005",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-007",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-active",
+              "odphp-get-active"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-009",
+            "type": "answerable",
+            "retrieved": [
+              "niddk-changing-habits-better-health",
+              "odphp-get-active",
+              "odphp-get-active"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-011",
+            "type": "answerable",
+            "retrieved": [
+              "nimh-caring-for-your-mental-health",
+              "medlineplus-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-013",
+            "type": "answerable",
+            "retrieved": [
+              "nia-how-talk-your-doctor-about-sensitive-issues",
+              "nia-how-talk-your-doctor-about-sensitive-issues"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-015",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-017",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep",
+              "odphp-get-enough-sleep",
+              "odphp-get-enough-sleep"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-019",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-manage-stress",
+              "nimh-caring-for-your-mental-health",
+              "nimh-so-stressed-out-fact-sheet"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-021",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-023",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-025",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-enough-sleep",
+              "cdc-sleep-about",
+              "cdc-sleep-about"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-027",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-029",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-conversations-matter",
+              "cdc-managing-difficult-emotions"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-031",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-manage-stress",
+              "cdc-managing-difficult-emotions",
+              "nimh-so-stressed-out-fact-sheet"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-033",
+            "type": "answerable",
+            "retrieved": [
+              "nia-how-talk-your-doctor-about-sensitive-issues"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-035",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-wellness-and-well-being"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-037",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-039",
+            "type": "answerable",
+            "retrieved": [
+              "nia-sleep-and-older-adults",
+              "nia-sleep-and-older-adults"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-041",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep",
+              "odphp-get-enough-sleep",
+              "odphp-get-enough-sleep"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-043",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-managing-difficult-emotions",
+              "nia-how-talk-your-doctor-about-sensitive-issues",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-045",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-active",
+              "odphp-get-active",
+              "cdc-physical-activity-overcoming-barriers"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-047",
+            "type": "answerable",
+            "retrieved": [
+              "nimh-so-stressed-out-fact-sheet",
+              "odphp-manage-stress",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-049",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-enough-sleep",
+              "odphp-get-enough-sleep",
+              "cdc-sleep-about"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-051",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-improve-your-emotional-well-being",
+              "odphp-manage-stress",
+              "nccih-stress"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-053",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-055",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-wellness-and-well-being"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-057",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-059",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-061",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders",
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nia-sleep-and-older-adults"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-063",
+            "type": "answerable",
+            "retrieved": [
+              "nia-how-talk-your-doctor-about-sensitive-issues"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-065",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders",
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "medlineplus-healthy-sleep"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-067",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-069",
+            "type": "answerable",
+            "retrieved": [
+              "nia-tips-getting-and-staying-active-you-age"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-071",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-073",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-075",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-077",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-improve-your-emotional-well-being"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-079",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-stress",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-081",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-improve-your-emotional-well-being"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-083",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-085",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-stress",
+              "odphp-manage-stress",
+              "cdc-physical-activity-overcoming-barriers"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-087",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-stress",
+              "nccih-stress",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-088",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-090",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-092",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-094",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-096",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-098",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-100",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-102",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-104",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-106",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-108",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-110",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-112",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-114",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-116",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-118",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-120",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-122",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-124",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-126",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-128",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-130",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-132",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-134",
+            "type": "off_topic",
+            "retrieved": []
+          }
+        ]
+      },
+      "lexical_fallback": {
+        "selected_min_lexical": 0.5,
+        "metrics": {
+          "answerable": 44,
+          "negative": 24,
+          "hit_rate": 0.6364,
+          "source_recall": 0.5076,
+          "precision": 0.4737,
+          "mrr": 0.5417,
+          "fact_hit_rate": 0.4318,
+          "abstention_rate": 0.8333,
+          "abstention_by_type": {
+            "unanswerable": 0.75,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7349
+        }
+      }
+    }
+  ]
+}

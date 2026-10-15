@@ -499,6 +499,8 @@ async def eval_retrieval(args: argparse.Namespace) -> int:
                 run["selected"] = sweep[best]
             if args.reranker:
                 scores = rerank_scores(args.reranker, scored)
+                # The reranker-score gate is swept on dev only.
+                gate_thresholds = RERANK_THRESHOLDS if args.min_semantic is None else [0.0]
                 gate = {
                     t: score(
                         scored,
@@ -506,7 +508,7 @@ async def eval_retrieval(args: argparse.Namespace) -> int:
                         lexical_only=False,
                         select=reranked(scores, base, threshold=t, semantic_gate=None),
                     )
-                    for t in RERANK_THRESHOLDS
+                    for t in gate_thresholds
                 }
                 best_gate = select(gate)
                 ordering = score(

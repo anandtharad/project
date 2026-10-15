@@ -1,0 +1,252 @@
+{
+  "eval": "rag-routing",
+  "split": "test",
+  "dataset": "eval/datasets/rag/v1/routing.jsonl",
+  "dataset_sha256": "70fc1fc3c8b8a6641374be5b0fe08da96ebeee4b52260920f9b1b6aa5e871033",
+  "metrics": {
+    "n": 100,
+    "positives": 45,
+    "negatives": 55,
+    "unnecessary_retrieval_rate": 0.2364,
+    "missed_rate": 0.2444,
+    "precision": 0.7234,
+    "recall": 0.7556,
+    "per_kind": {
+      "casual": {
+        "n": 16,
+        "correct": 16
+      },
+      "current_info": {
+        "n": 4,
+        "correct": 3
+      },
+      "evidence": {
+        "n": 8,
+        "correct": 6
+      },
+      "factual": {
+        "n": 28,
+        "correct": 22
+      },
+      "off_topic": {
+        "n": 16,
+        "correct": 3
+      },
+      "reflection": {
+        "n": 23,
+        "correct": 23
+      },
+      "source_followup": {
+        "n": 5,
+        "correct": 3
+      }
+    },
+    "lookups_on_negatives": 0.2364,
+    "evidence": {
+      "min_semantic": 0.7,
+      "evidence_on_negatives": 0.0,
+      "evidence_on_positives": 0.6222,
+      "by_kind": {
+        "casual": {
+          "n": 16,
+          "evidence": 0
+        },
+        "current_info": {
+          "n": 4,
+          "evidence": 3
+        },
+        "evidence": {
+          "n": 8,
+          "evidence": 5
+        },
+        "factual": {
+          "n": 28,
+          "evidence": 17
+        },
+        "off_topic": {
+          "n": 16,
+          "evidence": 0
+        },
+        "reflection": {
+          "n": 23,
+          "evidence": 0
+        },
+        "source_followup": {
+          "n": 5,
+          "evidence": 3
+        }
+      },
+      "negatives_with_evidence": []
+    }
+  },
+  "errors": [
+    {
+      "id": "rt2-001",
+      "want": true,
+      "kind": "evidence",
+      "routed": "reflection",
+      "reason": "no_request"
+    },
+    {
+      "id": "rt2-003",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-004",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-008",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-010",
+      "want": true,
+      "kind": "factual",
+      "routed": "reflection",
+      "reason": "no_request"
+    },
+    {
+      "id": "rt2-012",
+      "want": true,
+      "kind": "factual",
+      "routed": "reflection",
+      "reason": "no_request"
+    },
+    {
+      "id": "rt2-018",
+      "want": true,
+      "kind": "current_info",
+      "routed": "reflection",
+      "reason": "no_request"
+    },
+    {
+      "id": "rt2-035",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-036",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-038",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-042",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-048",
+      "want": true,
+      "kind": "factual",
+      "routed": "reflection",
+      "reason": "no_request"
+    },
+    {
+      "id": "rt2-055",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-056",
+      "want": true,
+      "kind": "source_followup",
+      "routed": "reflection",
+      "reason": "no_request"
+    },
+    {
+      "id": "rt2-064",
+      "want": true,
+      "kind": "source_followup",
+      "routed": "reflection",
+      "reason": "no_request"
+    },
+    {
+      "id": "rt2-067",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-071",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-072",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-073",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-081",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt2-082",
+      "want": true,
+      "kind": "evidence",
+      "routed": "reflection",
+      "reason": "no_request"
+    },
+    {
+      "id": "rt2-087",
+      "want": true,
+      "kind": "factual",
+      "routed": "casual",
+      "reason": "about_the_companion"
+    },
+    {
+      "id": "rt2-088",
+      "want": true,
+      "kind": "factual",
+      "routed": "reflection",
+      "reason": "no_request"
+    },
+    {
+      "id": "rt2-096",
+      "want": true,
+      "kind": "factual",
+      "routed": "reflection",
+      "reason": "no_request"
+    }
+  ]
+}
