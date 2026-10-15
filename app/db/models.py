@@ -10,7 +10,7 @@ through new migrations.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from enum import StrEnum
 from typing import Any
 
@@ -18,6 +18,8 @@ from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
+    Computed,
+    Date,
     DateTime,
     Float,
     ForeignKey,
@@ -32,7 +34,7 @@ from sqlalchemy import (
     func,
     text,
 )
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 NAMING_CONVENTION = {
@@ -304,3 +306,72 @@ class UserMemorySettings(Base):
     # Last "delete all": memories from messages sent before it are not stored.
     memories_cleared_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class KnowledgeDocument(Base):
+    """One version of a reviewed knowledge source (spec §11.3). A changed
+    source gets a new version row; old versions are retired, not deleted, so
+    citations stored with earlier replies keep resolving."""
+
+    __tablename__ = "knowledge_documents"
+    __table_args__ = (
+        UniqueConstraint("source_key", "version", name="uq_knowledge_documents_source_version"),
+        CheckConstraint("review_status IN ('approved', 'retired')", name="review_status_valid"),
+        Index(
+            "uq_knowledge_documents_one_current",
+            "source_key",
+            unique=True,
+            postgresql_where=text("review_status = 'approved'"),
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    source_key: Mapped[str] = mapped_column(String(128))
+    version: Mapped[int] = mapped_column(Integer)
+    url: Mapped[str] = mapped_column(Text)
+    title: Mapped[str] = mapped_column(Text)
+    publisher: Mapped[str] = mapped_column(String(128))
+    licence: Mapped[str] = mapped_column(String(128))
+    licence_url: Mapped[str | None] = mapped_column(Text)
+    attribution: Mapped[str | None] = mapped_column(Text)
+    reviewed_on: Mapped[date | None] = mapped_column(Date)
+    topics: Mapped[list[str]] = mapped_column(JSONB)
+    review_status: Mapped[str] = mapped_column(String(16))
+    # SHA-256 of the normalised extracted text: unchanged text, no new version.
+    content_checksum: Mapped[str] = mapped_column(String(64))
+    ingested_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now()
+    )
+    retired_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class KnowledgeChunk(Base):
+    """A passage of a document version (spec §11.5); every chunk traces to its
+    document. Deleted only with its document version."""
+
+    __tablename__ = "knowledge_chunks"
+    __table_args__ = (
+        UniqueConstraint("document_id", "ordinal", name="uq_knowledge_chunks_document_ordinal"),
+        CheckConstraint(
+            "(embedding IS NULL) = (embedding_model IS NULL)", name="embedding_has_model"
+        ),
+        Index("ix_knowledge_chunks_search", "search", postgresql_using="gin"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    document_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("knowledge_documents.id", ondelete="CASCADE"), index=True
+    )
+    ordinal: Mapped[int] = mapped_column(Integer)
+    heading: Mapped[str] = mapped_column(Text)
+    text: Mapped[str] = mapped_column(Text)
+    # SHA-256 of the normalised chunk text, for de-duplication.
+    text_checksum: Mapped[str] = mapped_column(String(64))
+    # English full-text vector of heading and text, kept by the database.
+    search: Mapped[Any] = mapped_column(
+        TSVECTOR,
+        Computed("to_tsvector('english', heading || ' ' || text)", persisted=True),
+    )
+    # Vectors from different models are never compared; dimensions vary by model.
+    embedding: Mapped[list[float] | None] = mapped_column(Vector())
+    embedding_model: Mapped[str | None] = mapped_column(String(128))
