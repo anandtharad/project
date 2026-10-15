@@ -264,6 +264,30 @@ class TurnStore:
             state = ConversationState()
         return StoredState(state=state, version=record.state_version, updated_at=record.updated_at)
 
+    async def delete_conversation(self, *, user_id: uuid.UUID, conversation_id: uuid.UUID) -> bool:
+        """Delete an owned conversation with its messages, state, decisions and
+        other per-turn rows (ON DELETE CASCADE). Memories are kept: their
+        conversation and source-message links become NULL, and the person
+        deletes memories separately. False when the conversation does not
+        exist or belongs to someone else (the caller answers 404 either way).
+        Refused while a turn is in flight, under the same row lock `begin`
+        takes, so a reply is never written into a deleted conversation.
+        """
+        async with self._sessions() as session, session.begin():
+            conversation = await repo.get_owned_conversation(
+                session, conversation_id, user_id, for_update=True
+            )
+            if conversation is None:
+                return False
+            pending = await repo.find_pending_turn(session, conversation.id)
+            if pending is not None:
+                db_now = await session.scalar(select(func.now()))
+                assert db_now is not None
+                if not self._is_stale(pending, db_now):
+                    raise turn_in_progress()
+            await session.delete(conversation)
+        return True
+
     def _is_stale(self, message: Message, db_now: datetime) -> bool:
         started = message.attempt_started_at
         return started is None or db_now - started > self._stale_after

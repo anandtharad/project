@@ -205,16 +205,17 @@ def create_app(
         app.state.dev_tokens = dev_tokens
         app.state.migration_head = head
         app.state.resolved_provider = resolved
+        app.state.turn_store = turn_store = TurnStore(
+            session_factory,
+            stale_turn_seconds=settings.stale_turn_seconds,
+            history_limit=settings.history_max_messages,
+        )
         app.state.orchestrator = TurnOrchestrator(
             settings=settings,
             model=resolved.model,
             effort=resolved.effort,
             max_output_tokens=resolved.max_output_tokens,
-            store=TurnStore(
-                session_factory,
-                stale_turn_seconds=settings.stale_turn_seconds,
-                history_limit=settings.history_max_messages,
-            ),
+            store=turn_store,
             llm=llm,
             prompt=prompt,
             context_builder=ContextBuilder(

@@ -250,9 +250,10 @@ are clean.
 - No independent safety layer (Phase 5). Do not use with real users.
 - No per-user rate limiting or cost quotas. Concurrency is limited only per
   conversation.
-- No conversation deletion endpoint and no retention policy for
-  conversations yet (memories have both). Deleting a memory does not delete
-  the message it came from.
+- No retention period for conversations yet (memories have one);
+  conversations are deleted only on request
+  (`DELETE /v1/conversations/{id}`, which keeps memories). Deleting a memory
+  does not delete the message it came from.
 - Memory sensitivity screening relies on the extraction model's label, with
   a code backstop only for precise money amounts. Retrieval precision on the
   held-out set is about 0.6, so some irrelevant memories reach the prompt;

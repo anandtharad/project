@@ -38,6 +38,15 @@ Creates a conversation owned by the caller. `201`:
 ### `GET /v1/conversations/{conversation_id}`
 `200` with `conversation_id`, `created_at`, `updated_at`, `status`, `message_count`.
 
+### `DELETE /v1/conversations/{conversation_id}`
+204 No Content. Deletes the conversation with its messages, conversation
+state, decisions and every other per-turn record. Memories learned from it
+are kept (their link to the conversation is cleared); delete them under
+`/v1/users/me/memories`. `409 turn_in_progress` while a reply is being
+generated (retry after it finishes); a turn abandoned longer than
+`STALE_TURN_SECONDS` does not block deletion. Another user's conversation
+returns the same 404 as a missing one.
+
 ### `POST /v1/conversations/{conversation_id}/messages`
 Submits a user message and returns the assistant's reply.
 

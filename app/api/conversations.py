@@ -3,12 +3,13 @@ from __future__ import annotations
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Request, status
+from fastapi import APIRouter, Depends, Request, Response, status
 
 from app.api.auth import AuthenticatedUser, authenticate
 from app.api.schemas import ConversationCreated, ConversationDetail
 from app.db import repositories as repo
 from app.errors import conversation_not_found
+from app.orchestration.persistence import TurnStore
 
 router = APIRouter(prefix="/v1/conversations", tags=["conversations"])
 
@@ -42,3 +43,16 @@ async def get_conversation(
         status=conversation.status,
         message_count=message_count,
     )
+
+
+@router.delete("/{conversation_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_conversation(
+    conversation_id: uuid.UUID, request: Request, user: CurrentUser
+) -> Response:
+    """Deletes the conversation and everything stored per turn. Memories
+    learned from it are kept (delete them under /v1/users/me/memories).
+    409 turn_in_progress while a reply is being generated."""
+    store: TurnStore = request.app.state.turn_store
+    if not await store.delete_conversation(user_id=user.id, conversation_id=conversation_id):
+        raise conversation_not_found()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
