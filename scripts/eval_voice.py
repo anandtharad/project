@@ -1,7 +1,7 @@
 """Generate companion replies for scripted conversations under one or more
 prompt versions, and measure how they read (app/evaluation/voice.py).
 
-    uv run python scripts/eval_voice.py --variant current=companion_system@1.4.0 \\
+    uv run python scripts/eval_voice.py --variant old=companion_system@1.4.0 \\
         --variant new=companion_system@1.5.0 --scenarios eval/datasets/voice/v1/dev.jsonl
 
 A variant is `label=<prompt id>@<version>` or `label=<path to a prompt .toml>`

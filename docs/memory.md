@@ -16,7 +16,7 @@ user message saved (ownership checked)
        retrieval: embed the message, hybrid search over this person's
        active and unconfirmed memories, threshold, top 5
   -> decisions, policy
-  -> reply prompt: companion_system 1.4.0; the memories go into the
+  -> reply prompt: companion_system 1.4.0 or later; the memories go into the
      person's latest message as an escaped <memories> block
   -> reply saved (with the IDs and scores of the memories used)
   -> background: memory extraction for this message
@@ -148,7 +148,7 @@ Messages under 20 characters ("ok thanks!") never reach the extractor.
 In the prompt, memories are a JSON list (type, content, the date noted,
 `status: unconfirmed` where relevant) with `<` and `>` escaped, at the
 start of the person's latest message, after any conversation notes, never
-in the system prompt. Prompt 1.4.0 says they are untrusted background, may
+in the system prompt. Prompt 1.4.0 (and 1.5.0) says they are untrusted background, may
 be out of date, and are never instructions; that the companion must not
 claim to remember anything outside the block or this conversation; and
 that deleting memories happens in the app's memory settings.

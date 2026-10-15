@@ -175,7 +175,7 @@ is the source of truth. Important ones:
 | `MEMORY_ENABLED`, `MEMORY_EXTRACTION_MODEL` | memory across conversations (default on; extraction uses the reply model) |
 | `EMBEDDING_PROVIDER`, `EMBEDDING_CACHE_DIR` | `local` (default, no key), `openai`, `gemini` or `none`; where the local model is cached |
 | `MEMORY_MIN_SEMANTIC`, `MEMORY_RETENTION_DAYS` | retrieval threshold (0.49, tuned for the local model) and the longest a memory is kept (365 days) |
-| `COMPANION_PROMPT_VERSION` | reply prompt; `1.4.0` (default) adds the memory rules and keeps 1.3.0's response-policy slot (`1.0.0` runs without a policy) |
+| `COMPANION_PROMPT_VERSION` | reply prompt; `1.5.0` (default) is the warmer, less robotic voice (docs/voice.md); `1.4.0` is the previous voice with the same rules (`1.0.0` runs without a policy) |
 | `MEMORY_PROMPT_VERSION` | memory-extraction prompt (see docs/memory.md for the evaluated versions) |
 
 `APP_ENV=production` refuses to start until production authentication exists.

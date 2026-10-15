@@ -310,6 +310,15 @@ policy, persistence and retrieval, duplicate and contradiction handling,
 user inspection and deletion, retention, and cross-user security tests are
 all built. See [memory.md](memory.md).
 
+## Voice (companion prompt 1.5.0, added on request)
+
+The developer found 1.4.0 robotic. 1.5.0 (default) rewrites the voice and
+keeps the rules; blind judges preferred it in 64 of 75 judgements, including
+31 of 36 on held-out public messages, with no hard-rule violations found
+(docs/voice.md). Known gap: plans with arithmetic constraints are sometimes
+wrong (a reply-model limitation the prompt did not fix). Judges were AI; human
+review of a sample is still needed.
+
 ## Open questions and next steps
 
 1. **A decision model that passes calibration.** The LLM provider on

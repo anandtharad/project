@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+from app.config import Settings
+from app.orchestration.policy import Strategy
 from app.prompting import (
     LOCK_FILE_NAME,
     PROMPTS_DIR,
@@ -52,6 +54,34 @@ def test_companion_prompt_covers_required_behaviors() -> None:
         "do not change them",
     ):
         assert phrase in text, phrase
+
+
+def test_default_companion_prompt_keeps_the_rules_and_every_policy_fragment() -> None:
+    # 1.5.0 rewrote the voice; the product, safety and privacy rules must survive.
+    # The field default, not Settings(): a developer's .env may pin another version.
+    default = Settings.model_fields["companion_prompt_version"].default
+    prompt = PromptRegistry().get("companion_system", default)
+    assert prompt.version == "1.5.0"
+    text = prompt.render(response_guidance="")
+    for phrase in (
+        "You are an AI, not a person",
+        "not a therapist",
+        "Never make up a day, plans, feelings or experiences",
+        "Don't diagnose",
+        "never claim to remember anything",
+        "Don't present yourself as their only support",
+        "local emergency services or a crisis line",
+        "Don't provide information that could be used to cause harm",
+        "do not change them",
+        "<memories>",
+        "unconfirmed",
+        "memory settings",
+        "<conversation_notes>",
+        "If the latest message explicitly asks for something different",
+    ):
+        assert phrase in text, phrase
+    selectable = {s.value for s in Strategy} | {"open", "no_advice", "safety_signal"}
+    assert set(prompt.fragments) == selectable
 
 
 def copy_prompts(tmp_path: Path) -> Path:
