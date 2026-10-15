@@ -106,9 +106,10 @@ service's sum check (within 0.02) rejects; renormalising them would be
 repairing an answer, which this layer never does. Independent weights with a
 fixed, documented normalisation avoid both. What makes the result usable is
 a threshold chosen for this exact model and prompt on the dev split and
-confirmed on the held-out split. **No evaluation has run yet, so every
-question runs in shadow mode** with this provider too: answers are validated
-and stored (`turn_decisions.returned_value`), and the policy ignores them.
+confirmed on the held-out split. **On the dev split no threshold reaches
+the target, so every question runs in shadow mode** with this provider too
+(results below): answers are validated and stored
+(`turn_decisions.returned_value`), and the policy ignores them.
 Groq returns no log-probabilities for any model (HTTP 400), so token
 probabilities are not an option there.
 
@@ -289,7 +290,7 @@ already answered; `--start N` begins at example N (with `--limit` to run a
 fixed part per day), taking the earlier examples from the cache. The result
 file is written once every example in range has an answer.
 
-## Results (2026-10-12/13, live)
+## Results (2026-10-12/14, live)
 
 ### Laya decisions (`laya[serve]==0.4.6`, English checkpoint, zero-shot, CPU)
 
@@ -316,10 +317,41 @@ What would change this: fine-tuning Laya on labelled decisions (its
 fine-tuned checkpoint reaches 0.77 on its own benchmark), Jev
 (`DECISION_PROVIDER=jev`), or the LLM provider (`DECISION_PROVIDER=llm`),
 each re-evaluated with the same scripts. Jev has not been evaluated (no API
-key yet), and the LLM provider has not been evaluated yet either: it is
-built and tested offline only.
+key yet). The LLM provider is evaluated below.
 
 Files: `eval/results/decisions-laya-english-{dev,test}-*.json`.
+
+### LLM decisions (`DECISION_PROVIDER=llm`, Groq `openai/gpt-oss-20b`, `decision_llm@1.0.0`, effort low; 2026-10-14)
+
+| Question | Dev (125) | Laya dev | Majority baseline dev |
+|---|---|---|---|
+| conversation_mode: accuracy (all 125; valid answers only) | 0.696; 0.725 | 0.112 | 0.224 |
+| response_strategy: accuracy (all; valid only) | 0.576; 0.602 | 0.288 | 0.229 |
+| knowledge_retrieval_useful: AUROC | 0.948 (accuracy at 0.5: 0.933) | 0.373 | 0.5 = chance |
+| `safety` mode recall | 5 of 7 (the other two: listening, reflection) | 1 of 7 | - |
+| invalid answers (schema failures) | 5 of 125 | - | - |
+| latency p50 / p95 | 0.65 s / 1.08 s | 2.3 s / 4.5 s | - |
+
+Far better than Laya and the majority baseline, but **no threshold reaches
+the pre-set target** (acted-on accuracy >= 0.80 with at least 15% coverage
+and 10 examples). The best acted-on accuracy on the sweep is 0.758 for
+conversation_mode (threshold 0.95, coverage 0.50) and 0.784 for
+response_strategy (threshold 0.95, coverage 0.31). The target was fixed
+before this run and is not lowered after it, so **every LLM question also
+runs in shadow mode**, and the held-out test split was not run (it would
+only confirm a threshold, and there is none). The annotators agreed far more
+with each other (kappa 0.96-0.98, DATASET_CARD.md) than the model agrees
+with them, so the gap is the model's, not a ceiling of the labels.
+
+knowledge_retrieval_useful (a yes/no question) has no threshold sweep in the
+evaluation, so it is recorded only, whatever its AUROC; Phase 4 routing can
+add a sweep for it.
+
+What could close the gap: a stronger decision model (the reply model would
+share the developer's daily token budget), a revised decision prompt
+evaluated on dev, or labelled data to fine-tune a small model.
+
+File: `eval/results/decisions-llm-groq-openai_gpt-oss-20b-decision_llm_1.0.0-dev-20261014T031400.json`.
 
 ### Does the response policy change replies?
 

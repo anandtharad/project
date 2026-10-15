@@ -1,0 +1,5875 @@
+{
+ "created_at": "2026-10-14T03:14:00+00:00",
+ "dataset": {
+  "path": "eval/datasets/decisions/v1/dev.jsonl",
+  "sha256": "758bbb0e0783f008c3b77ce90eda11c39d32a1d4bd174b39d8196781403dbfca"
+ },
+ "split": "dev",
+ "provider": "llm",
+ "requested_model": "openai/gpt-oss-20b",
+ "decision_llm": {
+  "provider": "groq",
+  "effort": "low",
+  "max_output_tokens": 1024
+ },
+ "decision_prompt": {
+  "key": "decision_llm@1.0.0",
+  "checksum": "004c6bfd1e5ae52bc54f8e5b4a6ef46eb7e62225af802a270a264789699d9064",
+  "request_sha256": "3364572eb01908ffafde7af93623600570776779202f36b030264ec590175dcb"
+ },
+ "questions": {
+  "conversation_mode@1.0.0": "5e862bdfbd8bd6f166befd2cbf0daa8efc6bb98de514725039b7c25ffab94069",
+  "response_strategy@1.0.0": "06e4e4d7e8145368c31b4623dbaf9ff1b733b5d947c3f68e05ff1c044d7cccaf",
+  "knowledge_retrieval_useful@1.0.0": "2f50da0aa4f5fd6a78b93b41e32f0e09ef4322010829078f4fe98382fa31919a"
+ },
+ "calibration_key": "llm:groq:openai/gpt-oss-20b:decision_llm@1.0.0",
+ "served_models": [
+  "openai/gpt-oss-20b"
+ ],
+ "thresholds_from": null,
+ "run": {
+  "examples": 125,
+  "start": 0,
+  "resumed": true,
+  "from_cache": 3,
+  "pause_seconds": 2.0,
+  "tokens_per_minute": 7000,
+  "decision_timeout_seconds": 3.0,
+  "max_retries": 1
+ },
+ "metrics": {
+  "examples": 125,
+  "failed_requests": {
+   "invalid_response": 5
+  },
+  "latency_ms": {
+   "p50": 647.0,
+   "p95": 1084.1
+  },
+  "safety_mode_recall": {
+   "gold_safety": 7,
+   "predicted_safety": 5
+  },
+  "questions": {
+   "conversation_mode@1.0.0": {
+    "n": 125,
+    "valid_answers": 120,
+    "accuracy": 0.696,
+    "macro_f1": 0.6456,
+    "majority_baseline": {
+     "label": "information",
+     "accuracy": 0.224
+    },
+    "ece_top_probability": 0.2353,
+    "mean_confidence": 0.8514,
+    "predicted_distribution": {
+     "casual": 16,
+     "exploration": 21,
+     "planning": 11,
+     "problem_solving": 20,
+     "listening": 13,
+     "reflection": 14,
+     "information": 20,
+     "safety": 5,
+     "None": 5
+    },
+    "per_label": {
+     "casual": {
+      "support": 16,
+      "recall": 0.812,
+      "predicted": 16
+     },
+     "listening": {
+      "support": 18,
+      "recall": 0.611,
+      "predicted": 13
+     },
+     "exploration": {
+      "support": 13,
+      "recall": 0.769,
+      "predicted": 21
+     },
+     "reflection": {
+      "support": 9,
+      "recall": 0.778,
+      "predicted": 14
+     },
+     "problem_solving": {
+      "support": 20,
+      "recall": 0.55,
+      "predicted": 20
+     },
+     "planning": {
+      "support": 13,
+      "recall": 0.846,
+      "predicted": 11
+     },
+     "information": {
+      "support": 28,
+      "recall": 0.679,
+      "predicted": 20
+     },
+     "safety": {
+      "support": 7,
+      "recall": 0.714,
+      "predicted": 5
+     },
+     "other": {
+      "support": 1,
+      "recall": 0.0,
+      "predicted": 0
+     }
+    },
+    "confusion": {
+     "casual": {
+      "casual": 13,
+      "reflection": 3
+     },
+     "exploration": {
+      "exploration": 10,
+      "reflection": 1,
+      "listening": 1,
+      "None": 1
+     },
+     "planning": {
+      "planning": 11,
+      "problem_solving": 2
+     },
+     "problem_solving": {
+      "problem_solving": 11,
+      "exploration": 6,
+      "reflection": 1,
+      "None": 2
+     },
+     "safety": {
+      "listening": 1,
+      "safety": 5,
+      "reflection": 1
+     },
+     "information": {
+      "problem_solving": 6,
+      "information": 19,
+      "exploration": 3
+     },
+     "reflection": {
+      "reflection": 7,
+      "None": 1,
+      "exploration": 1
+     },
+     "listening": {
+      "listening": 11,
+      "None": 1,
+      "casual": 2,
+      "reflection": 1,
+      "problem_solving": 1,
+      "information": 1,
+      "exploration": 1
+     },
+     "other": {
+      "casual": 1
+     }
+    },
+    "threshold_sweep": [
+     {
+      "threshold": 0.0,
+      "acted": 120,
+      "coverage": 0.96,
+      "accuracy": 0.725
+     },
+     {
+      "threshold": 0.05,
+      "acted": 120,
+      "coverage": 0.96,
+      "accuracy": 0.725
+     },
+     {
+      "threshold": 0.1,
+      "acted": 120,
+      "coverage": 0.96,
+      "accuracy": 0.725
+     },
+     {
+      "threshold": 0.15,
+      "acted": 120,
+      "coverage": 0.96,
+      "accuracy": 0.725
+     },
+     {
+      "threshold": 0.2,
+      "acted": 120,
+      "coverage": 0.96,
+      "accuracy": 0.725
+     },
+     {
+      "threshold": 0.25,
+      "acted": 120,
+      "coverage": 0.96,
+      "accuracy": 0.725
+     },
+     {
+      "threshold": 0.3,
+      "acted": 119,
+      "coverage": 0.952,
+      "accuracy": 0.7311
+     },
+     {
+      "threshold": 0.35,
+      "acted": 119,
+      "coverage": 0.952,
+      "accuracy": 0.7311
+     },
+     {
+      "threshold": 0.4,
+      "acted": 119,
+      "coverage": 0.952,
+      "accuracy": 0.7311
+     },
+     {
+      "threshold": 0.45,
+      "acted": 116,
+      "coverage": 0.928,
+      "accuracy": 0.7414
+     },
+     {
+      "threshold": 0.5,
+      "acted": 111,
+      "coverage": 0.888,
+      "accuracy": 0.7477
+     },
+     {
+      "threshold": 0.55,
+      "acted": 107,
+      "coverage": 0.856,
+      "accuracy": 0.7383
+     },
+     {
+      "threshold": 0.6,
+      "acted": 105,
+      "coverage": 0.84,
+      "accuracy": 0.7333
+     },
+     {
+      "threshold": 0.65,
+      "acted": 95,
+      "coverage": 0.76,
+      "accuracy": 0.7158
+     },
+     {
+      "threshold": 0.7,
+      "acted": 90,
+      "coverage": 0.72,
+      "accuracy": 0.7111
+     },
+     {
+      "threshold": 0.75,
+      "acted": 86,
+      "coverage": 0.688,
+      "accuracy": 0.7209
+     },
+     {
+      "threshold": 0.8,
+      "acted": 86,
+      "coverage": 0.688,
+      "accuracy": 0.7209
+     },
+     {
+      "threshold": 0.85,
+      "acted": 75,
+      "coverage": 0.6,
+      "accuracy": 0.7333
+     },
+     {
+      "threshold": 0.9,
+      "acted": 73,
+      "coverage": 0.584,
+      "accuracy": 0.726
+     },
+     {
+      "threshold": 0.95,
+      "acted": 62,
+      "coverage": 0.496,
+      "accuracy": 0.7581
+     }
+    ],
+    "selected_threshold": null
+   },
+   "response_strategy@1.0.0": {
+    "n": 118,
+    "valid_answers": 113,
+    "accuracy": 0.5763,
+    "macro_f1": 0.5537,
+    "majority_baseline": {
+     "label": "provide_information",
+     "accuracy": 0.2288
+    },
+    "ece_top_probability": 0.1109,
+    "mean_confidence": 0.6799,
+    "predicted_distribution": {
+     "reflect": 22,
+     "check_in": 5,
+     "summarize": 4,
+     "problem_solve": 16,
+     "validate": 17,
+     "plan": 12,
+     "explore": 12,
+     "provide_information": 24,
+     "None": 5,
+     "clarify": 1
+    },
+    "per_label": {
+     "reflect": {
+      "support": 12,
+      "recall": 0.5,
+      "predicted": 22
+     },
+     "validate": {
+      "support": 19,
+      "recall": 0.316,
+      "predicted": 17
+     },
+     "explore": {
+      "support": 11,
+      "recall": 0.545,
+      "predicted": 12
+     },
+     "clarify": {
+      "support": 8,
+      "recall": 0.0,
+      "predicted": 1
+     },
+     "summarize": {
+      "support": 7,
+      "recall": 0.571,
+      "predicted": 4
+     },
+     "provide_information": {
+      "support": 27,
+      "recall": 0.778,
+      "predicted": 24
+     },
+     "problem_solve": {
+      "support": 12,
+      "recall": 0.75,
+      "predicted": 16
+     },
+     "plan": {
+      "support": 11,
+      "recall": 1.0,
+      "predicted": 12
+     },
+     "check_in": {
+      "support": 11,
+      "recall": 0.455,
+      "predicted": 5
+     }
+    },
+    "confusion": {
+     "check_in": {
+      "reflect": 2,
+      "check_in": 5,
+      "validate": 3,
+      "None": 1
+     },
+     "validate": {
+      "reflect": 11,
+      "validate": 6,
+      "explore": 2
+     },
+     "explore": {
+      "reflect": 1,
+      "explore": 6,
+      "validate": 2,
+      "None": 2
+     },
+     "summarize": {
+      "summarize": 4,
+      "explore": 1,
+      "clarify": 1,
+      "provide_information": 1
+     },
+     "clarify": {
+      "reflect": 1,
+      "problem_solve": 2,
+      "validate": 1,
+      "explore": 1,
+      "plan": 1,
+      "provide_information": 1,
+      "None": 1
+     },
+     "reflect": {
+      "validate": 5,
+      "reflect": 6,
+      "provide_information": 1
+     },
+     "provide_information": {
+      "reflect": 1,
+      "problem_solve": 5,
+      "provide_information": 21
+     },
+     "plan": {
+      "plan": 11
+     },
+     "problem_solve": {
+      "problem_solve": 9,
+      "explore": 2,
+      "None": 1
+     }
+    },
+    "threshold_sweep": [
+     {
+      "threshold": 0.0,
+      "acted": 113,
+      "coverage": 0.9576,
+      "accuracy": 0.6018
+     },
+     {
+      "threshold": 0.05,
+      "acted": 113,
+      "coverage": 0.9576,
+      "accuracy": 0.6018
+     },
+     {
+      "threshold": 0.1,
+      "acted": 113,
+      "coverage": 0.9576,
+      "accuracy": 0.6018
+     },
+     {
+      "threshold": 0.15,
+      "acted": 113,
+      "coverage": 0.9576,
+      "accuracy": 0.6018
+     },
+     {
+      "threshold": 0.2,
+      "acted": 113,
+      "coverage": 0.9576,
+      "accuracy": 0.6018
+     },
+     {
+      "threshold": 0.25,
+      "acted": 113,
+      "coverage": 0.9576,
+      "accuracy": 0.6018
+     },
+     {
+      "threshold": 0.3,
+      "acted": 111,
+      "coverage": 0.9407,
+      "accuracy": 0.6126
+     },
+     {
+      "threshold": 0.35,
+      "acted": 103,
+      "coverage": 0.8729,
+      "accuracy": 0.6408
+     },
+     {
+      "threshold": 0.4,
+      "acted": 94,
+      "coverage": 0.7966,
+      "accuracy": 0.6489
+     },
+     {
+      "threshold": 0.45,
+      "acted": 82,
+      "coverage": 0.6949,
+      "accuracy": 0.6829
+     },
+     {
+      "threshold": 0.5,
+      "acted": 75,
+      "coverage": 0.6356,
+      "accuracy": 0.6933
+     },
+     {
+      "threshold": 0.55,
+      "acted": 65,
+      "coverage": 0.5508,
+      "accuracy": 0.7385
+     },
+     {
+      "threshold": 0.6,
+      "acted": 57,
+      "coverage": 0.4831,
+      "accuracy": 0.7368
+     },
+     {
+      "threshold": 0.65,
+      "acted": 53,
+      "coverage": 0.4492,
+      "accuracy": 0.7547
+     },
+     {
+      "threshold": 0.7,
+      "acted": 53,
+      "coverage": 0.4492,
+      "accuracy": 0.7547
+     },
+     {
+      "threshold": 0.75,
+      "acted": 48,
+      "coverage": 0.4068,
+      "accuracy": 0.75
+     },
+     {
+      "threshold": 0.8,
+      "acted": 46,
+      "coverage": 0.3898,
+      "accuracy": 0.7609
+     },
+     {
+      "threshold": 0.85,
+      "acted": 42,
+      "coverage": 0.3559,
+      "accuracy": 0.7619
+     },
+     {
+      "threshold": 0.9,
+      "acted": 42,
+      "coverage": 0.3559,
+      "accuracy": 0.7619
+     },
+     {
+      "threshold": 0.95,
+      "acted": 37,
+      "coverage": 0.3136,
+      "accuracy": 0.7838
+     }
+    ],
+    "selected_threshold": null
+   },
+   "knowledge_retrieval_useful@1.0.0": {
+    "n": 125,
+    "valid_answers": 120,
+    "base_rate": 0.2667,
+    "accuracy_at_0_5": 0.9333,
+    "majority_baseline_accuracy": 0.7333,
+    "brier": 0.0603,
+    "auroc": 0.9476,
+    "mean_probability": 0.2817,
+    "probability_range": [
+     0.0,
+     1.0
+    ]
+   }
+  }
+ },
+ "predictions": [
+  {
+   "example_id": "casual-001",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 1.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 1.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 992.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-003",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 1.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "check_in",
+     "confidence": 0.9,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.1,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.9
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 477.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-005",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.8571428571428571,
+     "probabilities": {
+      "casual": 0.8571428571428571,
+      "listening": 0.047619047619047616,
+      "exploration": 0.047619047619047616,
+      "reflection": 0.047619047619047616,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.7777777777777778,
+     "probabilities": {
+      "reflect": 0.7777777777777778,
+      "validate": 0.2222222222222222,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 485.5,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-007",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.6,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.6,
+      "reflection": 0.4,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.5333333333333333,
+     "probabilities": {
+      "reflect": 0.5333333333333333,
+      "validate": 0.4666666666666667,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 889.5,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-009",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 0.42105263157894735,
+     "probabilities": {
+      "casual": 0.05263157894736842,
+      "listening": 0.0,
+      "exploration": 0.10526315789473684,
+      "reflection": 0.3157894736842105,
+      "problem_solving": 0.05263157894736842,
+      "planning": 0.42105263157894735,
+      "information": 0.05263157894736842,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "summarize",
+     "confidence": 0.42857142857142855,
+     "probabilities": {
+      "reflect": 0.14285714285714285,
+      "validate": 0.047619047619047616,
+      "explore": 0.047619047619047616,
+      "clarify": 0.09523809523809523,
+      "summarize": 0.42857142857142855,
+      "provide_information": 0.047619047619047616,
+      "problem_solve": 0.047619047619047616,
+      "plan": 0.09523809523809523,
+      "check_in": 0.047619047619047616
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 699.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-011",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.7391304347826086,
+     "probabilities": {
+      "casual": 0.7391304347826086,
+      "listening": 0.043478260869565216,
+      "exploration": 0.13043478260869565,
+      "reflection": 0.08695652173913043,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.43478260869565216,
+     "probabilities": {
+      "reflect": 0.43478260869565216,
+      "validate": 0.043478260869565216,
+      "explore": 0.08695652173913043,
+      "clarify": 0.17391304347826086,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.2608695652173913
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 495.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-013",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.6504065040650406,
+     "probabilities": {
+      "casual": 0.04065040650406504,
+      "listening": 0.024390243902439025,
+      "exploration": 0.12195121951219512,
+      "reflection": 0.04065040650406504,
+      "problem_solving": 0.6504065040650406,
+      "planning": 0.04065040650406504,
+      "information": 0.08130081300813008,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.5384615384615384,
+     "probabilities": {
+      "reflect": 0.038461538461538464,
+      "validate": 0.038461538461538464,
+      "explore": 0.19230769230769232,
+      "clarify": 0.07692307692307693,
+      "summarize": 0.023076923076923078,
+      "provide_information": 0.038461538461538464,
+      "problem_solve": 0.5384615384615384,
+      "plan": 0.038461538461538464,
+      "check_in": 0.015384615384615385
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.2
+    }
+   },
+   "error": null,
+   "latency_ms": 558.4,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-015",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.8181818181818182,
+     "probabilities": {
+      "casual": 0.8181818181818182,
+      "listening": 0.045454545454545456,
+      "exploration": 0.09090909090909091,
+      "reflection": 0.045454545454545456,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.4857142857142857,
+     "probabilities": {
+      "reflect": 0.4,
+      "validate": 0.4857142857142857,
+      "explore": 0.05714285714285714,
+      "clarify": 0.0,
+      "summarize": 0.02857142857142857,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.02857142857142857
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 1441.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-017",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 1.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 1.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 799.5,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-019",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.9090909090909091,
+     "probabilities": {
+      "casual": 0.9090909090909091,
+      "listening": 0.0,
+      "exploration": 0.09090909090909091,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.4,
+     "probabilities": {
+      "reflect": 0.4,
+      "validate": 0.36,
+      "explore": 0.12,
+      "clarify": 0.04,
+      "summarize": 0.04,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.04
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 562.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-021",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 1.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 1.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 788.4,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-023",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 1.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.5555555555555556,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.4444444444444444,
+      "problem_solve": 0.5555555555555556,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 1162.3,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-025",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 1.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.4166666666666667,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.3333333333333333,
+      "clarify": 0.25,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.4166666666666667,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.8
+    }
+   },
+   "error": null,
+   "latency_ms": 558.1,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-027",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.6,
+     "probabilities": {
+      "casual": 0.08,
+      "listening": 0.08,
+      "exploration": 0.16,
+      "reflection": 0.6,
+      "problem_solving": 0.0,
+      "planning": 0.04,
+      "information": 0.04,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.43243243243243246,
+     "probabilities": {
+      "reflect": 0.43243243243243246,
+      "validate": 0.3783783783783784,
+      "explore": 0.05405405405405406,
+      "clarify": 0.02702702702702703,
+      "summarize": 0.05405405405405406,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.02702702702702703,
+      "check_in": 0.02702702702702703
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 721.9,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-029",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 1.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.5555555555555556,
+     "probabilities": {
+      "reflect": 0.5555555555555556,
+      "validate": 0.4444444444444444,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 722.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-031",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.7142857142857143,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.07142857142857142,
+      "exploration": 0.21428571428571427,
+      "reflection": 0.7142857142857143,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.5,
+     "probabilities": {
+      "reflect": 0.5,
+      "validate": 0.4375,
+      "explore": 0.0625,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 904.3,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-033",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 1.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "check_in",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 1.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 587.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-035",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.9,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.9,
+      "exploration": 0.0,
+      "reflection": 0.1,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.9,
+     "probabilities": {
+      "reflect": 0.05,
+      "validate": 0.9,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.05
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 627.4,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-037",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 1.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 1.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 481.4,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-039",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.8181818181818182,
+     "probabilities": {
+      "casual": 0.045454545454545456,
+      "listening": 0.045454545454545456,
+      "exploration": 0.09090909090909091,
+      "reflection": 0.8181818181818182,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.4,
+     "probabilities": {
+      "reflect": 0.3,
+      "validate": 0.4,
+      "explore": 0.15,
+      "clarify": 0.05,
+      "summarize": 0.05,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.05
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 925.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-041",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.64,
+     "probabilities": {
+      "casual": 0.08,
+      "listening": 0.04,
+      "exploration": 0.12,
+      "reflection": 0.64,
+      "problem_solving": 0.04,
+      "planning": 0.04,
+      "information": 0.04,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.5161290322580645,
+     "probabilities": {
+      "reflect": 0.5161290322580645,
+      "validate": 0.12903225806451613,
+      "explore": 0.12903225806451613,
+      "clarify": 0.03225806451612903,
+      "summarize": 0.03225806451612903,
+      "provide_information": 0.03225806451612903,
+      "problem_solve": 0.03225806451612903,
+      "plan": 0.03225806451612903,
+      "check_in": 0.06451612903225806
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 470.9,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-043",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.9
+    }
+   },
+   "error": null,
+   "latency_ms": 430.2,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-045",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 1.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.8181818181818182,
+     "probabilities": {
+      "reflect": 0.09090909090909091,
+      "validate": 0.09090909090909091,
+      "explore": 0.8181818181818182,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 475.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-047",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.4666666666666667,
+     "probabilities": {
+      "casual": 0.4,
+      "listening": 0.03333333333333333,
+      "exploration": 0.06666666666666667,
+      "reflection": 0.4666666666666667,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.03333333333333333,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.625,
+     "probabilities": {
+      "reflect": 0.16666666666666666,
+      "validate": 0.625,
+      "explore": 0.125,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.08333333333333333
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 969.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "casual-049",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 1.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.7,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.1,
+      "explore": 0.2,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.7,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 438.3,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-001",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 1.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.5882352941176471,
+     "probabilities": {
+      "reflect": 0.4117647058823529,
+      "validate": 0.5882352941176471,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 843.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-003",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 1.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.35714285714285715,
+     "probabilities": {
+      "reflect": 0.35714285714285715,
+      "validate": 0.32142857142857145,
+      "explore": 0.25,
+      "clarify": 0.07142857142857142,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 498.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-005",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.8,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.8,
+      "exploration": 0.2,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.6086956521739131,
+     "probabilities": {
+      "reflect": 0.6086956521739131,
+      "validate": 0.13043478260869565,
+      "explore": 0.13043478260869565,
+      "clarify": 0.043478260869565216,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.08695652173913043
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 972.5,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-007",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 0.9090909090909091,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.09090909090909091,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.9090909090909091,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 0.7407407407407407,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.1111111111111111,
+      "clarify": 0.07407407407407407,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.037037037037037035,
+      "plan": 0.7407407407407407,
+      "check_in": 0.037037037037037035
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 433.5,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-009",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.7142857142857143,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.7142857142857143,
+      "exploration": 0.07142857142857142,
+      "reflection": 0.07142857142857142,
+      "problem_solving": 0.14285714285714285,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.38461538461538464,
+     "probabilities": {
+      "reflect": 0.3076923076923077,
+      "validate": 0.38461538461538464,
+      "explore": 0.23076923076923078,
+      "clarify": 0.07692307692307693,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 743.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-011",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.8,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.2,
+      "reflection": 0.8,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.7,
+     "probabilities": {
+      "reflect": 0.05,
+      "validate": 0.0,
+      "explore": 0.7,
+      "clarify": 0.15,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.1
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 476.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-013",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 0.9090909090909091,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.09090909090909091,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.9090909090909091,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.9090909090909091,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.09090909090909091,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.9090909090909091,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.9
+    }
+   },
+   "error": null,
+   "latency_ms": 991.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-015",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.9,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.9,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.1,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.7,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.3,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.7,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.9
+    }
+   },
+   "error": null,
+   "latency_ms": 628.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-017",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.7142857142857143,
+     "probabilities": {
+      "casual": 0.7142857142857143,
+      "listening": 0.07142857142857142,
+      "exploration": 0.14285714285714285,
+      "reflection": 0.07142857142857142,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.3684210526315789,
+     "probabilities": {
+      "reflect": 0.3157894736842105,
+      "validate": 0.3684210526315789,
+      "explore": 0.10526315789473684,
+      "clarify": 0.05263157894736842,
+      "summarize": 0.05263157894736842,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.10526315789473684
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 625.5,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-019",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 1.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 1.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 585.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-021",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 1.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 1.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.1
+    }
+   },
+   "error": null,
+   "latency_ms": 756.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-023",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.47058823529411764,
+     "probabilities": {
+      "casual": 0.029411764705882353,
+      "listening": 0.08823529411764706,
+      "exploration": 0.4117647058823529,
+      "reflection": 0.0,
+      "problem_solving": 0.47058823529411764,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.4,
+     "probabilities": {
+      "reflect": 0.075,
+      "validate": 0.075,
+      "explore": 0.3,
+      "clarify": 0.05,
+      "summarize": 0.025,
+      "provide_information": 0.025,
+      "problem_solve": 0.4,
+      "plan": 0.025,
+      "check_in": 0.025
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.4
+    }
+   },
+   "error": null,
+   "latency_ms": 593.6,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-025",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.6428571428571429,
+     "probabilities": {
+      "casual": 0.07142857142857142,
+      "listening": 0.6428571428571429,
+      "exploration": 0.14285714285714285,
+      "reflection": 0.07142857142857142,
+      "problem_solving": 0.03571428571428571,
+      "planning": 0.0,
+      "information": 0.03571428571428571,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.34782608695652173,
+     "probabilities": {
+      "reflect": 0.34782608695652173,
+      "validate": 0.30434782608695654,
+      "explore": 0.21739130434782608,
+      "clarify": 0.021739130434782608,
+      "summarize": 0.021739130434782608,
+      "provide_information": 0.021739130434782608,
+      "problem_solve": 0.021739130434782608,
+      "plan": 0.021739130434782608,
+      "check_in": 0.021739130434782608
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 560.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-027",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "safety",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 1.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "check_in",
+     "confidence": 0.4444444444444444,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.3888888888888889,
+      "explore": 0.1111111111111111,
+      "clarify": 0.05555555555555555,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.4444444444444444
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 782.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-029",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.8,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.2,
+      "reflection": 0.8,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.35714285714285715,
+     "probabilities": {
+      "reflect": 0.35714285714285715,
+      "validate": 0.2857142857142857,
+      "explore": 0.14285714285714285,
+      "clarify": 0.09523809523809523,
+      "summarize": 0.047619047619047616,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.07142857142857142
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 768.5,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-031",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 1.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.5,
+     "probabilities": {
+      "reflect": 0.375,
+      "validate": 0.5,
+      "explore": 0.125,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 909.3,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-033",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.5454545454545454,
+     "probabilities": {
+      "casual": 0.06060606060606061,
+      "listening": 0.06060606060606061,
+      "exploration": 0.5454545454545454,
+      "reflection": 0.12121212121212122,
+      "problem_solving": 0.06060606060606061,
+      "planning": 0.06060606060606061,
+      "information": 0.06060606060606061,
+      "safety": 0.0,
+      "other": 0.030303030303030304
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.48484848484848486,
+     "probabilities": {
+      "reflect": 0.09090909090909091,
+      "validate": 0.15151515151515152,
+      "explore": 0.48484848484848486,
+      "clarify": 0.06060606060606061,
+      "summarize": 0.030303030303030304,
+      "provide_information": 0.030303030303030304,
+      "problem_solve": 0.06060606060606061,
+      "plan": 0.030303030303030304,
+      "check_in": 0.06060606060606061
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 442.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-035",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 0.6363636363636364,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.36363636363636365,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.6363636363636364,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.5,
+     "probabilities": {
+      "reflect": 0.0625,
+      "validate": 0.09375,
+      "explore": 0.125,
+      "clarify": 0.0625,
+      "summarize": 0.03125,
+      "provide_information": 0.5,
+      "problem_solve": 0.03125,
+      "plan": 0.03125,
+      "check_in": 0.0625
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.8
+    }
+   },
+   "error": null,
+   "latency_ms": 569.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-037",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 1.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.5625,
+     "probabilities": {
+      "reflect": 0.4375,
+      "validate": 0.5625,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 919.6,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-039",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 1.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 1.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 889.2,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-041",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.8888888888888888,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.8888888888888888,
+      "exploration": 0.0,
+      "reflection": 0.1111111111111111,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.5384615384615384,
+     "probabilities": {
+      "reflect": 0.46153846153846156,
+      "validate": 0.5384615384615384,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 747.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-043",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.47368421052631576,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.15789473684210525,
+      "exploration": 0.47368421052631576,
+      "reflection": 0.3684210526315789,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.4090909090909091,
+     "probabilities": {
+      "reflect": 0.3181818181818182,
+      "validate": 0.2727272727272727,
+      "explore": 0.4090909090909091,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 588.6,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-045",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.6666666666666666,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.25,
+      "reflection": 0.0,
+      "problem_solving": 0.6666666666666666,
+      "planning": 0.08333333333333333,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.6428571428571429,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.14285714285714285,
+      "clarify": 0.07142857142857142,
+      "summarize": 0.0,
+      "provide_information": 0.03571428571428571,
+      "problem_solve": 0.6428571428571429,
+      "plan": 0.07142857142857142,
+      "check_in": 0.03571428571428571
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 639.1,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-047",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "safety",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 1.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 1.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.7
+    }
+   },
+   "error": null,
+   "latency_ms": 437.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "emotional-049",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.5714285714285714,
+     "probabilities": {
+      "casual": 0.07142857142857142,
+      "listening": 0.14285714285714285,
+      "exploration": 0.5714285714285714,
+      "reflection": 0.10714285714285714,
+      "problem_solving": 0.03571428571428571,
+      "planning": 0.03571428571428571,
+      "information": 0.03571428571428571,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.3333333333333333,
+     "probabilities": {
+      "reflect": 0.14285714285714285,
+      "validate": 0.3333333333333333,
+      "explore": 0.2857142857142857,
+      "clarify": 0.047619047619047616,
+      "summarize": 0.047619047619047616,
+      "provide_information": 0.023809523809523808,
+      "problem_solve": 0.023809523809523808,
+      "plan": 0.023809523809523808,
+      "check_in": 0.07142857142857142
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 540.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-001",
+   "answers": {},
+   "error": "invalid_response",
+   "latency_ms": 580.7,
+   "model_id": null
+  },
+  {
+   "example_id": "hard-003",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.8,
+     "probabilities": {
+      "casual": 0.8,
+      "listening": 0.05,
+      "exploration": 0.1,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.05
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.3,
+     "probabilities": {
+      "reflect": 0.3,
+      "validate": 0.3,
+      "explore": 0.1,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.3
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 698.1,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-005",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.6153846153846154,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.23076923076923078,
+      "reflection": 0.0,
+      "problem_solving": 0.6153846153846154,
+      "planning": 0.15384615384615385,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.3076923076923077,
+     "probabilities": {
+      "reflect": 0.07692307692307693,
+      "validate": 0.11538461538461539,
+      "explore": 0.3076923076923077,
+      "clarify": 0.07692307692307693,
+      "summarize": 0.038461538461538464,
+      "provide_information": 0.0,
+      "problem_solve": 0.2692307692307692,
+      "plan": 0.07692307692307693,
+      "check_in": 0.038461538461538464
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 837.4,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-007",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 1.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 1.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 513.6,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-009",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 696.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-011",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.9,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.9,
+      "reflection": 0.1,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.3902439024390244,
+     "probabilities": {
+      "reflect": 0.14634146341463414,
+      "validate": 0.24390243902439024,
+      "explore": 0.3902439024390244,
+      "clarify": 0.0975609756097561,
+      "summarize": 0.04878048780487805,
+      "provide_information": 0.0,
+      "problem_solve": 0.024390243902439025,
+      "plan": 0.024390243902439025,
+      "check_in": 0.024390243902439025
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.2
+    }
+   },
+   "error": null,
+   "latency_ms": 918.1,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-013",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.9,
+     "probabilities": {
+      "casual": 0.9,
+      "listening": 0.0,
+      "exploration": 0.1,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.48484848484848486,
+     "probabilities": {
+      "reflect": 0.48484848484848486,
+      "validate": 0.36363636363636365,
+      "explore": 0.06060606060606061,
+      "clarify": 0.030303030303030304,
+      "summarize": 0.030303030303030304,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.030303030303030304
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 844.4,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-015",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.4375,
+     "probabilities": {
+      "casual": 0.0625,
+      "listening": 0.125,
+      "exploration": 0.15625,
+      "reflection": 0.4375,
+      "problem_solving": 0.09375,
+      "planning": 0.0625,
+      "information": 0.03125,
+      "safety": 0.0,
+      "other": 0.03125
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.45161290322580644,
+     "probabilities": {
+      "reflect": 0.1935483870967742,
+      "validate": 0.45161290322580644,
+      "explore": 0.0967741935483871,
+      "clarify": 0.06451612903225806,
+      "summarize": 0.03225806451612903,
+      "provide_information": 0.03225806451612903,
+      "problem_solve": 0.03225806451612903,
+      "plan": 0.06451612903225806,
+      "check_in": 0.03225806451612903
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 724.5,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-017",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.2916666666666667,
+     "probabilities": {
+      "casual": 0.08333333333333333,
+      "listening": 0.16666666666666666,
+      "exploration": 0.25,
+      "reflection": 0.08333333333333333,
+      "problem_solving": 0.2916666666666667,
+      "planning": 0.041666666666666664,
+      "information": 0.041666666666666664,
+      "safety": 0.0,
+      "other": 0.041666666666666664
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.2608695652173913,
+     "probabilities": {
+      "reflect": 0.13043478260869565,
+      "validate": 0.21739130434782608,
+      "explore": 0.2608695652173913,
+      "clarify": 0.08695652173913043,
+      "summarize": 0.043478260869565216,
+      "provide_information": 0.043478260869565216,
+      "problem_solve": 0.13043478260869565,
+      "plan": 0.043478260869565216,
+      "check_in": 0.043478260869565216
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 812.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-019",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.5277777777777778,
+     "probabilities": {
+      "casual": 0.05555555555555555,
+      "listening": 0.5277777777777778,
+      "exploration": 0.1111111111111111,
+      "reflection": 0.2222222222222222,
+      "problem_solving": 0.027777777777777776,
+      "planning": 0.027777777777777776,
+      "information": 0.027777777777777776,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.46153846153846156,
+     "probabilities": {
+      "reflect": 0.46153846153846156,
+      "validate": 0.358974358974359,
+      "explore": 0.05128205128205128,
+      "clarify": 0.02564102564102564,
+      "summarize": 0.02564102564102564,
+      "provide_information": 0.0,
+      "problem_solve": 0.02564102564102564,
+      "plan": 0.02564102564102564,
+      "check_in": 0.02564102564102564
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.1
+    }
+   },
+   "error": null,
+   "latency_ms": 467.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-021",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 0.6923076923076923,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.6923076923076923,
+      "exploration": 0.07692307692307693,
+      "reflection": 0.15384615384615385,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.07692307692307693
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.4444444444444444,
+     "probabilities": {
+      "reflect": 0.3888888888888889,
+      "validate": 0.4444444444444444,
+      "explore": 0.1111111111111111,
+      "clarify": 0.05555555555555555,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 893.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-023",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "safety",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 1.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "check_in",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 1.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 467.4,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-025",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "safety",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 1.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.9,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.1,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.9,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.8
+    }
+   },
+   "error": null,
+   "latency_ms": 878.6,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-027",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.6896551724137931,
+     "probabilities": {
+      "casual": 0.04310344827586207,
+      "listening": 0.02586206896551724,
+      "exploration": 0.1724137931034483,
+      "reflection": 0.6896551724137931,
+      "problem_solving": 0.017241379310344827,
+      "planning": 0.034482758620689655,
+      "information": 0.008620689655172414,
+      "safety": 0.0,
+      "other": 0.008620689655172414
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.44554455445544555,
+     "probabilities": {
+      "reflect": 0.44554455445544555,
+      "validate": 0.3465346534653465,
+      "explore": 0.07425742574257425,
+      "clarify": 0.04950495049504951,
+      "summarize": 0.019801980198019802,
+      "provide_information": 0.0,
+      "problem_solve": 0.01485148514851485,
+      "plan": 0.024752475247524754,
+      "check_in": 0.024752475247524754
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 478.6,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-029",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "safety",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 1.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "check_in",
+     "confidence": 0.5294117647058824,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.47058823529411764,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.5294117647058824
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 1646.6,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-031",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 1.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "clarify",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 1.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 1513.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-033",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 0.5,
+     "probabilities": {
+      "casual": 0.07142857142857142,
+      "listening": 0.10714285714285714,
+      "exploration": 0.17857142857142858,
+      "reflection": 0.5,
+      "problem_solving": 0.03571428571428571,
+      "planning": 0.03571428571428571,
+      "information": 0.03571428571428571,
+      "safety": 0.0,
+      "other": 0.03571428571428571
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.36585365853658536,
+     "probabilities": {
+      "reflect": 0.36585365853658536,
+      "validate": 0.3170731707317073,
+      "explore": 0.0975609756097561,
+      "clarify": 0.04878048780487805,
+      "summarize": 0.04878048780487805,
+      "provide_information": 0.024390243902439025,
+      "problem_solve": 0.024390243902439025,
+      "plan": 0.024390243902439025,
+      "check_in": 0.04878048780487805
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 628.1,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-035",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.9
+    }
+   },
+   "error": null,
+   "latency_ms": 542.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-037",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 0.5333333333333333,
+     "probabilities": {
+      "casual": 0.06666666666666667,
+      "listening": 0.06666666666666667,
+      "exploration": 0.13333333333333333,
+      "reflection": 0.03333333333333333,
+      "problem_solving": 0.06666666666666667,
+      "planning": 0.5333333333333333,
+      "information": 0.06666666666666667,
+      "safety": 0.0,
+      "other": 0.03333333333333333
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 0.5151515151515151,
+     "probabilities": {
+      "reflect": 0.06060606060606061,
+      "validate": 0.12121212121212122,
+      "explore": 0.09090909090909091,
+      "clarify": 0.030303030303030304,
+      "summarize": 0.030303030303030304,
+      "provide_information": 0.030303030303030304,
+      "problem_solve": 0.06060606060606061,
+      "plan": 0.5151515151515151,
+      "check_in": 0.06060606060606061
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 839.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-039",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 1.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "check_in",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 1.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 1620.1,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-041",
+   "answers": {},
+   "error": "invalid_response",
+   "latency_ms": 509.4,
+   "model_id": null
+  },
+  {
+   "example_id": "hard-043",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.9
+    }
+   },
+   "error": null,
+   "latency_ms": 672.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-045",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.6153846153846154,
+     "probabilities": {
+      "casual": 0.038461538461538464,
+      "listening": 0.15384615384615385,
+      "exploration": 0.6153846153846154,
+      "reflection": 0.07692307692307693,
+      "problem_solving": 0.07692307692307693,
+      "planning": 0.038461538461538464,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.4473684210526316,
+     "probabilities": {
+      "reflect": 0.07894736842105263,
+      "validate": 0.3684210526315789,
+      "explore": 0.4473684210526316,
+      "clarify": 0.02631578947368421,
+      "summarize": 0.02631578947368421,
+      "provide_information": 0.0,
+      "problem_solve": 0.02631578947368421,
+      "plan": 0.0,
+      "check_in": 0.02631578947368421
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 492.9,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-047",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.8,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.1,
+      "reflection": 0.0,
+      "problem_solving": 0.8,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.1,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.5833333333333334,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.125,
+      "clarify": 0.08333333333333333,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.5833333333333334,
+      "plan": 0.16666666666666666,
+      "check_in": 0.041666666666666664
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.8
+    }
+   },
+   "error": null,
+   "latency_ms": 1299.9,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "hard-049",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 1.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 1.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 423.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-001",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 481.1,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-003",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.7692307692307693,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.07692307692307693,
+      "clarify": 0.15384615384615385,
+      "summarize": 0.0,
+      "provide_information": 0.7692307692307693,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 709.2,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-005",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 1.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.8
+    }
+   },
+   "error": null,
+   "latency_ms": 897.4,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-007",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 424.6,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-009",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 534.9,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-011",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.9
+    }
+   },
+   "error": null,
+   "latency_ms": 803.6,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-013",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 1.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.5882352941176471,
+     "probabilities": {
+      "reflect": 0.4117647058823529,
+      "validate": 0.5882352941176471,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 1084.1,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-015",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 1.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.5555555555555556,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.1111111111111111,
+      "clarify": 0.05555555555555555,
+      "summarize": 0.0,
+      "provide_information": 0.2777777777777778,
+      "problem_solve": 0.5555555555555556,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.8
+    }
+   },
+   "error": null,
+   "latency_ms": 522.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-017",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 1.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 1.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.8
+    }
+   },
+   "error": null,
+   "latency_ms": 618.9,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-019",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 666.4,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-021",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 1.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "summarize",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 1.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 897.5,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-023",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.625,
+     "probabilities": {
+      "casual": 0.625,
+      "listening": 0.0625,
+      "exploration": 0.0625,
+      "reflection": 0.0625,
+      "problem_solving": 0.0625,
+      "planning": 0.0625,
+      "information": 0.0625,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.5,
+     "probabilities": {
+      "reflect": 0.5,
+      "validate": 0.2777777777777778,
+      "explore": 0.1111111111111111,
+      "clarify": 0.05555555555555555,
+      "summarize": 0.05555555555555555,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 893.3,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-025",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 1.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.8,
+     "probabilities": {
+      "reflect": 0.2,
+      "validate": 0.8,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 430.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-027",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 393.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-029",
+   "answers": {},
+   "error": "invalid_response",
+   "latency_ms": 873.8,
+   "model_id": null
+  },
+  {
+   "example_id": "information-031",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.9,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.9,
+      "reflection": 0.0,
+      "problem_solving": 0.1,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.7,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.25,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.7,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.05
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.8
+    }
+   },
+   "error": null,
+   "latency_ms": 450.5,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-033",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.9
+    }
+   },
+   "error": null,
+   "latency_ms": 959.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-035",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 1.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 1.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 1019.4,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-037",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.9,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.9,
+      "planning": 0.0,
+      "information": 0.1,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.32,
+     "probabilities": {
+      "reflect": 0.04,
+      "validate": 0.08,
+      "explore": 0.08,
+      "clarify": 0.04,
+      "summarize": 0.04,
+      "provide_information": 0.28,
+      "problem_solve": 0.32,
+      "plan": 0.04,
+      "check_in": 0.08
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.9
+    }
+   },
+   "error": null,
+   "latency_ms": 519.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-039",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 1.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 1.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.6
+    }
+   },
+   "error": null,
+   "latency_ms": 812.2,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-041",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 0.4666666666666667,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.2,
+      "reflection": 0.0,
+      "problem_solving": 0.3333333333333333,
+      "planning": 0.4666666666666667,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 0.36363636363636365,
+     "probabilities": {
+      "reflect": 0.045454545454545456,
+      "validate": 0.045454545454545456,
+      "explore": 0.18181818181818182,
+      "clarify": 0.045454545454545456,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.2727272727272727,
+      "plan": 0.36363636363636365,
+      "check_in": 0.045454545454545456
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.2
+    }
+   },
+   "error": null,
+   "latency_ms": 508.9,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-043",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 481.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-045",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 0.5862068965517241,
+     "probabilities": {
+      "casual": 0.06896551724137931,
+      "listening": 0.034482758620689655,
+      "exploration": 0.13793103448275862,
+      "reflection": 0.10344827586206896,
+      "problem_solving": 0.034482758620689655,
+      "planning": 0.034482758620689655,
+      "information": 0.5862068965517241,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.38095238095238093,
+     "probabilities": {
+      "reflect": 0.09523809523809523,
+      "validate": 0.14285714285714285,
+      "explore": 0.11904761904761904,
+      "clarify": 0.07142857142857142,
+      "summarize": 0.047619047619047616,
+      "provide_information": 0.38095238095238093,
+      "problem_solve": 0.047619047619047616,
+      "plan": 0.047619047619047616,
+      "check_in": 0.047619047619047616
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.9
+    }
+   },
+   "error": null,
+   "latency_ms": 1004.4,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-047",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 836.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "information-049",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 467.2,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-001",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 1.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.9,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.1,
+      "explore": 0.9,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 397.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-003",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 1.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 1.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 620.3,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-005",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.625,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.625,
+      "reflection": 0.1875,
+      "problem_solving": 0.1875,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 0.5555555555555556,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.4444444444444444,
+      "provide_information": 0.5555555555555556,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.1
+    }
+   },
+   "error": null,
+   "latency_ms": 896.6,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-007",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 1066.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-009",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.6,
+     "probabilities": {
+      "casual": 0.06666666666666667,
+      "listening": 0.06666666666666667,
+      "exploration": 0.6,
+      "reflection": 0.06666666666666667,
+      "problem_solving": 0.13333333333333333,
+      "planning": 0.06666666666666667,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.4090909090909091,
+     "probabilities": {
+      "reflect": 0.13636363636363635,
+      "validate": 0.13636363636363635,
+      "explore": 0.4090909090909091,
+      "clarify": 0.09090909090909091,
+      "summarize": 0.045454545454545456,
+      "provide_information": 0.0,
+      "problem_solve": 0.09090909090909091,
+      "plan": 0.045454545454545456,
+      "check_in": 0.045454545454545456
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 568.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-011",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "listening",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 1.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.5263157894736842,
+     "probabilities": {
+      "reflect": 0.5263157894736842,
+      "validate": 0.47368421052631576,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 502.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-013",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 1.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "check_in",
+     "confidence": 0.8,
+     "probabilities": {
+      "reflect": 0.2,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.8
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 796.9,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-015",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.8,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.2,
+      "reflection": 0.0,
+      "problem_solving": 0.8,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.3,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.2,
+      "clarify": 0.1,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.3,
+      "plan": 0.3,
+      "check_in": 0.1
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 475.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-017",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.8,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.2,
+      "reflection": 0.0,
+      "problem_solving": 0.8,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 0.4666666666666667,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.13333333333333333,
+      "clarify": 0.06666666666666667,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.3333333333333333,
+      "plan": 0.4666666666666667,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3
+    }
+   },
+   "error": null,
+   "latency_ms": 647.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-019",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.45,
+     "probabilities": {
+      "casual": 0.025,
+      "listening": 0.025,
+      "exploration": 0.2,
+      "reflection": 0.05,
+      "problem_solving": 0.45,
+      "planning": 0.1,
+      "information": 0.15,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.3,
+     "probabilities": {
+      "reflect": 0.06666666666666667,
+      "validate": 0.06666666666666667,
+      "explore": 0.2,
+      "clarify": 0.1,
+      "summarize": 0.03333333333333333,
+      "provide_information": 0.16666666666666666,
+      "problem_solve": 0.3,
+      "plan": 0.03333333333333333,
+      "check_in": 0.03333333333333333
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.8
+    }
+   },
+   "error": null,
+   "latency_ms": 861.3,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-021",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "reflection",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 1.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "summarize",
+     "confidence": 0.45,
+     "probabilities": {
+      "reflect": 0.35,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.2,
+      "summarize": 0.45,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 810.1,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-023",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.42105263157894735,
+     "probabilities": {
+      "casual": 0.05263157894736842,
+      "listening": 0.10526315789473684,
+      "exploration": 0.42105263157894735,
+      "reflection": 0.21052631578947367,
+      "problem_solving": 0.13157894736842105,
+      "planning": 0.05263157894736842,
+      "information": 0.02631578947368421,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.27450980392156865,
+     "probabilities": {
+      "reflect": 0.27450980392156865,
+      "validate": 0.2549019607843137,
+      "explore": 0.19607843137254902,
+      "clarify": 0.058823529411764705,
+      "summarize": 0.0392156862745098,
+      "provide_information": 0.0196078431372549,
+      "problem_solve": 0.0784313725490196,
+      "plan": 0.0392156862745098,
+      "check_in": 0.0392156862745098
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.1
+    }
+   },
+   "error": null,
+   "latency_ms": 476.2,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-025",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.9,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.9,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.1,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "explore",
+     "confidence": 0.3333333333333333,
+     "probabilities": {
+      "reflect": 0.09523809523809523,
+      "validate": 0.09523809523809523,
+      "explore": 0.3333333333333333,
+      "clarify": 0.047619047619047616,
+      "summarize": 0.023809523809523808,
+      "provide_information": 0.23809523809523808,
+      "problem_solve": 0.09523809523809523,
+      "plan": 0.047619047619047616,
+      "check_in": 0.023809523809523808
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.8
+    }
+   },
+   "error": null,
+   "latency_ms": 418.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-027",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 1.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "check_in",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 1.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 489.1,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-029",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "planning",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 1.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "plan",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 1.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.8
+    }
+   },
+   "error": null,
+   "latency_ms": 994.1,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-031",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 1.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "reflect",
+     "confidence": 0.3783783783783784,
+     "probabilities": {
+      "reflect": 0.3783783783783784,
+      "validate": 0.2702702702702703,
+      "explore": 0.1891891891891892,
+      "clarify": 0.05405405405405406,
+      "summarize": 0.02702702702702703,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.08108108108108109
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 510.9,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-033",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.8181818181818182,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.18181818181818182,
+      "reflection": 0.0,
+      "problem_solving": 0.8181818181818182,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.6428571428571429,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.21428571428571427,
+      "clarify": 0.07142857142857142,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.6428571428571429,
+      "plan": 0.07142857142857142,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.3
+    }
+   },
+   "error": null,
+   "latency_ms": 476.7,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-035",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 0.9,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.9,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.1
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 0.9,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.1,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.9,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 486.0,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-037",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 0.8,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.8,
+      "reflection": 0.0,
+      "problem_solving": 0.2,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "summarize",
+     "confidence": 0.8181818181818182,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.09090909090909091,
+      "clarify": 0.09090909090909091,
+      "summarize": 0.8181818181818182,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 786.1,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-039",
+   "answers": {},
+   "error": "invalid_response",
+   "latency_ms": 438.6,
+   "model_id": null
+  },
+  {
+   "example_id": "practical-041",
+   "answers": {},
+   "error": "invalid_response",
+   "latency_ms": 668.0,
+   "model_id": null
+  },
+  {
+   "example_id": "practical-043",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "casual",
+     "confidence": 0.6956521739130435,
+     "probabilities": {
+      "casual": 0.6956521739130435,
+      "listening": 0.08695652173913043,
+      "exploration": 0.043478260869565216,
+      "reflection": 0.043478260869565216,
+      "problem_solving": 0.043478260869565216,
+      "planning": 0.043478260869565216,
+      "information": 0.043478260869565216,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 0.42857142857142855,
+     "probabilities": {
+      "reflect": 0.3333333333333333,
+      "validate": 0.42857142857142855,
+      "explore": 0.047619047619047616,
+      "clarify": 0.023809523809523808,
+      "summarize": 0.047619047619047616,
+      "provide_information": 0.023809523809523808,
+      "problem_solve": 0.023809523809523808,
+      "plan": 0.047619047619047616,
+      "check_in": 0.023809523809523808
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 730.3,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-045",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "exploration",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 1.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "validate",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 1.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.0
+    }
+   },
+   "error": null,
+   "latency_ms": 691.8,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-047",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "information",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 0.0,
+      "planning": 0.0,
+      "information": 1.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "provide_information",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 1.0,
+      "problem_solve": 0.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 1.0
+    }
+   },
+   "error": null,
+   "latency_ms": 575.3,
+   "model_id": "openai/gpt-oss-20b"
+  },
+  {
+   "example_id": "practical-049",
+   "answers": {
+    "conversation_mode": {
+     "type": "choice",
+     "choice": "problem_solving",
+     "confidence": 1.0,
+     "probabilities": {
+      "casual": 0.0,
+      "listening": 0.0,
+      "exploration": 0.0,
+      "reflection": 0.0,
+      "problem_solving": 1.0,
+      "planning": 0.0,
+      "information": 0.0,
+      "safety": 0.0,
+      "other": 0.0
+     }
+    },
+    "response_strategy": {
+     "type": "choice",
+     "choice": "problem_solve",
+     "confidence": 1.0,
+     "probabilities": {
+      "reflect": 0.0,
+      "validate": 0.0,
+      "explore": 0.0,
+      "clarify": 0.0,
+      "summarize": 0.0,
+      "provide_information": 0.0,
+      "problem_solve": 1.0,
+      "plan": 0.0,
+      "check_in": 0.0
+     }
+    },
+    "knowledge_retrieval_useful": {
+     "type": "noul",
+     "noul": 0.6
+    }
+   },
+   "error": null,
+   "latency_ms": 700.9,
+   "model_id": "openai/gpt-oss-20b"
+  }
+ ]
+}

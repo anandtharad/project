@@ -8,7 +8,7 @@ Last updated: 2026-10-13. Spec: COMPANION-TECH-SPEC-001 v2.1.
 |---|---|
 | 0: Foundation | **Done** |
 | 1: Basic conversation | **Done** (live LLM calls verified with Groq; other providers unverified, see below) |
-| 2: State and Jev | **Built and evaluated.** 4 of 5 acceptance criteria met; strategy decisions are wired and the policy measurably changes replies, but no decision model passes calibration yet, so decisions run in shadow mode (see Phase 2 acceptance). An LLM decision provider (`DECISION_PROVIDER=llm`, Groq `gpt-oss-20b`) now substitutes for Jev behind the same interface; built and tested offline, not yet evaluated |
+| 2: State and Jev | **Built and evaluated.** 4 of 5 acceptance criteria met; strategy decisions are wired and the policy measurably changes replies, but no decision model passes calibration yet, so decisions run in shadow mode (see Phase 2 acceptance). An LLM decision provider (`DECISION_PROVIDER=llm`, Groq `gpt-oss-20b`) now substitutes for Jev behind the same interface; evaluated live on dev (mode 0.70, strategy 0.58, retrieval AUROC 0.95, vs Laya 0.11 / 0.29 / 0.37), but no threshold reaches the 0.80 acted-on target, so it also runs in shadow mode (docs/decisions.md) |
 | 3: Memory | **Built and evaluated.** All 5 acceptance criteria met on the synthetic evaluation set (see Phase 3 acceptance); retrieval and extraction quality are moderate and measured, not assumed |
 | 4: RAG | Not started |
 | 5: Safety | Not started. **Required before any real-user exposure** |
@@ -178,14 +178,12 @@ are clean.
   (no keys).
 - **pgvector:** verified against extension 0.6.0 (local) and 0.8.7 (the
   compose image).
-- **LLM decision provider (`DECISION_PROVIDER=llm`):** offline only: the
-  scripted LLM double, the fake provider end to end, and the real `groq`
-  SDK on a mocked transport (exact strict `json_schema` request, hidden
-  reasoning, effort, output limit). Before it was built, three live trials
-  of `gpt-oss-20b` with a decision schema returned valid JSON 3/3, and Groq
-  rejected a `logprobs` request with HTTP 400. **No live call or evaluation
-  has been run with this code**; its questions stay in shadow mode until
-  `scripts/eval_decisions.py` sets thresholds for its calibration key.
+- **LLM decision provider (`DECISION_PROVIDER=llm`):** verified live on
+  Groq `openai/gpt-oss-20b` through the dev evaluation (125 conversations,
+  2026-10-14): strict `json_schema` requests, 5 of 125 schema failures
+  mapped to `invalid_response`, p50 0.65 s. Offline: the scripted LLM double,
+  the fake provider end to end, and the real `groq` SDK on a mocked
+  transport. Not yet exercised in a live HTTP turn.
 - **Server-side refusal fallback** (`fallbacks: "default"`): request shape
   verified offline. Whether your account or organization has the beta enabled
   is unverified. If it doesn't, the provider returns 400, which shows up as
@@ -314,10 +312,12 @@ all built. See [memory.md](memory.md).
 
 ## Open questions and next steps
 
-1. **A decision model that passes calibration.** Options: evaluate the LLM
-   provider (`DECISION_PROVIDER=llm`; on Groq's free tier one split per
-   day, `scripts/eval_decisions.py --pause 2 --tokens-per-minute 7000`,
-   `--resume` to continue), a Jev API key (`DECISION_PROVIDER=jev`, then
+1. **A decision model that passes calibration.** The LLM provider on
+   `gpt-oss-20b` gets close on dev (best acted-on accuracy 0.76 / 0.78
+   against the 0.80 target). Options: a revised decision prompt or a
+   stronger model evaluated on dev (`scripts/eval_decisions.py --pause 2
+   --tokens-per-minute 7000`, `--resume` to continue; one split per day on
+   Groq's free tier), a Jev API key (`DECISION_PROVIDER=jev`, then
    rerun `scripts/eval_decisions.py`), or fine-tuning Laya on labelled
    decisions (its notebook runs on Kaggle's free GPUs). Either way,
    thresholds come from the dev split and are confirmed on test before any
