@@ -34,6 +34,10 @@ class GenerationPurpose(StrEnum):
     MEMORY_EXTRACTION = "memory_extraction"
     # Typed decision questions answered by an LLM (DECISION_PROVIDER=llm).
     DECISION = "decision"
+    # Safety layer: the input risk classifier and the optional semantic
+    # check of a reply (app/safety/).
+    SAFETY_CLASSIFICATION = "safety_classification"
+    SAFETY_OUTPUT_CHECK = "safety_output_check"
 
 
 class GenerationParams(BaseModel):

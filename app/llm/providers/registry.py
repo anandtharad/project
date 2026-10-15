@@ -468,43 +468,54 @@ def resolve_provider(settings: Settings) -> ResolvedProvider:
     )
 
 
-def resolve_decision_llm(settings: Settings) -> ResolvedProvider:
-    """The decision model for DECISION_PROVIDER=llm, resolved like the reply
-    model (same key, effort and structured-output rules) from
-    DECISION_LLM_PROVIDER, DECISION_LLM_MODEL, DECISION_LLM_EFFORT and
-    DECISION_LLM_MAX_OUTPUT_TOKENS.
+def resolve_auxiliary_llm(
+    settings: Settings,
+    *,
+    provider: ProviderName,
+    model: str,
+    effort: Effort | Literal["off"] | None,
+    max_output_tokens: int,
+    setting_prefix: str,
+    feature: str,
+    users: str,
+) -> ResolvedProvider:
+    """A model used by a component other than the reply (decisions, the
+    safety classifier), resolved like the reply model: same key, effort and
+    structured-output rules.
 
     It uses the provider's own key setting (e.g. GROQ_API_KEY).
-    GENERATION_API_KEY and GENERATION_BASE_URL apply only when the decision
-    provider is also the generation provider, so the reply provider's key is
-    never sent to another provider's endpoint.
+    GENERATION_API_KEY and GENERATION_BASE_URL apply only when the provider
+    is also the generation provider, so the reply provider's key is never
+    sent to another provider's endpoint. `setting_prefix` (e.g.
+    "DECISION_LLM"), `feature` (e.g. "DECISION_PROVIDER=llm") and `users`
+    (e.g. "decisions") only name things in error and warning messages.
     """
-    preset = PRESETS[settings.decision_llm_provider]
+    preset = PRESETS[provider]
     shared = preset.name == settings.generation_provider
     if preset.name == "openai_compatible" and not shared:
         # Its endpoint is GENERATION_BASE_URL; without it the SDK would fall
         # back to environment defaults.
         raise ProviderConfigError(
-            "DECISION_LLM_PROVIDER=openai_compatible needs GENERATION_PROVIDER=openai_compatible "
-            "(it uses GENERATION_BASE_URL)"
+            f"{setting_prefix}_PROVIDER=openai_compatible needs "
+            "GENERATION_PROVIDER=openai_compatible (it uses GENERATION_BASE_URL)"
         )
     own_key = getattr(settings, preset.api_key_setting) if preset.api_key_setting else None
     if preset.requires_api_key and own_key is None and not (shared and settings.generation_api_key):
         key_var = (preset.api_key_setting or "generation_api_key").upper()
         raise ProviderConfigError(
-            f"DECISION_PROVIDER=llm needs an API key for DECISION_LLM_PROVIDER={preset.name}: "
+            f"{feature} needs an API key for {setting_prefix}_PROVIDER={preset.name}: "
             f"set {key_var}"
         )
     resolved = resolve_provider(
         settings.model_copy(
             update={
                 "generation_provider": preset.name,
-                "generation_model": settings.decision_llm_model,
-                "generation_effort": settings.decision_llm_effort,
+                "generation_model": model,
+                "generation_effort": effort,
                 "generation_temperature": None,
                 "generation_api_key": settings.generation_api_key if shared else None,
                 "generation_base_url": settings.generation_base_url if shared else None,
-                "max_output_tokens": settings.decision_llm_max_output_tokens,
+                "max_output_tokens": max_output_tokens,
             }
         )
     )
@@ -514,7 +525,23 @@ def resolve_decision_llm(settings: Settings) -> ResolvedProvider:
             resolved,
             warnings=(
                 *resolved.warnings,
-                "DECISION_LLM_MODEL is the reply model: decisions share its rate limits",
+                f"{setting_prefix}_MODEL is the reply model: {users} share its rate limits",
             ),
         )
     return resolved
+
+
+def resolve_decision_llm(settings: Settings) -> ResolvedProvider:
+    """The decision model for DECISION_PROVIDER=llm (see `resolve_auxiliary_llm`),
+    from DECISION_LLM_PROVIDER, DECISION_LLM_MODEL, DECISION_LLM_EFFORT and
+    DECISION_LLM_MAX_OUTPUT_TOKENS."""
+    return resolve_auxiliary_llm(
+        settings,
+        provider=settings.decision_llm_provider,
+        model=settings.decision_llm_model,
+        effort=settings.decision_llm_effort,
+        max_output_tokens=settings.decision_llm_max_output_tokens,
+        setting_prefix="DECISION_LLM",
+        feature="DECISION_PROVIDER=llm",
+        users="decisions",
+    )
