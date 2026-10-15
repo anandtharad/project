@@ -82,11 +82,18 @@ returned.
 `encourage_connection`) list none. It is null on ordinary turns and is
 returned unchanged on an idempotent replay.
 
+`sources` (list, usually empty): the reference passages cited in the reply
+with `[S1]` markers (docs/rag.md). Each has `marker`, `title`,
+`publisher`, `url`, `section`, `document_id`, `chunk_id` and `version`.
+Every marker left in `assistant_content` appears here. Markers that did not
+resolve were removed before the reply was stored. Also returned on replay.
+
 ### `GET /v1/conversations/{conversation_id}/messages?after_sequence=0&limit=50`
 Messages in conversation order (`limit` is 1–200). Each item has
 `message_id`, `sequence`, `role` (`user`/`assistant`), `content`,
 `created_at`, and, on user messages only, `status`
-(`pending`/`completed`/`failed`). If more messages exist,
+(`pending`/`completed`/`failed`). Assistant messages carry `sources` as
+above (empty when nothing was cited). If more messages exist,
 `next_after_sequence` gives the value to pass as `after_sequence`.
 
 ### Memories: `/v1/users/me/...`

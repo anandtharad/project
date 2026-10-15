@@ -61,16 +61,18 @@ Stages are recorded per turn (`app/orchestration/lifecycle.py`) and returned as
 `timing_ms` in development:
 
 `RECEIVED → VALIDATED → AUTHORIZED → USER_MESSAGE_PERSISTED → CONTEXT_LOADED →
-MEMORIES_RETRIEVED → STATE_UPDATED → DECISIONS_RESOLVED → POLICY_CREATED →
-CONTEXT_BUILT → RESPONSE_GENERATED → RESPONSE_VALIDATED →
+SAFETY_ASSESSED / MEMORIES_RETRIEVED / KNOWLEDGE_RETRIEVED / STATE_UPDATED →
+DECISIONS_RESOLVED → POLICY_CREATED → CONTEXT_BUILT → RESPONSE_GENERATED →
+RESPONSE_VALIDATED → SAFETY_CHECKED → CITATIONS_CHECKED →
 ASSISTANT_MESSAGE_PERSISTED → COMPLETED`
 
-Memory retrieval runs concurrently with the state update. Memory extraction
-runs after `ASSISTANT_MESSAGE_PERSISTED`, as a background task. The
-specification's `INPUT_SAFETY_ANALYZED` stage arrives with Phase 5, and
-knowledge retrieval with Phase 4. State extraction, decisions and memory
-never fail a turn; see [decisions.md](decisions.md) and
-[memory.md](memory.md) for each stage's failure behavior.
+Safety assessment, memory retrieval, the knowledge lookup and the state
+update run concurrently. Memory extraction runs after
+`ASSISTANT_MESSAGE_PERSISTED`, as a background task. State extraction,
+decisions, memory, safety analysis and knowledge retrieval never fail a turn;
+see [decisions.md](decisions.md), [memory.md](memory.md),
+[safety.md](safety.md) and [rag.md](rag.md) for each stage's failure
+behavior.
 
 No transaction is held open during generation:
 
@@ -199,6 +201,5 @@ and a test enforces this. SDK/HTTP debug loggers are capped at WARNING.
 
 | Spec component | Phase | Integration point |
 |---|---|---|
-| Knowledge RAG (pgvector) | 4 | the extension is enabled by migration `0003`; reuse `app/embeddings` |
 | Evaluation runner, experiment tables | 6 | `evaluation_runs` / `evaluation_results` |
 | SFT data pipeline | 7 | offline tooling under `data/training` and `scripts/` |

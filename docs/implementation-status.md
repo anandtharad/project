@@ -1,6 +1,6 @@
 # Implementation status
 
-Last updated: 2026-10-13. Spec: COMPANION-TECH-SPEC-001 v2.1.
+Last updated: 2026-10-15. Spec: COMPANION-TECH-SPEC-001 v2.1.
 
 ## Phase summary
 
@@ -10,7 +10,7 @@ Last updated: 2026-10-13. Spec: COMPANION-TECH-SPEC-001 v2.1.
 | 1: Basic conversation | **Done** (live LLM calls verified with Groq; other providers unverified, see below) |
 | 2: State and Jev | **Built and evaluated.** 4 of 5 acceptance criteria met; strategy decisions are wired and the policy measurably changes replies, but no decision model passes calibration yet, so decisions run in shadow mode (see Phase 2 acceptance). An LLM decision provider (`DECISION_PROVIDER=llm`, Groq `gpt-oss-20b`) now substitutes for Jev behind the same interface; evaluated live on dev (mode 0.70, strategy 0.58, retrieval AUROC 0.95, vs Laya 0.11 / 0.29 / 0.37), but no threshold reaches the 0.80 acted-on target, so it also runs in shadow mode (docs/decisions.md) |
 | 3: Memory | **Built and evaluated.** All 5 acceptance criteria met on the synthetic evaluation set (see Phase 3 acceptance); retrieval and extraction quality are moderate and measured, not assumed |
-| 4: RAG | Not started |
+| 4: RAG | **Built, being evaluated** (docs/rag.md): 26 reviewed public-domain sources, versioned idempotent ingestion, hybrid retrieval with rank fusion and a relevance threshold, form-based routing (never for casual chat or on safety pathways), escaped evidence block, citations that always resolve, sources in the API |
 | 5: Safety | **Built and wired into every turn** (docs/safety.md): pattern screen + LLM classifier, degraded mode, pathway policy overriding the strategy, verified regional resources, output checks with bounded recovery, `turn_safety` records. Not clinically validated; the person-facing texts need qualified review before real use |
 | 6: Evaluation and observability | Not started (structured logging and provenance already exist) |
 | 7: Fine-tuning preparation | Not started |
@@ -146,7 +146,7 @@ are clean.
 | Embedding failure | Full-text matching; memory stored without a vector and embedded later | `test_embedding_failure_falls_back_to_full_text_and_is_backfilled_later` |
 | Memory store unavailable | No memories in the prompt, flagged; turn completes | `test_an_unavailable_memory_store_means_no_memories_and_the_turn_succeeds` |
 | Memory extraction failure | Nothing stored; turn unaffected; one retry when the provider reports a schema failure or rejects the structured request | `test_a_failed_extraction_does_not_affect_the_turn`, `test_a_failed_structured_extraction_is_retried_once` |
-| RAG unavailable | Phase 4 | — |
+| RAG unavailable | No passages; an evidence request is told sources are unavailable; never claims a source; turn completes | `test_a_retrieval_failure_never_claims_a_source` |
 | Safety dependency unavailable | Degraded mode: patterns only, recorded; with no hit the turn is `unassessed`, never safe; strict output checks | `test_classifier_failure_is_degraded_mode_and_explicit_risk_still_routes`, `test_classifier_failure_with_no_signal_is_recorded_as_unassessed_not_safe`, `test_a_failed_semantic_check_does_not_block_the_reply` |
 
 ## Verified vs unverified integrations

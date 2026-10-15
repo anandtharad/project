@@ -4,11 +4,11 @@ An English-first conversational companion built as a decision-controlled LLM
 application: application code owns authorization, orchestration, persistence
 and enforcement; the LLM only produces conversational language.
 
-> **Status: Phases 0-1 are done; Phase 2 (state and decisions) and Phase 3
-> (memory) are built and evaluated, see the status page for what is and
-> isn't met.** This is a
-> development build. It has **no independent safety layer yet** (Phase 5)
-> and only **development authentication**. Do not expose it to real users.
+> **Status: Phases 0-1 are done; Phases 2 (state and decisions), 3
+> (memory), 4 (knowledge retrieval) and 5 (safety) are built and evaluated,
+> see the status page for what is and isn't met.** This is a development
+> build: the safety layer is **not clinically validated**, and
+> authentication is **development-only**. Do not expose it to real users.
 > See [docs/implementation-status.md](docs/implementation-status.md).
 
 What works now: text in → validated → persisted conversation history →
@@ -17,11 +17,15 @@ decision model (self-hosted Laya or TypeSafe Jev; shadow mode until
 calibrated) → response policy in code → instruction LLM → validated
 response → reply, decisions and versioned state persisted together →
 memories proposed in the background, accepted by code, and retrieved in
-later conversations (the person can list, delete or turn them off). It has
+later conversations (the person can list, delete or turn them off). Every
+turn also passes a safety layer (input analysis, pathways with verified
+crisis contacts, output checks), and information requests are grounded in a
+small reviewed library with citations that resolve. It has
 idempotent retries, one in-flight turn per conversation, bounded timeouts,
 controlled provider failures, and model, prompt and policy provenance on
 every reply. Details: [docs/decisions.md](docs/decisions.md),
-[docs/memory.md](docs/memory.md).
+[docs/memory.md](docs/memory.md), [docs/safety.md](docs/safety.md),
+[docs/rag.md](docs/rag.md).
 
 The LLM is swappable: Anthropic, OpenAI, Groq, Google Gemini, xAI (Grok),
 Qwen (Alibaba Model Studio), DeepSeek, OpenRouter, Together, Mistral, Ollama,
@@ -145,6 +149,10 @@ Windows notes:
   Clear one with `Remove-Item Env:NAME`.
 - Multi-line commands use a backtick (`` ` ``) instead of `\`, or put the
   whole command on one line.
+- Knowledge lookups need the reviewed corpus in the database once (and
+  again after `git pull` changes `data/knowledge`):
+  `uv run python scripts/ingest_knowledge.py`. Without it, information
+  requests are answered without sources.
 - Memory search uses a local embedding model. The first start downloads it
   (about 65 MB from huggingface.co) into `EMBEDDING_CACHE_DIR`
   (`.cache\fastembed` with `.env.example`); until it is ready, memories are
@@ -176,7 +184,8 @@ is the source of truth. Important ones:
 | `MEMORY_ENABLED`, `MEMORY_EXTRACTION_MODEL` | memory across conversations (default on; extraction uses the reply model) |
 | `EMBEDDING_PROVIDER`, `EMBEDDING_CACHE_DIR` | `local` (default, no key), `openai`, `gemini` or `none`; where the local model is cached |
 | `MEMORY_MIN_SEMANTIC`, `MEMORY_RETENTION_DAYS` | retrieval threshold (0.49, tuned for the local model) and the longest a memory is kept (365 days) |
-| `COMPANION_PROMPT_VERSION` | reply prompt; `1.6.0` (default) is the 1.5.0 voice (docs/voice.md) plus the safety pathway fragments; `1.4.0` is the previous voice (`1.0.0` runs without a policy) |
+| `COMPANION_PROMPT_VERSION` | reply prompt; `1.7.0` (default) is the 1.5.0 voice (docs/voice.md) with the safety pathway fragments (1.6.0) and the evidence rules for knowledge passages; `1.4.0` is the previous voice (`1.0.0` runs without a policy) |
+| `KNOWLEDGE_ENABLED`, `KNOWLEDGE_MIN_SEMANTIC` | knowledge lookups for information requests (default on; needs `scripts/ingest_knowledge.py` once) and the relevance threshold, tuned for the local embedding model; see docs/rag.md |
 | `SAFETY_REGION`, `SAFETY_CLASSIFIER_PROVIDER`, `SAFETY_CLASSIFIER_MODEL` | crisis resources (`IN`, `US`, `GB` or generic) and the safety classifier (`auto`: Groq `openai/gpt-oss-safeguard-20b` when `GROQ_API_KEY` is set); see docs/safety.md |
 | `MEMORY_PROMPT_VERSION` | memory-extraction prompt (see docs/memory.md for the evaluated versions) |
 
@@ -200,6 +209,8 @@ app/
   decisions/      decision questions, System One adapter (Laya / Jev), validation, thresholds
   state/          conversation state schema and structured extraction
   memory/         memory schema, eligibility policy, store, retrieval, extraction
+  safety/         taxonomy, pattern screen, classifier, pathway policy, resources, output checks
+  rag/            knowledge extraction, chunking, ingestion, hybrid retrieval, routing, citations
   embeddings/     embedding clients (local fastembed, OpenAI, Gemini)
   evaluation/     decision, policy-effect and memory evaluation metrics
   llm/            provider-neutral schemas, provider presets, and adapters
@@ -208,6 +219,7 @@ app/
   db/             SQLAlchemy models, engine, ownership-scoped queries
   prompting.py    versioned prompt registry
 migrations/       Alembic migrations
+data/knowledge/   reviewed knowledge manifest and extracted-text snapshots
 prompts/          versioned prompt files + checksum lock
 decisions/        decision-question checksum lock
 eval/             evaluation datasets (with dataset cards) and results
@@ -223,6 +235,7 @@ docs/             architecture, API, threat model, implementation status
 - [Decisions, state and response policy](docs/decisions.md)
 - [Memory](docs/memory.md)
 - [Safety layer](docs/safety.md)
+- [Knowledge retrieval](docs/rag.md)
 - [Voice (how replies read)](docs/voice.md)
 - [API reference](docs/api.md)
 - [Threat model and privacy notes](docs/threat-model.md)
