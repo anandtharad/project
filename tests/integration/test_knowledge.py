@@ -354,7 +354,7 @@ async def test_casual_conversation_is_not_looked_up(
         "AND role = 'assistant'",
         cid=uuid.UUID(cid),
     )
-    assert metadata["knowledge"]["route"] == "casual"
+    assert metadata["knowledge"]["retrieve"] is False
     assert metadata["knowledge"]["status"] == "not_needed"
 
 
