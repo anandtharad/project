@@ -431,16 +431,7 @@ class TurnOrchestrator:
     ) -> str:
         if not self._policy_enabled:
             return self._prompt.render()
-        if safety is not None and safety.overrides_strategy:
-            guidance = guidance_for(self._prompt, safety)
-        else:
-            names = [*policy.fragments]
-            knowledge = lookup.guidance_fragment() if lookup is not None else None
-            # Prompts before 1.8.0 have no knowledge fragments.
-            if knowledge is not None and knowledge in self._prompt.fragments:
-                names.append(knowledge)
-            guidance = "\n\n".join(self._prompt.fragment(name) for name in names)
-        return self._prompt.render(response_guidance=guidance)
+        return system_prompt(self._prompt, policy, safety, lookup)
 
     async def _assess(self, content: str, begun: StartedTurn) -> SafetyAssessment | None:
         if self._safety is None:
@@ -669,6 +660,28 @@ def _state_summary(
 
 
 _PENDING = MemoryStatus.PENDING_CONFIRMATION
+
+
+def system_prompt(
+    prompt: PromptTemplate,
+    policy: ResponsePolicy,
+    safety: SafetyDecision | None = None,
+    lookup: KnowledgeLookup | None = None,
+) -> str:
+    """The companion system prompt for one turn: the safety guidance when a
+    safety pathway overrides the strategy, else the policy's fragments and
+    the knowledge fragment for the lookup. Evaluation scripts call this too,
+    so what they measure is what a turn sends."""
+    if safety is not None and safety.overrides_strategy:
+        guidance = guidance_for(prompt, safety)
+    else:
+        names = [*policy.fragments]
+        knowledge = lookup.guidance_fragment() if lookup is not None else None
+        # Prompts before 1.8.0 have no knowledge fragments.
+        if knowledge is not None and knowledge in prompt.fragments:
+            names.append(knowledge)
+        guidance = "\n\n".join(prompt.fragment(name) for name in names)
+    return prompt.render(response_guidance=guidance)
 
 
 def _history_for_model(history: list[ChatMessage]) -> list[ChatMessage]:

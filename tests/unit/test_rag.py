@@ -430,3 +430,34 @@ def test_snapshot_round_trip(tmp_path: Path) -> None:
     write_snapshot(tmp_path / "k.json", snapshot)
     again = read_snapshot(tmp_path / "k.json")
     assert again.page == page and again.raw_sha256 == "ab"
+
+
+def test_system_prompt_adds_the_knowledge_fragment_only_when_the_prompt_has_it() -> None:
+    """The engine and the evaluation scripts share this assembly, so an
+    evaluation measures the prompt a turn sends."""
+    from app.decisions.schemas import DecisionSet
+    from app.orchestration.engine import system_prompt
+    from app.orchestration.policy import choose_policy
+    from app.prompting import PromptRegistry
+    from app.rag.routing import route
+    from app.rag.service import KnowledgeLookup
+
+    registry = PromptRegistry()
+    message = "how much sleep do adults need?"
+    policy = choose_policy(message, DecisionSet(provider="off", results={}))
+    asked = route(message)
+    assert asked.retrieve
+    none_found = KnowledgeLookup(route=asked, status="no_results")
+    with_fragments = registry.get("companion_system", "1.8.0")
+    text = system_prompt(with_fragments, policy, lookup=none_found)
+    assert with_fragments.fragment("knowledge_no_sources") in text
+    assert with_fragments.fragment("knowledge_evidence") not in text
+    assert system_prompt(with_fragments, policy) == system_prompt(
+        with_fragments, policy, None, None
+    )
+    assert with_fragments.fragment("knowledge_no_sources") not in system_prompt(
+        with_fragments, policy
+    )
+    # 1.7.0 has no knowledge fragments: the lookup changes nothing.
+    older = registry.get("companion_system", "1.7.0")
+    assert system_prompt(older, policy, lookup=none_found) == system_prompt(older, policy)

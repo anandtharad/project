@@ -74,6 +74,7 @@ from app.llm.schemas import (  # noqa: E402
     TraceMetadata,
 )
 from app.main import COMPANION_PROMPT_ID  # noqa: E402
+from app.orchestration.engine import system_prompt  # noqa: E402
 from app.orchestration.policy import choose_policy  # noqa: E402
 from app.prompting import PromptRegistry  # noqa: E402
 from app.rag.chunking import ChunkParams  # noqa: E402
@@ -658,9 +659,8 @@ async def eval_generation(args: argparse.Namespace) -> int:
             history = [ChatMessage(role=ChatRole.USER, content=query["query"])]
             lookup = await service.lookup(query["query"], history)
             policy = choose_policy(query["query"], DecisionSet(provider="off", results={}))
-            guidance = "\n\n".join(prompt.fragment(n) for n in policy.fragments)
             context = builder.build(
-                system=prompt.render(response_guidance=guidance),
+                system=system_prompt(prompt, policy, lookup=lookup),
                 history=history,
                 evidence=lookup.evidence_block(),
             )

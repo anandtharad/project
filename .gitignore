@@ -16,3 +16,4 @@ __pycache__/
 # Cached model answers from eval runs (scripts/eval_memory.py)
 eval/results/.cache/
 eval/datasets/safety/external/
+eval/datasets/dialogue/external/

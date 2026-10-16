@@ -41,7 +41,7 @@ DEFAULT_STRATEGIES = ("validate", "problem_solve", "explore")
 # explicit request ("help me plan...") would only test whether the model
 # obeys the person over the policy, which the prompt says it should.
 OPEN_ENDED_MODES = frozenset({"listening", "exploration", "reflection", "casual"})
-_ADVICE = re.compile(
+ADVICE_WORDING = re.compile(
     r"\b(?:you could|you might|try|consider|i(?:'d| would) suggest|i recommend|one option"
     r"|it (?:might|may) help|steps?|plan)\b",
     re.IGNORECASE,
@@ -166,7 +166,7 @@ def wilson_interval(successes: int, n: int, z: float = 1.96) -> tuple[float, flo
 def surface(reply: str) -> dict[str, Any]:
     return {
         "asks_question": "?" in reply,
-        "advice_wording": bool(_ADVICE.search(reply)),
+        "advice_wording": bool(ADVICE_WORDING.search(reply)),
         "words": len(reply.split()),
     }
 
