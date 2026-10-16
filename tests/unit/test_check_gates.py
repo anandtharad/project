@@ -7,13 +7,14 @@ import json
 import sys
 import tomllib
 from pathlib import Path
+from types import ModuleType
 
 import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def load_gates():  # type: ignore[no-untyped-def]
+def load_gates() -> ModuleType:
     spec = importlib.util.spec_from_file_location(
         "check_gates", ROOT / "scripts" / "check_gates.py"
     )

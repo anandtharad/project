@@ -20,7 +20,8 @@ page is about speech in and out.)
 - **Providers:** Deepgram, Sarvam and Gnani, each for speech-to-text (STT)
   and text-to-speech (TTS), all over their streaming WebSocket APIs. The
   adapters follow each provider's published reference as read on
-  2026-10-16. **None has been run against the real service yet** (no keys).
+  2026-10-16, then re-checked claim by claim by a second, independent
+  reader. **None has been run against the real service yet** (no keys).
   Everything was tested with local servers that speak each provider's
   documented protocol, and end to end with the development providers
   (`fake`) through the real database, orchestrator and a browser. Expect
@@ -133,6 +134,10 @@ keeps is governed by its own terms. A spoken message is stored as its transcript
 Transcripts are personal data, exactly like typed messages: they are covered
 by conversation deletion, retention and memory rules.
 
+**Audio framing.** Some providers end a chunk mid-sample, so the session
+holds an odd trailing byte until the next chunk and sends the client whole
+16-bit samples only.
+
 **What is spoken.** `speakable()` removes citation markers, Markdown and
 leftover separators, so `[1]` or `**` are not read aloud; the sources stay in
 the `reply` event. The reply goes to the TTS provider sentence by sentence.
@@ -156,7 +161,10 @@ adapter takes the safer reading and the disagreement is listed.
   settings in the query. Default model `nova-3`; `en-IN` is passed as is,
   `hi-IN` as `hi`. Audio goes up as binary frames. Interim and final results,
   `SpeechStarted` and `UtteranceEnd` (1000 ms gap) events. Push-to-talk ends
-  with `Finalize` then `CloseStream`.
+  with `Finalize` then `CloseStream`. `Error` messages are non-fatal (fatal
+  failures close the socket), so they are logged and the stream goes on.
+  English transcripts use American spelling for every dialect, en-IN
+  included.
 - **TTS:** `wss://api.deepgram.com/v1/speak`, default voice
   `aura-2-thalia-en` (the voice is part of the model name; `TTS_VOICE` or
   `TTS_MODEL` sets it), raw linear16 at 24 kHz as binary frames. `Speak`
@@ -181,8 +189,11 @@ adapter takes the safer reading and the disagreement is listed.
   `endpointing=manual` with `speech_start` / `speech_end`; hands-free uses the
   server's VAD (`vad.speech_end`). Partial and final transcripts.
 - **TTS:** `wss://api.sarvam.ai/text-to-speech/ws?model=bulbul:v4-flash`,
-  a `config` message first (language, speaker, 24 kHz, `linear16`), then
-  `text`, `flush`, base64 `audio` chunks and a `final` event. Default speaker
+  a `config` message first (language, speaker, 24 kHz, `wav`), then
+  `text`, `flush`, base64 `audio` chunks and a `final` event. WAV headers are
+  removed as they arrive (a header may be split across chunks, or each chunk
+  may be a whole WAV file), and the header's format is checked against the
+  one announced to the client. Default speaker
   `simran_en_customer` (an example persona id from Sarvam's v4-flash guide;
   v4-flash takes persona ids, not v3 names). No cancel message: barge-in
   closes the socket, as Sarvam documents.
@@ -190,11 +201,16 @@ adapter takes the safer reading and the disagreement is listed.
   - One guide calls the realtime STT endpoint beta, and its close code 4000
     can mean the account is not enabled for it. If a key gets 4000, ask
     Sarvam to enable it.
-  - The TTS reference says streaming returns MP3 only; the guides list
-    linear16 and recommend it. The adapter asks for linear16 and refuses
-    compressed audio with `tts_unavailable` instead of playing noise; if your
-    account returns MP3, Sarvam TTS will not work until MP3 decoding is
-    added.
+  - The streaming TTS codecs are contested: the reference says MP3 only,
+    the guides list linear16 and others, and the bulbul:v4-flash guide says
+    the WebSocket takes only `wav` and `mp3`. The adapter asks for `wav` and
+    refuses compressed audio with `tts_unavailable` instead of playing noise;
+    if your account returns MP3, Sarvam TTS will not work until MP3 decoding
+    is added.
+  - A best-practices page mentions a character limit "per request/session
+    (typically 2,500)". Each reply gets its own connection, so this matters
+    only for a reply longer than that; untested.
+  - Realtime STT errors carry `is_fatal`; only fatal ones end the utterance.
   - The default TTS model differs between documents, so the model is always
     sent explicitly.
 
@@ -205,7 +221,12 @@ adapter takes the safer reading and the disagreement is listed.
   headers), fixed for the connection. Audio must be binary frames of exactly
   1024 bytes at real-time pace; the adapter re-frames whatever the client
   sends. Final transcripts only (one per VAD segment, announced by
-  `processing`); no interim results. There is no flush or end message, so to
+  `processing`); no interim results. The adapter waits for the server's
+  `connected` message before streaming: with a bad key or header the server
+  closes instead (4001 is an authentication failure), which surfaces as
+  `stt_unavailable` on the first audio frame. Gnani's SDK also accepts
+  undocumented `speech_start` / `vad_start` events, read here as speech
+  started. There is no flush or end message, so to
   end a push-to-talk turn the adapter sends 0.9 s of paced silence (the
   server's minimum silence is set to 600 ms), which adds about a second to
   each spoken turn. Sessions are capped at 15 minutes (each utterance gets
@@ -213,8 +234,9 @@ adapter takes the safer reading and the disagreement is listed.
 - **TTS:** `wss://api.vachana.ai/api/v1/tts`, `X-API-Key-ID` header, model
   `timbre-v2.5`, voices `Kaveri` (en-IN) and `Nalini` (hi-IN) by default,
   raw 16-bit PCM at 24 kHz. Each request is one whole text (no incremental
-  text), so the reply is sent sentence by sentence. No cancel message:
-  barge-in closes the socket.
+  text), so the reply is sent sentence by sentence. Audio arrives base64 in
+  JSON `audio` messages; Gnani's own clients also accept binary frames, so
+  this adapter does too. No cancel message: barge-in closes the socket.
 - **Open questions:** whether one TTS connection takes several requests (the
   API page says yes, the SDK opens a connection per request; the adapter
   reuses it and reconnects once if the server closed it); access may be
@@ -267,6 +289,7 @@ What remains before `VOICE_DUPLEX=full` can be allowed:
   `speakable()` and sentence splitting.
 - `app/voice/providers/`: `deepgram.py`, `sarvam.py`, `gnani.py`, the shared
   WebSocket helpers (`_ws.py`) and the development stubs (`fake.py`).
+- `app/voice/wav.py`: removes and checks WAV headers in streamed audio.
 - `app/voice/factory.py`: providers from settings.
 - `app/voice/tickets.py`: single-use connection tickets.
 - `app/api/voice.py`: the ticket endpoint, the WebSocket and the `/voice`

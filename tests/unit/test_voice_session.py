@@ -5,9 +5,10 @@ the full-duplex barge-in path."""
 from __future__ import annotations
 
 import asyncio
+from collections.abc import AsyncIterator
 from typing import Any
 
-from app.voice.base import AudioFormat, TranscriptEvent, TranscriptKind
+from app.voice.base import AudioChunk, AudioFormat, TranscriptEvent, TranscriptKind
 from app.voice.providers.fake import FakeSpeechToText, FakeTextToSpeech
 from app.voice.session import State, TurnReply, VoiceConfig, VoiceSession, sentences, speakable
 
@@ -234,11 +235,34 @@ async def test_full_duplex_barge_in_cancels_the_reply() -> None:
     assert h.session.state == State.SPEAKING
     await h.session.on_audio(PCM)  # the person talks over the reply
     assert h.of("interrupted") and tts.cancelled == 1
-    assert h.session.state == State.LISTENING
+    assert h.states()[-1] == "listening"
     await h.session.on_end_of_speech()
     await h.session.wait_idle()
     assert h.turns == [("first", "voice"), ("second thing", "voice")]
     assert len(h.audio) < 400 + 400  # the first reply was cut short
+
+
+class SplitSampleTts(FakeTextToSpeech):
+    """Chunks that end mid-sample, as some providers send them."""
+
+    async def open(self, voice: str | None, language: str) -> Any:
+        stream = await super().open(voice, language)
+
+        async def audio() -> AsyncIterator[AudioChunk]:
+            for piece in (b"\x01", b"\x02\x03", b"\x04\x05\x06", b"\x07"):
+                yield AudioChunk(piece, self.output)
+
+        stream.audio = audio  # type: ignore[method-assign]
+        return stream
+
+
+async def test_reply_audio_is_sent_in_whole_samples() -> None:
+    h = Harness(tts=SplitSampleTts())
+    await h.session.start()
+    await h.session.on_text("hi")
+    await h.session.wait_idle()
+    assert h.audio == [b"\x01\x02", b"\x03\x04\x05\x06"]  # the odd last byte is dropped
+    assert h.session.state == State.LISTENING
 
 
 def test_speakable_text() -> None:

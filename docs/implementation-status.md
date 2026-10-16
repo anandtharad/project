@@ -87,11 +87,11 @@ unmodified here.
 
 | Suite | Result |
 |---|---|
-| unit | 775 passed |
+| unit | 778 passed |
 | integration | 119 passed |
 | security | 57 passed |
 | live | 8 skipped (opt-in; run with `scripts/dev.py live-groq`) |
-| **total** | **951 passed, 8 skipped** (2026-10-16, after the voice interface) |
+| **total** | **954 passed, 8 skipped** (2026-10-16, after the voice interface) |
 
 Live runs made from this environment once network access was allowed
 (2026-10-13): Groq live tests, strict structured state extraction, the
@@ -195,9 +195,13 @@ are clean.
   and tested against local servers that speak the documented protocols.
   **No live call** (no keys). Known open questions: Sarvam's realtime STT is
   labelled beta and may need enabling per account; Sarvam's streaming TTS
-  may return MP3 only (the adapter refuses compressed audio with a clear
-  error); Gnani's TTS connection reuse is ambiguous in its docs (the adapter
-  reconnects). See docs/voice-interface.md.
+  codecs are contested (the adapter asks for WAV and refuses compressed
+  audio with a clear error); Gnani's TTS connection reuse is ambiguous in its
+  docs (the adapter reconnects). Each adapter's claims were re-checked by an
+  independent reader; the corrections (Deepgram's non-fatal `Error`, Sarvam's
+  `is_fatal` and WAV-only v4-flash socket, Gnani's `connected` handshake and
+  binary audio, chunks split mid-sample) are in the code and tests. See
+  docs/voice-interface.md.
 
 ## Stubs and development-only pieces
 

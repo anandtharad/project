@@ -5,8 +5,10 @@ Speech-to-text: wss://api.deepgram.com/v1/listen, configured by query
 parameters, `Authorization: Token <key>`. Audio goes up as binary frames of
 raw linear16; the server sends JSON `Results` (interim `is_final: false`,
 then final), `SpeechStarted` (vad_events), `UtteranceEnd`
-(utterance_end_ms), `Metadata` and `Error`. `Finalize` flushes buffered
-audio; `CloseStream` makes the server send the last results and close.
+(utterance_end_ms), `Metadata` and `Error`. `Error` messages are
+non-fatal (fatal failures close the socket), so they are logged and the
+stream goes on. `Finalize` flushes buffered audio; `CloseStream` makes the
+server send the last results and close.
 
 Text-to-speech: wss://api.deepgram.com/v1/speak. `{"type": "Speak", "text"}`
 adds text, `Flush` synthesises it (acknowledged by `Flushed`), audio comes
@@ -20,6 +22,7 @@ European languages) only: no Hindi and no Indian-accent English.
 from __future__ import annotations
 
 import contextlib
+import logging
 from collections.abc import AsyncIterator
 from typing import Any
 from urllib.parse import urlencode
@@ -27,9 +30,11 @@ from urllib.parse import urlencode
 from websockets.asyncio.client import ClientConnection
 from websockets.exceptions import ConnectionClosed
 
-from app.voice.base import AudioChunk, AudioFormat, SpeechError, TranscriptEvent, TranscriptKind
+from app.observability import log_event
+from app.voice.base import AudioChunk, AudioFormat, TranscriptEvent, TranscriptKind
 from app.voice.providers._ws import closed_error, open_socket, parse, send_json
 
+logger = logging.getLogger("app.voice")
 DEFAULT_BASE = "wss://api.deepgram.com"
 DEFAULT_STT_MODEL = "nova-3"
 DEFAULT_TTS_MODEL = "aura-2-thalia-en"
@@ -106,7 +111,13 @@ class _DeepgramSttStream:
                 elif kind == "UtteranceEnd":
                     yield TranscriptEvent(TranscriptKind.UTTERANCE_END)
                 elif kind == "Error":
-                    raise SpeechError("deepgram", str(event.get("variant") or event.get("code")))
+                    log_event(
+                        logger,
+                        "voice.provider_warning",
+                        level=logging.WARNING,
+                        provider="deepgram",
+                        code=str(event.get("variant") or event.get("code") or "error")[:80],
+                    )
         except ConnectionClosed as exc:
             if exc.rcvd is None or exc.rcvd.code != 1000:
                 raise closed_error("deepgram", exc) from None

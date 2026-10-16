@@ -19,9 +19,13 @@ it, audio comes back base64 in {"type": "audio", "data": {"audio"}}, and
 {"type": "event", "data": {"event_type": "final"}} ends a reply. There is
 no cancel message: barge-in closes the socket (Sarvam's documented way).
 
-The docs disagree on whether streaming TTS can return linear16 or only
-MP3. This adapter asks for linear16 and checks what arrives: raw PCM or WAV
-is used; anything else (MP3) fails with a clear error instead of noise.
+The docs disagree on the streaming TTS codecs: the reference says MP3 only,
+the guides list linear16 and others, and the bulbul:v4-flash guide says the
+WebSocket takes only wav and mp3. This adapter asks for wav, strips its
+headers (checking the format against the one announced to the client), and
+fails with a clear error on compressed audio instead of playing noise.
+Realtime STT errors carry `is_fatal`; non-fatal ones (a rejected
+config.update, which this adapter never sends) do not end the stream.
 """
 
 from __future__ import annotations
@@ -37,6 +41,7 @@ from websockets.exceptions import ConnectionClosed
 
 from app.voice.base import AudioChunk, AudioFormat, SpeechError, TranscriptEvent, TranscriptKind
 from app.voice.providers._ws import closed_error, open_socket, parse, send_json
+from app.voice.wav import WavStripper
 
 DEFAULT_BASE = "wss://api.sarvam.ai"
 DEFAULT_STT_MODEL = "saaras:v3-realtime"
@@ -132,7 +137,7 @@ class _SarvamSttStream:
                     yield TranscriptEvent(TranscriptKind.UTTERANCE_END)
                 elif kind == "session.end":
                     return
-                elif kind == "error":
+                elif kind == "error" and event.get("is_fatal") is not False:
                     raise SpeechError("sarvam", str(event.get("code") or "error"))
         except ConnectionClosed as exc:
             if exc.rcvd is None or exc.rcvd.code != 1000:
@@ -168,7 +173,7 @@ class SarvamTextToSpeech:
                         "language_code": language,
                         "speaker": voice or DEFAULT_SPEAKER,
                         "speech_sample_rate": TTS_SAMPLE_RATE,
-                        "output_audio_codec": "linear16",
+                        "output_audio_codec": "wav",
                     },
                 },
             )
@@ -182,6 +187,7 @@ class _SarvamTtsStream:
         self._socket = socket
         self._output = output
         self._cancelled = False
+        self._wav = WavStripper("sarvam", output)
 
     async def send_text(self, text: str) -> None:
         try:
@@ -205,9 +211,11 @@ class _SarvamTtsStream:
                 kind = event.get("type")
                 data = event.get("data") or {}
                 if kind == "audio" and not self._cancelled:
-                    pcm = pcm_from(
-                        base64.b64decode(str(data.get("audio") or "")),
-                        str(data.get("content_type") or ""),
+                    pcm = self._wav.feed(
+                        pcm_from(
+                            base64.b64decode(str(data.get("audio") or "")),
+                            str(data.get("content_type") or ""),
+                        )
                     )
                     if pcm:
                         yield AudioChunk(pcm, self._output)
@@ -234,11 +242,8 @@ _COMPRESSED = ("mp3", "mpeg", "aac", "opus", "ogg", "flac")
 
 
 def pcm_from(audio: bytes, content_type: str) -> bytes:
-    """Raw 16-bit PCM from a chunk: as is, or the data of a WAV chunk.
-    Compressed audio (MP3, ...) is refused rather than played as noise."""
+    """The chunk, unless it is compressed audio (MP3, ...), which is refused
+    rather than played as noise. WAV headers are removed by WavStripper."""
     if any(name in content_type.lower() for name in _COMPRESSED):
         raise SpeechError("sarvam", f"compressed_audio_returned:{content_type}")
-    if audio.startswith(b"RIFF"):
-        index = audio.find(b"data")
-        return audio[index + 8 :] if index >= 0 else b""
     return audio

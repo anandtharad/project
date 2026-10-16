@@ -9,6 +9,7 @@ import asyncio
 import base64
 import contextlib
 import json
+import struct
 from collections.abc import AsyncIterator, Awaitable, Callable
 from typing import Any
 
@@ -17,6 +18,7 @@ from websockets.asyncio.server import ServerConnection, serve
 
 from app.voice.base import AudioFormat, SpeechError, TranscriptKind
 from app.voice.providers import deepgram, gnani, sarvam
+from app.voice.wav import WavStripper
 
 AUDIO = AudioFormat(sample_rate=16_000)
 PCM = b"\x01\x00" * 800  # 1600 bytes
@@ -75,6 +77,8 @@ async def test_deepgram_stt_streams_binary_and_finalizes() -> None:
         )
         assert await receive(ws) == {"type": "Finalize"}
         assert await receive(ws) == {"type": "CloseStream"}
+        # Error messages are non-fatal (fatal failures close the socket).
+        await ws.send(json.dumps({"type": "Error", "variant": "bad_configure"}))
         await ws.send(
             json.dumps(
                 {
@@ -186,6 +190,11 @@ async def test_sarvam_stt_manual_endpointing_and_base64_audio() -> None:
         assert await receive(ws) == {"event": "speech_end"}
         assert await receive(ws) == {"event": "end"}
         await ws.send(
+            json.dumps(
+                {"event": "error", "code": "invalid_config", "is_fatal": False, "message": "x"}
+            )
+        )
+        await ws.send(
             json.dumps({"event": "transcript.final", "utterance_idx": 0, "text": "namaste ji"})
         )
         await ws.send(json.dumps({"event": "session.end", "request_id": "r"}))
@@ -206,6 +215,27 @@ async def test_sarvam_stt_manual_endpointing_and_base64_audio() -> None:
     with pytest.raises(SpeechError):
         await stt.open(AudioFormat(sample_rate=48_000), "hi-IN")
 
+    async def fatal(ws: ServerConnection) -> None:
+        await ws.recv()
+        await ws.send(json.dumps({"event": "error", "code": "quota", "is_fatal": True}))
+        await ws.wait_closed()
+
+    async with server(fatal) as (url, _):
+        stream = await sarvam.SarvamSpeechToText("k", base=url).open(AUDIO, "en-IN")
+        await stream.send(PCM)
+        with pytest.raises(SpeechError, match="quota"):
+            await events_of(stream)
+        await stream.close()
+
+
+def wav_header(rate: int = 24_000, channels: int = 1, bits: int = 16, data_size: int = 0) -> bytes:
+    fmt = struct.pack("<HHIIHH", 1, channels, rate, rate * channels * bits // 8, channels * 2, bits)
+    extra = b"LIST" + struct.pack("<I", 4) + b"INFO"  # a chunk before data
+    body = b"WAVE" + b"fmt " + struct.pack("<I", 16) + fmt + extra
+    return (
+        b"RIFF" + struct.pack("<I", 4 + len(body)) + body + b"data" + struct.pack("<I", data_size)
+    )
+
 
 async def test_sarvam_tts_config_text_flush_and_formats() -> None:
     seen: list[Any] = []
@@ -213,16 +243,21 @@ async def test_sarvam_tts_config_text_flush_and_formats() -> None:
     async def handler(ws: ServerConnection) -> None:
         receive = collector(seen)
         config = await receive(ws)
-        assert config["type"] == "config" and config["data"]["output_audio_codec"] == "linear16"
+        assert config["type"] == "config" and config["data"]["output_audio_codec"] == "wav"
         assert (await receive(ws))["type"] == "text"
         assert await receive(ws) == {"type": "flush"}
-        wav = (
-            b"RIFF\x00\x00\x00\x00WAVEfmt " + bytes(16) + b"data\x08\x00\x00\x00" + b"\x01\x02" * 4
+        header = wav_header()
+        # A header split across two chunks, then headerless PCM, then a chunk
+        # that is a whole WAV file of its own.
+        chunks = (
+            header[:20],
+            header[20:] + b"\x01\x02" * 4,
+            b"\x03\x04" * 4,
+            wav_header(data_size=4) + b"\x05\x06" * 2,
         )
-        raw = b"\x03\x04" * 4
-        for chunk, kind in ((wav, "audio/wav"), (raw, "audio/l16")):
+        for chunk in chunks:
             payload = {
-                "content_type": kind,
+                "content_type": "audio/wav",
                 "audio": base64.b64encode(chunk).decode(),
                 "request_id": "r",
             }
@@ -234,11 +269,23 @@ async def test_sarvam_tts_config_text_flush_and_formats() -> None:
         await stream.send_text("Namaste. ")
         await stream.flush()
         chunks = [c.pcm async for c in stream.audio()]
-    assert chunks == [b"\x01\x02" * 4, b"\x03\x04" * 4]  # the WAV header was removed
+    assert chunks == [b"\x01\x02" * 4, b"\x03\x04" * 4, b"\x05\x06" * 2]  # headers removed
     assert seen[0]["data"]["speaker"] == "anushka" and seen[0]["data"]["language_code"] == "hi-IN"
     assert "model=bulbul%3Av4-flash" in dict(info)["path"]
     with pytest.raises(SpeechError, match="compressed"):
         sarvam.pcm_from(b"\xff\xfb\x90\x00", "audio/mp3")
+
+
+def test_wav_headers_must_match_the_announced_format() -> None:
+    stripper = WavStripper("sarvam", AudioFormat(sample_rate=24_000))
+    assert stripper.feed(b"\x00\x01" * 3) == b"\x00\x01" * 3  # no header: as is
+    with pytest.raises(SpeechError, match="unexpected_audio_format"):
+        WavStripper("sarvam", AudioFormat(sample_rate=24_000)).feed(wav_header(rate=22_050))
+    with pytest.raises(SpeechError, match="bad_wav_header"):
+        WavStripper("sarvam", AudioFormat(sample_rate=24_000)).feed(b"RIFF\x00\x00\x00\x00AVI ")
+    held = WavStripper("sarvam", AudioFormat(sample_rate=24_000))
+    assert held.feed(b"RIFF") == b""  # incomplete: held until the rest arrives
+    assert held.feed(wav_header()[4:] + b"\x07\x08") == b"\x07\x08"
 
 
 # --- Gnani ----------------------------------------------------------------
@@ -255,6 +302,8 @@ async def test_gnani_stt_exact_frames_trailing_silence_and_finals() -> None:
         async for message in ws:
             assert isinstance(message, bytes)
             frames.append(message)
+            if len(frames) == 1:
+                await ws.send(json.dumps({"type": "speech_start"}))  # undocumented, SDK-known
             silent = silent + 1 if message == bytes(1024) else 0
             if silent == 5:
                 await ws.send(json.dumps({"type": "processing"}))
@@ -275,6 +324,7 @@ async def test_gnani_stt_exact_frames_trailing_silence_and_finals() -> None:
     assert all(len(f) == 1024 for f in frames)
     assert frames[1][:576] == PCM[1024:]  # the last partial frame, padded
     assert events == [
+        (TranscriptKind.SPEECH_STARTED, ""),
         (TranscriptKind.UTTERANCE_END, ""),
         (TranscriptKind.FINAL, "hello from gnani"),
     ]
@@ -290,6 +340,7 @@ async def test_gnani_stt_ends_quietly_when_nothing_was_said(
     monkeypatch.setattr(gnani, "TRAILING_SILENCE_MS", 100)
 
     async def handler(ws: ServerConnection) -> None:
+        await ws.send(json.dumps({"type": "connected"}))
         async for _ in ws:
             pass
 
@@ -299,6 +350,23 @@ async def test_gnani_stt_ends_quietly_when_nothing_was_said(
         await stream.finish()
         assert await asyncio.wait_for(reader, 5) == []
         await stream.close()
+
+
+async def test_gnani_stt_open_waits_for_connected() -> None:
+    async def reject(ws: ServerConnection) -> None:
+        await ws.close(code=4001, reason="auth")  # a bad key: no "connected"
+
+    async with server(reject) as (url, _):
+        with pytest.raises(SpeechError, match="closed_4001"):
+            await gnani.GnaniSpeechToText("bad", url=url).open(AUDIO, "en-IN")
+
+    async def wrong(ws: ServerConnection) -> None:
+        await ws.send(json.dumps({"type": "error", "message": "bad lang_code"}))
+        await ws.wait_closed()
+
+    async with server(wrong) as (url, _):
+        with pytest.raises(SpeechError, match="not_connected:error"):
+            await gnani.GnaniSpeechToText("k", url=url).open(AUDIO, "xx-XX")
 
 
 async def test_gnani_tts_sends_one_request_per_sentence_and_reconnects() -> None:
@@ -315,6 +383,7 @@ async def test_gnani_tts_sends_one_request_per_sentence_and_reconnects() -> None
                 {"type": "audio", "data": {"chunk_index": 1, "audio": audio, "is_final": False}}
             )
         )
+        await ws.send(b"\x07\x08" * 4)  # binary audio, as Gnani's own clients accept
         await ws.send(json.dumps({"type": "complete", "data": {"audio": "", "is_final": True}}))
         await ws.close()
 
@@ -324,7 +393,7 @@ async def test_gnani_tts_sends_one_request_per_sentence_and_reconnects() -> None
         await stream.send_text("Doosra vakya. ")
         await stream.flush()
         chunks = [c async for c in stream.audio()]
-    assert len(chunks) == 2
+    assert [c.pcm for c in chunks] == [b"\x05\x06" * 10, b"\x07\x08" * 4] * 2
     assert [r["text"] for r in requests] == ["Pehla vakya.", "Doosra vakya."]
     assert requests[0]["voice"] == "Nalini" and requests[0]["model"] == "timbre-v2.5"
     assert requests[0]["audio_config"]["container"] == "raw"

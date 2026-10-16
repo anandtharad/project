@@ -7,6 +7,7 @@ import importlib.util
 import json
 import sys
 from pathlib import Path
+from types import ModuleType
 from typing import Any
 
 import pytest
@@ -30,7 +31,7 @@ ROOT = Path(__file__).resolve().parents[2]
 LONG = "this is a message long enough to answer"
 
 
-def load_runner():  # type: ignore[no-untyped-def]
+def load_runner() -> ModuleType:
     spec = importlib.util.spec_from_file_location(
         "eval_dialogue", ROOT / "scripts" / "eval_dialogue.py"
     )

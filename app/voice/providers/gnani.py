@@ -5,8 +5,11 @@ Speech-to-text: wss://api.vachana.ai/stt/v3/stream. All settings are
 upgrade headers, fixed for the connection: `x-api-key-id`, `lang_code`,
 `x-sample-rate`, `x-format`, and the VAD headers. Audio goes up as binary
 frames of exactly 1024 bytes (512 samples of 16-bit mono PCM) at real-time
-pace. The server sends JSON "connected", "processing" (its VAD found the
-end of speech), "transcript" (one final text per VAD segment) and "error".
+pace. The server sends JSON "connected" (first; a bad key or header closes
+the socket instead, so the adapter waits for it), "processing" (its VAD found
+the end of speech), "transcript" (one final text per VAD segment) and
+"error". The official SDK also accepts undocumented "speech_start" /
+"vad_start" (read here as speech started) and "speech_end" / "vad_end".
 There are no interim results and no flush message: to end a push-to-talk
 turn, this adapter sends trailing silence (paced) so the server's VAD
 closes the segment.
@@ -17,6 +20,7 @@ audio_config}); the server answers "start", base64 "audio" chunks and
 "complete". Text is not streamed incrementally, so a reply is sent sentence
 by sentence. The docs disagree on whether one socket takes several
 requests; the adapter reuses it and reconnects if the server closed it.
+Gnani's own clients also accept audio as binary frames, so this one does too.
 There is no cancel message: barge-in closes the socket.
 """
 
@@ -33,6 +37,7 @@ from websockets.exceptions import ConnectionClosed
 
 from app.voice.base import AudioChunk, AudioFormat, SpeechError, TranscriptEvent, TranscriptKind
 from app.voice.providers._ws import closed_error, open_socket, parse, send_json
+from app.voice.wav import WavStripper
 
 STT_URL = "wss://api.vachana.ai/stt/v3/stream"
 TTS_URL = "wss://api.vachana.ai/api/v1/tts"
@@ -43,6 +48,7 @@ STT_SAMPLE_RATES = (8_000, 16_000, 44_100, 48_000)
 MIN_SILENCE_MS = 600
 TRAILING_SILENCE_MS = 900
 NO_SPEECH_WAIT_SECONDS = 2.0
+CONNECTED_WAIT_SECONDS = 5.0
 DEFAULT_TTS_MODEL = "timbre-v2.5"
 TTS_SAMPLE_RATE = 24_000
 # timbre-v2.5 voices listed by Gnani for each language; TTS_VOICE overrides.
@@ -68,6 +74,17 @@ class GnaniSpeechToText:
             "x-min-silence-ms": str(MIN_SILENCE_MS),
         }
         socket = await open_socket(self.name, self._url, headers)
+        try:
+            first = parse(await asyncio.wait_for(socket.recv(), CONNECTED_WAIT_SECONDS))
+        except TimeoutError:
+            await socket.close()
+            raise SpeechError(self.name, "not_connected", retryable=True) from None
+        except ConnectionClosed as exc:  # 4001: authentication failed
+            raise closed_error(self.name, exc) from None
+        if first is None or first.get("type") != "connected":
+            await socket.close()
+            kind = first.get("type") if first else None
+            raise SpeechError(self.name, f"not_connected:{kind}")
         return _GnaniSttStream(socket, audio)
 
 
@@ -128,6 +145,8 @@ class _GnaniSttStream:
                 if kind == "processing":
                     pending += 1
                     yield TranscriptEvent(TranscriptKind.UTTERANCE_END)
+                elif kind in ("speech_start", "vad_start"):
+                    yield TranscriptEvent(TranscriptKind.SPEECH_STARTED)
                 elif kind == "transcript":
                     pending = max(0, pending - 1)
                     yield TranscriptEvent(TranscriptKind.FINAL, str(event.get("text") or ""))
@@ -171,6 +190,8 @@ class _GnaniTtsStream:
         self._language = language
         self._texts: list[str] = []
         self._cancelled = False
+        # The raw container has no headers; this guards against one anyway.
+        self._wav = WavStripper("gnani", owner.output)
 
     async def send_text(self, text: str) -> None:
         if text.strip():
@@ -206,11 +227,16 @@ class _GnaniTtsStream:
                 await send_json(self._socket, self._request(text))
             try:
                 async for message in self._socket:
+                    if isinstance(message, bytes):
+                        pcm = self._wav.feed(message) if not self._cancelled else b""
+                        if pcm:
+                            yield AudioChunk(pcm, self._owner.output)
+                        continue
                     event = parse(message) or {}
                     kind = event.get("type")
                     if kind == "audio" and not self._cancelled:
                         data = event.get("data") or {}
-                        pcm = base64.b64decode(str(data.get("audio") or ""))
+                        pcm = self._wav.feed(base64.b64decode(str(data.get("audio") or "")))
                         if pcm:
                             yield AudioChunk(pcm, self._owner.output)
                     elif kind == "complete":

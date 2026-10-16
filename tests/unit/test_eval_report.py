@@ -6,11 +6,12 @@ import importlib.util
 import json
 import sys
 from pathlib import Path
+from types import ModuleType
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def load_report():  # type: ignore[no-untyped-def]
+def load_report() -> ModuleType:
     spec = importlib.util.spec_from_file_location(
         "eval_report", ROOT / "scripts" / "eval_report.py"
     )

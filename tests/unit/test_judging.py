@@ -8,6 +8,7 @@ import importlib.util
 import json
 import sys
 from pathlib import Path
+from types import ModuleType
 from typing import Any
 
 import pytest
@@ -38,7 +39,7 @@ def test_cohen_kappa() -> None:
     assert agreement([True, False], [True, True]) == {"items": 2, "agree_rate": 0.5, "kappa": 0.0}
 
 
-def load_eval_rag():  # type: ignore[no-untyped-def]
+def load_eval_rag() -> ModuleType:
     spec = importlib.util.spec_from_file_location("eval_rag", ROOT / "scripts" / "eval_rag.py")
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)

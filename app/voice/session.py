@@ -324,6 +324,9 @@ class VoiceSession:
         await self._set_state(State.SPEAKING)
         self._playback_done.clear()
         seconds = 0.0
+        # Providers may end a chunk mid-sample: send whole samples only.
+        frame = 2 * self._tts.output.channels
+        carry = b""
         try:
             stream = await self._tts.open(self.config.voice, self.config.language)
             self._speaking = stream
@@ -334,8 +337,13 @@ class VoiceSession:
                 async for chunk in stream.audio():
                     if turn != self._turn:
                         break  # cancelled by a barge-in
-                    seconds += len(chunk.pcm) / chunk.format.bytes_per_second()
-                    await self._send_audio(chunk.pcm)
+                    pcm = carry + chunk.pcm
+                    cut = len(pcm) - len(pcm) % frame
+                    pcm, carry = pcm[:cut], pcm[cut:]
+                    if not pcm:
+                        continue
+                    seconds += len(pcm) / chunk.format.bytes_per_second()
+                    await self._send_audio(pcm)
             finally:
                 self._speaking = None
                 with contextlib.suppress(Exception):
