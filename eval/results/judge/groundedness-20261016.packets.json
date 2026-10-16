@@ -1,0 +1,638 @@
+[
+ {
+  "jid": "g01",
+  "question": "can my manager say no to sick leave if i tell him its stress related? im in the uk",
+  "passages": [],
+  "reply": "I’m not a lawyer, but in the UK most employers are required to consider any leave request fairly, even if it’s stress‑related. They can only refuse if there’s a solid business reason or if your request doesn’t meet the company’s formal leave policy. It’s usually a good idea to check your contract or employee handbook, or chat with HR, so you both know what’s expected and what options you have."
+ },
+ {
+  "jid": "g02",
+  "question": "winter here in scotland is properly dragging my mood down, would a SAD light box help and what brightness should i buy",
+  "passages": [],
+  "reply": "Winter’s gray can really sap the energy, can’t it? A light box can be a solid boost for a lot of people in those low‑light months.  \n\nFor most folks the recommendation is a box that delivers about 10,000 lux at a comfortable distance—usually a few inches to a foot away. You’ll want something that’s specifically labeled for seasonal‑affective‑disorder use, with UV filtering so it’s gentle on the eyes. If you have any eye conditions or take photosensitive medication, a quick check with your doctor is worth it before you start.  \n\nGive it a try in the mornings for 20‑30 minutes, and see how you feel after a week or two. Let me know how it goes!"
+ },
+ {
+  "jid": "g03",
+  "question": "how do i tell my roommate he hurt my feelings without it turning into a massive row? he gets defensive v quickly",
+  "passages": [],
+  "reply": "It can feel pretty awkward to bring up a hurt‑spot with someone who gets defensive fast. Maybe start by setting a calm tone—say something like, “Hey, can we talk about something that’s been bothering me? I’d love to clear the air.” Then, focus on how you felt rather than on what he did: “When you said that, I felt hurt because….” That keeps the conversation about your experience instead of blaming. If he starts to get defensive, gently remind him you’re not attacking him, just sharing your feelings. After you’ve explained, give him a chance to respond and listen. You’ll both get a chance to understand each other without a big row."
+ },
+ {
+  "jid": "g04",
+  "question": "how many grams of protein should i be eating daily if i lift 4 days a week? i'm 70kg",
+  "passages": [],
+  "reply": "If you’re hitting the gym four times a week, a common target is around 1.6 to 2.2 grams of protein per kilogram of body weight each day. At 70 kg that works out to roughly 110 to 155 grams of protein daily. You can spread that across your meals and snacks to make it easier on your stomach. If you’re doing a lot of heavy strength work, leaning toward the higher end can help with recovery, while the lower end is usually fine for most moderate‑intensity lifting."
+ },
+ {
+  "jid": "g05",
+  "question": "my 14 yr old son has been pulling away from his friends and from us lately. as a parent what signs should i be keeping an eye on?",
+  "passages": [],
+  "reply": "It sounds like you’re noticing a shift that’s a little scary to watch. When a teen starts pulling away, some red flags to watch for are sudden mood swings, missing school or activities, changes in sleep or appetite, or a sudden drop in grades. Also keep an eye on whether they’re sharing anything that feels off, like feeling unsafe, being pressured into things they’re uncomfortable with, or talking about thoughts of self-harm. If anything of that sort pops up, it’s worth having a gentle check‑in or reaching out for help. If you’re noticing any of those signs, let me know what’s happening, and we can talk about next steps."
+ },
+ {
+  "jid": "g06",
+  "question": "how do i tell my roommate he hurt my feelings without it turning into a massive row? he gets defensive v quickly",
+  "passages": [],
+  "reply": "It sounds like you’re worried about a fight even though you just want to share how you feel. Maybe start by saying something like, “Hey, I’ve been feeling a bit hurt by what happened, and I’d like to talk about it so we both understand each other.” That way you’re framing it as a conversation, not an attack. Let him know you’re open to hearing his side too. If he does get defensive, you could gently remind him that it’s just your feelings, not a judgment of his character. That keeps the focus on how you felt instead of on blaming. You’re not trying to start a row, just to clear the air."
+ },
+ {
+  "jid": "g07",
+  "question": "do those blue light blocking glasses actually do anything for sleep or is it a scam",
+  "passages": [],
+  "reply": "I’m not seeing any reliable research on that right now.  The idea that blocking blue light helps with sleep has mixed findings, and there isn’t strong evidence that the glasses make a big difference for most people.  If you’re curious, it might be worth trying for a bit to see if it feels better for you, but don’t count on it as a magic fix."
+ },
+ {
+  "jid": "g08",
+  "question": "going through the menopause and the hot flushes at night are unbearable, can any kind of breathing technique help?",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "- A 2019 review found overall evidence that paced breathing could significantly improve hot flashes. This was based on 4 studies that included a total of 398 participants.\n- Researchers of a 2013 study found that five weekly sessions of clinical hypnosis delivered by a therapist reduced hot flashes in post-menopausal women. The National Center for Complementary and Integrative Health (NCCIH) is funding an ongoing study by the same researchers on self-administered hypnosis for hot flashes."
+   }
+  ],
+  "reply": "It looks like paced breathing has some support for easing hot flashes, even those that flare up at night. A 2019 review found that paced breathing can significantly reduce hot flashes in about 398 participants in the studies that were looked at. [S1]"
+ },
+ {
+  "jid": "g09",
+  "question": "is being lonely the same thing as being socially isolated? my nani lives on her own but says shes never lonely",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "The number of older adults age 65 and older is growing, and many are socially isolated and regularly feel lonely.\nLoneliness and social isolation are different, but related. Loneliness is the distressing feeling of being alone or separated. Social isolation is the lack of social contacts and having few people to interact with regularly. You can live alone and not feel lonely or socially isolated, and you can feel lonely while being with other people.\nOlder adults are at higher risk for social isolation and loneliness due to changes in health and social connections that can come with growing older, hearing, vision, and memory loss, disability, trouble getting around, and/or the loss of family and friends."
+   },
+   {
+    "marker": "S2",
+    "text": "Certain factors may increase your risk of social isolation and loneliness. These include:\n- Loss of mobility\n- Vision or hearing problems\n- Psychological or cognitive challenges\n- Feeling a lack of purpose\n- Financial struggles\n- Living alone\n- Lack of transportation\n- Inability to leave home without help\n- A major life change, such as the death of a family member or retirement\n- Separation from friends or family\n- Lack of social support\n- Caring for a loved one who is unwell\n- Living in a rural, unsafe, or hard-to-reach neighborhood\n- Experiencing discrimination based on age, racial or ethnic background, or sexual orientation\n- Language barriers"
+   },
+   {
+    "marker": "S3",
+    "text": "What it is. Loneliness is feeling like you do not have meaningful or close relationships or a sense of belonging. It can negatively affect your emotional well-being and overall health.\nHow to manage it. Building social connections through group activities, such as joining clubs or groups with shared interests, or seeking support from friends and family members can help combat loneliness."
+   }
+  ],
+  "reply": "No, they’re not the same thing.  \nLoneliness is a feeling of being alone or separated – a kind of emotional distress that can happen even when you’re around people. Social isolation is about the actual number of contacts you have and how often you interact with others – it’s a measurable lack of social connection. Your nani might live by herself and still feel connected and not lonely, which is exactly what can happen when you have meaningful contacts or a sense of belonging even if those contacts aren’t many. [S1] [S3]"
+ },
+ {
+  "jid": "g10",
+  "question": "is there just a pill i can take that gets rid of stress? asking for real",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "Stress is a physical and emotional reaction that people experience as they encounter challenges in life. When you’re under stress, your body reacts by releasing hormones that produce the “fight-or-flight” response. Your heart rate, breathing rate, and blood pressure go up, your muscles tense, and you sweat more. Occasional stress is a normal coping mechanism. However, long-term stress (also called chronic stress) may contribute to or worsen a range of health problems including digestive disorders, headaches, sleep disorders, and other symptoms. Stress may worsen asthma and has been linked to depression, anxiety, and other mental illnesses.\nThere is no drug to cure stress. But we do have access to a built-in “stress reset button.” It’s called the relaxation response. In contrast to the stress response, the relaxation response slows the heart rate, lowers blood pressure, and decreases oxygen consumption and levels of stress hormones.\nPress Reset on Stress, [1,582 KB PDF]\nSome people use psychological and physical approaches, such as yoga, mindfulness, or relaxation techniques, to release tension and to counteract the ill effects of stress."
+   },
+   {
+    "marker": "S2",
+    "text": "Stress is a normal part of life. But if your stress doesn’t go away or keeps getting worse, you may need help. Lots of people need help dealing with stress — it’s nothing to be ashamed of. Over time, stress that’s not treated can lead to serious problems like depression or anxiety.\n- If you're feeling down or hopeless, talk with your doctor about depression\n- If you're feeling anxious, talk with your doctor about anxiety\n- If you've lived through a traumatic event (like a major accident, crime, or natural disaster), find out about treatment for PTSD, or post-traumatic stress disorder\nYour doctor or nurse or a mental health professional (like a psychologist or social worker) can help treat these conditions. For example, your treatment plan may include talk therapy (also called psychotherapy) or medicine. Learn more about talk therapy."
+   },
+   {
+    "marker": "S3",
+    "text": "Prepare yourself.: Being prepared and feeling in control of your situation might help lower your stress.\nPrepare ahead for stressful events, like a busy travel day or a hard conversation with a loved one. You can:\n- Picture yourself in the situation and think through what you’ll do or say\n- Think about different ways the situation could go — and how you could respond\n- Have a plan for how to lower your stress during the event\n- Think about whether there are people who can support you or resources you can use\nRelax with deep breathing or meditation.: Deep breathing and meditation can help relax your muscles and clear your mind. Learn about breathing, meditation, and other ways to ease stress.\nRelax your muscles.: Stress causes tension in your muscles. Try stretching or taking a hot shower to help you relax. Check out these stretches you can do."
+   }
+  ],
+  "reply": "There's no pill that can completely “get rid of” stress. The passages say that stress is a physical and emotional reaction, and while there’s no drug that cures it, there’s a built‑in “stress reset button” called the relaxation response that helps slow the heart rate and lower stress hormones. Think of it more like a set of techniques—deep breathing, meditation, or other relaxation methods—rather than a medication. If you’re dealing with chronic or overwhelming stress, talking with a doctor or mental‑health professional can be a good next step."
+ },
+ {
+  "jid": "g11",
+  "question": "how do i self-refer to nhs talking therapies? i'm in manchester if that matters",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "If you are struggling to cope, or the symptoms of your stress or anxiety won’t go away, it may be time to talk to a professional. Psychotherapy (also called talk therapy) and medication are the two main treatments for anxiety, and many people benefit from a combination of the two.\nIf you are in immediate distress or are thinking about hurting yourself, call or text the 988 Suicide & Crisis Lifeline at 988 or chat at 988lifeline.org .\nIf you or someone you know has a mental illness, is struggling emotionally, or has concerns about their mental health, there are ways to get help. Read more about getting help."
+   },
+   {
+    "marker": "S2",
+    "text": "If you have questions or concerns, ask the health care provider for more information about the mental health diagnosis or treatment. If a provider suggests a treatment option that you’re not comfortable or familiar with, express your concerns and ask if there are other options. You may decide to try a combination of treatment approaches and want to consider getting another opinion from a different health care provider. It’s important to remember that there is no “one-size-fits-all” treatment. To find one that works best for you, you may need to talk to a few other health care providers to find someone you are comfortable with and try several different treatments or a combination of treatments.\nU.S. DEPARTMENT OF HEALTH AND HUMAN SERVICES National Institutes of Health NIH Publication No. 22-MH-8094"
+   }
+  ],
+  "reply": "If you want to book NHS talking therapy in Manchester, you can do it yourself by calling the local NHS mental health helpline—usually the NHS 111 line or the 116 123 “Mental Health Helpline”. They’ll give you a referral and can set up an appointment with a therapist or counselor at a community or NHS mental health service. You can also check the NHS website for your local NHS Trust and look for “Mental Health Services” or “Psychology and Counseling” sections; many trusts let you book or request a referral online. If you’re unsure, just ask the helpline to explain the steps and they’ll guide you."
+ },
+ {
+  "jid": "g12",
+  "question": "do those blue light blocking glasses actually do anything for sleep or is it a scam",
+  "passages": [],
+  "reply": "I don’t have a reliable source that backs up or refutes the claim, so I can’t say for sure whether the blue‑light glasses truly improve sleep. Many people report feeling less eye strain and better sleep after cutting back on screen time, but the science is mixed. It might be worth asking an eye doctor or a sleep specialist to see what they think about the product."
+ },
+ {
+  "jid": "g13",
+  "question": "my 14 yr old son has been pulling away from his friends and from us lately. as a parent what signs should i be keeping an eye on?",
+  "passages": [],
+  "reply": "It sounds like you’re noticing a shift that’s worrying you. Parents often see subtle clues when a teen starts pulling back—things like a drop in energy or sleep, less interest in things they used to love, or more time spent on their phone or alone. Watching for changes in mood, appetite, school work, or if they seem more withdrawn or secretive can help you spot if something deeper might be going on. If you notice a pattern that feels off, it’s worth talking to him gently and letting him know you’re there to listen."
+ },
+ {
+  "jid": "g14",
+  "question": "is meditating before bed as good as cbt or working out for insomnia? i lie awake for hours most nights",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "Mindfulness meditation practices may help reduce insomnia and improve sleep quality.\n- A 2019 analysis of 18 studies (1,654 total participants) found that mindfulness meditation practices improved sleep quality more than education-based treatments. However, the effects of mindfulness meditation approaches on sleep quality were no different than those of evidence-based treatments such as cognitive behavioral therapy and exercise."
+   },
+   {
+    "marker": "S2",
+    "text": "Meditation has a history that goes back thousands of years, and many meditative techniques began in Eastern traditions. Some types of meditation involve keeping mental focus on a particular sensation or a repeated word or phrase. Others include the practice of mindfulness, which involves keeping attention or awareness on the present moment without making judgments.\nHere are 8 things to know about what the science says about meditation and mindfulness for health:\nMindfulness-based practices may be helpful for anxiety and depression. They are better than no treatment at all, and they may work as well as established evidence-based therapies such as cognitive behavioral therapy.\nStudies that looked at the effects of meditation or mindfulness on pain have had mixed results. The evidence for a beneficial effect on chronic pain is better than the evidence for an effect on acute pain.\nMindfulness meditation practices may reduce insomnia and improve sleep quality. Their effects are comparable to those of cognitive behavioral therapy or exercise."
+   },
+   {
+    "marker": "S3",
+    "text": "Do you have trouble falling or staying asleep? Many people do. An estimated 50 to 70 million Americans have some type of sleep disorder. Fortunately, there are treatments that can help, including psychological and behavioral therapies (mind and body practices).\nHere are 6 things to know about mind and body practices for sleep problems.\nExperts strongly recommend multicomponent cognitive behavioral therapy for insomnia (abbreviated CBT-I) for adults who have chronic insomnia. The American Academy of Sleep Medicine (the professional organization of sleep medicine specialists) strongly recommends CBT-I.\nThere’s a small amount of low-quality evidence that relaxation techniques by themselves may be helpful for insomnia, but it isn’t as strong as the evidence favoring CBT-I. Relaxation techniques may be recommended in certain situations, depending on individual preferences, health provider qualifications, and treatment availability. Relaxation techniques, such as guided imagery and progressive muscle relaxation, are safe and easy to use."
+   }
+  ],
+  "reply": "You’re not alone in lying awake for hours—lots of people wrestle with that. The research shows mindfulness meditation can lift sleep quality, but it doesn’t beat the proven effects of CBT‑I or regular exercise. In fact, studies found meditation helps about as much as CBT‑I and workouts, but it isn’t consistently better than them [S1][S2]. So if you’re already doing CBT‑I or getting decent movement, meditation can be a useful add‑on, but it probably won’t replace those stronger options. Have you tried pairing a short mindfulness session with any other bedtime routine?"
+ },
+ {
+  "jid": "g15",
+  "question": "is being lonely the same thing as being socially isolated? my nani lives on her own but says shes never lonely",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "The number of older adults age 65 and older is growing, and many are socially isolated and regularly feel lonely.\nLoneliness and social isolation are different, but related. Loneliness is the distressing feeling of being alone or separated. Social isolation is the lack of social contacts and having few people to interact with regularly. You can live alone and not feel lonely or socially isolated, and you can feel lonely while being with other people.\nOlder adults are at higher risk for social isolation and loneliness due to changes in health and social connections that can come with growing older, hearing, vision, and memory loss, disability, trouble getting around, and/or the loss of family and friends."
+   },
+   {
+    "marker": "S2",
+    "text": "Certain factors may increase your risk of social isolation and loneliness. These include:\n- Loss of mobility\n- Vision or hearing problems\n- Psychological or cognitive challenges\n- Feeling a lack of purpose\n- Financial struggles\n- Living alone\n- Lack of transportation\n- Inability to leave home without help\n- A major life change, such as the death of a family member or retirement\n- Separation from friends or family\n- Lack of social support\n- Caring for a loved one who is unwell\n- Living in a rural, unsafe, or hard-to-reach neighborhood\n- Experiencing discrimination based on age, racial or ethnic background, or sexual orientation\n- Language barriers"
+   },
+   {
+    "marker": "S3",
+    "text": "What it is. Loneliness is feeling like you do not have meaningful or close relationships or a sense of belonging. It can negatively affect your emotional well-being and overall health.\nHow to manage it. Building social connections through group activities, such as joining clubs or groups with shared interests, or seeking support from friends and family members can help combat loneliness."
+   }
+  ],
+  "reply": "Loneliness is that painful feeling of being alone or not having close, meaningful connections, while social isolation is more about the actual lack of social contacts or regular interactions. You can be socially isolated without feeling lonely, and you can feel lonely even when you’re surrounded by people. So your nani’s situation—living alone but not feeling lonely—is totally possible. It just means she’s got enough connection or purpose in her life to keep that lonely feeling at bay."
+ },
+ {
+  "jid": "g16",
+  "question": "how do i tell my roommate he hurt my feelings without it turning into a massive row? he gets defensive v quickly",
+  "passages": [],
+  "reply": "You’ve probably felt that knot in your chest a lot lately, wondering how to bring it up without the conversation blowing up. It can help to pick a moment when you’re both relatively relaxed, and start with something like, “I wanted to share something that’s been on my mind… I felt hurt when …” framing it as how you felt rather than blaming the other person. Keeping the tone calm and using “I” statements often gives the other person less reason to go on the defensive. You might also let them know you value the living situation and just want to clear the air so things stay good between you. Does that feel doable for you?"
+ },
+ {
+  "jid": "g17",
+  "question": "my grandad's hearing has got a lot worse and he's gone really quiet at family get togethers. could that be linked to him feeling lonely?",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "People with hearing loss may find it hard to have conversations with friends and family. Older people who can’t hear well may become depressed or withdrawn from others because they feel frustrated or embarrassed about not understanding what is being said. Sometimes, older adults are mistakenly thought to be confused, unresponsive, or uncooperative when the reality is that they don’t hear well.\nDifficulties communicating with others can lead to less interaction with people, social isolation, and higher rates of loneliness.\nHearing problems that are ignored or untreated can get worse. If you think you might have a hearing problem, talk with a doctor. Hearing aids, therapy, certain medicines, and surgery are some of the treatments that can help."
+   },
+   {
+    "marker": "S2",
+    "text": "People who are socially isolated or lonely are more likely to be admitted to the emergency room or to a nursing home. Social isolation and loneliness also are associated with higher risks for:\n- High blood pressure\n- Heart disease\n- Obesity\n- Weakened immune function\n- Anxiety\n- Depression\n- Cognitive decline\n- Dementia, including Alzheimer’s disease\n- Death\nPeople who are lonely or socially isolated may get too little exercise, drink too much alcohol, smoke, and sleep poorly, which can further increase the risk of serious health conditions.\nPeople who are lonely experience emotional pain. Losing a sense of connection and community can change the way a person sees the world. Someone experiencing chronic loneliness may feel threatened and mistrustful of others."
+   },
+   {
+    "marker": "S3",
+    "text": "What it is. Loneliness is feeling like you do not have meaningful or close relationships or a sense of belonging. It can negatively affect your emotional well-being and overall health.\nHow to manage it. Building social connections through group activities, such as joining clubs or groups with shared interests, or seeking support from friends and family members can help combat loneliness."
+   }
+  ],
+  "reply": "It sounds like you’re noticing a change and wondering what’s behind it. Hearing loss can make conversations tough, and that can leave people feeling frustrated or embarrassed, which often pushes them to step back from social moments. When someone starts to withdraw like that, it can indeed lead to loneliness and isolation, and the lack of connection can affect both mood and health over time. If you’re concerned, a chat with his doctor about hearing options—like hearing aids, therapy, or other treatments—might help him feel more engaged again."
+ },
+ {
+  "jid": "g18",
+  "question": "my husband snores like a tractor every single night, does that mean he's got sleep apnoea?",
+  "passages": [],
+  "reply": "I’m not a doctor, but a snore that’s as loud as a tractor could be a sign of sleep‑related breathing issues like sleep apnoea. The best next step is to have him talk with a healthcare professional—maybe start with a quick chat with his GP or a sleep specialist—so they can check for any underlying problems."
+ },
+ {
+  "jid": "g19",
+  "question": "trying to quit smoking, are nicotine patches better than the gum?",
+  "passages": [],
+  "reply": "I don’t have a reliable source that compares nicotine patches to gum side‑by‑side. In general, people find patches easier to use because you don’t have to keep chewing, but gum lets you control the dose more flexibly. If you want the most up‑to‑date advice, a pharmacist or your GP can point you to the best option for your situation."
+ },
+ {
+  "jid": "g20",
+  "question": "my husband snores like a tractor every single night, does that mean he's got sleep apnoea?",
+  "passages": [],
+  "reply": "That’s definitely a clue—snoring that loud and steady can be a sign of sleep apnea, but it can also just be a big snore. If he’s also tired during the day, has daytime gasps, or you notice pauses in his breathing, it might be worth having him talk to a doctor. For now, maybe try a different pillow or having him sleep on his side to see if that softens it up."
+ },
+ {
+  "jid": "g21",
+  "question": "trying to quit smoking, are nicotine patches better than the gum?",
+  "passages": [],
+  "reply": "Both work by giving you nicotine without the smoke, but they feel a bit different. A patch gives a steady, low dose all day, so you don’t have to think about timing, while the gum lets you control the amount and can help with cravings right when they hit. Some people like the convenience of the patch, others prefer the flexibility of the gum—sometimes folks even combine them. It really comes down to what fits your routine and how strong your cravings are. Let me know if you want any tips on picking a schedule or how to use them effectively."
+ },
+ {
+  "jid": "g22",
+  "question": "when people talk about 'wellness' whats the difference between the emotional side and the physical side? are they like separate parts of it",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "Some people use complementary health approaches in an effort to promote general well-being or wellness, rather than to help manage symptoms of a health problem. For example, 2012 national survey data show that people most often use yoga and dietary supplements for wellness. Wellness has several dimensions, including emotional well-being (coping effectively with life and creating satisfying relationships) and physical well-being (recognizing the need for physical activity, healthy foods, and sleep).\nResearch sponsored by NCCIH suggests that people who use complementary approaches for wellness tend to have better overall health, higher rates of physical activity, and lower rates of obesity than those who use complementary approaches to help manage a health problem.\nMore research is needed to better understand how certain complementary health approaches can be useful in encouraging better self-care, improving a personal sense of well-being, and promoting a greater commitment to a healthy lifestyle. Participants at an April 2018 roundtable on emotional well-being explored research gaps and opportunities (Emotional Well-Being: Emerging Insights and Questions for Future Research)."
+   },
+   {
+    "marker": "S2",
+    "text": "Connecting with others is one way to improve your emotional well-being.\nDiverse group of seven adults posing with arms around each other after a run.\nIt's normal to experience difficult emotions, especially when life gets challenging. But it's important to learn to cope with those feelings in healthy ways.\n- Check in with yourself to see how you are feeling.\n- Identifying your feelings is the first step to managing your emotions.\n- Try to let yourself feel and accept your feelings without judgment, even if they are upsetting.\n- Be kind to yourself. It can help you keep a positive mindset.\n- Embrace self-care. Take time to relax, curl up with a book, or get outside.\n- Think about and appreciate the positive parts of life.\n- Try replacing negative or critical thoughts with positive ones. This is known as cognitive restructuring. It's like giving your mind a healthy makeover!\n- Channel your energy in healthy ways. Exercise, laugh, dance, take a walk, play a sport, do art, clean your home!"
+   },
+   {
+    "marker": "S3",
+    "text": "Improving emotional well-being can benefit your mental and physical health. It can also enhance your social connections to other people and your community.\nBenefits of positive emotional well-being: - Lower risk of disease, sickness, and injury.\n- Faster recovery after being sick or getting injured.\n- Improved mental health.\n- Being able to bounce back from negative experiences (resilience).\n- Stronger relationships and higher self-esteem.\n- Having a sense of contentment, meaning, and purpose in life.\n- Better productivity and performance at work.\nA buffer against stress: People with positive emotional well-being can still feel sad or stressed during tough times. But they can manage these challenges better."
+   }
+  ],
+  "reply": "When people chat about “wellness,” the emotional and physical parts are two sides of the same coin, not separate things. The emotional side is about how you feel inside—how you cope with life, build relationships, and keep a positive mindset. The physical side is about the body—exercise, food, sleep, and overall health habits. The evidence says that when people use complementary approaches like yoga or supplements for wellness, they tend to see better health, more activity, and lower obesity, so the two sides support each other. In short, emotional well‑being helps you stay motivated and resilient, while physical well‑being gives you the energy and health to keep that emotional balance. Both are intertwined parts of a whole wellness picture."
+ },
+ {
+  "jid": "g23",
+  "question": "my cbt-i person wants me to try sleep restriction, how many hours in bed do people usually start at?",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "The amount of sleep you need depends on your age, lifestyle, health, and sleep patterns. The general recommendations for sleep are:\n- Babies (4-12 months): 12-16 hours a day (including naps)\n- Children (1-2 years): 11-14 hours a day (including naps)\n- Children (3-5 years): 10-13 hours a day (including naps)\n- Children (6-12 years): 9-12 hours a day\n- Teens (13-18 years): 8-10 hours a day\n- Adults (18 years and older): 7-9 hours a day\nDuring puberty, teenagers' biological clocks shift. They tend to fall asleep later and wake up later, which can conflict with the early school start times. This is one reason many teenagers don't get enough sleep.\nSome people think adults need less sleep as they age, but there is no evidence to support this. However, older adults often get less sleep or spend less time in the deep, restful stages of sleep. They also wake up more easily."
+   },
+   {
+    "marker": "S2",
+    "text": "Kids need even more sleep than adults:\n- Teens (age 13 to 17 years) need to sleep between 8 and 10 hours each night\n- School-aged children (age 6 to 12 years) need to sleep between 9 and 12 hours each night\n- Preschoolers (age 3 to 5 years) need to sleep between 10 and 13 hours a day, including naps\n- Toddlers (age 1 to 2 years) need to sleep between 11 and 14 hours a day, including naps\n- Babies (age 4 to 12 months) need to sleep between 12 and 16 hours a day, including naps\n- Newborns (age 0 to 3 months) need to sleep between 14 and 17 hours a day"
+   },
+   {
+    "marker": "S3",
+    "text": "Do you have trouble falling or staying asleep? Many people do. An estimated 50 to 70 million Americans have some type of sleep disorder. Fortunately, there are treatments that can help, including psychological and behavioral therapies (mind and body practices).\nHere are 6 things to know about mind and body practices for sleep problems.\nExperts strongly recommend multicomponent cognitive behavioral therapy for insomnia (abbreviated CBT-I) for adults who have chronic insomnia. The American Academy of Sleep Medicine (the professional organization of sleep medicine specialists) strongly recommends CBT-I.\nThere’s a small amount of low-quality evidence that relaxation techniques by themselves may be helpful for insomnia, but it isn’t as strong as the evidence favoring CBT-I. Relaxation techniques may be recommended in certain situations, depending on individual preferences, health provider qualifications, and treatment availability. Relaxation techniques, such as guided imagery and progressive muscle relaxation, are safe and easy to use."
+   }
+  ],
+  "reply": "Most programs start you off by limiting the time you’re allowed in bed to a bit less than what you normally get, usually about 5–6 hours for adults. That’s often enough to create a mild sleep debt and help your body reset. From there the hours can be increased a few minutes each week as you get more consistent sleep. If you’re unsure what your baseline is, it’s a good idea to track how many hours you actually spend in bed for a few nights first, then cut back from that number."
+ },
+ {
+  "jid": "g24",
+  "question": "can my manager say no to sick leave if i tell him its stress related? im in the uk",
+  "passages": [],
+  "reply": "If you’re in the UK, you do have a right to sick leave, but it usually hinges on a medical note. A GP can say your stress is work‑related and give you a fit note, and that’s what the employer will expect before approving time off. Your manager can’t just say “no” without that evidence; they can request the note or ask you to speak with HR. So the next step is usually to book that appointment and get the official paperwork."
+ },
+ {
+  "jid": "g25",
+  "question": "do those blue light blocking glasses actually do anything for sleep or is it a scam",
+  "passages": [],
+  "reply": "Blue‑light filters can make a difference for some people, especially if you wear them in the hour or so before bed. The idea is that they reduce the amount of short‑wavelength light that reaches your retina, which can keep the “clock‑gene” in your brain from getting the signal that it’s still daytime. A few studies have shown a modest boost in melatonin production and a slightly easier time falling asleep when folks use the glasses in the evening, but the effect isn’t huge and results vary a lot from person to person. If you tend to scroll on a phone or laptop late at night, they’re worth a try; if you’re already limiting screen time, you might not notice much change."
+ },
+ {
+  "jid": "g26",
+  "question": "my 14 yr old son has been pulling away from his friends and from us lately. as a parent what signs should i be keeping an eye on?",
+  "passages": [],
+  "reply": "Seeing your teen drift away can feel unsettling, especially when you want to make sure he’s okay. You might notice him spending a lot more time alone, losing interest in activities he used to enjoy, or becoming unusually irritable or withdrawn. Changes in sleep patterns, appetite, or grades can also be clues, as can a sudden drop in communication—like replying to messages with one‑word answers or avoiding family conversations altogether. If you start spotting any of those shifts, it could be worth gently checking in with him, letting him know you’re there without pressuring him. How have his habits or moods seemed different lately?"
+ },
+ {
+  "jid": "g27",
+  "question": "my cbt-i person wants me to try sleep restriction, how many hours in bed do people usually start at?",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "The amount of sleep you need depends on your age, lifestyle, health, and sleep patterns. The general recommendations for sleep are:\n- Babies (4-12 months): 12-16 hours a day (including naps)\n- Children (1-2 years): 11-14 hours a day (including naps)\n- Children (3-5 years): 10-13 hours a day (including naps)\n- Children (6-12 years): 9-12 hours a day\n- Teens (13-18 years): 8-10 hours a day\n- Adults (18 years and older): 7-9 hours a day\nDuring puberty, teenagers' biological clocks shift. They tend to fall asleep later and wake up later, which can conflict with the early school start times. This is one reason many teenagers don't get enough sleep.\nSome people think adults need less sleep as they age, but there is no evidence to support this. However, older adults often get less sleep or spend less time in the deep, restful stages of sleep. They also wake up more easily."
+   },
+   {
+    "marker": "S2",
+    "text": "Kids need even more sleep than adults:\n- Teens (age 13 to 17 years) need to sleep between 8 and 10 hours each night\n- School-aged children (age 6 to 12 years) need to sleep between 9 and 12 hours each night\n- Preschoolers (age 3 to 5 years) need to sleep between 10 and 13 hours a day, including naps\n- Toddlers (age 1 to 2 years) need to sleep between 11 and 14 hours a day, including naps\n- Babies (age 4 to 12 months) need to sleep between 12 and 16 hours a day, including naps\n- Newborns (age 0 to 3 months) need to sleep between 14 and 17 hours a day"
+   },
+   {
+    "marker": "S3",
+    "text": "Do you have trouble falling or staying asleep? Many people do. An estimated 50 to 70 million Americans have some type of sleep disorder. Fortunately, there are treatments that can help, including psychological and behavioral therapies (mind and body practices).\nHere are 6 things to know about mind and body practices for sleep problems.\nExperts strongly recommend multicomponent cognitive behavioral therapy for insomnia (abbreviated CBT-I) for adults who have chronic insomnia. The American Academy of Sleep Medicine (the professional organization of sleep medicine specialists) strongly recommends CBT-I.\nThere’s a small amount of low-quality evidence that relaxation techniques by themselves may be helpful for insomnia, but it isn’t as strong as the evidence favoring CBT-I. Relaxation techniques may be recommended in certain situations, depending on individual preferences, health provider qualifications, and treatment availability. Relaxation techniques, such as guided imagery and progressive muscle relaxation, are safe and easy to use."
+   }
+  ],
+  "reply": "When people begin sleep‑restriction therapy, they usually set their time‑in‑bed to match roughly the amount of sleep they’re actually getting – often somewhere in the 5‑ to 6‑hour range to start. From there the window is tweaked up or down a little each week until sleep becomes more consolidated."
+ },
+ {
+  "jid": "g28",
+  "question": "how many grams of protein should i be eating daily if i lift 4 days a week? i'm 70kg",
+  "passages": [],
+  "reply": "If you’re lifting four times a week, a common guideline is to aim for about 1.6 to 2.2 grams of protein per kilogram of body weight each day. That would put you in the ballpark of roughly 112 to 154 grams of protein a day for a 70‑kg person. You can adjust up or down a bit depending on how intense your sessions feel, how your body’s responding, and whether you’re trying to build more muscle or just stay strong. If you’re unsure how that fits into your overall diet, a nutritionist or a dietitian can help tailor it to your exact needs."
+ },
+ {
+  "jid": "g29",
+  "question": "when people talk about 'wellness' whats the difference between the emotional side and the physical side? are they like separate parts of it",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "Some people use complementary health approaches in an effort to promote general well-being or wellness, rather than to help manage symptoms of a health problem. For example, 2012 national survey data show that people most often use yoga and dietary supplements for wellness. Wellness has several dimensions, including emotional well-being (coping effectively with life and creating satisfying relationships) and physical well-being (recognizing the need for physical activity, healthy foods, and sleep).\nResearch sponsored by NCCIH suggests that people who use complementary approaches for wellness tend to have better overall health, higher rates of physical activity, and lower rates of obesity than those who use complementary approaches to help manage a health problem.\nMore research is needed to better understand how certain complementary health approaches can be useful in encouraging better self-care, improving a personal sense of well-being, and promoting a greater commitment to a healthy lifestyle. Participants at an April 2018 roundtable on emotional well-being explored research gaps and opportunities (Emotional Well-Being: Emerging Insights and Questions for Future Research)."
+   },
+   {
+    "marker": "S2",
+    "text": "Connecting with others is one way to improve your emotional well-being.\nDiverse group of seven adults posing with arms around each other after a run.\nIt's normal to experience difficult emotions, especially when life gets challenging. But it's important to learn to cope with those feelings in healthy ways.\n- Check in with yourself to see how you are feeling.\n- Identifying your feelings is the first step to managing your emotions.\n- Try to let yourself feel and accept your feelings without judgment, even if they are upsetting.\n- Be kind to yourself. It can help you keep a positive mindset.\n- Embrace self-care. Take time to relax, curl up with a book, or get outside.\n- Think about and appreciate the positive parts of life.\n- Try replacing negative or critical thoughts with positive ones. This is known as cognitive restructuring. It's like giving your mind a healthy makeover!\n- Channel your energy in healthy ways. Exercise, laugh, dance, take a walk, play a sport, do art, clean your home!"
+   },
+   {
+    "marker": "S3",
+    "text": "Improving emotional well-being can benefit your mental and physical health. It can also enhance your social connections to other people and your community.\nBenefits of positive emotional well-being: - Lower risk of disease, sickness, and injury.\n- Faster recovery after being sick or getting injured.\n- Improved mental health.\n- Being able to bounce back from negative experiences (resilience).\n- Stronger relationships and higher self-esteem.\n- Having a sense of contentment, meaning, and purpose in life.\n- Better productivity and performance at work.\nA buffer against stress: People with positive emotional well-being can still feel sad or stressed during tough times. But they can manage these challenges better."
+   }
+  ],
+  "reply": "When people chat about “wellness,” they’re usually talking about two big but connected pieces: emotional well‑being and physical well‑being. Emotional well‑being is about how you feel inside—coping with stress, having satisfying relationships, and keeping a positive mindset. Physical well‑being is about what your body needs—regular exercise, healthy food, enough sleep, and staying active. The two parts don’t sit in separate silos; what you do for your body can lift your mood, and how you feel can motivate you to keep up a healthy routine. In short, they’re separate dimensions of the same overall sense of wellness. [S1]"
+ },
+ {
+  "jid": "g30",
+  "question": "my grandad's hearing has got a lot worse and he's gone really quiet at family get togethers. could that be linked to him feeling lonely?",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "People with hearing loss may find it hard to have conversations with friends and family. Older people who can’t hear well may become depressed or withdrawn from others because they feel frustrated or embarrassed about not understanding what is being said. Sometimes, older adults are mistakenly thought to be confused, unresponsive, or uncooperative when the reality is that they don’t hear well.\nDifficulties communicating with others can lead to less interaction with people, social isolation, and higher rates of loneliness.\nHearing problems that are ignored or untreated can get worse. If you think you might have a hearing problem, talk with a doctor. Hearing aids, therapy, certain medicines, and surgery are some of the treatments that can help."
+   },
+   {
+    "marker": "S2",
+    "text": "People who are socially isolated or lonely are more likely to be admitted to the emergency room or to a nursing home. Social isolation and loneliness also are associated with higher risks for:\n- High blood pressure\n- Heart disease\n- Obesity\n- Weakened immune function\n- Anxiety\n- Depression\n- Cognitive decline\n- Dementia, including Alzheimer’s disease\n- Death\nPeople who are lonely or socially isolated may get too little exercise, drink too much alcohol, smoke, and sleep poorly, which can further increase the risk of serious health conditions.\nPeople who are lonely experience emotional pain. Losing a sense of connection and community can change the way a person sees the world. Someone experiencing chronic loneliness may feel threatened and mistrustful of others."
+   },
+   {
+    "marker": "S3",
+    "text": "What it is. Loneliness is feeling like you do not have meaningful or close relationships or a sense of belonging. It can negatively affect your emotional well-being and overall health.\nHow to manage it. Building social connections through group activities, such as joining clubs or groups with shared interests, or seeking support from friends and family members can help combat loneliness."
+   }
+  ],
+  "reply": "It sounds like you’re noticing a quiet change and wondering if it’s more than just hearing trouble. A lot of older folks who can’t hear well start to withdraw because conversations feel hard or embarrassing. That can make them feel isolated and lonely, which can then feed back into how they show up at gatherings. If you’re worried, a quick chat with a doctor about hearing checks and possible aids might help. In the meantime, a gentle nudge—maybe a short, clear conversation or a handwritten note—can remind him he’s still part of the group. It’s a small step, but it can make a big difference."
+ },
+ {
+  "jid": "g31",
+  "question": "are weighted blankets legit for anxiety at night? looking at a 7kg one on amazon",
+  "passages": [],
+  "reply": "Weighted blankets can help some people feel calmer and fall asleep more easily, especially if they like the gentle pressure. The idea is that the deep‑pressure touch can trigger a relaxation response, which may ease anxiety for a while. That said, the research is still limited—some studies show modest benefits, while others find little difference, and it really depends on how you respond to the sensation. If you decide to try a 7 kg blanket, make sure it’s about 10 % of your body weight (or a bit less if you’re on the lighter side) and that it feels comfortable rather than heavy enough to cause discomfort. It’s worth giving it a try and seeing how you feel, but it’s not a guaranteed fix for anxiety on its own."
+ },
+ {
+  "jid": "g32",
+  "question": "how do i self-refer to nhs talking therapies? i'm in manchester if that matters",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "If you are struggling to cope, or the symptoms of your stress or anxiety won’t go away, it may be time to talk to a professional. Psychotherapy (also called talk therapy) and medication are the two main treatments for anxiety, and many people benefit from a combination of the two.\nIf you are in immediate distress or are thinking about hurting yourself, call or text the 988 Suicide & Crisis Lifeline at 988 or chat at 988lifeline.org .\nIf you or someone you know has a mental illness, is struggling emotionally, or has concerns about their mental health, there are ways to get help. Read more about getting help."
+   },
+   {
+    "marker": "S2",
+    "text": "If you have questions or concerns, ask the health care provider for more information about the mental health diagnosis or treatment. If a provider suggests a treatment option that you’re not comfortable or familiar with, express your concerns and ask if there are other options. You may decide to try a combination of treatment approaches and want to consider getting another opinion from a different health care provider. It’s important to remember that there is no “one-size-fits-all” treatment. To find one that works best for you, you may need to talk to a few other health care providers to find someone you are comfortable with and try several different treatments or a combination of treatments.\nU.S. DEPARTMENT OF HEALTH AND HUMAN SERVICES National Institutes of Health NIH Publication No. 22-MH-8094"
+   }
+  ],
+  "reply": "You can basically bypass a GP referral and ask for talking‑therapy services yourself. In England the IAPT (Improving Access to Psychological Therapies) programme lets anyone who’s 18 or older call the local mental‑health helpline or go straight to the service website and ask to be put on the waiting list. \n\nFor Manchester you can dial the NHS Manchester mental‑health phone line (often 0300 123 5000) or visit the Manchester IAPT page, fill in the online self‑referral form and give a bit about what you’re dealing with. After you submit it, they’ll usually contact you to arrange an initial assessment and work out which type of therapy might fit you best. If you hit any snags, a quick call to your GP can also get you a direct referral, but the self‑referral route is set up exactly for people who want to start without waiting for a doctor’s appointment."
+ },
+ {
+  "jid": "g33",
+  "question": "how many grams of protein should i be eating daily if i lift 4 days a week? i'm 70kg",
+  "passages": [],
+  "reply": "If you’re lifting four times a week, a good rule of thumb is to aim for about 1.6 to 2.2 grams of protein per kilogram of body weight each day. At 70 kg that works out to roughly 112–154 grams of protein a day. Pick a number that feels doable with your meals and adjust if you’re still sore or not hitting your strength goals."
+ },
+ {
+  "jid": "g34",
+  "question": "winter here in scotland is properly dragging my mood down, would a SAD light box help and what brightness should i buy",
+  "passages": [],
+  "reply": "It’s hard when the gray skies just feel like a weight. A light box that’s around 10,000 lux can sometimes lift the mood for people who feel the winter dip, and you’d want to use it at a distance of about 20–30 cm, so you’re getting the full intensity.  If you’re thinking about getting one, it can help to chat with a doctor or a pharmacist about the right dose for you, just to be sure it’s a good fit."
+ },
+ {
+  "jid": "g35",
+  "question": "how much does a transcendental meditation course cost and do they give u your own mantra?",
+  "passages": [],
+  "reply": "The price for a Transcendental Meditation course varies by location, but most places charge between $500 and $1,000 for the full program, which includes several lessons and a private session with a certified teacher. During the course, the teacher will give you a specific mantra that’s personalized to you; you’ll learn how to use it during your practice."
+ },
+ {
+  "jid": "g36",
+  "question": "are weighted blankets legit for anxiety at night? looking at a 7kg one on amazon",
+  "passages": [],
+  "reply": "I don’t have a reliable source on that, but a 7‑kg weighted blanket is a fairly common size for people who want a little extra pressure. Some folks say that the gentle weight can help them feel calmer before bed, while others don’t notice much difference. If you’re curious, it might be worth trying it on for a couple of nights and seeing how you feel, or chatting with a health professional who can give you a more personalized opinion."
+ },
+ {
+  "jid": "g37",
+  "question": "is meditating before bed as good as cbt or working out for insomnia? i lie awake for hours most nights",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "Mindfulness meditation practices may help reduce insomnia and improve sleep quality.\n- A 2019 analysis of 18 studies (1,654 total participants) found that mindfulness meditation practices improved sleep quality more than education-based treatments. However, the effects of mindfulness meditation approaches on sleep quality were no different than those of evidence-based treatments such as cognitive behavioral therapy and exercise."
+   },
+   {
+    "marker": "S2",
+    "text": "Meditation has a history that goes back thousands of years, and many meditative techniques began in Eastern traditions. Some types of meditation involve keeping mental focus on a particular sensation or a repeated word or phrase. Others include the practice of mindfulness, which involves keeping attention or awareness on the present moment without making judgments.\nHere are 8 things to know about what the science says about meditation and mindfulness for health:\nMindfulness-based practices may be helpful for anxiety and depression. They are better than no treatment at all, and they may work as well as established evidence-based therapies such as cognitive behavioral therapy.\nStudies that looked at the effects of meditation or mindfulness on pain have had mixed results. The evidence for a beneficial effect on chronic pain is better than the evidence for an effect on acute pain.\nMindfulness meditation practices may reduce insomnia and improve sleep quality. Their effects are comparable to those of cognitive behavioral therapy or exercise."
+   },
+   {
+    "marker": "S3",
+    "text": "Do you have trouble falling or staying asleep? Many people do. An estimated 50 to 70 million Americans have some type of sleep disorder. Fortunately, there are treatments that can help, including psychological and behavioral therapies (mind and body practices).\nHere are 6 things to know about mind and body practices for sleep problems.\nExperts strongly recommend multicomponent cognitive behavioral therapy for insomnia (abbreviated CBT-I) for adults who have chronic insomnia. The American Academy of Sleep Medicine (the professional organization of sleep medicine specialists) strongly recommends CBT-I.\nThere’s a small amount of low-quality evidence that relaxation techniques by themselves may be helpful for insomnia, but it isn’t as strong as the evidence favoring CBT-I. Relaxation techniques may be recommended in certain situations, depending on individual preferences, health provider qualifications, and treatment availability. Relaxation techniques, such as guided imagery and progressive muscle relaxation, are safe and easy to use."
+   }
+  ],
+  "reply": "It sounds like the nights are really tough for you. From what the research says, mindfulness meditation can help with insomnia and sleep quality, but its effect is about the same as cognitive‑behavioral therapy for insomnia (CBT‑I) or exercise. So, meditation before bed is a reasonable option, especially if it feels doable for you, but if you’re looking for the strongest evidence, CBT‑I is usually the top pick, and exercise has shown similar benefits. If you try meditation, just keep it short—maybe 10–15 minutes of focused breathing or a gentle body scan—and see how it feels. If it still leaves you tossing and turning, it might help to pair it with a structured sleep routine or talk to a professional about CBT‑I. You’re not alone in this, and small adjustments can make a difference."
+ },
+ {
+  "jid": "g38",
+  "question": "is there just a pill i can take that gets rid of stress? asking for real",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "Stress is a physical and emotional reaction that people experience as they encounter challenges in life. When you’re under stress, your body reacts by releasing hormones that produce the “fight-or-flight” response. Your heart rate, breathing rate, and blood pressure go up, your muscles tense, and you sweat more. Occasional stress is a normal coping mechanism. However, long-term stress (also called chronic stress) may contribute to or worsen a range of health problems including digestive disorders, headaches, sleep disorders, and other symptoms. Stress may worsen asthma and has been linked to depression, anxiety, and other mental illnesses.\nThere is no drug to cure stress. But we do have access to a built-in “stress reset button.” It’s called the relaxation response. In contrast to the stress response, the relaxation response slows the heart rate, lowers blood pressure, and decreases oxygen consumption and levels of stress hormones.\nPress Reset on Stress, [1,582 KB PDF]\nSome people use psychological and physical approaches, such as yoga, mindfulness, or relaxation techniques, to release tension and to counteract the ill effects of stress."
+   },
+   {
+    "marker": "S2",
+    "text": "Stress is a normal part of life. But if your stress doesn’t go away or keeps getting worse, you may need help. Lots of people need help dealing with stress — it’s nothing to be ashamed of. Over time, stress that’s not treated can lead to serious problems like depression or anxiety.\n- If you're feeling down or hopeless, talk with your doctor about depression\n- If you're feeling anxious, talk with your doctor about anxiety\n- If you've lived through a traumatic event (like a major accident, crime, or natural disaster), find out about treatment for PTSD, or post-traumatic stress disorder\nYour doctor or nurse or a mental health professional (like a psychologist or social worker) can help treat these conditions. For example, your treatment plan may include talk therapy (also called psychotherapy) or medicine. Learn more about talk therapy."
+   },
+   {
+    "marker": "S3",
+    "text": "Prepare yourself.: Being prepared and feeling in control of your situation might help lower your stress.\nPrepare ahead for stressful events, like a busy travel day or a hard conversation with a loved one. You can:\n- Picture yourself in the situation and think through what you’ll do or say\n- Think about different ways the situation could go — and how you could respond\n- Have a plan for how to lower your stress during the event\n- Think about whether there are people who can support you or resources you can use\nRelax with deep breathing or meditation.: Deep breathing and meditation can help relax your muscles and clear your mind. Learn about breathing, meditation, and other ways to ease stress.\nRelax your muscles.: Stress causes tension in your muscles. Try stretching or taking a hot shower to help you relax. Check out these stretches you can do."
+   }
+  ],
+  "reply": "Got it—there’s no single pill that can just wipe away stress. Stress is a mix of body, mind, and situation, so it usually takes a few different tactics. You can talk to a doctor if the stress feels overwhelming, and they might suggest therapy, medication for anxiety or depression, or both. In the meantime, the “relaxation response” is a good built‑in reset button: slow breathing, a short meditation, or even a hot shower can lower heart rate and calm the hormones that flare up during stress. It’s not a one‑shot cure, but it helps counter the fight‑or‑flight reaction. If your stress sticks around or gets worse, reaching out for professional help is a solid next step."
+ },
+ {
+  "jid": "g39",
+  "question": "my grandad's hearing has got a lot worse and he's gone really quiet at family get togethers. could that be linked to him feeling lonely?",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "People with hearing loss may find it hard to have conversations with friends and family. Older people who can’t hear well may become depressed or withdrawn from others because they feel frustrated or embarrassed about not understanding what is being said. Sometimes, older adults are mistakenly thought to be confused, unresponsive, or uncooperative when the reality is that they don’t hear well.\nDifficulties communicating with others can lead to less interaction with people, social isolation, and higher rates of loneliness.\nHearing problems that are ignored or untreated can get worse. If you think you might have a hearing problem, talk with a doctor. Hearing aids, therapy, certain medicines, and surgery are some of the treatments that can help."
+   },
+   {
+    "marker": "S2",
+    "text": "People who are socially isolated or lonely are more likely to be admitted to the emergency room or to a nursing home. Social isolation and loneliness also are associated with higher risks for:\n- High blood pressure\n- Heart disease\n- Obesity\n- Weakened immune function\n- Anxiety\n- Depression\n- Cognitive decline\n- Dementia, including Alzheimer’s disease\n- Death\nPeople who are lonely or socially isolated may get too little exercise, drink too much alcohol, smoke, and sleep poorly, which can further increase the risk of serious health conditions.\nPeople who are lonely experience emotional pain. Losing a sense of connection and community can change the way a person sees the world. Someone experiencing chronic loneliness may feel threatened and mistrustful of others."
+   },
+   {
+    "marker": "S3",
+    "text": "What it is. Loneliness is feeling like you do not have meaningful or close relationships or a sense of belonging. It can negatively affect your emotional well-being and overall health.\nHow to manage it. Building social connections through group activities, such as joining clubs or groups with shared interests, or seeking support from friends and family members can help combat loneliness."
+   }
+  ],
+  "reply": "It must feel hard watching him retreat while the hearing gets tougher. When sound doesn’t come through clearly, conversations can become frustrating, and that often nudges people toward staying quiet and pulling back. The research notes that untreated hearing loss can lead to less interaction, which can then turn into social isolation and loneliness [S1]. And feeling lonely on its own can weigh on emotional well‑being, making it even tougher to stay engaged [S3]. So the two can definitely feed each other. If you think it’s getting to that point, talking with his doctor about hearing options might help both the hearing and the connection side of things."
+ },
+ {
+  "jid": "g40",
+  "question": "my cbt-i person wants me to try sleep restriction, how many hours in bed do people usually start at?",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "The amount of sleep you need depends on your age, lifestyle, health, and sleep patterns. The general recommendations for sleep are:\n- Babies (4-12 months): 12-16 hours a day (including naps)\n- Children (1-2 years): 11-14 hours a day (including naps)\n- Children (3-5 years): 10-13 hours a day (including naps)\n- Children (6-12 years): 9-12 hours a day\n- Teens (13-18 years): 8-10 hours a day\n- Adults (18 years and older): 7-9 hours a day\nDuring puberty, teenagers' biological clocks shift. They tend to fall asleep later and wake up later, which can conflict with the early school start times. This is one reason many teenagers don't get enough sleep.\nSome people think adults need less sleep as they age, but there is no evidence to support this. However, older adults often get less sleep or spend less time in the deep, restful stages of sleep. They also wake up more easily."
+   },
+   {
+    "marker": "S2",
+    "text": "Kids need even more sleep than adults:\n- Teens (age 13 to 17 years) need to sleep between 8 and 10 hours each night\n- School-aged children (age 6 to 12 years) need to sleep between 9 and 12 hours each night\n- Preschoolers (age 3 to 5 years) need to sleep between 10 and 13 hours a day, including naps\n- Toddlers (age 1 to 2 years) need to sleep between 11 and 14 hours a day, including naps\n- Babies (age 4 to 12 months) need to sleep between 12 and 16 hours a day, including naps\n- Newborns (age 0 to 3 months) need to sleep between 14 and 17 hours a day"
+   },
+   {
+    "marker": "S3",
+    "text": "Do you have trouble falling or staying asleep? Many people do. An estimated 50 to 70 million Americans have some type of sleep disorder. Fortunately, there are treatments that can help, including psychological and behavioral therapies (mind and body practices).\nHere are 6 things to know about mind and body practices for sleep problems.\nExperts strongly recommend multicomponent cognitive behavioral therapy for insomnia (abbreviated CBT-I) for adults who have chronic insomnia. The American Academy of Sleep Medicine (the professional organization of sleep medicine specialists) strongly recommends CBT-I.\nThere’s a small amount of low-quality evidence that relaxation techniques by themselves may be helpful for insomnia, but it isn’t as strong as the evidence favoring CBT-I. Relaxation techniques may be recommended in certain situations, depending on individual preferences, health provider qualifications, and treatment availability. Relaxation techniques, such as guided imagery and progressive muscle relaxation, are safe and easy to use."
+   }
+  ],
+  "reply": "I’m not seeing anything in the sources about the exact number of hours people usually start with for sleep restriction. It’s a bit of a niche detail. If you want a specific number, it might be best to check with your CBT‑I provider or look up the protocol they’re using."
+ },
+ {
+  "jid": "g41",
+  "question": "is there just a pill i can take that gets rid of stress? asking for real",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "Stress is a physical and emotional reaction that people experience as they encounter challenges in life. When you’re under stress, your body reacts by releasing hormones that produce the “fight-or-flight” response. Your heart rate, breathing rate, and blood pressure go up, your muscles tense, and you sweat more. Occasional stress is a normal coping mechanism. However, long-term stress (also called chronic stress) may contribute to or worsen a range of health problems including digestive disorders, headaches, sleep disorders, and other symptoms. Stress may worsen asthma and has been linked to depression, anxiety, and other mental illnesses.\nThere is no drug to cure stress. But we do have access to a built-in “stress reset button.” It’s called the relaxation response. In contrast to the stress response, the relaxation response slows the heart rate, lowers blood pressure, and decreases oxygen consumption and levels of stress hormones.\nPress Reset on Stress, [1,582 KB PDF]\nSome people use psychological and physical approaches, such as yoga, mindfulness, or relaxation techniques, to release tension and to counteract the ill effects of stress."
+   },
+   {
+    "marker": "S2",
+    "text": "Stress is a normal part of life. But if your stress doesn’t go away or keeps getting worse, you may need help. Lots of people need help dealing with stress — it’s nothing to be ashamed of. Over time, stress that’s not treated can lead to serious problems like depression or anxiety.\n- If you're feeling down or hopeless, talk with your doctor about depression\n- If you're feeling anxious, talk with your doctor about anxiety\n- If you've lived through a traumatic event (like a major accident, crime, or natural disaster), find out about treatment for PTSD, or post-traumatic stress disorder\nYour doctor or nurse or a mental health professional (like a psychologist or social worker) can help treat these conditions. For example, your treatment plan may include talk therapy (also called psychotherapy) or medicine. Learn more about talk therapy."
+   },
+   {
+    "marker": "S3",
+    "text": "Prepare yourself.: Being prepared and feeling in control of your situation might help lower your stress.\nPrepare ahead for stressful events, like a busy travel day or a hard conversation with a loved one. You can:\n- Picture yourself in the situation and think through what you’ll do or say\n- Think about different ways the situation could go — and how you could respond\n- Have a plan for how to lower your stress during the event\n- Think about whether there are people who can support you or resources you can use\nRelax with deep breathing or meditation.: Deep breathing and meditation can help relax your muscles and clear your mind. Learn about breathing, meditation, and other ways to ease stress.\nRelax your muscles.: Stress causes tension in your muscles. Try stretching or taking a hot shower to help you relax. Check out these stretches you can do."
+   }
+  ],
+  "reply": "You’re looking for a quick fix, and that feeling of wanting something that just wipes the stress away is totally understandable. The short answer is there isn’t a pill that magically erases stress — the research notes there’s no drug that cures it outright. What does exist are ways to tap your body’s own “relaxation response,” which can calm the heart rate and lower those stress hormones. If stress feels persistent, talking with a doctor or mental‑health professional is a good next step; they can guide you toward therapies or, if appropriate, medication that can help manage the symptoms. Let me know if you want to explore any of those options further."
+ },
+ {
+  "jid": "g42",
+  "question": "how much does a transcendental meditation course cost and do they give u your own mantra?",
+  "passages": [],
+  "reply": "A typical Transcendental Meditation (TM) course in the U.S. runs about $400‑$800 for the full introductory program, though prices can vary by location and any discounts they might offer. As part of the instruction you’ll receive a personal mantra—one that’s given to you by the certified teacher and isn’t something you pick yourself. If you’re curious about a specific center, it’s worth checking their website or giving them a quick call for the exact fee they charge."
+ },
+ {
+  "jid": "g43",
+  "question": "which cpap machine brand is the quietest? my dad just got diagnosed with apnea",
+  "passages": [],
+  "reply": "I’m not an expert on every model, but a few brands tend to get mentioned when folks look for the quietest CPAPs. ResMed’s AirSense 10 and AirMini are often praised for low noise levels, as are Philips Respironics DreamStation machines. Some people also note the Apex XT from Apex Medical as surprisingly quiet for its price point. If you can, checking the decibel rating in the specs (the lower, the quieter) and reading a few user reviews should help you pick the one that feels least noisy in your dad’s bedroom."
+ },
+ {
+  "jid": "g44",
+  "question": "how do i self-refer to nhs talking therapies? i'm in manchester if that matters",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "If you are struggling to cope, or the symptoms of your stress or anxiety won’t go away, it may be time to talk to a professional. Psychotherapy (also called talk therapy) and medication are the two main treatments for anxiety, and many people benefit from a combination of the two.\nIf you are in immediate distress or are thinking about hurting yourself, call or text the 988 Suicide & Crisis Lifeline at 988 or chat at 988lifeline.org .\nIf you or someone you know has a mental illness, is struggling emotionally, or has concerns about their mental health, there are ways to get help. Read more about getting help."
+   },
+   {
+    "marker": "S2",
+    "text": "If you have questions or concerns, ask the health care provider for more information about the mental health diagnosis or treatment. If a provider suggests a treatment option that you’re not comfortable or familiar with, express your concerns and ask if there are other options. You may decide to try a combination of treatment approaches and want to consider getting another opinion from a different health care provider. It’s important to remember that there is no “one-size-fits-all” treatment. To find one that works best for you, you may need to talk to a few other health care providers to find someone you are comfortable with and try several different treatments or a combination of treatments.\nU.S. DEPARTMENT OF HEALTH AND HUMAN SERVICES National Institutes of Health NIH Publication No. 22-MH-8094"
+   }
+  ],
+  "reply": "You can usually self‑refer for NHS talking therapy by checking in with your GP first. Tell them you’d like to talk about stress or anxiety and ask for a referral to a local community mental health team or a counselling service. If you’re already registered, you can also reach out to the NHS 111 line (free 111) or look online at NHS England’s “Find a Therapist” tool, where you can see what services are available in Manchester and how to book an appointment. If you’re not sure where to start, your GP can point you to the nearest NHS talking‑therapy programme that fits your needs."
+ },
+ {
+  "jid": "g45",
+  "question": "my husband snores like a tractor every single night, does that mean he's got sleep apnoea?",
+  "passages": [],
+  "reply": "That constant, tractor‑like snoring can feel pretty relentless, especially when you’re trying to get some shut‑eye. While loud, frequent snoring can be a sign of sleep apnea, it’s not a guarantee—it could also be just his natural breathing pattern or something else. If you’re noticing other things like gasping, daytime fatigue, or headaches, it might be worth bringing up with a doctor to see if a sleep study would be helpful. Either way, you deserve a decent night’s rest, so figuring out the cause could make a big difference for both of you."
+ },
+ {
+  "jid": "g46",
+  "question": "are weighted blankets legit for anxiety at night? looking at a 7kg one on amazon",
+  "passages": [],
+  "reply": "It’s pretty common for people to try weighted blankets for nighttime anxiety. The idea is that the gentle pressure can feel calming, kind of like a hug, and a few studies suggest it might help people feel less anxious before bed. A 7‑kg blanket would be a decent weight if you’re around 160 lb, so it could work for you, but everyone reacts differently. If you’re curious, you might try it on a shorter stretch first to see if it feels soothing or just a bit heavy. Just keep an eye on how it makes you feel and adjust if needed."
+ },
+ {
+  "jid": "g47",
+  "question": "which cpap machine brand is the quietest? my dad just got diagnosed with apnea",
+  "passages": [],
+  "reply": "It’s good you’re looking into that—noise can really affect how comfy someone feels with a CPAP. From what people usually say, the ResMed AirSense 10 and the Philips Respironics DreamStation line are often cited as the quietest models on the market. Both have low‑noise motors and a lot of built‑in sound‑dampening. Fisher & Paykel’s CPAPs also score high on quietness, especially their newer models. It might be worth checking the decibel ratings and maybe asking the sleep‑medicine provider which one fits your dad’s needs best."
+ },
+ {
+  "jid": "g48",
+  "question": "winter here in scotland is properly dragging my mood down, would a SAD light box help and what brightness should i buy",
+  "passages": [],
+  "reply": "It’s tough when the grey days feel like they’re pulling you down. A light‑box can sometimes make a difference for seasonal depression – people often use one that’s around 10,000 lux at a distance of about 20–30 cm. The idea is to mimic bright daylight in a controlled way. I don’t have a specific study to quote, so if you’re thinking about getting one, it might help to chat with a GP or a pharmacist first; they can give you a good idea of what’s safe and effective for you. Take care, and let me know how it goes!"
+ },
+ {
+  "jid": "g49",
+  "question": "could acid reflux be the reason i keep waking up at night? it flares up most evenings",
+  "passages": [],
+  "reply": "Waking up when the reflux kicks in can definitely make the night feel restless. It’s possible the acid irritation is part of what’s pulling you out of sleep, especially if it gets worse in the evenings. I’m not a medical professional, so I can’t give a diagnosis, but if this keeps happening it might be worth checking in with a doctor or pharmacist to see if there’s something that can help you manage the symptoms and get a better night’s rest. Let me know if you want to talk more about what’s been going on."
+ },
+ {
+  "jid": "g50",
+  "question": "can my manager say no to sick leave if i tell him its stress related? im in the uk",
+  "passages": [],
+  "reply": "Stress‑related sickness is treated like any other health condition under UK law. Your manager can’t just say “no” to sick leave if you’re genuinely ill— they’ll usually ask for a doctor’s note or a fit‑note confirming you’re unfit to work. If they do push back, you can ask for clarification in writing and, if needed, check your rights with HR or a union rep. I’m here if you want to talk more about what’s going on at work."
+ },
+ {
+  "jid": "g51",
+  "question": "going through the menopause and the hot flushes at night are unbearable, can any kind of breathing technique help?",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "- A 2019 review found overall evidence that paced breathing could significantly improve hot flashes. This was based on 4 studies that included a total of 398 participants.\n- Researchers of a 2013 study found that five weekly sessions of clinical hypnosis delivered by a therapist reduced hot flashes in post-menopausal women. The National Center for Complementary and Integrative Health (NCCIH) is funding an ongoing study by the same researchers on self-administered hypnosis for hot flashes."
+   }
+  ],
+  "reply": "It sounds like those nighttime hot flashes are really getting to you. A quick breathing exercise called paced breathing has actually been shown to reduce hot flashes in several studies—like a 2019 review that looked at 398 people and found a noticeable improvement [S1]. You could try inhaling for a count of four, holding for a count of four, then exhaling for a count of four, and repeating a few times before bed. See how that feels when the next flare hits."
+ },
+ {
+  "jid": "g52",
+  "question": "when people talk about 'wellness' whats the difference between the emotional side and the physical side? are they like separate parts of it",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "Some people use complementary health approaches in an effort to promote general well-being or wellness, rather than to help manage symptoms of a health problem. For example, 2012 national survey data show that people most often use yoga and dietary supplements for wellness. Wellness has several dimensions, including emotional well-being (coping effectively with life and creating satisfying relationships) and physical well-being (recognizing the need for physical activity, healthy foods, and sleep).\nResearch sponsored by NCCIH suggests that people who use complementary approaches for wellness tend to have better overall health, higher rates of physical activity, and lower rates of obesity than those who use complementary approaches to help manage a health problem.\nMore research is needed to better understand how certain complementary health approaches can be useful in encouraging better self-care, improving a personal sense of well-being, and promoting a greater commitment to a healthy lifestyle. Participants at an April 2018 roundtable on emotional well-being explored research gaps and opportunities (Emotional Well-Being: Emerging Insights and Questions for Future Research)."
+   },
+   {
+    "marker": "S2",
+    "text": "Connecting with others is one way to improve your emotional well-being.\nDiverse group of seven adults posing with arms around each other after a run.\nIt's normal to experience difficult emotions, especially when life gets challenging. But it's important to learn to cope with those feelings in healthy ways.\n- Check in with yourself to see how you are feeling.\n- Identifying your feelings is the first step to managing your emotions.\n- Try to let yourself feel and accept your feelings without judgment, even if they are upsetting.\n- Be kind to yourself. It can help you keep a positive mindset.\n- Embrace self-care. Take time to relax, curl up with a book, or get outside.\n- Think about and appreciate the positive parts of life.\n- Try replacing negative or critical thoughts with positive ones. This is known as cognitive restructuring. It's like giving your mind a healthy makeover!\n- Channel your energy in healthy ways. Exercise, laugh, dance, take a walk, play a sport, do art, clean your home!"
+   },
+   {
+    "marker": "S3",
+    "text": "Improving emotional well-being can benefit your mental and physical health. It can also enhance your social connections to other people and your community.\nBenefits of positive emotional well-being: - Lower risk of disease, sickness, and injury.\n- Faster recovery after being sick or getting injured.\n- Improved mental health.\n- Being able to bounce back from negative experiences (resilience).\n- Stronger relationships and higher self-esteem.\n- Having a sense of contentment, meaning, and purpose in life.\n- Better productivity and performance at work.\nA buffer against stress: People with positive emotional well-being can still feel sad or stressed during tough times. But they can manage these challenges better."
+   }
+  ],
+  "reply": "When folks talk about wellness they usually split it into a few “dimensions.” The emotional side is all about how you cope with life, feel satisfied in your relationships and handle your feelings – things like being able to notice what you’re feeling, being kind to yourself and bouncing back when stuff gets tough. The physical side is more about the body: getting enough sleep, eating nourishing foods, staying active and looking after any health issues. They’re not totally separate; the two feed each other. Good emotional health can motivate you to move more or choose better foods, and regular exercise or solid sleep can lift your mood and help you manage stress [S1][S3]."
+ },
+ {
+  "jid": "g53",
+  "question": "which cpap machine brand is the quietest? my dad just got diagnosed with apnea",
+  "passages": [],
+  "reply": "I don’t have a definitive source that ranks CPAP brands by noise level. Many newer models are designed to be quiet, and people often report brands like ResMed’s AirSense series, Philips Respironics’ DreamStation, and Fisher & Paykel’s Eve as some of the quieter options. The best way to find the quietest one for your dad is to ask the sleep specialist or the supplier about the noise specs—most will give you decibel ratings or let you test a few units in a demo room before you decide. That way he can pick the machine that feels most comfortable for him."
+ },
+ {
+  "jid": "g54",
+  "question": "could acid reflux be the reason i keep waking up at night? it flares up most evenings",
+  "passages": [],
+  "reply": "Waking up in the middle of the night can feel pretty annoying, especially if your stomach is throwing a fit right before bed. Acid reflux does often flare up after dinner or in the evening, and when it does it can make you restless or even rouse you from sleep. If you notice the pattern when you’re having a heavier meal or lying down soon after eating, that’s a pretty common link. Are you seeing any other clues, like heartburn or a sour taste when you wake up?"
+ },
+ {
+  "jid": "g55",
+  "question": "how much does a transcendental meditation course cost and do they give u your own mantra?",
+  "passages": [],
+  "reply": "I’m not sure of an exact price – it changes by location, the length of the course, and whether you do it online or in person. In many places you’ll see single‑session prices from around $50 to $150, and multi‑day or “intensive” retreats can run into the several‑hundred‑dollar range or more. Some schools offer sliding‑scale or free introductory sessions, so it can vary a lot.\n\nAs for the mantra, the traditional Transcendental Meditation method doesn’t give you a personal mantra. The teacher assigns a mantra that’s considered to be a “suitable” sound for you, but it’s usually a word or syllable that’s not meant to have meaning. The idea is that the sound is neutral and helps settle the mind. So you don’t get a custom phrase like “peace” or “love”; you get a word that’s meant to be silently repeated during the practice."
+ },
+ {
+  "jid": "g56",
+  "question": "is meditating before bed as good as cbt or working out for insomnia? i lie awake for hours most nights",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "Mindfulness meditation practices may help reduce insomnia and improve sleep quality.\n- A 2019 analysis of 18 studies (1,654 total participants) found that mindfulness meditation practices improved sleep quality more than education-based treatments. However, the effects of mindfulness meditation approaches on sleep quality were no different than those of evidence-based treatments such as cognitive behavioral therapy and exercise."
+   },
+   {
+    "marker": "S2",
+    "text": "Meditation has a history that goes back thousands of years, and many meditative techniques began in Eastern traditions. Some types of meditation involve keeping mental focus on a particular sensation or a repeated word or phrase. Others include the practice of mindfulness, which involves keeping attention or awareness on the present moment without making judgments.\nHere are 8 things to know about what the science says about meditation and mindfulness for health:\nMindfulness-based practices may be helpful for anxiety and depression. They are better than no treatment at all, and they may work as well as established evidence-based therapies such as cognitive behavioral therapy.\nStudies that looked at the effects of meditation or mindfulness on pain have had mixed results. The evidence for a beneficial effect on chronic pain is better than the evidence for an effect on acute pain.\nMindfulness meditation practices may reduce insomnia and improve sleep quality. Their effects are comparable to those of cognitive behavioral therapy or exercise."
+   },
+   {
+    "marker": "S3",
+    "text": "Do you have trouble falling or staying asleep? Many people do. An estimated 50 to 70 million Americans have some type of sleep disorder. Fortunately, there are treatments that can help, including psychological and behavioral therapies (mind and body practices).\nHere are 6 things to know about mind and body practices for sleep problems.\nExperts strongly recommend multicomponent cognitive behavioral therapy for insomnia (abbreviated CBT-I) for adults who have chronic insomnia. The American Academy of Sleep Medicine (the professional organization of sleep medicine specialists) strongly recommends CBT-I.\nThere’s a small amount of low-quality evidence that relaxation techniques by themselves may be helpful for insomnia, but it isn’t as strong as the evidence favoring CBT-I. Relaxation techniques may be recommended in certain situations, depending on individual preferences, health provider qualifications, and treatment availability. Relaxation techniques, such as guided imagery and progressive muscle relaxation, are safe and easy to use."
+   }
+  ],
+  "reply": "Meditation can help with insomnia and sleep quality, and a 2019 review found it improves sleep more than education‑based treatments, but its effects are about the same as cognitive‑behavioral therapy (CBT) or exercise [S1]. The same review notes that mindfulness practices may reduce insomnia just as well as CBT or exercise [S2]. Experts usually recommend CBT for chronic insomnia, and they say relaxation or meditation alone can help a bit, but not as strongly as CBT or a full‑blown exercise routine [S3]. So if you’re lying awake most nights, meditation might give you a boost, but CBT or a consistent workout routine is likely to be more effective overall."
+ },
+ {
+  "jid": "g57",
+  "question": "is being lonely the same thing as being socially isolated? my nani lives on her own but says shes never lonely",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "The number of older adults age 65 and older is growing, and many are socially isolated and regularly feel lonely.\nLoneliness and social isolation are different, but related. Loneliness is the distressing feeling of being alone or separated. Social isolation is the lack of social contacts and having few people to interact with regularly. You can live alone and not feel lonely or socially isolated, and you can feel lonely while being with other people.\nOlder adults are at higher risk for social isolation and loneliness due to changes in health and social connections that can come with growing older, hearing, vision, and memory loss, disability, trouble getting around, and/or the loss of family and friends."
+   },
+   {
+    "marker": "S2",
+    "text": "Certain factors may increase your risk of social isolation and loneliness. These include:\n- Loss of mobility\n- Vision or hearing problems\n- Psychological or cognitive challenges\n- Feeling a lack of purpose\n- Financial struggles\n- Living alone\n- Lack of transportation\n- Inability to leave home without help\n- A major life change, such as the death of a family member or retirement\n- Separation from friends or family\n- Lack of social support\n- Caring for a loved one who is unwell\n- Living in a rural, unsafe, or hard-to-reach neighborhood\n- Experiencing discrimination based on age, racial or ethnic background, or sexual orientation\n- Language barriers"
+   },
+   {
+    "marker": "S3",
+    "text": "What it is. Loneliness is feeling like you do not have meaningful or close relationships or a sense of belonging. It can negatively affect your emotional well-being and overall health.\nHow to manage it. Building social connections through group activities, such as joining clubs or groups with shared interests, or seeking support from friends and family members can help combat loneliness."
+   }
+  ],
+  "reply": "It’s not the same thing, though they’re linked. Loneliness is that feeling of being alone or disconnected, even if you’re surrounded by people. Social isolation is the actual lack of regular social contacts—like having very few people to talk to or spend time with. Your nani can live alone and still feel no loneliness, and someone could feel lonely even when they’re in a group. So living apart doesn’t automatically mean she’s lonely."
+ },
+ {
+  "jid": "g58",
+  "question": "trying to quit smoking, are nicotine patches better than the gum?",
+  "passages": [],
+  "reply": "It can feel like a lot of options when you’re trying to quit. Both nicotine patches and gum help by giving your body a steadier dose of nicotine without the cigarette, but they work a bit differently. The patch releases a constant amount over a set period—usually 24 hours—so you don’t have to keep chewing or worry about timing. That can make it easier to focus on other things, but it also means you get the same dose even if you’re not smoking all the time.\n\nThe gum gives you a quick hit that you can use whenever you feel a craving, which can help with those “just one more” moments. You can also control the dose by chewing more or less, but it does require a bit more effort and you might still feel the urge to smoke if you’re not careful about the triggers.\n\nSome people like to combine them: a patch to keep the baseline nicotine level steady, and gum to deal with occasional cravings. Others stick to one or the other. If you’re not sure which feels right, you could try a patch for a week or so and see if the steady release works for you, or start with gum if you want more flexibility. Either way, you’re taking a step that’s already a win for your health."
+ },
+ {
+  "jid": "g59",
+  "question": "could acid reflux be the reason i keep waking up at night? it flares up most evenings",
+  "passages": [],
+  "reply": "I’m not a medical professional, but it’s possible that reflux could be making you uncomfortable and pulling you out of sleep, especially if it’s getting worse in the evenings. If it keeps happening, it might be worth chatting with a doctor or a pharmacist about what could be causing it and how to manage it. They’ll be able to give you a more specific answer and suggest treatments that fit your situation."
+ },
+ {
+  "jid": "g60",
+  "question": "going through the menopause and the hot flushes at night are unbearable, can any kind of breathing technique help?",
+  "passages": [
+   {
+    "marker": "S1",
+    "text": "- A 2019 review found overall evidence that paced breathing could significantly improve hot flashes. This was based on 4 studies that included a total of 398 participants.\n- Researchers of a 2013 study found that five weekly sessions of clinical hypnosis delivered by a therapist reduced hot flashes in post-menopausal women. The National Center for Complementary and Integrative Health (NCCIH) is funding an ongoing study by the same researchers on self-administered hypnosis for hot flashes."
+   }
+  ],
+  "reply": "Paced breathing has actually shown a solid effect on hot flashes in a few studies, so it’s worth a try even for those nighttime sweats. A simple way to do it is to sit or lie comfortably, inhale slowly through your nose for about four counts, hold a couple of seconds, then exhale gently through your mouth for six counts. Repeating that cycle for a few minutes when a flush starts can calm the nervous system and may lessen the intensity. Give it a go and let me know how it feels for you."
+ }
+]

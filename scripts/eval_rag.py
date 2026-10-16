@@ -61,6 +61,7 @@ from app.context.builder import ContextBuilder  # noqa: E402
 from app.decisions.schemas import DecisionSet  # noqa: E402
 from app.embeddings.base import EmbeddingClient  # noqa: E402
 from app.embeddings.factory import build_embedding_client  # noqa: E402
+from app.evaluation.judging import agreement, blind  # noqa: E402
 from app.llm.factory import build_llm_client  # noqa: E402
 from app.llm.providers.registry import resolve_provider  # noqa: E402
 from app.llm.schemas import (  # noqa: E402
@@ -834,6 +835,171 @@ def rescore_generation(args: argparse.Namespace) -> int:
     return 0
 
 
+JUDGE_DIR = RESULTS_DIR / "judge"
+
+
+def shown(path: Path) -> str:
+    return str(path.relative_to(ROOT)) if path.is_relative_to(ROOT) else str(path)
+
+
+GROUNDEDNESS_RUBRIC = ROOT / "eval" / "rubrics" / "groundedness_v1.md"
+VERDICTS = ("grounded", "minor", "unsupported")
+
+
+def judge_prepare(args: argparse.Namespace) -> int:
+    """Blind packets for groundedness judges from generation results: every
+    reply, its question and passages, mixed across runs with opaque ids."""
+    items = []
+    for name in args.results:
+        path = Path(name)
+        result = json.loads(path.read_text(encoding="utf-8"))
+        packets = {
+            p["id"]: p
+            for p in json.loads(path.with_suffix(".packets.json").read_text(encoding="utf-8"))
+        }
+        for row in result["rows"]:
+            packet = packets[row["id"]]
+            items.append(
+                {
+                    "packet": {
+                        "question": packet["question"],
+                        "passages": packet["passages"],
+                        "reply": packet["reply"],
+                    },
+                    "source": {
+                        "result": path.name,
+                        "id": row["id"],
+                        "model": result["model"],
+                        "prompt": result["prompt"],
+                        "evidence": bool(row["passages"]),
+                        "regex_says_no_source": row["says_no_source"],
+                    },
+                }
+            )
+    blind_packets, key = blind(items, args.seed, prefix="g")
+    JUDGE_DIR.mkdir(parents=True, exist_ok=True)
+    (JUDGE_DIR / f"{args.name}.packets.json").write_text(
+        json.dumps(blind_packets, indent=1, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+    (JUDGE_DIR / f"{args.name}.key.json").write_text(
+        json.dumps(key, indent=1) + "\n", encoding="utf-8"
+    )
+    print(f"{len(blind_packets)} items -> {shown(JUDGE_DIR / args.name)}.packets.json")
+    return 0
+
+
+def _judgements(path: Path, jids: set[str]) -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
+    for entry in json.loads(path.read_text(encoding="utf-8")):
+        jid = str(entry.get("jid"))
+        ok = (
+            jid in jids
+            and entry.get("verdict") in VERDICTS
+            and isinstance(entry.get("unsupported_specifics"), int)
+            and isinstance(entry.get("contradicts"), bool)
+            and isinstance(entry.get("says_no_source"), bool)
+        )
+        if not ok:
+            raise SystemExit(f"{path.name}: bad entry {entry}")
+        out[jid] = entry
+    missing = jids - set(out)
+    if missing:
+        raise SystemExit(
+            f"{path.name}: {len(missing)} items not judged, e.g. {sorted(missing)[:3]}"
+        )
+    return out
+
+
+def judge_score(args: argparse.Namespace) -> int:
+    key: dict[str, dict[str, Any]] = json.loads(
+        (JUDGE_DIR / f"{args.name}.key.json").read_text(encoding="utf-8")
+    )
+    jids = set(key)
+    judges = {Path(f).stem: _judgements(Path(f), jids) for f in args.judgements}
+    names = list(judges)
+    ordered = sorted(jids)
+
+    def config(jid: str) -> str:
+        return f"{key[jid]['model']} {key[jid]['prompt']}"
+
+    def rates(selected: list[str], verdicts: dict[str, dict[str, Any]]) -> dict[str, Any]:
+        n = len(selected)
+        if not n:
+            return {"n": 0}
+        without = [j for j in selected if not key[j]["evidence"]]
+        return {
+            "n": n,
+            **{
+                f"{v}_rate": round(sum(verdicts[j]["verdict"] == v for j in selected) / n, 3)
+                for v in VERDICTS
+            },
+            "mean_unsupported_specifics": round(
+                sum(verdicts[j]["unsupported_specifics"] for j in selected) / n, 2
+            ),
+            "contradicts": sum(verdicts[j]["contradicts"] for j in selected),
+            "says_no_source_when_none": round(
+                sum(verdicts[j]["says_no_source"] for j in without) / len(without), 3
+            )
+            if without
+            else None,
+        }
+
+    configs = sorted({config(j) for j in ordered})
+    by_config: dict[str, Any] = {}
+    for name in configs:
+        selected = [j for j in ordered if config(j) == name]
+        by_config[name] = {
+            "per_judge": {judge: rates(selected, judges[judge]) for judge in names},
+            "with_evidence": {
+                judge: rates([j for j in selected if key[j]["evidence"]], judges[judge])
+                for judge in names
+            },
+            "without_evidence": {
+                judge: rates([j for j in selected if not key[j]["evidence"]], judges[judge])
+                for judge in names
+            },
+        }
+    agreements: dict[str, Any] = {}
+    if len(names) >= 2:
+        a, b = judges[names[0]], judges[names[1]]
+        agreements = {
+            "judges": names[:2],
+            "verdict": agreement(
+                [a[j]["verdict"] for j in ordered], [b[j]["verdict"] for j in ordered]
+            ),
+            "says_no_source": agreement(
+                [a[j]["says_no_source"] for j in ordered], [b[j]["says_no_source"] for j in ordered]
+            ),
+            # Is the code measure (says_no_source regex) in line with the judges?
+            "regex_vs_judge": {
+                judge: agreement(
+                    [key[j]["regex_says_no_source"] for j in ordered],
+                    [judges[judge][j]["says_no_source"] for j in ordered],
+                )
+                for judge in names
+            },
+        }
+    result = {
+        "eval": "rag-groundedness",
+        "packets": f"eval/results/judge/{args.name}.packets.json",
+        "rubric": str(GROUNDEDNESS_RUBRIC.relative_to(ROOT)),
+        "rubric_sha256": file_sha256(GROUNDEDNESS_RUBRIC),
+        "judges": names,
+        "configs": by_config,
+        "agreement": agreements,
+        "items": [
+            {"jid": j, **key[j], "judged": {judge: judges[judge][j] for judge in names}}
+            for j in ordered
+        ],
+    }
+    out = write_result("rag-groundedness", result)
+    for name in configs:
+        print(name, json.dumps(by_config[name]["per_judge"]))
+    print(json.dumps(agreements, indent=1))
+    print(f"written: {shown(out)}")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = parser.add_subparsers(dest="mode", required=True)
@@ -863,6 +1029,15 @@ def main() -> int:
     rescore = sub.add_parser("rescore", help="recompute a generation result's wording measures")
     rescore.add_argument("result", help="eval/results/rag-generation-*.json")
     rescore.add_argument("--reason", required=True)
+    prepare = sub.add_parser(
+        "judge-prepare", help="blind groundedness packets from generation runs"
+    )
+    prepare.add_argument("results", nargs="+", help="eval/results/rag-generation-*.json")
+    prepare.add_argument("--name", required=True)
+    prepare.add_argument("--seed", type=int, default=20261016)
+    judged = sub.add_parser("judge-score", help="score groundedness judgements")
+    judged.add_argument("name")
+    judged.add_argument("judgements", nargs="+", help="one JSON file per judge")
     args = parser.parse_args()
     if args.mode == "routing":
         return eval_routing(args)
@@ -870,6 +1045,10 @@ def main() -> int:
         return asyncio.run(eval_generation(args))
     if args.mode == "rescore":
         return rescore_generation(args)
+    if args.mode == "judge-prepare":
+        return judge_prepare(args)
+    if args.mode == "judge-score":
+        return judge_score(args)
     return asyncio.run(eval_retrieval(args))
 
 
