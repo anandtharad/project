@@ -87,11 +87,11 @@ unmodified here.
 
 | Suite | Result |
 |---|---|
-| unit | 733 passed |
-| integration | 114 passed |
+| unit | 775 passed |
+| integration | 119 passed |
 | security | 57 passed |
 | live | 8 skipped (opt-in; run with `scripts/dev.py live-groq`) |
-| **total** | **904 passed, 8 skipped** (2026-10-16, after the golden scenarios and routing v5) |
+| **total** | **951 passed, 8 skipped** (2026-10-16, after the voice interface) |
 
 Live runs made from this environment once network access was allowed
 (2026-10-13): Groq live tests, strict structured state extraction, the
@@ -190,10 +190,22 @@ are clean.
   `generation_unavailable` on every turn. Set
   `GENERATION_REFUSAL_FALLBACK=off` in that case.
 
+- **Speech providers (Deepgram, Sarvam, Gnani):** adapters written against
+  each provider's published reference, guides and SDK source (2026-10-16)
+  and tested against local servers that speak the documented protocols.
+  **No live call** (no keys). Known open questions: Sarvam's realtime STT is
+  labelled beta and may need enabling per account; Sarvam's streaming TTS
+  may return MP3 only (the adapter refuses compressed audio with a clear
+  error); Gnani's TTS connection reuse is ambiguous in its docs (the adapter
+  reconnects). See docs/voice-interface.md.
+
 ## Stubs and development-only pieces
 
 - `GENERATION_PROVIDER=fake`: labeled stub, no model is called. Refused in production.
 - `EMBEDDING_PROVIDER=fake`: hashed bag of words for tests. Refused in production.
+- `STT_PROVIDER=fake` / `TTS_PROVIDER=fake`: a scripted transcript and a tone
+  per word. Refused in production.
+- `/voice`: a development page for talking to the companion.
 - Development bearer-token auth: not production authentication. Production
   startup is refused.
 - `/docs` and `/openapi.json`: disabled in production.
@@ -342,6 +354,16 @@ keeps the rules; blind judges preferred it in 64 of 75 judgements, including
 (docs/voice.md). Known gap: plans with arithmetic constraints are sometimes
 wrong (a reply-model limitation the prompt did not fix). Judges were AI; human
 review of a sample is still needed.
+
+## Voice interface (speech in and out, added on request)
+
+| Item | Status | Evidence |
+|---|---|---|
+| Text and voice, in and out, on one conversation | Built | a typed and a spoken turn on the same socket, text-only or text+audio output (`tests/integration/test_voice.py`); spoken turns go through the normal turn lifecycle and only the validated reply is spoken |
+| Streaming providers: Deepgram, Sarvam, Gnani | Built, not run live | each adapter tested against a local server speaking the provider's documented protocol (`tests/unit/test_voice_providers.py`); no keys yet |
+| Half duplex | Built | audio is dropped and typing refused while transcribing, thinking or speaking; listening resumes after the client's `playback_done` (`tests/unit/test_voice_session.py`) |
+| Full duplex with barge-in | Prepared, not enabled | `cancel()` on every TTS stream, `_barge_in()` with a turn counter, tested; still needs echo cancellation, a speech-start trigger and keep-alive STT (docs/voice-interface.md) |
+| Browser client | Built (development page) | `/voice` checked in headless Chromium with a fake microphone and the fake providers: typed and spoken turns, button disabled while speaking, back to listening after playback, no console errors |
 
 ## Open questions and next steps
 

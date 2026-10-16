@@ -197,6 +197,15 @@ Structured JSON logs carry a `trace_id`: `request.completed`,
 location only). Message and reply content, tokens and keys are never logged,
 and a test enforces this. SDK/HTTP debug loggers are capped at WARNING.
 
+## Voice
+
+`app/api/voice.py` holds a WebSocket per voice session; `app/voice/session.py`
+runs the half-duplex state machine (listening, transcribing, thinking,
+speaking) between a streaming STT provider, the normal
+`TurnOrchestrator.submit_message` and a streaming TTS provider. Providers
+implement the protocols in `app/voice/base.py`. Details in
+[voice-interface.md](voice-interface.md).
+
 ## Not built yet, and where it plugs in
 
 | Spec component | Phase | Integration point |

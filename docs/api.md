@@ -116,6 +116,18 @@ A memory: `memory_id`, `memory_type` (`episodic`, `semantic`,
 `preference`), `content`, `status`, `importance` (1-3), `created_at`,
 `updated_at`, `expires_at`, `source_conversation_id`, `supersedes_id`.
 
+### Voice: `POST /v1/conversations/{conversation_id}/voice/tickets`, `WS /v1/voice`
+
+Only with `VOICE_ENABLED=true` (otherwise `409 voice_disabled`). The ticket
+endpoint returns `201 {"ticket", "expires_in", "path": "/v1/voice"}` for a
+conversation the caller owns (`404 conversation_not_found` otherwise). The
+ticket is single use and short-lived; connect with
+`/v1/voice?ticket=<ticket>`. A refused connection closes with `4401`
+(invalid ticket) or `4503` (voice disabled). Messages, states and events are
+in [voice-interface.md](voice-interface.md). Each turn on the socket is a
+normal message on the conversation (it appears in `GET .../messages`), with
+the same limits, safety and validation; a spoken turn stores its transcript.
+
 ## Idempotency
 
 Idempotency is enforced in PostgreSQL (a unique constraint on

@@ -36,6 +36,14 @@ covers what exists today and is revisited at each phase.
 2c. API → embedding provider: memory text and each message are embedded.
    With `EMBEDDING_PROVIDER=local` (the default) nothing leaves the machine;
    with `openai`/`gemini` the text goes to that provider.
+2e. API → speech providers (`VOICE_ENABLED=true` only): the person's audio
+   goes to the STT provider (Deepgram, Sarvam or Gnani) and the reply text to
+   the TTS provider, each a third party. Keys stay on the server; the browser
+   connects only to this app, with a single-use, short-lived ticket bound to
+   the user and conversation. This app does not store audio; spoken
+   messages are stored as transcripts, which are personal data like typed
+   messages. Transcripts are untrusted input exactly like typed text: they go
+   through the same safety screen and turn lifecycle.
 3. LLM output → API: model output is untrusted until validated.
 4. API → PostgreSQL: trusted store; access only through ownership-scoped queries.
 

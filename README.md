@@ -198,6 +198,7 @@ is the source of truth. Important ones:
 | `KNOWLEDGE_ENABLED`, `KNOWLEDGE_MIN_SEMANTIC` | knowledge lookups for information requests (default on; needs `scripts/ingest_knowledge.py` once) and the relevance threshold, tuned for the local embedding model; see docs/rag.md |
 | `SAFETY_REGION`, `SAFETY_CLASSIFIER_PROVIDER`, `SAFETY_CLASSIFIER_MODEL` | crisis resources (`IN`, `US`, `GB` or generic) and the safety classifier (`auto`: Groq `openai/gpt-oss-safeguard-20b` when `GROQ_API_KEY` is set); see docs/safety.md |
 | `MEMORY_PROMPT_VERSION` | memory-extraction prompt (see docs/memory.md for the evaluated versions) |
+| `VOICE_ENABLED`, `STT_PROVIDER`, `TTS_PROVIDER` | speech in and out (off by default): `deepgram`, `sarvam` or `gnani` with `DEEPGRAM_API_KEY` / `SARVAM_API_KEY` / `GNANI_API_KEY`; then open `/voice`. Half duplex, push-to-talk by default (`VOICE_END_OF_TURN`); see docs/voice-interface.md |
 
 `APP_ENV=production` refuses to start until production authentication exists.
 
@@ -223,6 +224,9 @@ app/
   rag/            knowledge extraction, chunking, ingestion, hybrid retrieval, routing, citations
   embeddings/     embedding clients (local fastembed, OpenAI, Gemini)
   evaluation/     metrics per suite, golden scenarios, dialogue benchmarks, run metadata and recorder
+  voice/          speech-to-text / text-to-speech protocols, providers (Deepgram, Sarvam, Gnani), half-duplex session
+  training/       fine-tuning data preparation: sources, canonical records, leakage index, exports
+  static/         the development voice page (/voice)
   llm/            provider-neutral schemas, provider presets, and adapters
                   (Anthropic, OpenAI-compatible, Groq, Gemini, dev stub)
   context/        context assembly with a history budget
@@ -247,6 +251,7 @@ docs/             architecture, API, threat model, implementation status
 - [Safety layer](docs/safety.md)
 - [Knowledge retrieval](docs/rag.md)
 - [Voice (how replies read)](docs/voice.md)
+- [Voice interface (speech in and out)](docs/voice-interface.md)
 - [Evaluation and observability](docs/evaluation.md)
 - [Fine-tuning preparation](docs/fine-tuning.md)
 - [API reference](docs/api.md)
