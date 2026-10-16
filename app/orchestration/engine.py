@@ -384,6 +384,7 @@ class TurnOrchestrator:
             policy_source=policy.source if self._policy_enabled else None,
             strategy=policy.strategy.value if self._policy_enabled and policy.strategy else None,
             input_tokens=response.usage.input_tokens,
+            estimated_input_tokens=context.estimated_tokens,
             output_tokens=response.usage.output_tokens,
             generation_ms=round(response.latency_ms, 2),
             total_ms=round(trace.elapsed_seconds() * 1000, 2),

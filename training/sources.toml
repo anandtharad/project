@@ -1,0 +1,50 @@
+# Training-data sources (spec §17.2): one audit record per source. A build
+# (scripts/prepare_training_data.py) reads only sources whose [approval] has
+# approved = true, with who approved it and when. Approving is the project
+# owner's decision after reading the licence; nothing here is approved by
+# default. Evaluation sets are never training sources (spec §16.3).
+sources_version = 1
+
+[[sources]]
+id = "esconv"
+name = "ESConv (Emotional Support Conversation)"
+url = "https://github.com/thu-coai/Emotional-Support-Conversation"
+file = "ESConv.json"
+file_url = "https://raw.githubusercontent.com/thu-coai/Emotional-Support-Conversation/main/ESConv.json"
+sha256 = "aa0556c5b330562ba009c1cd5137486bfa2a7255f33225a6524cd58f7efdd9af"
+licence = "CC BY-NC 4.0"
+permitted_use = "Non-commercial use with attribution (licence). The README adds: \"Data and codes are for academic research use only.\" Commercial use is not permitted."
+citation = "Liu et al., Towards Emotional Support Dialog Systems, ACL 2021"
+synthetic = false
+origin = "Crowd-sourced conversations between a help-seeker and a supporter; supporter messages labelled with one of 8 strategies; post-conversation survey scores."
+splits = "No official split. Conversations used by any evaluation item (eval/datasets/dialogue) or by the 1.5.0 voice held-out set are excluded; the rest are split train/validation by conversation."
+quality_annotations = "Supporter strategy per message; seeker survey scores (empathy, relevance, emotion intensity before and after)."
+licence_checked_on = "2026-10-16"
+
+[sources.approval]
+approved = false
+approved_by = ""
+approved_on = ""
+note = "Requires the owner's decision that the use is non-commercial academic research."
+
+[[sources]]
+id = "empatheticdialogues"
+name = "EmpatheticDialogues"
+url = "https://github.com/facebookresearch/EmpatheticDialogues"
+file = "empatheticdialogues.tar.gz"
+file_url = "https://dl.fbaipublicfiles.com/parlai/empatheticdialogues/empatheticdialogues.tar.gz"
+sha256 = "56f234d77b7dd1f005fd365bb17769cfe346c3c84295b69bc069c8ccb83be03d"
+licence = "CC BY-NC 4.0"
+permitted_use = "Non-commercial use with attribution. Commercial use is not permitted."
+citation = "Rashkin et al., Towards Empathetic Open-domain Conversation Models: a New Benchmark and Dataset, ACL 2019"
+synthetic = false
+origin = "Crowd-sourced conversations grounded in a described situation and one of 32 emotions; the first speaker had the experience, the second listens."
+splits = "The official train split only. valid and test are evaluation sources (eval/datasets/dialogue) and are never read for training."
+quality_annotations = "Situation, emotion label; per-utterance self-evaluation scores in some rows."
+licence_checked_on = "2026-10-16"
+
+[sources.approval]
+approved = false
+approved_by = ""
+approved_on = ""
+note = "Requires the owner's decision that the use is non-commercial."
