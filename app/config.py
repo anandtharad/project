@@ -157,7 +157,12 @@ class Settings(BaseSettings):
     memory_retention_days: int = Field(default=365, ge=1, le=3650)
     # Maintenance: delete expired memories and embed memories stored without a
     # vector (the local model was still loading, or EMBEDDING_MODEL changed).
+    # The same pass deletes conversations past their retention period.
     memory_maintenance_interval_seconds: int = Field(default=600, ge=60)
+    # A conversation with no new message for this many days is deleted with
+    # its messages, state and per-turn records (memories have their own
+    # retention and are kept).
+    conversation_retention_days: int = Field(default=365, ge=1, le=3650)
     # Embeddings for semantic retrieval: "local" (fastembed on CPU, no key),
     # "openai", "gemini", or "none" (full-text matching only).
     embedding_provider: Literal["none", "local", "openai", "gemini", "fake"] = "local"

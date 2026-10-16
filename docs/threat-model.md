@@ -101,9 +101,12 @@ covers what exists today and is revisited at each phase.
   loop; the person can delete them at any time, and deleting a memory
   deletes its embedding (same row). The full table of where memory content
   lives is in [memory.md](memory.md#retention-and-deletion-spec-107-154).
-  Conversations and messages still have **no** retention policy or deletion
-  endpoint: they are kept until deleted manually, and deleting a memory does
-  not delete the message it came from. Deleting a user cascades to their
+  A conversation with no new message for `CONVERSATION_RETENTION_DAYS` (365
+  by default) is deleted by the same loop, with its messages, state and
+  per-turn safety and decision records; the person can also delete one at
+  any time (`DELETE /v1/conversations/{id}`). Memories are kept on both
+  paths, with their links cleared, and follow their own retention.
+  Deleting a memory does not delete the message it came from. Deleting a user cascades to their
   conversations, messages and memories at the database level, but no API
   exposes this yet.
 - **Backups:** none are configured by this repository. Any backup an operator

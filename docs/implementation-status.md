@@ -254,10 +254,10 @@ are clean.
   guard against runaway use; they are approximate under concurrent first
   messages in different conversations, and there is no token or cost quota
   per user.
-- No retention period for conversations yet (memories have one);
-  conversations are deleted only on request
-  (`DELETE /v1/conversations/{id}`, which keeps memories). Deleting a memory
-  does not delete the message it came from.
+- Conversations are deleted after `CONVERSATION_RETENTION_DAYS` (365) with
+  no new message, or on request (`DELETE /v1/conversations/{id}`); both keep
+  memories, which have their own retention. Deleting a memory does not
+  delete the message it came from.
 - Memory sensitivity screening relies on the extraction model's label, with
   a code backstop only for precise money amounts. Retrieval precision on the
   held-out set is about 0.6, so some irrelevant memories reach the prompt;

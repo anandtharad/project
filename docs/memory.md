@@ -222,7 +222,7 @@ Where memory content exists, and what deleting a memory removes:
 |---|---|
 | `memories` row: content, quote in `provenance`, embedding | **Yes.** The embedding is a column of the same row; there is no other vector index or cache |
 | PostgreSQL dead tuples after `DELETE` | Reclaimed by (auto)vacuum; until then the bytes remain in the data files |
-| The person's original message, in `messages` | **No.** It is part of the conversation. There is no conversation deletion endpoint yet (known limitation since Phase 1) |
+| The person's original message, in `messages` | **No.** It is part of the conversation, which is deleted on request (`DELETE /v1/conversations/{id}`) or after `CONVERSATION_RETENTION_DAYS` (365) with no new message |
 | Replies that used the memory (`messages`), and that conversation's notes (`conversation_states`) | **No.** Earlier replies may repeat it, and later turns of the same conversation still see those replies and notes. A new conversation starts without them |
 | Reply metadata (`generation_metadata.memory`) | Holds only memory IDs and scores, no content |
 | Application logs | Never contain memory or message content (counts, modes, error types only) |

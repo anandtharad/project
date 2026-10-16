@@ -154,12 +154,31 @@ async def maintain_memories(store: MemoryStore, memory: MemoryService | None) ->
         )
 
 
-async def maintain_memories_periodically(
-    store: MemoryStore, memory: MemoryService | None, interval_seconds: int
+async def purge_conversations(turn_store: TurnStore, retention_days: int) -> None:
+    """Conversation retention (CONVERSATION_RETENTION_DAYS)."""
+    try:
+        purged = await turn_store.purge_inactive_conversations(retention_days)
+        if purged:
+            log_event(logger, "conversation.purged", count=purged)
+    except Exception as exc:  # retention must keep running
+        log_event(
+            logger,
+            "conversation.purge_failed",
+            level=logging.WARNING,
+            error_type=type(exc).__name__,
+        )
+
+
+async def maintain_periodically(
+    store: MemoryStore,
+    memory: MemoryService | None,
+    turn_store: TurnStore,
+    settings: Settings,
 ) -> None:
     while True:
         await maintain_memories(store, memory)
-        await asyncio.sleep(interval_seconds)
+        await purge_conversations(turn_store, settings.conversation_retention_days)
+        await asyncio.sleep(settings.memory_maintenance_interval_seconds)
 
 
 def create_app(
@@ -208,11 +227,6 @@ def create_app(
         app.state.background = background
         if embeddings is not None:
             embeddings.start()  # loads a local embedding model in the background
-        maintenance_task = asyncio.create_task(
-            maintain_memories_periodically(
-                memory_store, memory, settings.memory_maintenance_interval_seconds
-            )
-        )
         app.state.settings = settings
         app.state.engine = engine
         app.state.session_factory = session_factory
@@ -227,6 +241,9 @@ def create_app(
             history_limit=settings.history_max_messages,
             messages_per_minute=settings.user_messages_per_minute,
             messages_per_day=settings.user_messages_per_day,
+        )
+        maintenance_task = asyncio.create_task(
+            maintain_periodically(memory_store, memory, turn_store, settings)
         )
         app.state.orchestrator = TurnOrchestrator(
             settings=settings,

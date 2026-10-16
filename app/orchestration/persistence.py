@@ -40,7 +40,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from pydantic import ValidationError
-from sqlalchemy import func, select, update
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
@@ -347,6 +347,21 @@ class TurnStore:
                     raise turn_in_progress()
             await session.delete(conversation)
         return True
+
+    async def purge_inactive_conversations(self, retention_days: int) -> int:
+        """Retention: delete every conversation with no new message for
+        `retention_days` (database time), with its messages, state, decisions
+        and other per-turn rows (ON DELETE CASCADE). Memories are kept, with
+        their links set to NULL, as for a deletion on request. A conversation
+        idle that long has no turn in flight."""
+        async with self._sessions() as session, session.begin():
+            cutoff = func.now() - timedelta(days=retention_days)
+            result = await session.execute(
+                delete(Conversation)
+                .where(Conversation.updated_at < cutoff)
+                .returning(Conversation.id)
+            )
+            return len(result.all())
 
     async def _enforce_rate_limits(
         self, session: AsyncSession, user_id: uuid.UUID, db_now: datetime

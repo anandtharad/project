@@ -8,6 +8,7 @@ import asyncio
 import uuid
 
 import httpx
+from fastapi import FastAPI
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine
 
@@ -129,3 +130,45 @@ async def test_delete_requires_credentials(client: httpx.AsyncClient) -> None:
     cid = await create_conversation(client, ALICE)
     response = await client.delete(f"/v1/conversations/{cid}")
     assert response.status_code == 401
+
+
+async def test_retention_purges_only_inactive_conversations(
+    app: FastAPI, client: httpx.AsyncClient, db_engine: AsyncEngine
+) -> None:
+    """CONVERSATION_RETENTION_DAYS: a conversation with no new message for
+    that long goes with its turns; a recent one stays; memories stay."""
+    old = await create_conversation(client, ALICE)
+    recent = await create_conversation(client, ALICE)
+    for cid in (old, recent):
+        assert (await send(client, cid, "hello there")).status_code == 201
+    async with db_engine.begin() as conn:
+        user_id = await conn.scalar(
+            text("SELECT user_id FROM conversations WHERE id = :cid"), {"cid": uuid.UUID(old)}
+        )
+        await conn.execute(
+            text(
+                "UPDATE conversations SET updated_at = now() - interval '31 days' WHERE id = :cid"
+            ),
+            {"cid": uuid.UUID(old)},
+        )
+        await conn.execute(
+            text(
+                "INSERT INTO memories (id, user_id, source_conversation_id, content, memory_type,"
+                " status, importance, provenance, schema_version)"
+                " VALUES (:id, :uid, :cid, 'likes tea', 'preference', 'active', 2, '{}', 1)"
+            ),
+            {"id": uuid.uuid4(), "uid": user_id, "cid": uuid.UUID(old)},
+        )
+
+    assert await app.state.turn_store.purge_inactive_conversations(30) == 1
+    assert (await client.get(f"/v1/conversations/{old}", headers=ALICE)).status_code == 404
+    assert await _count(db_engine, "messages", old) == 0
+    assert await _count(db_engine, "turn_decisions", old) == 0
+    assert await _count(db_engine, "messages", recent) == 2
+    async with db_engine.connect() as conn:
+        kept = await conn.scalar(
+            text("SELECT count(*) FROM memories WHERE user_id = :uid"), {"uid": user_id}
+        )
+    assert kept == 1
+    # Nothing left to purge.
+    assert await app.state.turn_store.purge_inactive_conversations(30) == 0
