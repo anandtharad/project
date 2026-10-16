@@ -6,7 +6,9 @@ and enforcement; the LLM only produces conversational language.
 
 > **Status: Phases 0-1 are done; Phases 2 (state and decisions), 3
 > (memory), 4 (knowledge retrieval), 5 (safety) and 6 (evaluation) are
-> built and evaluated, see the status page for what is and isn't met.** This is a development
+> built and evaluated, and Phase 7 (fine-tuning data preparation) is built
+> with no data approved and no training run; see the status page for what
+> is and isn't met.** This is a development
 > build: the safety layer is **not clinically validated**, and
 > authentication is **development-only**. Do not expose it to real users.
 > See [docs/implementation-status.md](docs/implementation-status.md).
@@ -246,6 +248,7 @@ docs/             architecture, API, threat model, implementation status
 - [Knowledge retrieval](docs/rag.md)
 - [Voice (how replies read)](docs/voice.md)
 - [Evaluation and observability](docs/evaluation.md)
+- [Fine-tuning preparation](docs/fine-tuning.md)
 - [API reference](docs/api.md)
 - [Threat model and privacy notes](docs/threat-model.md)
 - [Implementation status and known limitations](docs/implementation-status.md)

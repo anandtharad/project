@@ -13,7 +13,7 @@ Last updated: 2026-10-16. Spec: COMPANION-TECH-SPEC-001 v2.1.
 | 4: RAG | **Built and evaluated** (docs/rag.md): 26 reviewed public-domain sources, versioned idempotent ingestion, hybrid retrieval with rank fusion and a relevance threshold, form-based routing v5 (never for casual chat, companion or conversation questions, or on safety pathways), escaped evidence block, citations that always resolve (100% on the reply model), sources in the API. Blind test: requests missed 11.1%, no evidence reaching the prompt for non-requests, retrieval hit rate 69.8%. Prompt 1.8.0 (knowledge fragments) helped on `gpt-oss-20b` and awaits confirmation on the reply model before it becomes the default |
 | 5: Safety | **Built and wired into every turn** (docs/safety.md): pattern screen + LLM classifier, degraded mode, pathway policy overriding the strategy, verified regional resources, output checks with bounded recovery, `turn_safety` records. Not clinically validated; the person-facing texts need qualified review before real use |
 | 6: Evaluation and observability | **Built and run** (docs/evaluation.md): experiment metadata on every run, evaluation tables and recorder, 216 golden end-to-end scenarios over all 16 spec categories (deterministic: guarantees 100%, routing and retrieval 97.3%), comparison reports with paired bootstrap intervals, 12 release gates with baselines (3 mandatory; all pass), public benchmarks imported without redistribution (safety; ESConv and EmpatheticDialogues), a blind pairwise judge rubric. Not yet run: golden live mode and the dialogue benchmark on the reply model (free-tier budget) |
-| 7: Fine-tuning preparation | Not started |
+| 7: Fine-tuning preparation | **Built, no data approved, no training run** (docs/fine-tuning.md): licence audit records with explicit approvals (none given: ESConv and EmpatheticDialogues are non-commercial, ESConv academic-only), a deterministic pipeline to canonical records (quality and safety filtering, strategy labels, dedup, leakage checks against every evaluation file, splits by conversation), and exports verified against official docs (TRL, OpenAI, ChatML, Llama 3) |
 
 ## Multi-provider LLM support (added on request)
 
@@ -323,6 +323,16 @@ all built. See [memory.md](memory.md).
 | Failures trace to component/model/prompt/policy/retrieval versions | Met | `turn.completed` logs every component's version; turns store provider, model, prompt and checksum; per-turn `turn_safety` and `turn_decisions`; golden results name the failing step and check (routing v5 and a policy fix were traced this way) |
 | Critical privacy/safety tests are mandatory | Met | mandatory gates: golden guarantees (privacy probes, deletion, failure status codes, explicit safety), citations resolving, no evidence for non-requests; plus the full test suite including `tests/security` |
 | Metrics derive from actual runs | Met | every number in the docs points to a file in `eval/results/`; gates read those files; two measurement bugs (a missing prompt fragment, curly apostrophes) were found and the affected runs redone or rescored with a record |
+
+## Phase 7 acceptance
+
+| Criterion | Status | Evidence |
+|---|---|---|
+| Dataset preparation is reproducible | Met (fixtures) | the pipeline is deterministic; a build twice gives identical records and build id (`test_splits_are_by_conversation_and_builds_are_reproducible`); the manifest records file and evaluation-set checksums. Not yet run on real data: nothing is approved |
+| Every example has provenance | Met | `TrainingRecord.provenance`: source, URL, licence, file SHA-256, conversation id, turn, synthetic flag, every transformation with its version |
+| Held-out evaluation is isolated | Met | conversations used by any evaluation item are excluded; any example repeating an evaluation text or sharing an 8-word run with one is dropped (all 13 evaluation files indexed); EmpatheticDialogues valid/test are never read; splits are by conversation |
+| No training run is required | Met | none was made |
+| No unapproved data is used | Met | a build refuses unapproved sources and files whose SHA-256 differs from the audit; approvals need a name and date; none is given |
 
 ## Voice (companion prompt 1.5.0, added on request)
 

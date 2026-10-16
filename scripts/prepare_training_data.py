@@ -22,12 +22,14 @@ import hashlib
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from app.config import Settings  # noqa: E402
 from app.prompting import PromptRegistry  # noqa: E402
+from app.training.export import FORMATS, export  # noqa: E402
 from app.training.leakage import build_index  # noqa: E402
 from app.training.pipeline import SourceInput, build, records_jsonl  # noqa: E402
 from app.training.schema import SystemRef, TrainingRecord  # noqa: E402
@@ -105,7 +107,7 @@ def build_command(args: argparse.Namespace) -> int:
     return 0
 
 
-def load_build(build_id: str) -> tuple[list[TrainingRecord], dict[str, object]]:
+def load_build(build_id: str) -> tuple[list[TrainingRecord], dict[str, Any]]:
     folder = BUILD_DIR / build_id
     manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
     text = (folder / "records.jsonl").read_text(encoding="utf-8")
@@ -113,6 +115,24 @@ def load_build(build_id: str) -> tuple[list[TrainingRecord], dict[str, object]]:
         raise SystemExit(f"{folder}/records.jsonl does not match its manifest")
     records = [TrainingRecord.model_validate_json(line) for line in text.splitlines() if line]
     return records, manifest
+
+
+def export_command(args: argparse.Namespace) -> int:
+    records, manifest = load_build(args.build)
+    rows = export(records, args.format)
+    folder = BUILD_DIR / args.build
+    written = {}
+    for split, items in rows.items():
+        path = folder / f"{args.format}-{split}.jsonl"
+        text = "".join(json.dumps(r, ensure_ascii=False) + "\n" for r in items)
+        path.write_text(text, encoding="utf-8")
+        written[split] = {"rows": len(items), "sha256": hashlib.sha256(text.encode()).hexdigest()}
+    manifest.setdefault("exports", {})[args.format] = written
+    (folder / "manifest.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    print(f"{args.format}: {written} -> {folder}")
+    return 0
 
 
 def main() -> int:
@@ -127,9 +147,14 @@ def main() -> int:
         default=Settings.model_fields["companion_prompt_version"].default,
         help="companion_system version the records reference",
     )
+    export_parser = sub.add_parser("export")
+    export_parser.add_argument("--build", required=True, help="build id (training/build/<id>)")
+    export_parser.add_argument("--format", choices=FORMATS, default="trl")
     args = parser.parse_args()
     if args.mode == "audit":
         return audit(args)
+    if args.mode == "export":
+        return export_command(args)
     return build_command(args)
 
 

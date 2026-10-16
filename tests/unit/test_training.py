@@ -332,3 +332,86 @@ def test_advice_after_the_person_declined_it_is_dropped() -> None:
     }
     result = run([declined])
     assert result.manifest["sources"]["fixture"]["dropped"] == {"advice_after_no_advice": 1}
+
+
+def exportable() -> TrainingRecord:
+    from app.prompting import PromptRegistry
+
+    prompt = PromptRegistry().get("companion_system", "1.7.0")
+    turns = [
+        ["user", "work has been a lot this week", []],
+        ["assistant", "that sounds like a heavy week", []],
+        ["user", "yeah my manager keeps moving deadlines", []],
+        ["assistant", "what has that been like for you", ["Question"]],
+    ]
+    data = json.dumps([{"id": "e1", "turns": turns}]).encode()
+    src = source(data)
+    result = build(
+        [SourceInput(src, data)],
+        Registry(sources_version=1, sources=[src]),
+        LeakageIndex(),
+        SystemRef(prompt=prompt.key, checksum=prompt.checksum),
+        adapters={"fixture": fixture_conversations},
+    )
+    return max(result.records, key=lambda r: r.provenance.turn)
+
+
+def test_exports_render_each_verified_format() -> None:
+    from app.prompting import PromptRegistry
+    from app.training import export
+
+    record = exportable()
+    registry = PromptRegistry()
+    system = export.system_text(record, registry)
+    prompt = registry.get("companion_system", "1.7.0")
+    # The strategy's policy fragment is in the system message, as at run time.
+    assert prompt.fragment("explore") in system
+
+    trl = export.trl_row(record, system)
+    assert [m["role"] for m in trl["prompt"]] == ["system", "user", "assistant", "user"]
+    assert trl["completion"] == [
+        {"role": "assistant", "content": "what has that been like for you"}
+    ]
+
+    openai = export.openai_row(record, system)["messages"]
+    assert [(m["role"], m.get("weight")) for m in openai] == [
+        ("system", None),
+        ("user", None),
+        ("assistant", 0),
+        ("user", None),
+        ("assistant", 1),
+    ]
+
+    chatml = export.chatml_row(record, "SYS")
+    assert chatml == {
+        "prompt": "<|im_start|>system\nSYS<|im_end|>\n"
+        "<|im_start|>user\nwork has been a lot this week<|im_end|>\n"
+        "<|im_start|>assistant\nthat sounds like a heavy week<|im_end|>\n"
+        "<|im_start|>user\nyeah my manager keeps moving deadlines<|im_end|>\n"
+        "<|im_start|>assistant\n",
+        "completion": "what has that been like for you<|im_end|>",
+    }
+    llama3 = export.llama3_row(record, "SYS")
+    assert llama3 == {
+        "prompt": "<|begin_of_text|>"
+        "<|start_header_id|>system<|end_header_id|>\n\nSYS<|eot_id|>"
+        "<|start_header_id|>user<|end_header_id|>\n\nwork has been a lot this week<|eot_id|>"
+        "<|start_header_id|>assistant<|end_header_id|>\n\nthat sounds like a heavy week<|eot_id|>"
+        "<|start_header_id|>user<|end_header_id|>\n\n"
+        "yeah my manager keeps moving deadlines<|eot_id|>"
+        "<|start_header_id|>assistant<|end_header_id|>\n\n",
+        "completion": "what has that been like for you<|eot_id|>",
+    }
+    rows = export.export([record], "trl", registry)
+    assert sum(len(v) for v in rows.values()) == 1
+
+
+def test_export_refuses_a_changed_prompt() -> None:
+    from app.prompting import PromptRegistry
+    from app.training import export
+
+    record = exportable().model_copy(
+        update={"system": SystemRef(prompt="companion_system@1.7.0", checksum="0")}
+    )
+    with pytest.raises(ValueError, match="checksum"):
+        export.system_text(record, PromptRegistry())
