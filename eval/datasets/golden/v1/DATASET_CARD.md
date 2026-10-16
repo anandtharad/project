@@ -75,5 +75,5 @@ failures, not edited away.
 - **Reply checks are blunt.** Mentions, word and question counts, lists and
   stock phrases only. How good a reply is gets judged separately (voice and
   dialogue evaluations).
-- **Live mode costs model calls.** It has been run only on a small sample
-  so far (see docs/evaluation.md).
+- **Live mode has not been run on this set yet.** Reply checks are
+  untested until it is (docs/evaluation.md).

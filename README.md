@@ -5,8 +5,8 @@ application: application code owns authorization, orchestration, persistence
 and enforcement; the LLM only produces conversational language.
 
 > **Status: Phases 0-1 are done; Phases 2 (state and decisions), 3
-> (memory), 4 (knowledge retrieval) and 5 (safety) are built and evaluated,
-> see the status page for what is and isn't met.** This is a development
+> (memory), 4 (knowledge retrieval), 5 (safety) and 6 (evaluation) are
+> built and evaluated, see the status page for what is and isn't met.** This is a development
 > build: the safety layer is **not clinically validated**, and
 > authentication is **development-only**. Do not expose it to real users.
 > See [docs/implementation-status.md](docs/implementation-status.md).
@@ -23,9 +23,11 @@ crisis contacts, output checks), and information requests are grounded in a
 small reviewed library with citations that resolve. It has
 idempotent retries, one in-flight turn per conversation, bounded timeouts,
 controlled provider failures, and model, prompt and policy provenance on
-every reply. Details: [docs/decisions.md](docs/decisions.md),
-[docs/memory.md](docs/memory.md), [docs/safety.md](docs/safety.md),
-[docs/rag.md](docs/rag.md).
+every reply. Each layer and the whole conversation are measured, with
+release gates (docs/evaluation.md). Details:
+[docs/decisions.md](docs/decisions.md), [docs/memory.md](docs/memory.md),
+[docs/safety.md](docs/safety.md), [docs/rag.md](docs/rag.md),
+[docs/evaluation.md](docs/evaluation.md).
 
 The LLM is swappable: Anthropic, OpenAI, Groq, Google Gemini, xAI (Grok),
 Qwen (Alibaba Model Studio), DeepSeek, OpenRouter, Together, Mistral, Ollama,
@@ -97,7 +99,12 @@ uv run python scripts/eval_decisions.py --split dev       # decision accuracy (n
 uv run python scripts/eval_policy_effect.py --split dev   # do strategies change replies? (live LLM)
 uv run python scripts/eval_memory.py retrieval --split dev   # memory retrieval (local model, needs the database)
 uv run python scripts/eval_memory.py extraction --split dev  # memory extraction (live LLM)
+uv run python scripts/eval_golden.py --mode deterministic    # 216 end-to-end scenarios, no key needed
+uv run python scripts/eval_report.py eval/results/A.json eval/results/B.json   # compare two runs
+uv run python scripts/check_gates.py                       # release gates (eval/gates.toml)
 ```
+
+All evaluation suites, datasets, judges and gates: [docs/evaluation.md](docs/evaluation.md).
 
 `test` uses the compose database by default. Set `TEST_DATABASE_URL` to use a
 different one; the role must be allowed to CREATE DATABASE. Keys are read
@@ -212,7 +219,7 @@ app/
   safety/         taxonomy, pattern screen, classifier, pathway policy, resources, output checks
   rag/            knowledge extraction, chunking, ingestion, hybrid retrieval, routing, citations
   embeddings/     embedding clients (local fastembed, OpenAI, Gemini)
-  evaluation/     decision, policy-effect and memory evaluation metrics
+  evaluation/     metrics per suite, golden scenarios, dialogue benchmarks, run metadata and recorder
   llm/            provider-neutral schemas, provider presets, and adapters
                   (Anthropic, OpenAI-compatible, Groq, Gemini, dev stub)
   context/        context assembly with a history budget
@@ -222,7 +229,7 @@ migrations/       Alembic migrations
 data/knowledge/   reviewed knowledge manifest and extracted-text snapshots
 prompts/          versioned prompt files + checksum lock
 decisions/        decision-question checksum lock
-eval/             evaluation datasets (with dataset cards) and results
+eval/             evaluation datasets (with dataset cards), results, rubrics and release gates
 docker/           optional Laya decision-server image
 tests/            unit / integration / security / live
 docs/             architecture, API, threat model, implementation status
@@ -237,6 +244,7 @@ docs/             architecture, API, threat model, implementation status
 - [Safety layer](docs/safety.md)
 - [Knowledge retrieval](docs/rag.md)
 - [Voice (how replies read)](docs/voice.md)
+- [Evaluation and observability](docs/evaluation.md)
 - [API reference](docs/api.md)
 - [Threat model and privacy notes](docs/threat-model.md)
 - [Implementation status and known limitations](docs/implementation-status.md)

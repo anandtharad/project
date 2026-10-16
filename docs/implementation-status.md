@@ -1,6 +1,6 @@
 # Implementation status
 
-Last updated: 2026-10-15. Spec: COMPANION-TECH-SPEC-001 v2.1.
+Last updated: 2026-10-16. Spec: COMPANION-TECH-SPEC-001 v2.1.
 
 ## Phase summary
 
@@ -10,9 +10,9 @@ Last updated: 2026-10-15. Spec: COMPANION-TECH-SPEC-001 v2.1.
 | 1: Basic conversation | **Done** (live LLM calls verified with Groq; other providers unverified, see below) |
 | 2: State and Jev | **Built and evaluated.** 4 of 5 acceptance criteria met; strategy decisions are wired and the policy measurably changes replies, but no decision model passes calibration yet, so decisions run in shadow mode (see Phase 2 acceptance). An LLM decision provider (`DECISION_PROVIDER=llm`, Groq `gpt-oss-20b`) now substitutes for Jev behind the same interface; evaluated live on dev (mode 0.70, strategy 0.58, retrieval AUROC 0.95, vs Laya 0.11 / 0.29 / 0.37), but no threshold reaches the 0.80 acted-on target, so it also runs in shadow mode (docs/decisions.md) |
 | 3: Memory | **Built and evaluated.** All 5 acceptance criteria met on the synthetic evaluation set (see Phase 3 acceptance); retrieval and extraction quality are moderate and measured, not assumed |
-| 4: RAG | **Built, being evaluated** (docs/rag.md): 26 reviewed public-domain sources, versioned idempotent ingestion, hybrid retrieval with rank fusion and a relevance threshold, form-based routing (never for casual chat or on safety pathways), escaped evidence block, citations that always resolve, sources in the API |
+| 4: RAG | **Built and evaluated** (docs/rag.md): 26 reviewed public-domain sources, versioned idempotent ingestion, hybrid retrieval with rank fusion and a relevance threshold, form-based routing v5 (never for casual chat, companion or conversation questions, or on safety pathways), escaped evidence block, citations that always resolve (100% on the reply model), sources in the API. Blind test: requests missed 11.1%, no evidence reaching the prompt for non-requests, retrieval hit rate 69.8%. Prompt 1.8.0 (knowledge fragments) helped on `gpt-oss-20b` and awaits confirmation on the reply model before it becomes the default |
 | 5: Safety | **Built and wired into every turn** (docs/safety.md): pattern screen + LLM classifier, degraded mode, pathway policy overriding the strategy, verified regional resources, output checks with bounded recovery, `turn_safety` records. Not clinically validated; the person-facing texts need qualified review before real use |
-| 6: Evaluation and observability | Not started (structured logging and provenance already exist) |
+| 6: Evaluation and observability | **Built and run** (docs/evaluation.md): experiment metadata on every run, evaluation tables and recorder, 216 golden end-to-end scenarios over all 16 spec categories (deterministic: guarantees 100%, routing and retrieval 97.3%), comparison reports with paired bootstrap intervals, 12 release gates with baselines (3 mandatory; all pass), public benchmarks imported without redistribution (safety; ESConv and EmpatheticDialogues), a blind pairwise judge rubric. Not yet run: golden live mode and the dialogue benchmark on the reply model (free-tier budget) |
 | 7: Fine-tuning preparation | Not started |
 
 ## Multi-provider LLM support (added on request)
@@ -87,11 +87,11 @@ unmodified here.
 
 | Suite | Result |
 |---|---|
-| unit | 586 passed |
-| integration | 79 passed |
-| security | 53 passed |
+| unit | 733 passed |
+| integration | 114 passed |
+| security | 57 passed |
 | live | 8 skipped (opt-in; run with `scripts/dev.py live-groq`) |
-| **total** | **718 passed, 8 skipped** (2026-10-13, after the LLM decision provider) |
+| **total** | **904 passed, 8 skipped** (2026-10-16, after the golden scenarios and routing v5) |
 
 Live runs made from this environment once network access was allowed
 (2026-10-13): Groq live tests, strict structured state extraction, the
@@ -315,6 +315,15 @@ policy, persistence and retrieval, duplicate and contradiction handling,
 user inspection and deletion, retention, and cross-user security tests are
 all built. See [memory.md](memory.md).
 
+## Phase 6 acceptance
+
+| Criterion | Status | Evidence |
+|---|---|---|
+| Configurations can be compared reproducibly | Met | every run records its metadata (model, prompts and checksums, settings, dataset checksum, commit); `scripts/eval_report.py` diffs two runs, with a paired bootstrap interval where items match; seeded sampling, cached replies |
+| Failures trace to component/model/prompt/policy/retrieval versions | Met | `turn.completed` logs every component's version; turns store provider, model, prompt and checksum; per-turn `turn_safety` and `turn_decisions`; golden results name the failing step and check (routing v5 and a policy fix were traced this way) |
+| Critical privacy/safety tests are mandatory | Met | mandatory gates: golden guarantees (privacy probes, deletion, failure status codes, explicit safety), citations resolving, no evidence for non-requests; plus the full test suite including `tests/security` |
+| Metrics derive from actual runs | Met | every number in the docs points to a file in `eval/results/`; gates read those files; two measurement bugs (a missing prompt fragment, curly apostrophes) were found and the affected runs redone or rescored with a record |
+
 ## Voice (companion prompt 1.5.0, added on request)
 
 The developer found 1.4.0 robotic. 1.5.0 (default) rewrites the voice and
@@ -340,3 +349,7 @@ review of a sample is still needed.
    adversarial rows.
 3. **LLM credentials** for providers other than Groq, and the Phase 6 model
    comparison.
+4. **Runs waiting for the reply model's daily budget** (Groq free tier,
+   `gpt-oss-120b`): the 1.7.0 vs 1.8.0 generation comparison (20 queries),
+   then the dialogue benchmark (`eval_dialogue.py run --split dev --limit
+   40`, then two blind judges) and a live golden sample.
