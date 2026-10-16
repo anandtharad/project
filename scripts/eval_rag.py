@@ -428,10 +428,11 @@ async def candidates_for(
         model = embeddings.model_id if embeddings is not None else None
         scored: list[Scored] = []
         for query in queries:
-            lexical = await store.lexical(query["query"], limit=POOL, filters=NO_FILTER)
+            text = query.get("searched", query["query"])
+            lexical = await store.lexical(text, limit=POOL, filters=NO_FILTER)
             semantic = None
             if embeddings is not None and model is not None:
-                vector = (await embeddings.embed([query["query"]], kind="query"))[0]
+                vector = (await embeddings.embed([text], kind="query"))[0]
                 semantic = await store.semantic(vector, model, limit=POOL, filters=NO_FILTER)
             scored.append(Scored(query, lexical, semantic))
         corpus = report.corpus
@@ -525,13 +526,20 @@ async def eval_retrieval(args: argparse.Namespace) -> int:
         for config in configs:
             max_words, overlap, min_words = (int(x) for x in config.split("/"))
             chunking = ChunkParams(max_words=max_words, overlap_words=overlap, min_words=min_words)
+            searched = queries
+            if args.through_router:
+                # As in a turn: the router's query is searched, and a message
+                # it does not send to a lookup gets no passages.
+                routes = [route(q["query"], previous_user_message="x") for q in queries]
+                searched = [
+                    {**q, "searched": chosen.query if chosen.retrieve else q["query"]}
+                    for q, chosen in zip(queries, routes, strict=True)
+                ]
             scored, info = await candidates_for(
-                settings.database_url, chunking, embeddings, queries
+                settings.database_url, chunking, embeddings, searched
             )
             if args.through_router:
-                # As in a turn: no lookup, no passages.
-                for item in scored:
-                    chosen = route(item.query["query"], previous_user_message="x")
+                for item, chosen in zip(scored, routes, strict=True):
                     if not chosen.retrieve:
                         item.lexical, item.semantic = [], [] if item.semantic is not None else None
                     item.query = {**item.query, "routed": chosen.retrieve}

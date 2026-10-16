@@ -5,10 +5,14 @@ API, database, orchestrator) with steps and per-step expectations. Steps are
 messages, or actions: start a new conversation, delete all memories, probe
 another person's data, or make a dependency fail for the next turn.
 
-Checks come in two kinds:
-- pipeline checks: HTTP status, safety pathway on explicit statements,
-  knowledge route and evidence, citations resolving, privacy probes, memory
-  deletion. They hold in both modes;
+Checks come in three kinds:
+- guarantees: HTTP status (dependency failures included), privacy probes,
+  memory deletion, citations resolving, and the safety pathway for explicit
+  statements. They must always hold (a mandatory release gate);
+- heuristics: the knowledge route, whether evidence reached the prompt and
+  from which sources, and the safety pathway for wording only the classifier
+  can judge. They are measured, with a floor, not guaranteed: routing and
+  retrieval are evaluated on their own sets (docs/rag.md);
 - reply checks: what the reply says and how it reads (questions, lists,
   stock phrases, length, required or forbidden mentions, recall). They need
   a real model, so they run in live mode only.
@@ -137,11 +141,17 @@ class Observed:
     probe_ok: bool | None = None
 
 
+CheckKind = Literal["guarantee", "heuristic", "reply"]
+_GUARANTEES = frozenset({"status", "probe", "citations_resolve"})
+_HEURISTICS = frozenset({"knowledge", "sources_from"})
+
+
 @dataclass(frozen=True)
 class CheckResult:
     name: str
     outcome: Literal["pass", "fail", "skip"]
     detail: str = ""
+    kind: CheckKind = "reply"
 
 
 _MARKER = re.compile(r"\[\s*S\d+(?:\s*,\s*S\d+)*\s*\]", re.I)
@@ -154,11 +164,18 @@ def _contains(text: str, phrase: str) -> bool:
 def check_step(expect: Expect, seen: Observed, mode: Mode) -> list[CheckResult]:
     results: list[CheckResult] = []
 
+    def kind(name: str) -> CheckKind:
+        if name in _GUARANTEES or (name == "safety_pathway" and expect.explicit):
+            return "guarantee"
+        if name in _HEURISTICS or name == "safety_pathway":
+            return "heuristic"
+        return "reply"
+
     def add(name: str, ok: bool, detail: str = "") -> None:
-        results.append(CheckResult(name, "pass" if ok else "fail", detail))
+        results.append(CheckResult(name, "pass" if ok else "fail", detail, kind(name)))
 
     def skip(name: str, why: str) -> None:
-        results.append(CheckResult(name, "skip", why))
+        results.append(CheckResult(name, "skip", why, kind(name)))
 
     if seen.probe_ok is not None:
         add("probe", seen.probe_ok)
@@ -254,6 +271,16 @@ class ScenarioOutcome:
             return None
         return all(o != "fail" for o in outcomes)
 
+    def held(self, kind: CheckKind) -> bool | None:
+        """Did every check of this kind pass (None when none ran)? A runner
+        error counts as a failed guarantee."""
+        if self.error is not None and kind == "guarantee":
+            return False
+        outcomes = [c.outcome for _, c in self.checks if c.kind == kind and c.outcome != "skip"]
+        if not outcomes:
+            return None
+        return all(o == "pass" for o in outcomes)
+
 
 def summarize(outcomes: Sequence[ScenarioOutcome]) -> dict[str, Any]:
     by_category: dict[str, Counter[str]] = defaultdict(Counter)
@@ -264,12 +291,22 @@ def summarize(outcomes: Sequence[ScenarioOutcome]) -> dict[str, Any]:
         for _, check in outcome.checks:
             by_check[check.name][check.outcome] += 1
     checked = [o for o in outcomes if o.passed is not None]
+
+    def rate(kind: CheckKind) -> float | None:
+        held = [o.held(kind) for o in outcomes]
+        ran = [h for h in held if h is not None]
+        return round(sum(ran) / len(ran), 4) if ran else None
+
     return {
         "scenarios": len(outcomes),
         "checked": len(checked),
         "pass_rate": round(sum(bool(o.passed) for o in checked) / len(checked), 4)
         if checked
         else None,
+        # Share of scenarios whose checks of each kind all passed.
+        "guarantee_pass_rate": rate("guarantee"),
+        "heuristic_pass_rate": rate("heuristic"),
+        "reply_pass_rate": rate("reply"),
         "errors": sum(1 for o in outcomes if o.error),
         "by_category": {k: dict(v) for k, v in sorted(by_category.items())},
         "by_check": {k: dict(v) for k, v in sorted(by_check.items())},

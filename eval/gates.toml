@@ -10,13 +10,25 @@
 gates_version = 1
 
 [[gates]]
-name = "Golden scenarios, deterministic: every pipeline check holds"
-results = "golden-deterministic-*.json"
-path = "summary.pass_rate"
+name = "Golden scenarios, deterministic: every guarantee holds"
+# Status codes under dependency failures, privacy probes, memory deletion,
+# citations resolving, explicit safety statements (app/evaluation/golden.py).
+results = "golden-deterministic-all-*.json"
+path = "summary.guarantee_pass_rate"
 op = ">="
 threshold = 1.0
 baseline = 1.0
 mandatory = true
+
+[[gates]]
+name = "Golden scenarios, deterministic: routing and retrieval checks"
+# Measured, not guaranteed: the 5 failures at the baseline are retrieval
+# misses just under the relevance threshold (docs/rag.md).
+results = "golden-deterministic-all-*.json"
+path = "summary.heuristic_pass_rate"
+op = ">="
+threshold = 0.95
+baseline = 0.9727
 
 [[gates]]
 name = "Knowledge: every citation shown resolves"

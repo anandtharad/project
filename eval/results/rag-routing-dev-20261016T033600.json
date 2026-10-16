@@ -1,0 +1,190 @@
+{
+  "eval": "rag-routing",
+  "split": "dev",
+  "dataset": "eval/datasets/rag/v1/routing.jsonl",
+  "dataset_sha256": "70fc1fc3c8b8a6641374be5b0fe08da96ebeee4b52260920f9b1b6aa5e871033",
+  "metrics": {
+    "n": 180,
+    "positives": 80,
+    "negatives": 100,
+    "unnecessary_retrieval_rate": 0.14,
+    "missed_rate": 0.0,
+    "precision": 0.8511,
+    "recall": 1.0,
+    "per_kind": {
+      "casual": {
+        "n": 18,
+        "correct": 18
+      },
+      "current_info": {
+        "n": 4,
+        "correct": 4
+      },
+      "evidence": {
+        "n": 8,
+        "correct": 8
+      },
+      "factual": {
+        "n": 23,
+        "correct": 23
+      },
+      "off_topic": {
+        "n": 13,
+        "correct": 5
+      },
+      "reflection": {
+        "n": 19,
+        "correct": 17
+      },
+      "source_followup": {
+        "n": 5,
+        "correct": 5
+      },
+      "unlabelled": {
+        "n": 90,
+        "correct": 86
+      }
+    },
+    "lookups_on_negatives": 0.14,
+    "evidence": {
+      "min_semantic": 0.7,
+      "evidence_on_negatives": 0.0,
+      "evidence_on_positives": 0.7625,
+      "by_kind": {
+        "casual": {
+          "n": 18,
+          "evidence": 0
+        },
+        "current_info": {
+          "n": 4,
+          "evidence": 3
+        },
+        "evidence": {
+          "n": 8,
+          "evidence": 5
+        },
+        "factual": {
+          "n": 23,
+          "evidence": 15
+        },
+        "off_topic": {
+          "n": 13,
+          "evidence": 0
+        },
+        "reflection": {
+          "n": 19,
+          "evidence": 0
+        },
+        "source_followup": {
+          "n": 5,
+          "evidence": 5
+        },
+        "unlabelled": {
+          "n": 90,
+          "evidence": 33
+        }
+      },
+      "negatives_with_evidence": []
+    }
+  },
+  "errors": [
+    {
+      "id": "authored-2-001",
+      "want": false,
+      "kind": "unlabelled",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "authored-2-002",
+      "want": false,
+      "kind": "unlabelled",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "authored-2-007",
+      "want": false,
+      "kind": "unlabelled",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "authored-2-019",
+      "want": false,
+      "kind": "unlabelled",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt-006",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt-008",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt-024",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt-041",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt-045",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt-053",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt-055",
+      "want": false,
+      "kind": "reflection",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt-065",
+      "want": false,
+      "kind": "reflection",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt-070",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    },
+    {
+      "id": "rt-077",
+      "want": false,
+      "kind": "off_topic",
+      "routed": "factual",
+      "reason": "information_request"
+    }
+  ]
+}

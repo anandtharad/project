@@ -62,6 +62,8 @@ def decision_set(**acted: str) -> DecisionSet:
         ("I didn't ask for any advice", Strategy.VALIDATE, False),
         ("I never asked for any advice.", Strategy.VALIDATE, False),
         ("No advice please.", Strategy.VALIDATE, False),
+        ("i'm not after any advice or tips, i know what i did wrong", Strategy.VALIDATE, False),
+        ("no advice pls, just let me moan", Strategy.VALIDATE, False),
         # Requests for advice, including ones that contain a negation.
         ("What should I do about my landlord?", Strategy.PROBLEM_SOLVE, True),
         ("Any tips for sleeping better?", Strategy.PROBLEM_SOLVE, True),
@@ -85,6 +87,7 @@ def decision_set(**acted: str) -> DecisionSet:
         ("I didn't get any advice from my doctor and it's frustrating", None, True),
         ("I had a long day.", None, True),
         ("I advise people at work all day", None, True),
+        ("I went running after work, felt good", None, True),
     ],
 )
 def test_explicit_requests_are_recognized(

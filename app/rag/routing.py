@@ -7,8 +7,15 @@ a request for tips, an explanation or evidence, or a question about where an
 answer came from. Personal context does not stop a question from being one.
 Never looked up: casual chat and venting without a question, rhetorical
 questions ("what's the point", "why did she do that", "lol what is my life"),
-questions to the companion itself, retractions ("any tips? nah, never
-mind"), and messages that say they don't want advice.
+questions to the companion itself or about the conversation ("who did I say
+was coming?"), tasks for the companion ("help me write a text"),
+retractions ("any tips? nah, never mind"), and messages that say they don't
+want advice.
+
+A statement is not a question because of its first word (v5, from the
+golden scenarios): texting drops the subject ("might try that", "did my
+long run"), "which/when" after a comma open a clause, and quoted words are
+someone else's ("the 'tell me about a time' questions").
 
 The router does not decide whether the library covers the question: the
 retrieval's relevance threshold does (app/rag/retrieval.py). So an
@@ -70,6 +77,7 @@ _REFLECTIVE = re.compile(
     r"remember|understand|listen|read)\b"
     r"|\bwhat are we\b"
     r"|\bwhy do i (?:always|keep|feel)\b"
+    r"|\bwhy (?:do|does|did) (?:they|people|he|she|you|everyone) (?:always|keep|never)\b"
     r"|\bis there (?:any|a|even a) point\b"
     r"|\bhow many (?:more )?times (?:do|did|have|has|must|am|will|can|should) "
     r"(?:i|he|she|they|you|we)\b"
@@ -92,11 +100,31 @@ _COMPANION = re.compile(
     r"|^\W*(?:and )?(?:do|did|can|could|will|would|have) you (?:ever |even |really |actually )?"
     r"(?:like|love|care|feel|think|remember|know me|understand me|get (?:bored|lonely|tired|sad)|"
     r"have (?:feelings|friends|a (?:name|body|family))|miss|dream|sleep|eat|mind|promise|"
-    r"judge|hate|forget|talk to anyone|get it)\b"
+    r"judge|hate|forget|talk to anyone|get it|see|watch|hear|catch|play|guess|pick|choose|"
+    r"decode|translate|summari[sz]e|proofread)\b"
+    r"|^\W*(?:and |ok |okay |so )?(?:can|could|shall|should) we (?:play|do|talk|chat|try|start)\b"
+    r"|^\W*let'?s (?:play|talk|chat)\b|\bwhat would you (?:do|say|pick|choose)\b"
+    # Its own instructions and what it keeps about the person.
+    r"|\byour (?:hidden |secret |system )?(?:prompt|instructions|rules|notes|settings)\b"
+    r"|\b(?:stored|saved|got|know|remember)(?: \w+){0,2} about me\b"
+    # Writing for the person is a task, not a question for the library.
+    r"|\b(?:help me|can you|could you|pls|please) (?:write|draft|word|phrase|reword|rewrite|"
+    r"reply to)\b"
     r"|\b(?:how|who|what) (?:are|were) you\b|\bhow(?:'s| is| was) your\b"
     r"|\bwhat(?:'s| is) (?:new|up|the latest) with you\b|\babout you(?:rself)?\b"
     r"|\bdo you (?:like|love|care|feel|think|remember|ever|have|know me)\b"
     r"|\byour (?:favou?rite|day|weekend|life|opinion)\b|\b(?:a time )?you (?:were|ever)\b",
+    re.IGNORECASE,
+)
+
+# Questions about the conversation itself: what was said in it, or whether a
+# message went through. The library cannot answer them.
+_CONVERSATION = re.compile(
+    r"\bdid i (?:say|tell you|mention)\b|\bwhat did (?:i|we) (?:say|talk about|decide)\b"
+    r"|\bwhat (?:was|were) (?:the|that|those) [\w' -]{1,40} called again\b"
+    r"|^\W*(?:(?:hello|hi|hey)\W+)*(?:did|has|is) (?:that|it|this|my message) "
+    r"(?:work|go through|send|come through|working)\b"
+    r"|\bare you (?:still )?there\b",
     re.IGNORECASE,
 )
 
@@ -148,7 +176,7 @@ _CURRENT = re.compile(
 _HOW_TO = re.compile(
     r"\bhow (?:do|can|could|should|would|might) (?:i|we|you|one|someone|people|a person) "
     r"(?!even\b|just\b|not\b)\w+"
-    r"|\bhow to\b"
+    r"|^\W*(?:(?:and|so|ok|okay|but|or|also|like|hey|um|uh)\W+)*how to\b"
     r"|\bwhat (?:can|should|could) (?:i|we|you|one) (?:do|try|eat|drink|say)\b"
     r"|\bwhat(?:'s| is| are) (?:the |some |a few )?(?:best|good|healthy|easy|simple|quick) "
     r"(?:ways?|tips?|things?|techniques?|habits?|exercises?|foods?)\b"
@@ -198,9 +226,29 @@ _PERSONAL = re.compile(
 )
 # Marks a question as rhetorical or a joke rather than a request.
 _RHETORICAL = re.compile(
-    r"\b(?:lol|lmao|haha+|smh|anyway|even mean|before i (?:crack|lose it|snap)|"
+    r"\b(?:lol|lmao|haha+|smh|even mean|before i (?:crack|lose it|snap)|"
     r"what's the use|why bother)\b",
     re.IGNORECASE,
+)
+# Without "?", these mark a question as rhetorical ("what is love anyway",
+# "like who has a thought at 6pm on a friday"); with one, "anyway" is just a
+# change of topic ("what is mindfulness anyway?").
+_RHETORICAL_UNASKED = re.compile(
+    r"\banyway\b|^\W*(?:(?:like|honestly|ok|so)\W+)*who(?:se)?\b", re.I
+)
+# Venting about how anyone manages, unasked: "honestly how do people do this
+# every single day". "how do you do it" is a real how-to.
+_VENTING = re.compile(
+    r"\bhow (?:do|does|did|can|could) (?:people|anyone|everyone|others|ppl) "
+    r"(?:even |just )?(?:do|manage|handle|cope with|deal with|survive|keep up with|stand) "
+    r"(?:this|it|that)\b",
+    re.IGNORECASE,
+)
+# Quoted words are someone else's ("my boss said it was 'fine'", "the 'tell me
+# about a time' questions"); they are masked when looking for a request.
+_QUOTED = re.compile(
+    r'(?<![\w])["\u201c][^"\u201d]{1,500}["\u201d]'  # a pasted message can be long
+    r"|(?<![\w])'[^'\n]{1,80}'(?![\w])"
 )
 # "me" as the person asking for something ("tell me about", "help me sleep").
 _ASKING_ME = re.compile(r"\b(?:tell|teach|show|give|help|remind|let|send|explain to)\s+me\b", re.I)
@@ -228,7 +276,7 @@ def _clean(message: str) -> str:
 # left out: texting drops the subject ("can't sleep", "don't know why").
 _INTERROGATIVE = re.compile(
     r"^\W*(?:(?:and|so|also|ok|okay|honestly|hey|ugh|hmm|anyway|like|yaar|but|or)\W+)*"
-    r"(?:what|what's|whats|how|how's|why|when|which|where|who|whose|is|are|was|"
+    r"(what|what's|whats|how|how's|why|when|which|where|who|whose|is|are|was|"
     r"does|do|did|can|could|should|would|will|may|might|any|at what)(?![\w'])",
     re.IGNORECASE,
 )
@@ -241,39 +289,103 @@ _QUESTION_WORD = re.compile(
 )
 
 
-def _clauses(text: str) -> list[tuple[str, bool]]:
-    """(clause, is it a question): it ends with "?" or starts with an
-    interrogative word."""
-    out: list[tuple[str, bool]] = []
-    for match in re.finditer(r"[^.?!;\n]+(?:[.?!;\n]+|$)", text):
-        sentence = match.group(0)
+# Statements that drop their subject open with these ("might try that",
+# "will do", "could be worse", "did a 5k today"); a question keeps it.
+_MODAL = frozenset({"did", "will", "would", "could", "should", "may", "might"})
+_RELATIVE = frozenset({"which", "who", "whose", "where", "when"})
+# What follows an auxiliary in a question: its subject ("should i go",
+# "does walking help"). Texting drops the subject of statements instead
+# ("might try that", "will do", "could be worse").
+_SUBJECT = re.compile(
+    r"^\s*(?:i|you|u|we|he|she|it|they|my|your|his|her|their|our|there|this|that|these|"
+    r"those|people|someone|anyone|anybody|everyone|the|a|an|\w+ing)\b",
+    re.IGNORECASE,
+)
+
+
+_POSSESSIVE = re.compile(r"^\s*(?:my|your|his|her|their|our)\b", re.IGNORECASE)
+_AUXILIARY_NEXT = re.compile(
+    r"^\s*(?:is|are|was|were|does|do|did|can|could|should|would|will|may|might)\b", re.I
+)
+
+
+def _is_question(part: str, asked: bool, first: bool) -> bool:
+    """A clause is a question when its sentence has "?" and it has a question
+    word, or when it opens with an interrogative word. Without "?", an
+    modal needs a subject after it, and "which/who/where/when" need an
+    auxiliary after them and are relative after a comma ("the numbers bit,
+    which is the bit everyone stares at")."""
+    match = _INTERROGATIVE.match(part)
+    if asked:
+        return bool(match) or bool(_QUESTION_WORD.search(part))
+    if not match:
+        return False
+    word, rest = match.group(1).lower(), part[match.end() :]
+    if word in _RELATIVE:
+        # "when i brought it up he said..." is a clause; "when should i..." asks.
+        return first and bool(_AUXILIARY_NEXT.match(rest))
+    if word in _MODAL:
+        # "did my long run this morning" drops its subject.
+        if word == "did" and _POSSESSIVE.match(rest):
+            return False
+        return bool(_SUBJECT.match(rest))
+    return True
+
+
+@dataclass(frozen=True)
+class _Clause:
+    text: str
+    question: bool
+    # Does its sentence have "?".
+    asked: bool
+
+
+def _sentences(text: str) -> list[str]:
+    return [m.group(0) for m in re.finditer(r"[^.?!;\n]+(?:[.?!;\n]+|$)", text)]
+
+
+def _clauses(text: str) -> list[_Clause]:
+    out: list[_Clause] = []
+    for sentence in _sentences(text):
         asked = "?" in sentence
-        for part in re.split(r",\s+|\s+(?:but|and so|so)\s+", sentence.rstrip(".?!;\n ")):
-            part = part.strip()
+        parts = re.split(r",\s+|\s+(?:but|and so|so)\s+", sentence.rstrip(".?!;\n "))
+        for index, part in enumerate(p.strip() for p in parts):
             if part:
-                question = bool(_INTERROGATIVE.match(part)) or (
-                    asked and bool(_QUESTION_WORD.search(part))
-                )
-                out.append((part, question))
+                out.append(_Clause(part, _is_question(part, asked, index == 0), asked))
     return out
 
 
+def _about_us(clause: str) -> bool:
+    """A clause about the companion or the conversation itself."""
+    return bool(_COMPANION.search(clause) or _CONVERSATION.search(clause))
+
+
 def _request(text: str) -> RouteKind | None:
-    """The kind of information request in the message, or None."""
+    """The kind of information request in the message, or None. The whole
+    message is the query: searching only the sentences that ask was measured
+    and lost the topic the other sentences carry (docs/rag.md)."""
     found: list[RouteKind] = []
-    for clause, question in _clauses(text):
+    for item in _clauses(_QUOTED.sub(" something ", text)):
+        clause, question, sentence_asked = item.text, item.question, item.asked
+        if _about_us(clause):
+            continue
+        if not sentence_asked and _VENTING.search(clause):
+            continue
         general = not _PERSONAL.search(_ASKING_ME.sub(" ", clause))
         # A question may carry personal context ("my dad is 72, how should he
         # raise this with his GP?"); whether the library answers it is the
         # relevance threshold's call. Rhetorical markers still rule it out.
-        asked = question and not _RHETORICAL.search(clause)
+        rhetorical = _RHETORICAL.search(clause) or (
+            not sentence_asked and _RHETORICAL_UNASKED.search(clause)
+        )
+        asked = question and not rhetorical
         if _CURRENT.search(clause) and (general or asked):
             found.append("current_info")
         elif _EVIDENCE.search(clause) and (general or asked):
             found.append("evidence")
         elif _HOW_TO.search(clause) or (_EXPLAIN.search(clause) and general) or asked:
             found.append("factual")
-    if not found and "?" in text:
+    if not found and "?" in text and not _about_us(text):
         # A short question with no personal words ("sleep hygiene?").
         words = re.findall(r"[\w'-]+", text)
         if (
@@ -304,10 +416,12 @@ def route(message: str, *, previous_user_message: str | None = None) -> Route:
         return Route("source_followup", False, "", "nothing_to_source")
     if _REFLECTIVE.search(text):
         return Route("reflection", False, "", "rhetorical_or_personal")
-    if _COMPANION.search(text):
-        return Route("casual", False, "", "about_the_companion")
     kind = _request(text)
     if kind is None:
+        if _CONVERSATION.search(text):
+            return Route("casual", False, "", "about_the_conversation")
+        if any(_COMPANION.search(clause.text) for clause in _clauses(text)):
+            return Route("casual", False, "", "about_the_companion")
         return Route("reflection", False, "", "no_request")
     reasons = {
         "current_info": "current_information",

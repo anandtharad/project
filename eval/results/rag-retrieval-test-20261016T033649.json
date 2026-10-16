@@ -1,0 +1,553 @@
+{
+  "eval": "rag-retrieval",
+  "split": "test",
+  "dataset": "eval/datasets/rag/v1/retrieval.jsonl",
+  "dataset_sha256": "ec0e6f392d11ab1fbd8a352fd63e0aa0f3685db004b90363d2a56592ae31a79a",
+  "manifest_sha256": "5c6624f76eaef812df3914a5b9bcd1c7f1982b67383fdd12eb06d2a1a9452c45",
+  "embedding_model": "local:BAAI/bge-small-en-v1.5:384",
+  "max_results": 3,
+  "max_per_document": 2,
+  "runs": [
+    {
+      "chunking": "chunker1:180/30/25",
+      "chunks": 274,
+      "documents": 26,
+      "through_router": true,
+      "routed": 65,
+      "fixed": {
+        "min_semantic": 0.7,
+        "metrics": {
+          "answerable": 43,
+          "negative": 24,
+          "hit_rate": 0.6977,
+          "source_recall": 0.5814,
+          "precision": 0.7222,
+          "mrr": 0.686,
+          "fact_hit_rate": 0.6047,
+          "abstention_rate": 0.875,
+          "abstention_by_type": {
+            "unanswerable": 0.8125,
+            "off_topic": 1.0
+          },
+          "balanced": 0.7863
+        },
+        "per_query": [
+          {
+            "id": "rq-002",
+            "type": "answerable",
+            "retrieved": [
+              "nia-loneliness-and-social-isolation-tips-staying-connected",
+              "nia-loneliness-and-social-isolation-tips-staying-connected",
+              "cdc-managing-difficult-emotions"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-004",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-8-things-to-know-about-meditation-and-mindfulness",
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-006",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-008",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-010",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-012",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-stress",
+              "odphp-manage-stress",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-014",
+            "type": "answerable",
+            "retrieved": [
+              "nia-loneliness-and-social-isolation-tips-staying-connected",
+              "nia-loneliness-and-social-isolation-tips-staying-connected",
+              "cdc-managing-difficult-emotions"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-016",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-018",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-020",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-wellness-and-well-being",
+              "cdc-improve-your-emotional-well-being",
+              "cdc-emotional-well-being-about"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-022",
+            "type": "answerable",
+            "retrieved": [
+              "nia-tips-getting-and-staying-active-you-age",
+              "nia-tips-getting-and-staying-active-you-age",
+              "nia-how-talk-your-doctor-about-sensitive-issues"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-024",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-improve-your-emotional-well-being",
+              "cdc-improve-your-emotional-well-being",
+              "cdc-managing-difficult-emotions"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-026",
+            "type": "answerable",
+            "retrieved": [
+              "niddk-changing-habits-better-health",
+              "niddk-changing-habits-better-health"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-028",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-manage-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-030",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep",
+              "odphp-get-enough-sleep"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-032",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-managing-difficult-emotions"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-034",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-get-active",
+              "nia-tips-getting-and-staying-active-you-age",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-036",
+            "type": "answerable",
+            "retrieved": [
+              "cdc-emotional-well-being-about",
+              "cdc-improve-your-emotional-well-being",
+              "cdc-improve-your-emotional-well-being"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-038",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-040",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-042",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep",
+              "odphp-get-enough-sleep",
+              "medlineplus-healthy-sleep"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-044",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders",
+              "medlineplus-healthy-sleep",
+              "nccih-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-046",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-relaxation-techniques-what-you-need-to-know",
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-048",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-8-things-to-know-about-meditation-and-mindfulness",
+              "nccih-8-things-to-know-about-meditation-and-mindfulness",
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-050",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-052",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-054",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-056",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-058",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-060",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-manage-stress",
+              "nccih-stress",
+              "cdc-improve-your-emotional-well-being"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-062",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep",
+              "odphp-get-active",
+              "nia-sleep-and-older-adults"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-064",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-066",
+            "type": "answerable",
+            "retrieved": [
+              "nimh-tips-for-talking-with-your-health-care-provider",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-068",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-070",
+            "type": "answerable",
+            "retrieved": [
+              "nimh-so-stressed-out-fact-sheet",
+              "odphp-get-enough-sleep",
+              "odphp-manage-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-072",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-stress",
+              "nccih-stress",
+              "nccih-relaxation-techniques-what-you-need-to-know"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-074",
+            "type": "answerable",
+            "retrieved": [],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-076",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep",
+              "odphp-get-enough-sleep",
+              "odphp-get-enough-sleep"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-078",
+            "type": "answerable",
+            "retrieved": [
+              "odphp-manage-stress",
+              "medlineplus-stress",
+              "nimh-so-stressed-out-fact-sheet"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-080",
+            "type": "answerable",
+            "retrieved": [
+              "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+              "nccih-8-things-to-know-about-meditation-and-mindfulness",
+              "nccih-stress"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-082",
+            "type": "answerable",
+            "retrieved": [
+              "nimh-tips-for-talking-with-your-health-care-provider",
+              "nia-loneliness-and-social-isolation-tips-staying-connected",
+              "nimh-tips-for-talking-with-your-health-care-provider"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-084",
+            "type": "answerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep",
+              "cdc-sleep-about",
+              "odphp-get-enough-sleep"
+            ],
+            "fact_hit": false
+          },
+          {
+            "id": "rq-086",
+            "type": "answerable",
+            "retrieved": [
+              "nia-loneliness-and-social-isolation-tips-staying-connected",
+              "nia-loneliness-and-social-isolation-tips-staying-connected",
+              "cdc-managing-difficult-emotions"
+            ],
+            "fact_hit": true
+          },
+          {
+            "id": "rq-089",
+            "type": "unanswerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep",
+              "odphp-get-enough-sleep",
+              "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders"
+            ]
+          },
+          {
+            "id": "rq-091",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-093",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-095",
+            "type": "unanswerable",
+            "retrieved": [
+              "nimh-so-stressed-out-fact-sheet",
+              "nimh-tips-for-talking-with-your-health-care-provider"
+            ]
+          },
+          {
+            "id": "rq-097",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-099",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-101",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-103",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-105",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-107",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-109",
+            "type": "unanswerable",
+            "retrieved": [
+              "medlineplus-healthy-sleep"
+            ]
+          },
+          {
+            "id": "rq-111",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-113",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-115",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-117",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-119",
+            "type": "unanswerable",
+            "retrieved": []
+          },
+          {
+            "id": "rq-121",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-123",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-125",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-127",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-129",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-131",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-133",
+            "type": "off_topic",
+            "retrieved": []
+          },
+          {
+            "id": "rq-135",
+            "type": "off_topic",
+            "retrieved": []
+          }
+        ]
+      },
+      "lexical_fallback": {
+        "selected_min_lexical": 0.46,
+        "metrics": {
+          "answerable": 43,
+          "negative": 24,
+          "hit_rate": 0.6512,
+          "source_recall": 0.5357,
+          "precision": 0.5404,
+          "mrr": 0.5194,
+          "fact_hit_rate": 0.4419,
+          "abstention_rate": 0.6667,
+          "abstention_by_type": {
+            "unanswerable": 0.5,
+            "off_topic": 1.0
+          },
+          "balanced": 0.6589
+        }
+      }
+    }
+  ]
+}

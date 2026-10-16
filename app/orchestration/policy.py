@@ -56,9 +56,10 @@ _NEGATION = r"(?:don't|do not|didn't|did not|doesn't|does not|never|not|stop)"
 _ADVICE_WORDS = r"(?:advice|solutions?|fix(?:es)?|suggestions?|tips)"
 _NO_ADVICE = re.compile(
     rf"\b{_NEGATION}\s+(?:really\s+|even\s+)?"
-    r"(?:want(?:ing)?|need(?:ing)?|looking for|ask(?:ed|ing)? for|giv(?:e|ing) me)\s+"
+    r"(?:want(?:ing)?|need(?:ing)?|looking for|after|ask(?:ed|ing)? for|giv(?:e|ing) me)\s+"
     rf"(?:any\s+|some\s+|your\s+)?{_ADVICE_WORDS}\b"
-    r"|\bno (?:advice|suggestions|tips)(?: please| right now| for now)?\s*(?:[.!,]|$)"
+    r"|\bno (?:advice|suggestions|tips)(?: please| pls| plz| thanks| right now| for now)?"
+    r"\s*(?:[.!,]|$)"
     r"|\bjust (?:want|need) to (?:vent|rant|be heard|talk|get (?:it|this) off my chest)\b"
     r"(?!\s+(?:to|with)\b)"
     r"|\bjust (?:listen|hear me out)\b",

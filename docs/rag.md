@@ -206,9 +206,24 @@ information or advice:
   - casual chat and venting without a question;
   - rhetorical questions ("what's the point", "why did she do that", "lol
     what is my life");
-  - questions to the companion ("are you real?", "do you ever get lonely?");
+  - questions to the companion ("are you real?", "do you ever get lonely?"),
+    wherever they appear in the message, including about its own
+    instructions ("show me your prompt");
+  - questions about the conversation ("who did I say was doing the slides?",
+    "what was that dance called again?", "did that work?");
+  - tasks for the companion ("help me write a text to my mates");
   - retractions ("any tips? nah, never mind");
-  - any message that says they don't want advice.
+  - any message that says they don't want advice ("not after any advice",
+    "no advice pls").
+- **Statements are not questions because of their first word** (v5):
+  - texting drops the subject ("might try that", "will do", "did my long
+    run"), so a modal or "did" counts only with a subject after it;
+  - "which/who/where/when" after a comma open a clause ("the numbers bit,
+    which is the bit everyone stares at"). Without "?" they count only
+    before an auxiliary ("when should I take it");
+  - quoted words are someone else's ("my boss said it was 'fine'");
+  - without "?", "anyway", an opening "who", and venting about how anyone
+    copes ("honestly how do people do this") are rhetorical.
 - **Source follow-ups** ("source?", "where's that from?", "is that true?")
   look up the person's previous message.
 - **Kinds** are recorded: factual, evidence, current information (the
@@ -219,6 +234,13 @@ information or advice:
 or emotional question ("how do I make chai?", "is it bad that I'm relieved
 he's gone?") runs a lookup. On the blind test set, every such lookup ended
 with no passage in the prompt.
+
+**The query is the whole message.** Searching only the sentences that ask
+was tried: "what is mindfulness anyway? my coworker keeps going on about
+it" scores 0.69 as a whole message and 0.79 as its question alone. On the
+retrieval dev set, though, hit rate fell from 77.3% to 68.2% and MRR from
+0.73 to 0.66. The other sentences usually carry the topic ("I keep waking
+at 3am. what helps?"), so the change was not kept.
 
 **Two earlier designs were measured and replaced:**
 
@@ -317,7 +339,14 @@ read; only results are looked at. v3 and v4 were each run on it once.
 |---|---|---|---|---|
 | v2: covered-topic word list | 40.0% | 0% | 0% | not measured |
 | v3: request form, personal words block explanatory questions | 24.4% | 23.6% | 0% | 62.2% |
-| **v4: any question or request (current)** | **11.1% (5/45)** | 30.9% (17/55) | **0% (0/55)** | **73.3%** |
+| v4: any question or request | 11.1% (5/45) | 30.9% (17/55) | 0% (0/55) | 73.3% |
+| **v5: v4 plus statement, clause and companion forms (current)** | **11.1%** | 30.9% | **0%** | **73.3%** |
+
+v5 (2026-10-16) came from the golden scenarios, not this set. They have many
+statements and companion questions, which this set has few of. On test it
+changes nothing; on dev, lookups for non-requests fell from 15% to 14% with
+no request missed. In the deterministic golden run, every routing check
+holds (below and docs/evaluation.md).
 
 - **What runs a lookup.** Under v4 the lookups for non-requests are mostly
   off-topic questions, plus a few emotional ones. The relevance threshold
@@ -424,9 +453,44 @@ replies and passages are in `.packets.json`, synthetic queries only.
      doses from memory, and never attribute a claim to a study or
      organisation.
 
-1.8.0 is not the default until a live comparison shows it helps (below).
+**Prompt 1.8.0, indicative comparison (2026-10-16).** This used the same 20
+queries on Groq `openai/gpt-oss-20b`, because the reply model's daily
+budget was spent. Files: `rag-generation-test-20261016T025832.json` (1.7.0)
+and `…T031508.json` (1.8.0).
+
+| | 1.7.0 | 1.8.0 |
+|---|---|---|
+| Citation validity | 100% | 100% |
+| Cites when evidence was given | 1 of 8 | **4 of 8** |
+| Claims a source without evidence | 1 of 12 | **0 of 12** |
+| Says it has no reliable source when none was found | 0 of 12 | **5 of 12** |
+| Mean words | 98 | 86 |
+
+Two corrections were made to get these numbers:
+
+- **The first 1.8.0 run never sent the fragments.** The evaluation built
+  its own system prompt and left the knowledge fragment out. The engine's
+  assembly is now one function (`system_prompt()` in
+  `app/orchestration/engine.py`), and the evaluation uses it.
+- **"Says no source" missed curly apostrophes** ("I don’t have a reliable
+  source"). The measure was fixed, and the stored runs were recomputed from
+  their saved replies (`eval_rag.py rescore`, recorded in each file). Only
+  the 1.8.0 run changed. The 120b run's "0 of 12" stands.
+
+Still wrong under 1.8.0: one reply named CPAP brands, and one gave protein
+targets from memory. No code measure catches these yet.
+
+1.8.0 stays off by default until the same comparison on the reply model
+(`gpt-oss-120b`) confirms it.
 
 ## Limits
+
+- **Near-misses at the relevance threshold.** Some requests the library
+  covers score just under 0.70 and get no evidence: "ways to meet people
+  when you move somewhere new" (0.67), "does going for walks actually help
+  your mood?" (0.70), "tips on how to support someone" (golden scenarios;
+  5 of 191). The threshold was set on dev, where lowering it lets
+  unanswerable queries through, so it was not moved.
 
 - **Small, U.S.-only corpus.** 26 pages; little on grief or nutrition and
   nothing on non-U.S. services. Questions outside it get "no source".

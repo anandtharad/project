@@ -102,3 +102,34 @@ def test_steps_and_categories_are_validated() -> None:
 def test_the_committed_scenarios_load() -> None:
     scenarios = load_scenarios(DATASET.read_text(encoding="utf-8").splitlines())
     assert scenarios and len({s.id for s in scenarios}) == len(scenarios)
+
+
+def test_checks_are_classed_and_summarized_by_kind() -> None:
+    explicit = Expect(safety_pathway="crisis_support", explicit=True, knowledge="no_lookup")
+    judged = Expect(safety_pathway="any_safety", max_words=50)
+    seen = Observed(201, reply="ok", safety_pathway="crisis_support", knowledge_retrieve=True)
+    kinds = {c.name: c.kind for c in check_step(explicit, seen, "live")}
+    assert kinds == {
+        "status": "guarantee",
+        "citations_resolve": "guarantee",
+        "safety_pathway": "guarantee",
+        "knowledge": "heuristic",
+    }
+    kinds = {c.name: c.kind for c in check_step(judged, seen, "live")}
+    assert kinds["safety_pathway"] == "heuristic" and kinds["max_words"] == "reply"
+
+    scenario = Scenario(
+        id="s", category="casual", split="dev", description="d", steps=[Step(user="hi")]
+    )
+    # The lookup check fails, the guarantees hold.
+    outcome = ScenarioOutcome(scenario, [(0, c) for c in check_step(explicit, seen, "live")])
+    assert outcome.passed is False
+    assert outcome.held("guarantee") is True
+    assert outcome.held("heuristic") is False
+    assert outcome.held("reply") is None
+    crashed = ScenarioOutcome(scenario, [], error="boom")
+    assert crashed.held("guarantee") is False
+    summary = summarize([outcome, crashed])
+    assert summary["guarantee_pass_rate"] == 0.5
+    assert summary["heuristic_pass_rate"] == 0.0
+    assert summary["reply_pass_rate"] is None

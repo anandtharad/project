@@ -482,7 +482,8 @@ async def run(args: argparse.Namespace) -> int:
         await recorder.finish(run_id, summary)
         await engine.dispose()
         print(f"recorded run {run_id}")
-    print(json.dumps({k: summary[k] for k in ("scenarios", "checked", "pass_rate", "errors")}))
+    keys = ("scenarios", "checked", "pass_rate", "guarantee_pass_rate", "heuristic_pass_rate")
+    print(json.dumps({k: summary[k] for k in (*keys, "reply_pass_rate", "errors")}))
     print(f"written: {out.relative_to(ROOT)}")
     return 0 if summary["errors"] == 0 else 1
 
