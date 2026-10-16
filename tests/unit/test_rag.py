@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import itertools
 import json
+import sys
 import uuid
 from datetime import date
 from pathlib import Path
@@ -461,3 +462,23 @@ def test_system_prompt_adds_the_knowledge_fragment_only_when_the_prompt_has_it()
     # 1.7.0 has no knowledge fragments: the lookup changes nothing.
     older = registry.get("companion_system", "1.7.0")
     assert system_prompt(older, policy, lookup=none_found) == system_prompt(older, policy)
+
+
+def test_generation_wording_measures_read_curly_apostrophes_and_negations() -> None:
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "eval_rag", Path(__file__).resolve().parents[2] / "scripts" / "eval_rag.py"
+    )
+    assert spec is not None and spec.loader is not None
+    eval_rag = importlib.util.module_from_spec(spec)
+    sys.modules["eval_rag"] = eval_rag
+    spec.loader.exec_module(eval_rag)
+    measure = eval_rag.reply_measures
+    assert measure("I don\u2019t have a reliable source on that, but...", False)["says_no_source"]
+    assert measure("I don't have a specific study to quote.", False)["says_no_source"]
+    negated = measure("I don't have a study on that, sorry.", False)
+    assert negated["says_no_source"] and not negated["source_claim_without_evidence"]
+    claim = measure("According to the CDC, adults need 7 hours.", False)
+    assert claim["source_claim_without_evidence"] and not claim["says_no_source"]
+    assert not measure("According to the CDC [S1], ...", True)["source_claim_without_evidence"]

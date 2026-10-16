@@ -98,11 +98,57 @@ SOURCE_CLAIM = re.compile(
     re.IGNORECASE,
 )
 NO_SOURCE = re.compile(
-    r"\b(?:don't|do not|didn't) have (?:a |any )?(?:reliable |good )?(?:source|sources|reference)"
+    r"\b(?:don't|do not|didn't) have (?:a |any )?(?:\w+ )?"
+    r"(?:source|sources|reference|study|studies)\b"
     r"|\bno (?:reliable )?(?:source|sources)\b|\bcouldn't find\b|\bnot (?:in|from) (?:my|the) "
     r"(?:library|sources)\b",
     re.IGNORECASE,
 )
+
+
+def reply_measures(reply: str, evidence_given: bool) -> dict[str, Any]:
+    """Wording measures of a reply. Curly apostrophes count as straight ones:
+    models write both, and until 2026-10-16 "I don\u2019t have a source" was
+    missed."""
+    text = reply.replace("\u2019", "'")
+    # "I don't have a study on that" is not a claim to have one.
+    claims = SOURCE_CLAIM.search(NO_SOURCE.sub(" ", text))
+    return {
+        "source_claim_without_evidence": not evidence_given and bool(claims),
+        "says_no_source": bool(NO_SOURCE.search(text)),
+        "words": len(reply.split()),
+    }
+
+
+def generation_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    with_evidence = [r for r in rows if r["passages"]]
+    without = [r for r in rows if not r["passages"]]
+    all_markers = sum(r["markers"] for r in rows)
+    return {
+        "n": len(rows),
+        "with_evidence": len(with_evidence),
+        "citation_validity": (
+            round(1 - sum(r["invalid_markers"] for r in rows) / all_markers, 4)
+            if all_markers
+            else None
+        ),
+        "cites_when_evidence_given": (
+            round(sum(bool(r["cited"]) for r in with_evidence) / len(with_evidence), 4)
+            if with_evidence
+            else None
+        ),
+        "source_claim_without_evidence_rate": (
+            round(sum(r["source_claim_without_evidence"] for r in without) / len(without), 4)
+            if without
+            else None
+        ),
+        "says_no_source_when_none": (
+            round(sum(r["says_no_source"] for r in without) / len(without), 4) if without else None
+        ),
+        "mean_words": round(sum(r["words"] for r in rows) / len(rows), 1) if rows else None,
+    }
+
+
 THRESHOLDS = [round(0.50 + 0.01 * i, 2) for i in range(41)]  # 0.50 .. 0.90
 LEXICAL_THRESHOLDS = [round(0.02 * i, 2) for i in range(1, 26)]  # 0.02 .. 0.50
 POOL = 20
@@ -710,10 +756,7 @@ async def eval_generation(args: argparse.Namespace) -> int:
                 "markers": markers,
                 "invalid_markers": check.invalid,
                 "cited": [c.marker for c in check.citations],
-                "source_claim_without_evidence": not lookup.items
-                and bool(SOURCE_CLAIM.search(reply)),
-                "says_no_source": bool(NO_SOURCE.search(reply)),
-                "words": len(reply.split()),
+                **reply_measures(reply, bool(lookup.items)),
             }
             rows.append(row)
             packets.append(
@@ -736,32 +779,7 @@ async def eval_generation(args: argparse.Namespace) -> int:
             await embeddings.aclose()
         await engine.dispose()
         await drop_database(settings.database_url, url)
-    with_evidence = [r for r in rows if r["passages"]]
-    without = [r for r in rows if not r["passages"]]
-    all_markers = sum(r["markers"] for r in rows)
-    metrics = {
-        "n": len(rows),
-        "with_evidence": len(with_evidence),
-        "citation_validity": (
-            round(1 - sum(r["invalid_markers"] for r in rows) / all_markers, 4)
-            if all_markers
-            else None
-        ),
-        "cites_when_evidence_given": (
-            round(sum(bool(r["cited"]) for r in with_evidence) / len(with_evidence), 4)
-            if with_evidence
-            else None
-        ),
-        "source_claim_without_evidence_rate": (
-            round(sum(r["source_claim_without_evidence"] for r in without) / len(without), 4)
-            if without
-            else None
-        ),
-        "says_no_source_when_none": (
-            round(sum(r["says_no_source"] for r in without) / len(without), 4) if without else None
-        ),
-        "mean_words": round(sum(r["words"] for r in rows) / len(rows), 1) if rows else None,
-    }
+    metrics = generation_metrics(rows)
     payload = {
         "eval": "rag-generation",
         "split": args.split,
@@ -778,6 +796,33 @@ async def eval_generation(args: argparse.Namespace) -> int:
     )
     print(json.dumps(metrics, indent=2))
     print(f"written: {out.relative_to(ROOT)} and {packet_path.name}")
+    return 0
+
+
+def rescore_generation(args: argparse.Namespace) -> int:
+    """Recompute a generation result's wording measures from its saved
+    replies (the .packets.json file) after a change to the measures. Replies
+    and other fields are unchanged; the file records when and why."""
+    path = Path(args.result)
+    result = json.loads(path.read_text(encoding="utf-8"))
+    replies = {
+        p["id"]: p["reply"]
+        for p in json.loads(path.with_suffix(".packets.json").read_text(encoding="utf-8"))
+    }
+    before = result["metrics"]
+    for row in result["rows"]:
+        row.update(reply_measures(replies[row["id"]], bool(row["passages"])))
+    result["metrics"] = generation_metrics(result["rows"])
+    result.setdefault("rescored", []).append(
+        {
+            "at": datetime.now(UTC).isoformat(timespec="seconds"),
+            "reason": args.reason,
+            "metrics_before": before,
+        }
+    )
+    path.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    changed = {k: (before.get(k), v) for k, v in result["metrics"].items() if before.get(k) != v}
+    print(f"{path.name}: {changed or 'no change'}")
     return 0
 
 
@@ -807,11 +852,16 @@ def main() -> int:
     generation.add_argument("--split", choices=["dev", "test", "all"], default="test")
     generation.add_argument("--limit", type=int, help="at most this many queries")
     generation.add_argument("--pause", type=float, default=20.0, help="seconds between calls")
+    rescore = sub.add_parser("rescore", help="recompute a generation result's wording measures")
+    rescore.add_argument("result", help="eval/results/rag-generation-*.json")
+    rescore.add_argument("--reason", required=True)
     args = parser.parse_args()
     if args.mode == "routing":
         return eval_routing(args)
     if args.mode == "generation":
         return asyncio.run(eval_generation(args))
+    if args.mode == "rescore":
+        return rescore_generation(args)
     return asyncio.run(eval_retrieval(args))
 
 
