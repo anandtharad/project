@@ -1,0 +1,14 @@
+# Fine-tuning environment for scripts/train_sft.py, separate from the app
+# (docs/fine-tuning.md, "Training"). Versions are the ones the smoke test
+# passed with on 2026-10-16 (CPU); pin them for a reproducible run.
+#
+# Install PyTorch first (2.6 or newer; tested with 2.14.1), for your CUDA
+# version (https://pytorch.org), then:
+#   pip install -r training/requirements.txt
+# For 4-bit QLoRA on an NVIDIA GPU, also: pip install bitsandbytes==0.50.2
+# TRL needs Python 3.11 or newer.
+trl==1.16.0
+transformers==5.20.1
+peft==0.21.2
+datasets==5.1.0
+accelerate==1.15.0

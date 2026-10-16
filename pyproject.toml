@@ -74,6 +74,12 @@ plugins = ["pydantic.mypy"]
 exclude = ["^migrations/versions/"]
 
 [[tool.mypy.overrides]]
+# Training libraries live in their own environment (training/requirements.txt);
+# scripts/train_sft.py imports them lazily.
+module = ["torch", "torch.*", "transformers", "transformers.*", "trl", "trl.*", "peft", "peft.*", "datasets", "datasets.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
 module = ["tests.*"]
 disallow_untyped_defs = false
 disallow_incomplete_defs = false

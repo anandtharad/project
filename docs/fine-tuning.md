@@ -1,8 +1,9 @@
 # Fine-tuning preparation (Phase 7)
 
 Fine-tuning is planned but deferred (spec §17). The system works with a
-standard instruction model. This phase prepares data and plans experiments:
-**no training run was made, and no data has been approved for one.**
+standard instruction model. This phase prepares data, the training setup and
+the experiments: **no training run was made, and no data has been approved
+for one.**
 
 ## Sources and approval (spec §17.2)
 
@@ -124,6 +125,76 @@ message, with a hard-coded default date, and Meta's own documents disagree
 on them. For Llama 3.1 and any other model, use `trl`, so the model's own
 template is applied.
 
+## Training (ready, not run)
+
+`scripts/train_sft.py` trains a LoRA adapter (or 4-bit QLoRA) on an
+exported build with TRL's `SFTTrainer`. It runs in its own environment, not
+the app's, and needs a GPU for a real model:
+
+```bash
+# once, in a separate environment (Python 3.11+): PyTorch for your CUDA, then
+pip install -r training/requirements.txt        # + bitsandbytes==0.50.2 for QLoRA
+python scripts/train_sft.py smoke --precision fp16 --load-in-4bit   # about a minute
+
+uv run python scripts/prepare_training_data.py export --build <id> --format trl
+python scripts/train_sft.py check --config training/configs/sft-qlora-t4.toml
+python scripts/train_sft.py train --config training/configs/sft-qlora-t4.toml
+python scripts/train_sft.py merge --config training/configs/sft-qlora-t4.toml \
+    --run training/runs/<run id> --out <folder>
+```
+
+**What `check` verifies before any GPU time is spent:**
+- the exported `trl-train.jsonl` / `trl-validation.jsonl` match the build
+  manifest (row counts and SHA-256), every row is a conversational
+  prompt-completion row, and every source in the build has a recorded
+  approval;
+- the model has a chat template, it keeps the system message, and each
+  prompt renders as a prefix of prompt + reply (TRL's completion-only loss
+  starts where the two diverge);
+- every row's token length against `max_length`. TRL truncates from the end
+  and silently drops rows left with no reply tokens; here longer rows are
+  dropped explicitly and counted in `run.json` (`over_length = "error"`
+  refuses instead);
+- the precision against the GPU: TRL defaults to bf16, which a T4 lacks
+  (and `torch.cuda.is_bf16_supported()` counts emulation, so the check asks
+  for native support).
+
+**What `train` records** in `training/runs/<run id>/run.json` (git-ignored
+with the adapter): the config, build id and data checksums, the sources'
+licences and approvals, the system prompt reference, the base model and
+revision, package versions, rows dropped and why, and the logged losses.
+Only the adapter is saved; the base model is downloaded again to serve or
+merge it.
+
+**Settings that differ from the libraries' defaults, on purpose:**
+
+| Setting | Here | Library default | Why |
+|---|---|---|---|
+| model dtype | from `precision` | float32 when TRL loads a model by name | half the memory |
+| `bf16` / `fp16` | from `precision` | bf16 unless fp16 is set | a T4 has no bf16 |
+| LoRA `r` / `alpha` / `dropout` | 16 / 32 / 0.05 | 8 / 8 / 0.0 (PEFT) | TRL's CLI defaults |
+| `target_modules` | `all-linear` | query and value only (PEFT) | QLoRA trains every linear layer; `lm_head` is excluded, which TRL requires |
+| `learning_rate` | 2e-4 | 2e-5 | TRL's documented rate for LoRA |
+| `max_length` | 2048 | 1024 | multi-turn prompts; over-length rows are dropped and counted |
+| `eval_strategy` | every `eval_steps` | none | validation loss is recorded |
+| `completion_only_loss` | true | true for prompt-completion data | explicit: loss on the reply only |
+| telemetry | off (`HF_HUB_DISABLE_TELEMETRY=1`) | TRL sends a usage ping | |
+
+`prepare_model_for_kbit_training` is not called: TRL 1.16.0's trainer
+builds the PEFT model itself and casts the adapter for 4-bit models.
+
+**Verified here:** `train_sft.py smoke` ran on CPU (fp32) with TRL's tiny
+test model and trl 1.16.0, transformers 5.20.1, peft 0.21.2, datasets
+5.1.0, accelerate 1.15.0, torch 2.14.1: checks, two training steps with
+validation, the adapter saved, merged, and the merged model generated. Not
+verified: a GPU run, 4-bit QLoRA, and any real model. Run `smoke --precision
+fp16 --load-in-4bit` on the target GPU first.
+
+The API facts (TRL `SFTTrainer` / `SFTConfig`, PEFT `LoraConfig`,
+transformers `BitsAndBytesConfig`, bitsandbytes GPU support) were read from
+each project's source at the release tag and its documentation on
+2026-10-16.
+
 ## Baseline failures that fine-tuning might address (spec §17.1, §17.5)
 
 Measured, with the prompted and orchestrated system:
@@ -174,6 +245,8 @@ Proceed only when all of these hold:
 4. **Preference optimisation (DPO) needs a reviewed preference dataset.**
    It must not rank longer or more emotional replies higher by default.
 
-Not yet decided: which open-weights model to tune, and where. The reply
+Not yet decided: which open-weights model to tune, and where.
+`training/configs/sft-qlora-t4.toml` uses Qwen2.5-7B-Instruct (Apache-2.0,
+a chat template with a system role) as an example only. The reply
 model in use (`openai/gpt-oss-120b` on Groq) is served by a provider.
 Whether and how it can be fine-tuned there has not been checked.

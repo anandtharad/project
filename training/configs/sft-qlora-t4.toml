@@ -1,0 +1,45 @@
+# 4-bit QLoRA on one 16 GB NVIDIA T4 (Kaggle or Colab), for scripts/train_sft.py
+# (docs/fine-tuning.md, "Training"). An example: the model to tune is not
+# decided yet. Run `python scripts/train_sft.py check --config <this file>`
+# first; it verifies the data, the chat template, row lengths and precision.
+
+[data]
+# scripts/prepare_training_data.py build, then export --format trl.
+build = "<build id>"
+build_dir = "training/build"
+# Rows longer than train.max_length: "drop" (counted in run.json) or "error".
+over_length = "drop"
+
+[model]
+# Apache-2.0, chat template with a system role (model card and
+# tokenizer_config.json, checked 2026-10-16). Pinned to a commit.
+id = "Qwen/Qwen2.5-7B-Instruct"
+revision = "a09a35458c702b33eeacc393d103063234e8bc28"
+trust_remote_code = false
+
+[lora]
+r = 16
+alpha = 32
+dropout = 0.05
+target_modules = "all-linear"
+
+[quantization]
+# NF4 with double quantization; bitsandbytes needs compute capability 6.0+.
+load_in_4bit = true
+
+[train]
+# A T4 has no bf16.
+precision = "fp16"
+max_length = 2048
+epochs = 1
+learning_rate = 2.0e-4
+per_device_batch_size = 1
+gradient_accumulation_steps = 16
+gradient_checkpointing = true
+# TRL's QLoRA notebook for a free Colab T4 uses this optimizer.
+optim = "paged_adamw_8bit"
+logging_steps = 10
+eval_steps = 100
+save_steps = 100
+seed = 20261016
+output_dir = "training/runs"

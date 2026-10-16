@@ -87,11 +87,11 @@ unmodified here.
 
 | Suite | Result |
 |---|---|
-| unit | 778 passed |
+| unit | 783 passed |
 | integration | 119 passed |
 | security | 57 passed |
 | live | 8 skipped (opt-in; run with `scripts/dev.py live-groq`) |
-| **total** | **954 passed, 8 skipped** (2026-10-16, after the voice interface) |
+| **total** | **959 passed, 8 skipped** (2026-10-16, after the voice interface and the training setup) |
 
 Live runs made from this environment once network access was allowed
 (2026-10-13): Groq live tests, strict structured state extraction, the
@@ -347,7 +347,7 @@ all built. See [memory.md](memory.md).
 | Dataset preparation is reproducible | Met (fixtures) | the pipeline is deterministic; a build twice gives identical records and build id (`test_splits_are_by_conversation_and_builds_are_reproducible`); the manifest records file and evaluation-set checksums. Not yet run on real data: nothing is approved |
 | Every example has provenance | Met | `TrainingRecord.provenance`: source, URL, licence, file SHA-256, conversation id, turn, synthetic flag, every transformation with its version |
 | Held-out evaluation is isolated | Met | conversations used by any evaluation item are excluded; any example repeating an evaluation text or sharing an 8-word run with one is dropped (all 13 evaluation files indexed); EmpatheticDialogues valid/test are never read; splits are by conversation |
-| No training run is required | Met | none was made |
+| No training run is required | Met | none was made. The training setup is ready (`scripts/train_sft.py`: check, train, merge, smoke); its smoke test passed on CPU with a tiny test model, not yet on a GPU |
 | No unapproved data is used | Met | a build refuses unapproved sources and files whose SHA-256 differs from the audit; approvals need a name and date; none is given |
 
 ## Voice (companion prompt 1.5.0, added on request)
