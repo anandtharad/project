@@ -233,7 +233,7 @@ class TurnOrchestrator:
         trace.mark(TurnStage.POLICY_CREATED)
 
         context = self._context_builder.build(
-            system=self._system_prompt(policy, safety),
+            system=self._system_prompt(policy, safety, lookup),
             history=_history_for_model(begun.history),
             notes=state.notes() if state is not None and not state.is_empty() else None,
             memories=_memories_for_context(recalled),
@@ -423,13 +423,23 @@ class TurnOrchestrator:
             return None
         return await self._memory.retrieve_for_turn(user_id, content)
 
-    def _system_prompt(self, policy: ResponsePolicy, safety: SafetyDecision | None = None) -> str:
+    def _system_prompt(
+        self,
+        policy: ResponsePolicy,
+        safety: SafetyDecision | None = None,
+        lookup: KnowledgeLookup | None = None,
+    ) -> str:
         if not self._policy_enabled:
             return self._prompt.render()
         if safety is not None and safety.overrides_strategy:
             guidance = guidance_for(self._prompt, safety)
         else:
-            guidance = "\n\n".join(self._prompt.fragment(name) for name in policy.fragments)
+            names = [*policy.fragments]
+            knowledge = lookup.guidance_fragment() if lookup is not None else None
+            # Prompts before 1.8.0 have no knowledge fragments.
+            if knowledge is not None and knowledge in self._prompt.fragments:
+                names.append(knowledge)
+            guidance = "\n\n".join(self._prompt.fragment(name) for name in names)
         return self._prompt.render(response_guidance=guidance)
 
     async def _assess(self, content: str, begun: StartedTurn) -> SafetyAssessment | None:

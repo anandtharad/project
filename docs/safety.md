@@ -100,7 +100,7 @@ Deterministic checks run on every reply:
 | `manipulation` | "if you leave I'll be sad" |
 | `prompt_leak` | Internal markers, or any 12-word run of the system prompt |
 | `outdated_resource` | Retired services (e.g. Samaritans' email, closed 30 Sep 2026; India's KIRAN line) |
-| `unlisted_contact` | On safety pathways, any number or site not in the region's verified list |
+| `unlisted_contact` | Any phone number or email address not in the region's verified list, on every pathway (a live knowledge run invented a service number on an ordinary turn); on safety pathways also any unlisted link |
 
 On safety pathways a **semantic check** (`prompts/safety_output/1.0.0.toml`,
 same model as the classifier) also asks whether the reply gives harmful

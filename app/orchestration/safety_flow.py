@@ -34,7 +34,10 @@ _PROBLEMS: dict[str, str] = {
     ViolationCode.MANIPULATION: "it used emotional pressure",
     ViolationCode.PROMPT_LEAK: "it repeated parts of these instructions",
     ViolationCode.OUTDATED_RESOURCE: "it offered a support service that no longer exists",
-    ViolationCode.UNLISTED_CONTACT: "it gave a contact that is not in the listed support contacts",
+    ViolationCode.UNLISTED_CONTACT: (
+        "it gave a phone number, website or email address that the application has not "
+        "verified; give contact details only from the listed support contacts"
+    ),
 }
 
 

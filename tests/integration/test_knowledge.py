@@ -464,3 +464,33 @@ async def test_a_turn_emits_the_observability_events(
     assert versions["safety_policy"] and versions["embedding_model"]
     assert completed[0]["knowledge"] == "ok" and completed[0]["citations"] == 1
     assert "private-note-5521" not in json.dumps(events)
+
+
+async def test_prompt_180_adds_the_knowledge_fragment_that_fits(
+    database_url: str,
+    clean_db: None,
+    manifest: Manifest,
+    sessions: async_sessionmaker[AsyncSession],
+    llm: ScriptedLLMClient,
+) -> None:
+    from app.prompting import PromptRegistry
+
+    prompt = PromptRegistry().get("companion_system", "1.8.0")
+    evidence = prompt.fragment("knowledge_evidence")
+    none_found = prompt.fragment("knowledge_no_sources")
+    await run_ingest(manifest, sessions)
+    settings = make_settings(
+        database_url=database_url,
+        companion_prompt_version="1.8.0",
+        knowledge_min_semantic=RETRIEVAL.min_semantic,
+    )
+    async with running_app(settings, llm) as (_, c):
+        llm.queue("Seven or more hours [S1].", "Not sure.", "Morning!")
+        cid = await create_conversation(c, ALICE)
+        await send(c, cid, "how much sleep do adults need?")
+        await send(c, cid, "what's the best pasta recipe with tomatoes?")
+        await send(c, cid, "good morning")
+    found, nothing, casual = (r.system for r in llm.requests)
+    assert evidence in found and none_found not in found
+    assert none_found in nothing and evidence not in nothing
+    assert evidence not in casual and none_found not in casual

@@ -42,6 +42,15 @@ class KnowledgeLookup:
             return self
         return replace(self, status="skipped_safety", items=())
 
+    def guidance_fragment(self) -> str | None:
+        """The companion prompt's knowledge fragment for this lookup (1.8.0+),
+        or None when no lookup ran or it was dropped for a safety pathway."""
+        if self.items:
+            return "knowledge_evidence"
+        if self.route.retrieve and self.status in ("no_results", "unavailable"):
+            return "knowledge_no_sources"
+        return None
+
     def evidence_block(self) -> str | None:
         if self.items:
             return render_evidence(

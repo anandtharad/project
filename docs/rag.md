@@ -379,7 +379,52 @@ reproducible with `--reranker`.
 
 ### Generation
 
-To be filled in from the live run.
+20 test queries (10 answerable, 10 unanswerable) went through routing,
+retrieval and the reply model, Groq `openai/gpt-oss-120b`, with
+`companion_system@1.7.0`. File: `rag-generation-test-20261015T171712.json`;
+replies and passages are in `.packets.json`, synthetic queries only.
+
+| | |
+|---|---|
+| Replies with evidence | 8 of 20 (all routed by v4) |
+| Citation validity (markers that resolve) | **100%** (no invalid marker) |
+| Replies that cite when evidence was given | **3 of 8** |
+| Replies without evidence that still claim a source ("studies show") | 2 of 12 |
+| Replies that say no source answers, when none does | **0** |
+
+**What went wrong, read from the replies:**
+
+- **Evidence used without citing it.** The model often used a passage
+  without citing it ("the research notes there's no drug that cures
+  stress").
+- **No "no source".** When the library had nothing, it answered from
+  general knowledge, often with confident specifics: a meditation course's
+  price, CPAP brands, protein targets, UK sick-leave rules. On the one
+  evidence request with no relevant passage ("do blue-light glasses
+  actually work?") it said "a few studies have shown..." instead of saying
+  it had no source.
+- **An invented phone number.** On an ordinary turn, the reply gave a
+  phone number for an NHS service that was in neither the passages nor the
+  verified contacts.
+
+**Changes made:**
+
+1. The output checks now reject an unverified phone number or email
+   address on every pathway, not only on safety pathways. The reply is
+   regenerated once with a note (docs/safety.md).
+2. Prompt `companion_system@1.8.0` adds two short knowledge fragments. Code
+   places them at the end of the guidance, where the policy fragments
+   already proved effective (docs/decisions.md):
+   - `knowledge_evidence`: answer from the passages that answer the
+     question, cite each sentence that uses one, and say so first if none
+     answers;
+   - `knowledge_no_sources`: say there is no reliable source for health,
+     wellbeing, product, service, money and law questions, then stay
+     general and hedged; never give numbers, websites, prices, brands or
+     doses from memory, and never attribute a claim to a study or
+     organisation.
+
+1.8.0 is not the default until a live comparison shows it helps (below).
 
 ## Limits
 

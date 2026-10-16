@@ -18,8 +18,9 @@ returns the violations found (codes and rule ids only, never text):
 - prompt_leak: any 12-word run of the system prompt (minus the resource
   lines it gave) appears in the reply, or an internal marker does.
 - outdated_resource: a known-outdated contact (resources file).
-- unlisted_contact: on a non-normal pathway, a phone number, link or email
-  that is not one of the region's resources (models invent hotlines).
+- unlisted_contact: a phone number or email address that is not one of the
+  region's verified resources, on every pathway (models invent hotlines and
+  service numbers); on a non-normal pathway also any unlisted link.
 
 These are backstops, not proof of safety. `SemanticOutputChecker` is the
 optional semantic check on non-normal pathways: the classifier model reads
@@ -455,15 +456,16 @@ class SafetyOutputValidator:
         add(ViolationCode.MANIPULATION, ["manipulation"] if _MANIPULATION.search(text) else [])
         add(ViolationCode.PROMPT_LEAK, _leak(reply, text, system_prompt, decision))
         add(ViolationCode.OUTDATED_RESOURCE, outdated_in(reply, self.directory.outdated))
-        if non_normal:
-            add(
-                ViolationCode.UNLISTED_CONTACT,
-                _unlisted(
-                    text,
-                    self.directory.allowed_numbers(decision.region),
-                    self.directory.allowed_domains(decision.region),
-                ),
-            )
+        unlisted = _unlisted(
+            text,
+            self.directory.allowed_numbers(decision.region),
+            self.directory.allowed_domains(decision.region),
+        )
+        if not non_normal:
+            # Links are common in ordinary replies; numbers and emails from
+            # memory are not (a live run invented a service phone number).
+            unlisted = [rule for rule in unlisted if rule != "unlisted.link"]
+        add(ViolationCode.UNLISTED_CONTACT, unlisted)
         return OutputCheck(tuple(found))
 
 

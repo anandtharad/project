@@ -226,3 +226,21 @@ async def test_safety_records_are_deleted_with_the_conversation(
             {"cid": uuid.UUID(cid)},
         )
     assert count == 0
+
+
+async def test_an_invented_phone_number_on_an_ordinary_turn_is_regenerated(
+    client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
+) -> None:
+    llm.queue(
+        "You can ring the local service on 0300 123 5000.",
+        "The service's own website will have the right number.",
+    )
+    cid = await create_conversation(client, ALICE)
+    response = await send(client, cid, "how do i reach my local talking therapy service?")
+    assert response.json()["assistant_content"] == (
+        "The service's own website will have the right number."
+    )
+    assert "has not verified" in llm.requests[1].system
+    row = await safety_row(db_engine, cid)
+    assert row["pathway"] == "normal" and row["recovery"] == "regenerated"
+    assert row["output_violations"] == ["unlisted_contact"]
