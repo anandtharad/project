@@ -70,12 +70,12 @@ async def submit_message(
         created_at=turn.created_at,
         replayed=turn.replayed,
         timing_ms=result.timings_ms if settings.expose_timing_metadata else None,
-        safety=_safety_notice(turn),
+        safety=safety_notice(turn),
         sources=[CitedSource.model_validate(s) for s in turn.sources],
     )
 
 
-def _safety_notice(turn: CompletedTurn) -> SafetyNotice | None:
+def safety_notice(turn: CompletedTurn) -> SafetyNotice | None:
     if turn.safety_pathway is None or turn.safety_pathway == Pathway.NORMAL:
         return None
     pathway = Pathway(turn.safety_pathway)

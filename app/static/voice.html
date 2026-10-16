@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Companion voice</title>
+<style>
+  :root { --bg: #fafaf9; --fg: #1c1917; --muted: #78716c; --line: #e7e5e4; --accent: #0f766e; --you: #e0f2fe; --them: #f5f5f4; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #1c1917; --fg: #f5f5f4; --muted: #a8a29e; --line: #44403c; --accent: #2dd4bf; --you: #0c4a6e; --them: #292524; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.45 system-ui, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 16px; display: grid; gap: 12px; }
+  fieldset { border: 1px solid var(--line); border-radius: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  input[type=text], input[type=password] { flex: 1 1 180px; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; }
+  button { padding: 8px 14px; border: 1px solid var(--accent); border-radius: 6px; background: transparent; color: var(--accent); cursor: pointer; }
+  button:disabled { opacity: .4; cursor: default; }
+  #talk { flex: 1; padding: 18px; font-size: 18px; user-select: none; touch-action: none; }
+  #talk.on { background: var(--accent); color: var(--bg); }
+  #state { font-size: 13px; color: var(--muted); }
+  #log { display: grid; gap: 8px; }
+  .msg { padding: 8px 12px; border-radius: 10px; max-width: 85%; white-space: pre-wrap; }
+  .you { background: var(--you); justify-self: end; }
+  .them { background: var(--them); }
+  .note { color: var(--muted); font-size: 13px; }
+  .interim { opacity: .6; font-style: italic; }
+</style>
+</head>
+<body>
+<main>
+  <h1 style="margin:0;font-size:20px">Companion voice (development)</h1>
+  <fieldset>
+    <input id="token" type="password" placeholder="Development token (DEV_AUTH_TOKENS)" autocomplete="off">
+    <label><input id="out-text" type="checkbox" checked> text</label>
+    <label><input id="out-audio" type="checkbox" checked> audio</label>
+    <button id="connect">Connect</button>
+  </fieldset>
+  <div id="state">Not connected.</div>
+  <div id="log"></div>
+  <fieldset>
+    <input id="text" type="text" placeholder="Type a message" disabled>
+    <button id="send" disabled>Send</button>
+  </fieldset>
+  <button id="talk" disabled>Hold to talk</button>
+  <p class="note">Half duplex: one side speaks at a time. Hold the button (or the space bar) while you talk; the companion replies when you let go.</p>
+</main>
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const log = $("log");
+let ws = null, state = "closed", inputRate = 16000, outputRate = 16000;
+let audioCtx = null, micNode = null, micStream = null, talking = false;
+let playAt = 0, pendingAudioEnd = false, interimEl = null;
+
+function note(text) { const el = document.createElement("div"); el.className = "note"; el.textContent = text; log.append(el); el.scrollIntoView(); }
+function bubble(text, who) { const el = document.createElement("div"); el.className = "msg " + who; el.textContent = text; log.append(el); el.scrollIntoView(); return el; }
+function setState(next) {
+  state = next;
+  $("state").textContent = "State: " + next;
+  const listening = next === "listening";
+  $("talk").disabled = !listening && !talking;
+  $("text").disabled = $("send").disabled = !listening;
+}
+
+async function api(path, method = "POST") {
+  const res = await fetch(path, { method, headers: { Authorization: "Bearer " + $("token").value.trim() } });
+  if (!res.ok) throw new Error(path + ": " + res.status + " " + (await res.text()));
+  return res.json();
+}
+
+$("connect").onclick = async () => {
+  try {
+    const { conversation_id } = await api("/v1/conversations");
+    const { ticket, path } = await api(`/v1/conversations/${conversation_id}/voice/tickets`);
+    const scheme = location.protocol === "https:" ? "wss:" : "ws:";
+    ws = new WebSocket(`${scheme}//${location.host}${path}?ticket=${encodeURIComponent(ticket)}`);
+    ws.binaryType = "arraybuffer";
+    ws.onopen = () => {
+      const output = [];
+      if ($("out-text").checked) output.push("text");
+      if ($("out-audio").checked) output.push("audio");
+      ws.send(JSON.stringify({ type: "start", output: output.length ? output : ["text"] }));
+    };
+    ws.onmessage = (event) => (typeof event.data === "string" ? onEvent(JSON.parse(event.data)) : play(event.data));
+    ws.onclose = (event) => { setState("closed"); note(`Disconnected (${event.code}${event.reason ? " " + event.reason : ""}).`); };
+    $("connect").disabled = true;
+  } catch (err) { note(String(err)); }
+};
+
+function onEvent(e) {
+  switch (e.type) {
+    case "ready":
+      inputRate = e.input_audio.sample_rate;
+      if (e.output_audio) outputRate = e.output_audio.sample_rate;
+      note(`Connected. Input: ${e.input.join(", ")}. Output: ${e.output.join(", ")}. Duplex: ${e.duplex}.`);
+      if (!e.input.includes("audio")) $("talk").textContent = "Speech input not configured";
+      break;
+    case "state": setState(e.state); break;
+    case "transcript":
+      if (!interimEl) interimEl = bubble("", "you interim");
+      interimEl.textContent = e.text;
+      if (e.final) { interimEl.classList.remove("interim"); interimEl = null; }
+      break;
+    case "reply": {
+      let text = e.text;
+      if (e.sources && e.sources.length) text += "\n\nSources: " + e.sources.map((s) => s.title).join("; ");
+      if (e.safety && e.safety.resources) text += "\n\n" + e.safety.resources.map((r) => `${r.name}: ${r.contact}`).join("\n");
+      bubble(text, "them");
+      break;
+    }
+    case "audio_end": pendingAudioEnd = true; checkPlaybackDone(); break;
+    case "no_speech": note("Nothing was heard."); break;
+    case "interrupted": playAt = 0; note("Interrupted."); break;
+    case "error": note(`Error: ${e.message} (${e.code})`); break;
+  }
+}
+
+// --- playback: 16-bit PCM frames scheduled back to back ----------------------
+function ensureAudio() {
+  if (!audioCtx) audioCtx = new AudioContext();
+  if (audioCtx.state === "suspended") audioCtx.resume();
+  return audioCtx;
+}
+function play(buffer) {
+  const ctx = ensureAudio();
+  const pcm = new Int16Array(buffer);
+  const out = ctx.createBuffer(1, pcm.length, outputRate);
+  const channel = out.getChannelData(0);
+  for (let i = 0; i < pcm.length; i++) channel[i] = pcm[i] / 32768;
+  const source = ctx.createBufferSource();
+  source.buffer = out;
+  source.connect(ctx.destination);
+  playAt = Math.max(playAt, ctx.currentTime + 0.05);
+  source.start(playAt);
+  playAt += out.duration;
+}
+function checkPlaybackDone() {
+  if (!pendingAudioEnd) return;
+  const left = audioCtx ? playAt - audioCtx.currentTime : 0;
+  if (left > 0.05) { setTimeout(checkPlaybackDone, Math.min(left * 1000, 250)); return; }
+  pendingAudioEnd = false;
+  ws && ws.readyState === 1 && ws.send(JSON.stringify({ type: "playback_done" }));
+}
+
+// --- microphone: resampled to the server's rate, 16-bit PCM, ~100 ms frames ---
+const WORKLET = `
+class Capture extends AudioWorkletProcessor {
+  constructor(options) { super(); this.ratio = sampleRate / options.processorOptions.rate; this.pos = 0; this.buf = []; this.frame = Math.round(options.processorOptions.rate / 10); }
+  process(inputs) {
+    const input = inputs[0][0];
+    if (!input) return true;
+    for (; this.pos < input.length; this.pos += this.ratio) {
+      const i = Math.floor(this.pos), f = this.pos - i, next = i + 1 < input.length ? input[i + 1] : input[i];
+      const s = Math.max(-1, Math.min(1, input[i] * (1 - f) + next * f));
+      this.buf.push(s < 0 ? s * 0x8000 : s * 0x7fff);
+      if (this.buf.length >= this.frame) { this.port.postMessage(Int16Array.from(this.buf).buffer); this.buf = []; }
+    }
+    this.pos -= input.length;
+    return true;
+  }
+}
+registerProcessor("capture", Capture);`;
+
+async function startTalking() {
+  if (talking || state !== "listening" || !ws) return;
+  talking = true;
+  $("talk").classList.add("on");
+  const ctx = ensureAudio();
+  if (!micNode) {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
+    await ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([WORKLET], { type: "application/javascript" })));
+    micNode = new AudioWorkletNode(ctx, "capture", { processorOptions: { rate: inputRate } });
+    ctx.createMediaStreamSource(micStream).connect(micNode);
+    micNode.port.onmessage = (event) => { if (talking && ws && ws.readyState === 1) ws.send(event.data); };
+  }
+}
+function stopTalking() {
+  if (!talking) return;
+  talking = false;
+  $("talk").classList.remove("on");
+  ws && ws.readyState === 1 && ws.send(JSON.stringify({ type: "end_of_speech" }));
+}
+const talk = $("talk");
+talk.addEventListener("pointerdown", (e) => { e.preventDefault(); startTalking(); });
+talk.addEventListener("pointerup", stopTalking);
+talk.addEventListener("pointerleave", stopTalking);
+document.addEventListener("keydown", (e) => { if (e.code === "Space" && document.activeElement !== $("text") && !e.repeat) { e.preventDefault(); startTalking(); } });
+document.addEventListener("keyup", (e) => { if (e.code === "Space" && document.activeElement !== $("text")) stopTalking(); });
+
+function sendText() {
+  const value = $("text").value.trim();
+  if (!value || !ws) return;
+  bubble(value, "you");
+  ws.send(JSON.stringify({ type: "text", content: value }));
+  $("text").value = "";
+}
+$("send").onclick = sendText;
+$("text").addEventListener("keydown", (e) => { if (e.key === "Enter") sendText(); });
+</script>
+</body>
+</html>

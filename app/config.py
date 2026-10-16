@@ -271,6 +271,32 @@ class Settings(BaseSettings):
     # --- Prompts ------------------------------------------------------------
     companion_prompt_version: str = "1.7.0"
 
+    # --- Voice (docs/voice-interface.md) --------------------------------------
+    # Speech in and out over a WebSocket, beside the text API. Off by default.
+    voice_enabled: bool = False
+    stt_provider: Literal["none", "deepgram", "sarvam", "gnani", "fake"] = "none"
+    tts_provider: Literal["none", "deepgram", "sarvam", "gnani", "fake"] = "none"
+    # Unset = the provider's default model / voice (app/voice/factory.py).
+    stt_model: str | None = None
+    tts_model: str | None = None
+    tts_voice: str | None = None
+    # BCP-47 language of the conversation, e.g. en-IN, en-US, hi-IN.
+    voice_language: str = "en-IN"
+    # The client sends 16-bit mono PCM at this rate.
+    voice_input_sample_rate: int = Field(default=16_000, ge=8_000, le=48_000)
+    # One side speaks at a time. "full" (barge-in) is not available yet.
+    voice_duplex: Literal["half"] = "half"
+    # "client": push-to-talk, the turn ends when the person lets go.
+    # "provider": hands-free, the speech-to-text provider's end of utterance.
+    voice_end_of_turn: Literal["client", "provider"] = "client"
+    voice_max_utterance_seconds: float = Field(default=60.0, ge=5.0, le=300.0)
+    # A WebSocket connects with a single-use ticket from
+    # POST /v1/conversations/{id}/voice/tickets, valid this long.
+    voice_ticket_ttl_seconds: int = Field(default=60, ge=10, le=600)
+    deepgram_api_key: SecretStr | None = None
+    sarvam_api_key: SecretStr | None = None
+    gnani_api_key: SecretStr | None = None
+
     # --- Diagnostics --------------------------------------------------------
     expose_timing_metadata: bool = True
 
@@ -310,6 +336,14 @@ class Settings(BaseSettings):
             from app.llm.providers.registry import resolve_decision_llm
 
             resolve_decision_llm(self)
+        if self.voice_enabled:
+            for kind, provider in (("STT", self.stt_provider), ("TTS", self.tts_provider)):
+                if provider in ("none", "fake"):
+                    continue
+                if getattr(self, f"{provider}_api_key") is None:
+                    raise ValueError(
+                        f"{kind}_PROVIDER={provider} requires {provider.upper()}_API_KEY"
+                    )
         if self.safety_enabled:
             from app.safety.resources import normalize_region
 
@@ -330,6 +364,8 @@ class Settings(BaseSettings):
                 raise ValueError("EMBEDDING_PROVIDER=fake is a development stub")
             if self.expose_timing_metadata:
                 raise ValueError("EXPOSE_TIMING_METADATA must be false in production")
+            if "fake" in (self.stt_provider, self.tts_provider):
+                raise ValueError("STT_PROVIDER / TTS_PROVIDER=fake are development stubs")
         return self
 
     def dev_token_map(self) -> dict[str, str]:

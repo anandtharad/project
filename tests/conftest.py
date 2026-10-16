@@ -41,6 +41,12 @@ _ISOLATED_ENV_PREFIXES = (
     "TYPESAFE_",
     "EMBEDDING_",
     "MEMORY_",
+    "VOICE_",
+    "STT_",
+    "TTS_",
+    "DEEPGRAM_",
+    "SARVAM_",
+    "GNANI_",
 )
 _ISOLATED_ENV_NAMES = {
     "MAX_OUTPUT_TOKENS",

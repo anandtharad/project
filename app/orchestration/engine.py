@@ -35,6 +35,7 @@ import asyncio
 import logging
 import uuid
 from dataclasses import dataclass
+from typing import Any
 
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -146,7 +147,11 @@ class TurnOrchestrator:
         conversation_id: uuid.UUID,
         content: str,
         idempotency_key: str | None,
+        input_metadata: dict[str, Any] | None = None,
     ) -> TurnResult:
+        """`input_metadata` describes how the message arrived (a spoken turn:
+        the speech-to-text provider and model); it is stored with the reply.
+        Typed messages default to {"modality": "text"}."""
         trace = TurnTrace(trace_id)
         trace.mark(TurnStage.VALIDATED)
 
@@ -169,7 +174,15 @@ class TurnOrchestrator:
             history_messages=len(begun.history),
         )
         try:
-            return await self._run(begun, trace, trace_id, user_id, conversation_id, content)
+            return await self._run(
+                begun,
+                trace,
+                trace_id,
+                user_id,
+                conversation_id,
+                content,
+                input_metadata or {"modality": "text"},
+            )
         except (AppError, TurnAttemptLost):
             raise
         except Exception:
@@ -187,6 +200,7 @@ class TurnOrchestrator:
         user_id: uuid.UUID,
         conversation_id: uuid.UUID,
         content: str,
+        input_metadata: dict[str, Any],
     ) -> TurnResult:
         previous = begun.state.state if begun.state is not None else None
         # Independent, so they run concurrently; none can fail the turn.
@@ -303,6 +317,7 @@ class TurnOrchestrator:
             metadata={
                 "requested_model": response.requested_model,
                 "prompt_checksum": self._prompt.checksum,
+                "input": input_metadata,
                 "finish_reason": response.finish_reason.value,
                 "raw_finish_reason": response.raw_finish_reason,
                 "fallback_used": response.fallback_used,

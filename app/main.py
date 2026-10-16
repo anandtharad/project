@@ -13,7 +13,7 @@ from alembic.config import Config as AlembicConfig
 from alembic.script import ScriptDirectory
 from fastapi import FastAPI
 
-from app.api import conversations, health, memories, messages
+from app.api import conversations, health, memories, messages, voice
 from app.api.errors import register_error_handlers
 from app.api.middleware import BodySizeLimitMiddleware, TraceMiddleware
 from app.background import BackgroundTasks
@@ -41,6 +41,8 @@ from app.rag.factory import build_knowledge_service
 from app.safety.factory import build_safety_layer
 from app.safety.policy import PATHWAY_RULES
 from app.state.extractor import StateExtractor
+from app.voice.factory import build_stt, build_tts
+from app.voice.tickets import TicketStore
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 COMPANION_PROMPT_ID = "companion_system"
@@ -325,10 +327,15 @@ def create_app(
         openapi_url=None if is_production else "/openapi.json",
     )
     register_error_handlers(app)
+    # Speech providers open their connections per voice session, not here.
+    app.state.voice_stt = build_stt(settings)
+    app.state.voice_tts = build_tts(settings)
+    app.state.voice_tickets = TicketStore(settings.voice_ticket_ttl_seconds)
     app.include_router(health.router)
     app.include_router(conversations.router)
     app.include_router(messages.router)
     app.include_router(memories.router)
+    app.include_router(voice.router)
     # Added last = outermost: tracing wraps the size limit.
     app.add_middleware(BodySizeLimitMiddleware, max_bytes=settings.max_request_bytes)
     app.add_middleware(TraceMiddleware)
