@@ -121,6 +121,7 @@ human judgements yet; results say so.
 | Use | Rubric | Status |
 |---|---|---|
 | Voice, 1.4.0 vs 1.5.0 | in docs/voice.md | done: 3 judges, 31 of 36 held-out judgements preferred 1.5.0 |
+| Groundedness of knowledge replies | `eval/rubrics/groundedness_v1.md` | done: 2 judges, 60 replies from 3 runs; verdict agreement 86.7% (kappa 0.78); found 2 misses in the code "no source" measure (docs/rag.md) |
 | Dialogue benchmarks: companion vs human reply | `eval/rubrics/dialogue_pairwise_v1.md` | ready; waiting for a live run on the reply model |
 
 ## Public benchmarks

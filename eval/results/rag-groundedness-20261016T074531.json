@@ -1,0 +1,1848 @@
+{
+  "eval": "rag-groundedness",
+  "packets": "eval/results/judge/groundedness-20261016.packets.json",
+  "rubric": "eval/rubrics/groundedness_v1.md",
+  "rubric_sha256": "536e5195ac5661636a7c5865a9eea14dfef69ef95c1ac193611e1f33d199a501",
+  "judges": [
+    "groundedness-20261016.judge-A",
+    "groundedness-20261016.judge-B"
+  ],
+  "configs": {
+    "groq:openai/gpt-oss-120b companion_system@1.7.0": {
+      "per_judge": {
+        "groundedness-20261016.judge-A": {
+          "n": 20,
+          "grounded_rate": 0.4,
+          "minor_rate": 0.1,
+          "unsupported_rate": 0.5,
+          "mean_unsupported_specifics": 1.65,
+          "contradicts": 1,
+          "says_no_source_when_none": 0.0
+        },
+        "groundedness-20261016.judge-B": {
+          "n": 20,
+          "grounded_rate": 0.35,
+          "minor_rate": 0.05,
+          "unsupported_rate": 0.6,
+          "mean_unsupported_specifics": 2.15,
+          "contradicts": 1,
+          "says_no_source_when_none": 0.0
+        }
+      },
+      "with_evidence": {
+        "groundedness-20261016.judge-A": {
+          "n": 8,
+          "grounded_rate": 0.5,
+          "minor_rate": 0.125,
+          "unsupported_rate": 0.375,
+          "mean_unsupported_specifics": 1.25,
+          "contradicts": 1,
+          "says_no_source_when_none": null
+        },
+        "groundedness-20261016.judge-B": {
+          "n": 8,
+          "grounded_rate": 0.5,
+          "minor_rate": 0.0,
+          "unsupported_rate": 0.5,
+          "mean_unsupported_specifics": 1.5,
+          "contradicts": 1,
+          "says_no_source_when_none": null
+        }
+      },
+      "without_evidence": {
+        "groundedness-20261016.judge-A": {
+          "n": 12,
+          "grounded_rate": 0.333,
+          "minor_rate": 0.083,
+          "unsupported_rate": 0.583,
+          "mean_unsupported_specifics": 1.92,
+          "contradicts": 0,
+          "says_no_source_when_none": 0.0
+        },
+        "groundedness-20261016.judge-B": {
+          "n": 12,
+          "grounded_rate": 0.25,
+          "minor_rate": 0.083,
+          "unsupported_rate": 0.667,
+          "mean_unsupported_specifics": 2.58,
+          "contradicts": 0,
+          "says_no_source_when_none": 0.0
+        }
+      }
+    },
+    "groq:openai/gpt-oss-20b companion_system@1.7.0": {
+      "per_judge": {
+        "groundedness-20261016.judge-A": {
+          "n": 20,
+          "grounded_rate": 0.3,
+          "minor_rate": 0.25,
+          "unsupported_rate": 0.45,
+          "mean_unsupported_specifics": 1.6,
+          "contradicts": 0,
+          "says_no_source_when_none": 0.083
+        },
+        "groundedness-20261016.judge-B": {
+          "n": 20,
+          "grounded_rate": 0.3,
+          "minor_rate": 0.15,
+          "unsupported_rate": 0.55,
+          "mean_unsupported_specifics": 1.8,
+          "contradicts": 0,
+          "says_no_source_when_none": 0.083
+        }
+      },
+      "with_evidence": {
+        "groundedness-20261016.judge-A": {
+          "n": 8,
+          "grounded_rate": 0.375,
+          "minor_rate": 0.25,
+          "unsupported_rate": 0.375,
+          "mean_unsupported_specifics": 1.38,
+          "contradicts": 0,
+          "says_no_source_when_none": null
+        },
+        "groundedness-20261016.judge-B": {
+          "n": 8,
+          "grounded_rate": 0.375,
+          "minor_rate": 0.375,
+          "unsupported_rate": 0.25,
+          "mean_unsupported_specifics": 1.38,
+          "contradicts": 0,
+          "says_no_source_when_none": null
+        }
+      },
+      "without_evidence": {
+        "groundedness-20261016.judge-A": {
+          "n": 12,
+          "grounded_rate": 0.25,
+          "minor_rate": 0.25,
+          "unsupported_rate": 0.5,
+          "mean_unsupported_specifics": 1.75,
+          "contradicts": 0,
+          "says_no_source_when_none": 0.083
+        },
+        "groundedness-20261016.judge-B": {
+          "n": 12,
+          "grounded_rate": 0.25,
+          "minor_rate": 0.0,
+          "unsupported_rate": 0.75,
+          "mean_unsupported_specifics": 2.08,
+          "contradicts": 0,
+          "says_no_source_when_none": 0.083
+        }
+      }
+    },
+    "groq:openai/gpt-oss-20b companion_system@1.8.0": {
+      "per_judge": {
+        "groundedness-20261016.judge-A": {
+          "n": 20,
+          "grounded_rate": 0.55,
+          "minor_rate": 0.1,
+          "unsupported_rate": 0.35,
+          "mean_unsupported_specifics": 1.2,
+          "contradicts": 1,
+          "says_no_source_when_none": 0.417
+        },
+        "groundedness-20261016.judge-B": {
+          "n": 20,
+          "grounded_rate": 0.55,
+          "minor_rate": 0.05,
+          "unsupported_rate": 0.4,
+          "mean_unsupported_specifics": 1.25,
+          "contradicts": 1,
+          "says_no_source_when_none": 0.417
+        }
+      },
+      "with_evidence": {
+        "groundedness-20261016.judge-A": {
+          "n": 8,
+          "grounded_rate": 0.75,
+          "minor_rate": 0.0,
+          "unsupported_rate": 0.25,
+          "mean_unsupported_specifics": 0.75,
+          "contradicts": 1,
+          "says_no_source_when_none": null
+        },
+        "groundedness-20261016.judge-B": {
+          "n": 8,
+          "grounded_rate": 0.75,
+          "minor_rate": 0.0,
+          "unsupported_rate": 0.25,
+          "mean_unsupported_specifics": 0.75,
+          "contradicts": 1,
+          "says_no_source_when_none": null
+        }
+      },
+      "without_evidence": {
+        "groundedness-20261016.judge-A": {
+          "n": 12,
+          "grounded_rate": 0.417,
+          "minor_rate": 0.167,
+          "unsupported_rate": 0.417,
+          "mean_unsupported_specifics": 1.5,
+          "contradicts": 0,
+          "says_no_source_when_none": 0.417
+        },
+        "groundedness-20261016.judge-B": {
+          "n": 12,
+          "grounded_rate": 0.417,
+          "minor_rate": 0.083,
+          "unsupported_rate": 0.5,
+          "mean_unsupported_specifics": 1.58,
+          "contradicts": 0,
+          "says_no_source_when_none": 0.417
+        }
+      }
+    }
+  },
+  "agreement": {
+    "judges": [
+      "groundedness-20261016.judge-A",
+      "groundedness-20261016.judge-B"
+    ],
+    "verdict": {
+      "items": 60,
+      "agree_rate": 0.8667,
+      "kappa": 0.7766
+    },
+    "says_no_source": {
+      "items": 60,
+      "agree_rate": 1.0,
+      "kappa": 1.0
+    },
+    "regex_vs_judge": {
+      "groundedness-20261016.judge-A": {
+        "items": 60,
+        "agree_rate": 0.9667,
+        "kappa": 0.8154
+      },
+      "groundedness-20261016.judge-B": {
+        "items": 60,
+        "agree_rate": 0.9667,
+        "kappa": 0.8154
+      }
+    }
+  },
+  "items": [
+    {
+      "jid": "g01",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-099",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g01",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and the reply states two UK legal specifics: employers must consider leave requests fairly, and they can refuse only for a business reason or a policy breach."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g01",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and it makes two high-stakes UK legal claims: that employers must consider stress-related leave fairly, and that they can refuse only for a solid business reason or a breach of policy."
+        }
+      }
+    },
+    {
+      "jid": "g02",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-093",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g02",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and the reply gives several device and usage specifics: 10,000 lux, a distance of a few inches to a foot, UV filtering, and 20-30 minutes each morning."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g02",
+          "unsupported_specifics": 6,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and it makes multiple specific and dose-like claims: 10,000 lux, a few inches to a foot away, UV filtering, cautions about eye conditions and photosensitive medication, 20-30 minutes each morning, and results within a week or two."
+        }
+      }
+    },
+    {
+      "jid": "g03",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-006",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g03",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Only communication suggestions and empathy, with no specific factual claims."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g03",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "With no passages, it offers only general communication suggestions and example phrasing, with no specific factual claims."
+        }
+      }
+    },
+    {
+      "jid": "g04",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-097",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g04",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and the reply states a dietary range of 1.6-2.2 g/kg plus a derived 110-155 g daily figure."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g04",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and it makes four claims: a 1.6-2.2 g/kg target, a derived 110-155 g figure, spreading intake being easier on the stomach, and the higher end aiding recovery while the lower end suits moderate lifting."
+        }
+      }
+    },
+    {
+      "jid": "g05",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-018",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g05",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "General warning signs and a suggestion to check in, with no numbers, named services or definite mechanisms."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g05",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "With no passages, it lists general, hedged red flags (mood swings, sleep and appetite changes, falling grades, talk of self-harm) and suggests checking in, with no numbers, products or definite mechanisms."
+        }
+      }
+    },
+    {
+      "jid": "g06",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-006",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g06",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Only conversational advice and empathy, with no specific factual claims."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g06",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "With no passages, it offers only general conversational advice and empathy, with no specific factual claims."
+        }
+      }
+    },
+    {
+      "jid": "g07",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-107",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g07",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "grounded",
+          "reason": "Says it has no reliable research, and otherwise makes only a hedged general remark that the evidence is mixed."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g07",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "grounded",
+          "reason": "It says it isn't seeing reliable research and makes only hedged general remarks that the evidence is mixed and not strong, with no specific claims."
+        }
+      }
+    },
+    {
+      "jid": "g08",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-010",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g08",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "The 2019 review, the paced-breathing finding and the 398 participants all match S1."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g08",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "The 2019 review, the significant improvement in hot flashes from paced breathing and the 398 participants all come from S1; applying it to night-time flushes is only a slight extension, not a new specific."
+        }
+      }
+    },
+    {
+      "jid": "g09",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-014",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g09",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "The definitions of loneliness and social isolation, and the point that someone can live alone without being lonely, come from S1 and S3."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g09",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "The distinction between loneliness and social isolation, and the point that someone living alone need not be lonely, match S1 and S3."
+        }
+      }
+    },
+    {
+      "jid": "g10",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-012",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g10",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "No drug cures stress, the relaxation response and its effects, the techniques, and the advice to see a doctor all come from S1-S3."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g10",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "No drug cures stress, the relaxation response slows heart rate and lowers stress hormones, breathing and meditation help, and seeing a professional is advised: all of this is supported by S1-S3."
+        }
+      }
+    },
+    {
+      "jid": "g11",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-095",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g11",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "The passages are US material with nothing on the NHS, yet the reply names NHS 111 and '116 123 Mental Health Helpline' as referral routes, says they will book appointments, and describes online booking with trusts, all unsupported and including contact details."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g11",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "The passages are US-focused and don't cover NHS referral, yet it names NHS 111 and 116 123 as a 'Mental Health Helpline' that gives referrals, and claims trusts take online bookings: high-stakes, unsupported contact and service details."
+        }
+      }
+    },
+    {
+      "jid": "g12",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-107",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": false,
+      "regex_says_no_source": true,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g12",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "grounded",
+          "reason": "Says plainly it has no reliable source, and adds only hedged general remarks and a suggestion to ask a specialist."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g12",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "grounded",
+          "reason": "It says it has no reliable source, makes only hedged general remarks (the science is mixed, people report various things) and suggests asking an eye doctor or sleep specialist."
+        }
+      }
+    },
+    {
+      "jid": "g13",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-018",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g13",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "General behavioural signs and a suggestion to talk gently, with no specific factual claims."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g13",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "With no passages, it lists only hedged, general signs to watch (energy, sleep, interest, mood, appetite, schoolwork) and suggests talking gently, with no specific claims."
+        }
+      }
+    },
+    {
+      "jid": "g14",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-004",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g14",
+          "unsupported_specifics": 1,
+          "contradicts": true,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "Calling CBT-I and exercise 'stronger options' that meditation 'probably won't replace' contradicts S1/S2, which say meditation's effects are no different from or comparable to CBT and exercise."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g14",
+          "unsupported_specifics": 1,
+          "contradicts": true,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "It calls CBT-I and exercise 'stronger options' that meditation won't replace, which contradicts S1/S2 (effects no different or comparable), and its claim that meditation is a useful add-on is unsupported."
+        }
+      }
+    },
+    {
+      "jid": "g15",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-014",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g15",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "The definitions, and the point that living alone need not mean loneliness, follow S1 and S3; the remark about the nani is a reasonable inference."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g15",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "The definitions of loneliness and social isolation, and the point that someone can live alone without feeling lonely, follow S1 and S3."
+        }
+      }
+    },
+    {
+      "jid": "g16",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-006",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g16",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Only communication suggestions, empathy and a question, with no specific factual claims."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g16",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "With no passages, it offers only general, hedged communication advice (timing, 'I' statements, a calm tone) and no specific factual claims."
+        }
+      }
+    },
+    {
+      "jid": "g17",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-002",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g17",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Hearing loss leading to withdrawal, isolation and loneliness, the health effects, and the treatment options all come from S1-S3."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g17",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Hearing loss causing frustration and withdrawal, leading to loneliness and isolation, the effects on mood and health, and treatments such as hearing aids and therapy are all supported by S1-S3."
+        }
+      }
+    },
+    {
+      "jid": "g18",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-016",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g18",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "A hedged 'could be a sign' and a suggestion to see a GP or sleep specialist, with no specific claims."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g18",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "It only makes a hedged point that loud snoring could be a sign of apnoea and suggests asking a GP or sleep specialist."
+        }
+      }
+    },
+    {
+      "jid": "g19",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-103",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": false,
+      "regex_says_no_source": true,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g19",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "minor",
+          "reason": "Says it has no source comparing them, then makes one commonplace, low-stakes claim about how the products work: gum lets you control the dose more flexibly."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g19",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "unsupported",
+          "reason": "It says it has no reliable source, but still claims that patches are easier because there is no chewing and that gum allows more flexible dose control, which makes two unsupported specifics."
+        }
+      }
+    },
+    {
+      "jid": "g20",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-016",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g20",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "minor",
+          "reason": "No passages were given; the reply lists sleep apnoea warning signs (daytime tiredness, breathing pauses), framed conditionally and paired with advice to see a doctor, and otherwise only hedged suggestions."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g20",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and it lists specific apnoea warning signs (daytime tiredness, gasping, breathing pauses) and suggests side-sleeping or a pillow change as a remedy, which makes two unsupported medical specifics."
+        }
+      }
+    },
+    {
+      "jid": "g21",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-103",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g21",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and the reply makes several claims about how nicotine replacement works: nicotine without smoke, a steady all-day patch dose, gum controlling the amount and cravings, and combining the two."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g21",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and it makes four claims about nicotine replacement: how it works, the patch giving a steady low dose, gum allowing on-demand control for cravings, and combining the two."
+        }
+      }
+    },
+    {
+      "jid": "g22",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-020",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g22",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "The reply misstates S1's comparative association as a benefit of yoga or supplements ('they tend to see better health... lower obesity'), dropping the comparison group and implying causation, which is an unsupported health claim."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g22",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "minor",
+          "reason": "Most of it matches S1-S3, but it turns S1's comparison between two groups of complementary-approach users into an apparent benefit of using yoga or supplements, which counts as one somewhat unsupported claim."
+        }
+      }
+    },
+    {
+      "jid": "g23",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-089",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g23",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "The passages cover only general sleep needs and CBT-I; the starting window of 5-6 hours, the sleep-debt mechanism, the weekly increases and the baseline-tracking method are all unsupported medical specifics."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g23",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "The passages do not cover sleep restriction, so four claims are unsupported: a 5-6 hour starting window, the sleep-debt mechanism, increases of a few minutes each week, and tracking a baseline first."
+        }
+      }
+    },
+    {
+      "jid": "g24",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-099",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g24",
+          "unsupported_specifics": 3,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and the reply makes UK legal claims: a right to sick leave, a GP fit note being needed before approval, and the manager being unable to refuse without that evidence."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g24",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and it makes several high-stakes UK legal claims: a right to sick leave that depends on a medical note, a GP fit note, employers expecting it before approving time off, and managers being unable to refuse without it."
+        }
+      }
+    },
+    {
+      "jid": "g25",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-107",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g25",
+          "unsupported_specifics": 3,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and the reply gives a timing (the hour before bed), a retinal 'clock-gene' mechanism, and study findings on melatonin and falling asleep."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g25",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and it makes four claims: wearing them in the hour before bed, the short-wavelength retina mechanism, the brain 'clock-gene' daytime signal, and studies showing a melatonin boost and easier sleep onset."
+        }
+      }
+    },
+    {
+      "jid": "g26",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-018",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g26",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "General behavioural signs, empathy and a question, with no specific factual claims."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g26",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "With no passages, it gives only hedged, general warning signs (withdrawal, lost interest, changes in sleep, appetite and grades) and a gentle check-in suggestion, with no numbers, products or definite mechanisms."
+        }
+      }
+    },
+    {
+      "jid": "g27",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-089",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g27",
+          "unsupported_specifics": 3,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "Nothing in the passages covers sleep restriction, so matching time in bed to actual sleep, the 5-6 hour start and the weekly adjustments are all unsupported."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g27",
+          "unsupported_specifics": 3,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "The passages cover sleep-need ranges and the CBT-I recommendation, but not sleep restriction protocol, so three claims are unsupported: matching time in bed to actual sleep, a typical 5-6 hour start, and weekly adjustments."
+        }
+      }
+    },
+    {
+      "jid": "g28",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-097",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g28",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and the reply states 1.6-2.2 g/kg and a derived 112-154 g daily protein target."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g28",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages were given, and it states a 1.6-2.2 g/kg protein target and a derived 112-154 g daily figure, which makes two unsupported numeric claims."
+        }
+      }
+    },
+    {
+      "jid": "g29",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-020",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g29",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "The emotional and physical dimensions, and the way they connect, are drawn from S1-S3, and the links between them are hedged."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g29",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "The definitions of emotional wellness (coping, relationships, positive mindset) and physical wellness (activity, food, sleep) match S1/S2, and the point that the two are linked is general and fits S2/S3."
+        }
+      }
+    },
+    {
+      "jid": "g30",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-002",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g30",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Withdrawal from hearing difficulty, the resulting isolation and loneliness, and the suggestion to see a doctor about hearing aids all come from S1; the rest is gentle suggestion."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g30",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Claims that hearing loss leads to withdrawal, embarrassment, isolation and loneliness, and that a doctor can advise on hearing aids, are all supported by S1; the note idea is just a suggestion."
+        }
+      }
+    },
+    {
+      "jid": "g31",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-101",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g31",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "minor",
+          "reason": "No passages; the one specific claim is the commonplace, low-stakes '10% of body weight' sizing rule, and the mechanism and research points are hedged."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g31",
+          "unsupported_specifics": 3,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "With no passages, it describes mixed study findings, a deep-pressure relaxation mechanism, and a 10% of body weight sizing rule."
+        }
+      }
+    },
+    {
+      "jid": "g32",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-095",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g32",
+          "unsupported_specifics": 5,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "The passages are US material and do not mention the NHS; the reply makes up specifics including the IAPT programme, an 18+ age rule, a Manchester phone number (0300 123 5000) and a Manchester IAPT online form."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g32",
+          "unsupported_specifics": 6,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "The passages are US NIH material; it makes many unsupported NHS specifics: a bypass of GP referral, the IAPT programme, an 18+ age rule, a phone number (0300 123 5000), a Manchester online self-referral form and the assessment process."
+        }
+      }
+    },
+    {
+      "jid": "g33",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-097",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g33",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "minor",
+          "reason": "No passages; one commonplace guideline (1.6-2.2 g/kg protein), plus arithmetic on the user's weight."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g33",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "With no passages, it gives a nutrition dose of 1.6-2.2 g/kg and a derived 112-154 g a day."
+        }
+      }
+    },
+    {
+      "jid": "g34",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-093",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g34",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages; it states two specifics, 10,000 lux and a 20-30 cm distance."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g34",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "With no passages, it gives specific light-therapy parameters: 10,000 lux at 20-30 cm."
+        }
+      }
+    },
+    {
+      "jid": "g35",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-091",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g35",
+          "unsupported_specifics": 3,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages; it gives a price ($500-$1,000), the course structure, and a personalised mantra from a certified teacher."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g35",
+          "unsupported_specifics": 3,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "With no passages, it gives a price range ($500-1,000), describes the course structure (several lessons, a private session) and says the mantra is personalised."
+        }
+      }
+    },
+    {
+      "jid": "g36",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-101",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": false,
+      "regex_says_no_source": true,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g36",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "minor",
+          "reason": "Says it has no reliable source; its one low-stakes specific is that 7 kg is a common blanket size, and the rest is hedged."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g36",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "minor",
+          "reason": "It says it has no reliable source; the one specific, low-stakes claim is that 7 kg is a fairly common blanket size, and the rest is hedged anecdote."
+        }
+      }
+    },
+    {
+      "jid": "g37",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-004",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g37",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "minor",
+          "reason": "The comparison with CBT-I and exercise and CBT-I's strong recommendation are supported by S1-S3; only the low-stakes '10-15 minutes' suggestion is unsupported."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g37",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "minor",
+          "reason": "S1-S3 support its comparison of meditation with CBT-I and exercise; the one unsupported specific is the low-stakes suggested 10-15 minute session length."
+        }
+      }
+    },
+    {
+      "jid": "g38",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-012",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g38",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "No drug cure, the relaxation response, therapy or medication via a doctor, and breathing, meditation or a hot shower are all supported by S1-S3."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g38",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "No pill for stress, the relaxation response, breathing, meditation and hot showers, and doctor-guided therapy or medication: all supported by S1-S3."
+        }
+      }
+    },
+    {
+      "jid": "g39",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-002",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g39",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "The link from hearing loss to withdrawal and loneliness comes from S1, the effect of loneliness on wellbeing from S3, and the advice to see a doctor from S1."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g39",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "The link from hearing loss to less interaction, isolation and loneliness, and loneliness affecting well-being, is supported by S1 and S3."
+        }
+      }
+    },
+    {
+      "jid": "g40",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-089",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g40",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "grounded",
+          "reason": "Says the sources do not give the starting hours, makes no specific claims, and refers the person to their provider."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g40",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "grounded",
+          "reason": "Says the sources don't give starting hours for sleep restriction, makes no claims, and refers the person to their CBT-I provider."
+        }
+      }
+    },
+    {
+      "jid": "g41",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-012",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g41",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "No drug cures stress, the relaxation response lowers heart rate and hormones, and a doctor may offer therapy or medication; all supported by S1 and S2."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g41",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "No drug cures stress, the relaxation response lowers heart rate and stress hormones, and a doctor can offer therapy or medication: all supported by S1 and S2."
+        }
+      }
+    },
+    {
+      "jid": "g42",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-091",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g42",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages; it gives a US price range ($400-$800) and says a certified teacher assigns a personal mantra."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g42",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "With no passages, it gives a US price range ($400-800) and says the teacher gives a personal mantra; price is a financial specific."
+        }
+      }
+    },
+    {
+      "jid": "g43",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-105",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g43",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages; it recommends named products (ResMed AirSense 10, AirMini, Philips DreamStation, Apex XT)."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g43",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "With no passages, it names four products as quiet (ResMed AirSense 10, AirMini, Philips DreamStation, Apex XT); product recommendations are high-stakes."
+        }
+      }
+    },
+    {
+      "jid": "g44",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-095",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g44",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "The passages are US material; the reply makes up NHS specifics including a GP-first route, a community mental health team referral, NHS 111 and an NHS England 'Find a Therapist' tool."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g44",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "The passages are US NIH material and don't cover the NHS; it gives unsupported NHS specifics: self-referral via GP first, a community mental health team referral, the NHS 111 line, and a named 'Find a Therapist' tool."
+        }
+      }
+    },
+    {
+      "jid": "g45",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-016",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g45",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Only hedged general points ('can be a sign') and a suggestion to see a doctor; nothing specific."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g45",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "minor",
+          "reason": "Mostly hedged; the one implied specific is a commonplace list of sleep apnoea warning signs (gasping, daytime fatigue, headaches), with no passages."
+        }
+      }
+    },
+    {
+      "jid": "g46",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-101",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g46",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "minor",
+          "reason": "No passages; the evidence is described in hedged terms, and the one low-stakes specific is that 7 kg suits someone of about 160 lb."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g46",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "With no passages, it says studies suggest weighted blankets reduce anxiety and that 7 kg suits someone around 160 lb."
+        }
+      }
+    },
+    {
+      "jid": "g47",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-105",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g47",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages; it recommends named products (ResMed AirSense 10, Philips DreamStation, Fisher & Paykel) and claims low-noise motors and sound-dampening."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g47",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "With no passages, it recommends named products (ResMed AirSense 10, Philips DreamStation, Fisher & Paykel) and says they have low-noise motors and sound dampening; brand recommendations are high-stakes."
+        }
+      }
+    },
+    {
+      "jid": "g48",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-093",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": false,
+      "regex_says_no_source": true,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g48",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "unsupported",
+          "reason": "Admits it has no study to cite but still gives 10,000 lux and 20-30 cm without support."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g48",
+          "unsupported_specifics": 3,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "unsupported",
+          "reason": "It says it has no specific study, but still gives 10,000 lux, a 20-30 cm distance and a mechanism claim (mimicking daylight) with no passages."
+        }
+      }
+    },
+    {
+      "jid": "g49",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-008",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g49",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Only a hedged possibility and a suggestion to see a doctor or pharmacist; nothing specific."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g49",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Hedged ('it's possible'), with empathy and a suggestion to see a doctor or pharmacist; no specific claims."
+        }
+      }
+    },
+    {
+      "jid": "g50",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-099",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g50",
+          "unsupported_specifics": 3,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages; it makes legal claims about UK law treating stress like other conditions, the manager being unable to refuse, and fit-note requirements."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g50",
+          "unsupported_specifics": 3,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "With no passages, it makes UK legal specifics: stress is treated like any other health condition under UK law, a manager can't refuse sick leave if you're genuinely ill, and a fit note is usually required."
+        }
+      }
+    },
+    {
+      "jid": "g51",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-010",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g51",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "minor",
+          "reason": "The 2019 review with 398 participants is supported by S1; the 4-4-4 breathing pattern is not, but it is low-stakes."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g51",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "minor",
+          "reason": "S1 supports the 2019 review and the 398 participants; the one unsupported specific is the low-stakes 4-4-4 breathing count."
+        }
+      }
+    },
+    {
+      "jid": "g52",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-020",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g52",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "The emotional and physical dimensions and their interplay are supported by S1-S3, and the extra links are hedged general points."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g52",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "S1 and S2 support its emotional and physical dimensions, and S3 and S2 broadly support the hedged point that the two influence each other."
+        }
+      }
+    },
+    {
+      "jid": "g53",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-105",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": false,
+      "regex_says_no_source": true,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g53",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "unsupported",
+          "reason": "Says it has no definitive source but still names brands and products (ResMed AirSense, Philips DreamStation, Fisher & Paykel Eve) and claims suppliers offer decibel specs and demo rooms."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g53",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": true,
+          "verdict": "unsupported",
+          "reason": "It admits it has no definitive source, yet names three CPAP products as quieter options (ResMed AirSense, Philips DreamStation, Fisher & Paykel Eve) and claims suppliers give decibel ratings or demo rooms; brand recommendations are high-stakes."
+        }
+      }
+    },
+    {
+      "jid": "g54",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-008",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g54",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages; it makes two definite causal claims, that reflux often flares in the evening and that heavy meals or lying down are a common link."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g54",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "With no passages, it states as fact that reflux often flares after dinner and in the evening, and that heavy meals or lying down after eating are a common trigger: two unsupported specific claims, though commonplace."
+        }
+      }
+    },
+    {
+      "jid": "g55",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-091",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g55",
+          "unsupported_specifics": 6,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages; it gives several prices ($50-$150 sessions, retreats in the hundreds, sliding-scale or free intros) and contradicts itself on mantras."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g55",
+          "unsupported_specifics": 5,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "With no passages, it gives price ranges ($50-150 a session, several hundred for retreats), sliding-scale or free intro sessions, and definite but self-contradictory claims about how TM mantras are assigned and that they have no meaning."
+        }
+      }
+    },
+    {
+      "jid": "g56",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-004",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g56",
+          "unsupported_specifics": 2,
+          "contradicts": true,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "Claims meditation is weaker than CBT or exercise and that they are 'more effective overall', which contradicts S1 and S2 (effects comparable); it also attributes this to S3, which does not say it."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g56",
+          "unsupported_specifics": 2,
+          "contradicts": true,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "It cites S3 for meditation being weaker than an exercise routine, which S3 does not say, and concludes that CBT or exercise is likely more effective, which contradicts S1/S2 (effects comparable/no different)."
+        }
+      }
+    },
+    {
+      "jid": "g57",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-014",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g57",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "The definitions of loneliness and social isolation, and living alone without being lonely, follow S1 closely."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g57",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Its definitions of loneliness and social isolation, and the point that someone can live alone without feeling lonely, closely follow S1."
+        }
+      }
+    },
+    {
+      "jid": "g58",
+      "result": "rag-generation-test-20261016T025832.json",
+      "id": "rq-103",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g58",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "No passages; it makes medical specifics, including a 24-hour patch release, quick-acting gum, controlling the gum dose, and combining patch and gum."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g58",
+          "unsupported_specifics": 4,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "With no passages, it makes several medical claims about how the products work: patch gives a constant release over about 24 hours, gum gives a fast dose on demand, dose can be controlled by chewing, and patch plus gum can be combined."
+        }
+      }
+    },
+    {
+      "jid": "g59",
+      "result": "rag-generation-test-20261016T031508.json",
+      "id": "rq-008",
+      "model": "groq:openai/gpt-oss-20b",
+      "prompt": "companion_system@1.8.0",
+      "evidence": false,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g59",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Only a hedged possibility and a suggestion to see a doctor or pharmacist; nothing specific."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g59",
+          "unsupported_specifics": 0,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "grounded",
+          "reason": "Only says reflux could possibly be disturbing sleep and suggests a doctor or pharmacist; no specific factual claims."
+        }
+      }
+    },
+    {
+      "jid": "g60",
+      "result": "rag-generation-test-20261015T171712.json",
+      "id": "rq-010",
+      "model": "groq:openai/gpt-oss-120b",
+      "prompt": "companion_system@1.7.0",
+      "evidence": true,
+      "regex_says_no_source": false,
+      "judged": {
+        "groundedness-20261016.judge-A": {
+          "jid": "g60",
+          "unsupported_specifics": 1,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "minor",
+          "reason": "Paced breathing helping hot flashes is supported by S1; the 4-count inhale and 6-count exhale is unsupported but low-stakes, and the effect is hedged."
+        },
+        "groundedness-20261016.judge-B": {
+          "jid": "g60",
+          "unsupported_specifics": 2,
+          "contradicts": false,
+          "says_no_source": false,
+          "verdict": "unsupported",
+          "reason": "S1 supports the claim that paced breathing helps, but the specific breathing timings (4-count inhale, short hold, 6-count exhale) and the claim that it calms the nervous system are not in the passage."
+        }
+      }
+    }
+  ]
+}

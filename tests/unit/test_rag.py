@@ -477,6 +477,11 @@ def test_generation_wording_measures_read_curly_apostrophes_and_negations() -> N
     measure = eval_rag.reply_measures
     assert measure("I don\u2019t have a reliable source on that, but...", False)["says_no_source"]
     assert measure("I don't have a specific study to quote.", False)["says_no_source"]
+    assert measure("I\u2019m not seeing any reliable research on that right now.", False)[
+        "says_no_source"
+    ]
+    assert measure("I'm not seeing anything in the sources about that.", True)["says_no_source"]
+    assert not measure("I'm not seeing my friends much lately.", False)["says_no_source"]
     negated = measure("I don't have a study on that, sorry.", False)
     assert negated["says_no_source"] and not negated["source_claim_without_evidence"]
     claim = measure("According to the CDC, adults need 7 hours.", False)

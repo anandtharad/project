@@ -10,7 +10,7 @@
     "citation_validity": 1.0,
     "cites_when_evidence_given": 0.125,
     "source_claim_without_evidence_rate": 0.0833,
-    "says_no_source_when_none": 0.0,
+    "says_no_source_when_none": 0.0833,
     "mean_words": 98.4
   },
   "rows": [
@@ -322,7 +322,7 @@
       "invalid_markers": 0,
       "cited": [],
       "source_claim_without_evidence": false,
-      "says_no_source": false,
+      "says_no_source": true,
       "words": 65
     }
   ],
@@ -330,6 +330,19 @@
     {
       "at": "2026-10-16T03:17:41+00:00",
       "reason": "says_no_source missed curly apostrophes (don’t); negated 'a study' no longer counts as a source claim",
+      "metrics_before": {
+        "n": 20,
+        "with_evidence": 8,
+        "citation_validity": 1.0,
+        "cites_when_evidence_given": 0.125,
+        "source_claim_without_evidence_rate": 0.0833,
+        "says_no_source_when_none": 0.0,
+        "mean_words": 98.4
+      }
+    },
+    {
+      "at": "2026-10-16T07:46:01+00:00",
+      "reason": "says_no_source missed 'not seeing any research / anything in the sources' (found by the groundedness judges)",
       "metrics_before": {
         "n": 20,
         "with_evidence": 8,

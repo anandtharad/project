@@ -102,7 +102,10 @@ NO_SOURCE = re.compile(
     r"\b(?:don't|do not|didn't) have (?:a |any )?(?:\w+ )?"
     r"(?:source|sources|reference|study|studies)\b"
     r"|\bno (?:reliable )?(?:source|sources)\b|\bcouldn't find\b|\bnot (?:in|from) (?:my|the) "
-    r"(?:library|sources)\b",
+    r"(?:library|sources)\b"
+    # "I'm not seeing any reliable research", "not seeing anything in the sources"
+    # (both missed until the groundedness judges flagged them, 2026-10-16).
+    r"|\bnot seeing (?:any|anything)\b[^.!?]{0,40}\b(?:research|sources?|evidence|studies)\b",
     re.IGNORECASE,
 )
 

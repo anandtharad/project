@@ -463,7 +463,7 @@ and `…T031508.json` (1.8.0).
 | Citation validity | 100% | 100% |
 | Cites when evidence was given | 1 of 8 | **4 of 8** |
 | Claims a source without evidence | 1 of 12 | **0 of 12** |
-| Says it has no reliable source when none was found | 0 of 12 | **5 of 12** |
+| Says it has no reliable source when none was found | 1 of 12 | **5 of 12** |
 | Mean words | 98 | 86 |
 
 Two corrections were made to get these numbers:
@@ -473,12 +473,48 @@ Two corrections were made to get these numbers:
   assembly is now one function (`system_prompt()` in
   `app/orchestration/engine.py`), and the evaluation uses it.
 - **"Says no source" missed curly apostrophes** ("I don’t have a reliable
-  source"). The measure was fixed, and the stored runs were recomputed from
-  their saved replies (`eval_rag.py rescore`, recorded in each file). Only
-  the 1.8.0 run changed. The 120b run's "0 of 12" stands.
+  source") and two wordings the judges below found ("I'm not seeing any
+  reliable research"). The measure was fixed each time, and the stored
+  runs were recomputed from their saved replies (`eval_rag.py rescore`,
+  recorded in each file). The 120b run's "0 of 12" stands.
 
 Still wrong under 1.8.0: one reply named CPAP brands, and one gave protein
 targets from memory. No code measure catches these yet.
+
+**Groundedness, judged blind (2026-10-16).** Two Claude judges labelled all
+60 replies of the three runs. The replies were mixed, under opaque ids. The
+rubric is `eval/rubrics/groundedness_v1.md`: count the specific claims the
+passages don't support; a contradiction or a high-stakes specific makes a
+reply "unsupported". File: `rag-groundedness-20261016T074531.json`.
+
+| Run | Grounded | Unsupported | Unsupported specific claims per reply | Contradicts a passage |
+|---|---|---|---|---|
+| 120b, 1.7.0 | 40% / 35% | 50% / 60% | 1.65 / 2.15 | 1 reply |
+| 20b, 1.7.0 | 30% / 30% | 45% / 55% | 1.60 / 1.80 | 0 |
+| 20b, 1.8.0 | **55% / 55%** | **35% / 40%** | **1.20 / 1.25** | 1 reply |
+
+The two numbers in each cell are judge A / judge B; 20 replies per run.
+
+- **Judges.** They gave the same verdict on 86.7% of replies (Cohen's
+  kappa 0.78), and the same "says no source" label on every reply.
+- **The code measure.** "Says no source" agreed with the judges on 58 of
+  60. Both misses were the wordings above, now fixed.
+- **With evidence, 1.8.0 changed the most:** grounded 3 of 8 → 6 of 8.
+  Without evidence, unsupported specifics fell little (about 1.9 → 1.5 per
+  reply).
+- **What still goes wrong:**
+  - specifics from memory: protein targets and lux values (120b), UK
+    sick-leave rules, an NHS helpline number (20b, 1.7.0; the output check
+    now blocks unverified numbers);
+  - two replies contradicted a passage, both on the same question. They
+    ranked CBT or exercise above meditation, where the passages say the
+    effects are comparable (120b with 1.7.0, 20b with 1.8.0). The 1.8.0
+    reply cited a passage for the claim: **a citation that resolves can
+    still be attached to something the passage doesn't say.** Citation
+    validity checks markers, not support; this judge measures support.
+
+These are model readings, not calibrated against people. They are 20 items
+per run on a weaker model than the reply model.
 
 1.8.0 stays off by default until the same comparison on the reply model
 (`gpt-oss-120b`) confirms it.
