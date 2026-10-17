@@ -116,8 +116,13 @@ class VoiceSession:
         send: Send,
         send_audio: SendAudio,
         audio_output: bool,
+        charge_audio: Callable[[float], bool] | None = None,
     ) -> None:
         self.config = config
+        # Counts audio against the person's daily budget (app/voice/limits.py);
+        # False means the budget is spent and the audio is not transcribed.
+        self._charge_audio = charge_audio
+        self._budget_spent = False
         self._stt = stt
         self._tts = tts
         self._run_turn = run_turn
@@ -163,6 +168,13 @@ class VoiceSession:
             await self._barge_in()
         if self.state != State.LISTENING or self._stt is None or self._stt_failed:
             self.dropped_audio_bytes += len(pcm)
+            return
+        seconds = len(pcm) / self.config.input_audio.bytes_per_second()
+        if self._charge_audio is not None and not self._charge_audio(seconds):
+            self.dropped_audio_bytes += len(pcm)
+            if not self._budget_spent:
+                self._budget_spent = True
+                await self._send(_BUDGET_ERROR)
             return
         if self._stream is None:
             try:
@@ -382,6 +394,12 @@ class VoiceSession:
         self.state = state
         await self._send({"type": "state", "state": state.value})
 
+
+_BUDGET_ERROR = {
+    "type": "error",
+    "code": "voice_limit_reached",
+    "message": "Today's voice limit is used up; you can still type.",
+}
 
 _STT_ERROR = {
     "type": "error",

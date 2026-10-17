@@ -1,0 +1,339 @@
+{
+  "eval": "rag-generation",
+  "split": "test",
+  "dataset_sha256": "ec0e6f392d11ab1fbd8a352fd63e0aa0f3685db004b90363d2a56592ae31a79a",
+  "model": "groq:openai/gpt-oss-120b",
+  "prompt": "companion_system@1.8.0",
+  "metrics": {
+    "n": 20,
+    "with_evidence": 8,
+    "citation_validity": 1.0,
+    "cites_when_evidence_given": 0.5,
+    "source_claim_without_evidence_rate": 0.0,
+    "says_no_source_when_none": 0.75,
+    "mean_words": 94.7
+  },
+  "rows": [
+    {
+      "id": "rq-002",
+      "type": "answerable",
+      "route": "factual",
+      "status": "ok",
+      "passages": [
+        "nia-loneliness-and-social-isolation-tips-staying-connected",
+        "nia-loneliness-and-social-isolation-tips-staying-connected",
+        "cdc-managing-difficult-emotions"
+      ],
+      "relevant_given": true,
+      "markers": 2,
+      "invalid_markers": 0,
+      "cited": [
+        "S1",
+        "S2"
+      ],
+      "source_claim_without_evidence": false,
+      "says_no_source": false,
+      "words": 97
+    },
+    {
+      "id": "rq-089",
+      "type": "unanswerable",
+      "route": "factual",
+      "status": "ok",
+      "passages": [
+        "medlineplus-healthy-sleep",
+        "odphp-get-enough-sleep",
+        "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders"
+      ],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": true,
+      "words": 90
+    },
+    {
+      "id": "rq-004",
+      "type": "answerable",
+      "route": "factual",
+      "status": "ok",
+      "passages": [
+        "nccih-meditation-and-mindfulness-effectiveness-and-safety",
+        "nccih-8-things-to-know-about-meditation-and-mindfulness",
+        "nccih-things-to-know-about-mind-and-body-practices-for-sleep-disorders"
+      ],
+      "relevant_given": true,
+      "markers": 3,
+      "invalid_markers": 0,
+      "cited": [
+        "S1",
+        "S2",
+        "S3"
+      ],
+      "source_claim_without_evidence": false,
+      "says_no_source": false,
+      "words": 130
+    },
+    {
+      "id": "rq-091",
+      "type": "unanswerable",
+      "route": "factual",
+      "status": "no_results",
+      "passages": [],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": true,
+      "words": 74
+    },
+    {
+      "id": "rq-006",
+      "type": "answerable",
+      "route": "factual",
+      "status": "no_results",
+      "passages": [],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": false,
+      "words": 89
+    },
+    {
+      "id": "rq-093",
+      "type": "unanswerable",
+      "route": "factual",
+      "status": "no_results",
+      "passages": [],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": true,
+      "words": 109
+    },
+    {
+      "id": "rq-008",
+      "type": "answerable",
+      "route": "factual",
+      "status": "no_results",
+      "passages": [],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": true,
+      "words": 74
+    },
+    {
+      "id": "rq-095",
+      "type": "unanswerable",
+      "route": "factual",
+      "status": "ok",
+      "passages": [
+        "nimh-so-stressed-out-fact-sheet",
+        "nimh-tips-for-talking-with-your-health-care-provider"
+      ],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": false,
+      "words": 137
+    },
+    {
+      "id": "rq-010",
+      "type": "answerable",
+      "route": "factual",
+      "status": "ok",
+      "passages": [
+        "nccih-relaxation-techniques-what-you-need-to-know"
+      ],
+      "relevant_given": true,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": false,
+      "words": 104
+    },
+    {
+      "id": "rq-097",
+      "type": "unanswerable",
+      "route": "factual",
+      "status": "no_results",
+      "passages": [],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": true,
+      "words": 73
+    },
+    {
+      "id": "rq-012",
+      "type": "answerable",
+      "route": "factual",
+      "status": "ok",
+      "passages": [
+        "nccih-stress",
+        "odphp-manage-stress",
+        "odphp-manage-stress"
+      ],
+      "relevant_given": true,
+      "markers": 2,
+      "invalid_markers": 0,
+      "cited": [
+        "S1",
+        "S2"
+      ],
+      "source_claim_without_evidence": false,
+      "says_no_source": false,
+      "words": 87
+    },
+    {
+      "id": "rq-099",
+      "type": "unanswerable",
+      "route": "factual",
+      "status": "no_results",
+      "passages": [],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": false,
+      "words": 119
+    },
+    {
+      "id": "rq-014",
+      "type": "answerable",
+      "route": "factual",
+      "status": "ok",
+      "passages": [
+        "nia-loneliness-and-social-isolation-tips-staying-connected",
+        "nia-loneliness-and-social-isolation-tips-staying-connected",
+        "cdc-managing-difficult-emotions"
+      ],
+      "relevant_given": true,
+      "markers": 1,
+      "invalid_markers": 0,
+      "cited": [
+        "S1"
+      ],
+      "source_claim_without_evidence": false,
+      "says_no_source": false,
+      "words": 83
+    },
+    {
+      "id": "rq-101",
+      "type": "unanswerable",
+      "route": "factual",
+      "status": "no_results",
+      "passages": [],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": true,
+      "words": 96
+    },
+    {
+      "id": "rq-016",
+      "type": "answerable",
+      "route": "factual",
+      "status": "no_results",
+      "passages": [],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": true,
+      "words": 102
+    },
+    {
+      "id": "rq-103",
+      "type": "unanswerable",
+      "route": "factual",
+      "status": "no_results",
+      "passages": [],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": true,
+      "words": 73
+    },
+    {
+      "id": "rq-018",
+      "type": "answerable",
+      "route": "factual",
+      "status": "no_results",
+      "passages": [],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": false,
+      "words": 110
+    },
+    {
+      "id": "rq-105",
+      "type": "unanswerable",
+      "route": "factual",
+      "status": "no_results",
+      "passages": [],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": true,
+      "words": 60
+    },
+    {
+      "id": "rq-020",
+      "type": "answerable",
+      "route": "factual",
+      "status": "ok",
+      "passages": [
+        "nccih-wellness-and-well-being",
+        "cdc-improve-your-emotional-well-being",
+        "cdc-emotional-well-being-about"
+      ],
+      "relevant_given": true,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": false,
+      "words": 108
+    },
+    {
+      "id": "rq-107",
+      "type": "unanswerable",
+      "route": "evidence",
+      "status": "no_results",
+      "passages": [],
+      "relevant_given": false,
+      "markers": 0,
+      "invalid_markers": 0,
+      "cited": [],
+      "source_claim_without_evidence": false,
+      "says_no_source": true,
+      "words": 79
+    }
+  ]
+}

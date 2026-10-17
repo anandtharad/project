@@ -4,7 +4,8 @@ Browsers cannot set an Authorization header on a WebSocket, and a bearer
 token in a URL ends up in logs. So the client asks for a ticket over the
 authenticated HTTP API (POST /v1/conversations/{id}/voice/tickets), then
 connects with `?ticket=`. A ticket names one user and one conversation,
-works once, and expires after VOICE_TICKET_TTL_SECONDS.
+works once, and expires after VOICE_TICKET_TTL_SECONDS. A person can hold
+only a few unused tickets: a new one replaces their oldest.
 
 Tickets live in this process's memory: with several workers, the ticket
 request and the WebSocket must reach the same one (or this store must move
@@ -27,12 +28,17 @@ class Ticket:
 
 
 class TicketStore:
-    def __init__(self, ttl_seconds: float) -> None:
+    def __init__(self, ttl_seconds: float, max_per_user: int = 5) -> None:
         self._ttl = ttl_seconds
+        self._max_per_user = max_per_user
+        # Insertion order is expiry order: every ticket has the same lifetime.
         self._tickets: dict[str, Ticket] = {}
 
     def issue(self, user_id: uuid.UUID, conversation_id: uuid.UUID) -> str:
         self._purge()
+        held = [token for token, ticket in self._tickets.items() if ticket.user_id == user_id]
+        for token in held[: max(0, len(held) - self._max_per_user + 1)]:
+            del self._tickets[token]
         token = secrets.token_urlsafe(32)
         self._tickets[token] = Ticket(user_id, conversation_id, time.monotonic() + self._ttl)
         return token
@@ -45,8 +51,12 @@ class TicketStore:
         return ticket
 
     def _purge(self) -> None:
+        """Drop expired tickets from the front (the oldest first)."""
         now = time.monotonic()
-        for token in [t for t, ticket in self._tickets.items() if ticket.expires_at < now]:
+        while self._tickets:
+            token, ticket = next(iter(self._tickets.items()))
+            if ticket.expires_at >= now:
+                break
             del self._tickets[token]
 
     def __len__(self) -> int:

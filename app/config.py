@@ -269,7 +269,7 @@ class Settings(BaseSettings):
     max_response_characters: int = Field(default=8_000, ge=100)
 
     # --- Prompts ------------------------------------------------------------
-    companion_prompt_version: str = "1.7.0"
+    companion_prompt_version: str = "1.8.0"
 
     # --- Voice (docs/voice-interface.md) --------------------------------------
     # Speech in and out over a WebSocket, beside the text API. Off by default.
@@ -293,6 +293,12 @@ class Settings(BaseSettings):
     # A WebSocket connects with a single-use ticket from
     # POST /v1/conversations/{id}/voice/tickets, valid this long.
     voice_ticket_ttl_seconds: int = Field(default=60, ge=10, le=600)
+    # Per person (docs/voice-interface.md, "Limits"): open sessions, seconds
+    # of audio sent to speech-to-text per UTC day, and how long a session may
+    # go without any message from the client.
+    voice_max_sessions_per_user: int = Field(default=2, ge=1, le=20)
+    voice_audio_seconds_per_day: int = Field(default=3600, ge=60, le=86_400)
+    voice_idle_timeout_seconds: int = Field(default=600, ge=30, le=7200)
     deepgram_api_key: SecretStr | None = None
     sarvam_api_key: SecretStr | None = None
     gnani_api_key: SecretStr | None = None

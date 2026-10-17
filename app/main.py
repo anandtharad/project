@@ -42,6 +42,7 @@ from app.safety.factory import build_safety_layer
 from app.safety.policy import PATHWAY_RULES
 from app.state.extractor import StateExtractor
 from app.voice.factory import build_stt, build_tts
+from app.voice.limits import VoiceLimits
 from app.voice.tickets import TicketStore
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -331,6 +332,10 @@ def create_app(
     app.state.voice_stt = build_stt(settings)
     app.state.voice_tts = build_tts(settings)
     app.state.voice_tickets = TicketStore(settings.voice_ticket_ttl_seconds)
+    app.state.voice_limits = VoiceLimits(
+        max_sessions_per_user=settings.voice_max_sessions_per_user,
+        audio_seconds_per_day=settings.voice_audio_seconds_per_day,
+    )
     app.include_router(health.router)
     app.include_router(conversations.router)
     app.include_router(messages.router)

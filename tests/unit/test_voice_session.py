@@ -268,3 +268,21 @@ async def test_reply_audio_is_sent_in_whole_samples() -> None:
 def test_speakable_text() -> None:
     assert speakable("**Sleep** helps [S1], [S2]. Try `this`.") == "Sleep helps. Try this."
     assert sentences("One. Two? Three!") == ["One.", "Two?", "Three!"]
+
+
+async def test_audio_beyond_the_daily_budget_is_not_transcribed() -> None:
+    budget = [0.25]  # seconds left
+
+    def charge(seconds: float) -> bool:
+        if seconds > budget[0] + 1e-9:
+            return False
+        budget[0] -= seconds
+        return True
+
+    h = Harness(transcripts=["hello"])
+    h.session._charge_audio = charge
+    await h.session.start()
+    for _ in range(4):  # 0.1 s each: the third and fourth are over budget
+        await h.session.on_audio(PCM)
+    assert h.session.dropped_audio_bytes == 2 * len(PCM)
+    assert [e["code"] for e in h.of("error")] == ["voice_limit_reached"]  # once

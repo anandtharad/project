@@ -194,7 +194,7 @@ is the source of truth. Important ones:
 | `EMBEDDING_PROVIDER`, `EMBEDDING_CACHE_DIR` | `local` (default, no key), `openai`, `gemini` or `none`; where the local model is cached |
 | `MEMORY_MIN_SEMANTIC`, `MEMORY_RETENTION_DAYS` | retrieval threshold (0.49, tuned for the local model) and the longest a memory is kept (365 days) |
 | `CONVERSATION_RETENTION_DAYS` | a conversation with no new message for this long is deleted with its turns (365 days; memories are kept) |
-| `COMPANION_PROMPT_VERSION` | reply prompt; `1.7.0` (default) is the 1.5.0 voice (docs/voice.md) with the safety pathway fragments (1.6.0) and the evidence rules for knowledge passages; `1.4.0` is the previous voice (`1.0.0` runs without a policy) |
+| `COMPANION_PROMPT_VERSION` | reply prompt; `1.8.0` (default) is the 1.5.0 voice (docs/voice.md) with the safety pathway fragments (1.6.0), the evidence rules for knowledge passages (1.7.0) and the knowledge fragments that ask for citations and for saying when there is no reliable source (docs/rag.md); `1.4.0` is the previous voice (`1.0.0` runs without a policy) |
 | `KNOWLEDGE_ENABLED`, `KNOWLEDGE_MIN_SEMANTIC` | knowledge lookups for information requests (default on; needs `scripts/ingest_knowledge.py` once) and the relevance threshold, tuned for the local embedding model; see docs/rag.md |
 | `SAFETY_REGION`, `SAFETY_CLASSIFIER_PROVIDER`, `SAFETY_CLASSIFIER_MODEL` | crisis resources (`IN`, `US`, `GB` or generic) and the safety classifier (`auto`: Groq `openai/gpt-oss-safeguard-20b` when `GROQ_API_KEY` is set); see docs/safety.md |
 | `MEMORY_PROMPT_VERSION` | memory-extraction prompt (see docs/memory.md for the evaluated versions) |

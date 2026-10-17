@@ -57,6 +57,9 @@ def configure_logging(level: str) -> None:
         "google_genai",
         "google.genai",
         "typesafe_sdk",
+        # The speech providers' WebSocket client logs every upgrade header
+        # (API keys) and frame (transcripts, reply text) at DEBUG.
+        "websockets",
     ):
         logging.getLogger(noisy).setLevel(max(logging.WARNING, root.level))
 

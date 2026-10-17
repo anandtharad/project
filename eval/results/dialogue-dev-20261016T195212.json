@@ -1,0 +1,1355 @@
+{
+  "eval": "dialogue",
+  "split": "dev",
+  "model": "groq:openai/gpt-oss-120b",
+  "prompt": "companion_system@1.7.0",
+  "items_sha256": "617542e62f01adbec2dc8a61ffdf54682d398e95039b78830a63e59d2cb119f9",
+  "sources": {
+    "esconv": 20,
+    "empatheticdialogues": 20
+  },
+  "metadata": {
+    "suite": "dialogue",
+    "created_at": "2026-10-16T19:52:12+00:00",
+    "code": {
+      "commit": "6e40fca682594368e1f0477b4184dff39ca59a22",
+      "dirty": false
+    },
+    "python": "3.12.3",
+    "generation": {
+      "provider": "groq",
+      "model": "openai/gpt-oss-120b",
+      "effort": "low",
+      "temperature": null,
+      "max_output_tokens": 2048,
+      "max_context_tokens": 4000
+    },
+    "prompts": {
+      "companion": {
+        "id": "companion_system",
+        "version": "1.7.0",
+        "checksum": "908774e17b0ae30fe2fee1d1bb0a2c8c85c3d894eff0118eb50346bf7a83ff27"
+      },
+      "state": {
+        "id": "state_extraction",
+        "version": "1.0.0",
+        "checksum": "aa29006d5339beb5d40bb7dabc062be4b7c6af80785d8c123397983c0c42e673"
+      },
+      "memory": {
+        "id": "memory_extraction",
+        "version": "1.1.0",
+        "checksum": "3f6a8d195ac34d54336dc4d2ec575575eb9478c3534cb43291ff13b34a77d3df"
+      },
+      "decision_llm": {
+        "id": "decision_llm",
+        "version": "1.0.0",
+        "checksum": "004c6bfd1e5ae52bc54f8e5b4a6ef46eb7e62225af802a270a264789699d9064"
+      },
+      "safety_policy": {
+        "id": "safety_policy",
+        "version": "1.0.0",
+        "checksum": "b022e2a40ca97148a58513b70689e9874490ec521c626e1bc6701bb71ce35a4a"
+      },
+      "safety_output": {
+        "id": "safety_output",
+        "version": "1.0.0",
+        "checksum": "bb152d110d67762b84a6b3ee821bec284ccc6d1c87c46c85adf7c7404a66470e"
+      }
+    },
+    "decisions": {
+      "provider": "off",
+      "llm_model": null,
+      "questions": {
+        "conversation_mode": "1.0.0",
+        "response_strategy": "1.0.0",
+        "knowledge_retrieval_useful": "1.0.0"
+      },
+      "questions_lock_sha256": "5720f51f8330e8031d459252400e124397447a95fe05445ba4d971d3d2c9e14d"
+    },
+    "state_extraction": true,
+    "memory": {
+      "enabled": true,
+      "min_semantic": 0.49,
+      "max_retrieved": 5
+    },
+    "embeddings": {
+      "provider": "local",
+      "model": null
+    },
+    "knowledge": {
+      "enabled": true,
+      "max_results": 3,
+      "min_semantic": 0.7,
+      "min_lexical": 0.46,
+      "max_per_document": 2,
+      "chunking": "180/30/25",
+      "manifest_sha256": "5c6624f76eaef812df3914a5b9bcd1c7f1982b67383fdd12eb06d2a1a9452c45",
+      "reranker": null
+    },
+    "safety": {
+      "enabled": true,
+      "classifier_provider": "auto",
+      "classifier_model": "openai/gpt-oss-safeguard-20b",
+      "region": "",
+      "output_llm_check": true
+    },
+    "dataset": {
+      "path": "eval/datasets/dialogue/external/items.jsonl",
+      "sha256": "617542e62f01adbec2dc8a61ffdf54682d398e95039b78830a63e59d2cb119f9"
+    },
+    "limitations": [
+      "Human history, not the companion's: each item is one reply, not a conversation.",
+      "No memory, knowledge, decisions or safety classifier; flagged items are marked, not routed.",
+      "Measures against the human reply are proxies (asked, suggested, length), not quality.",
+      "Human replies come from crowd-sourced conversations: a reference, not a gold standard."
+    ]
+  },
+  "summary": {
+    "all": {
+      "items": 40,
+      "median_length_ratio": 2.0,
+      "asks_rate": 0.575,
+      "human_asks_rate": 0.475,
+      "asks_when_human_asks": 0.579,
+      "asks_when_human_does_not": 0.571,
+      "suggests_rate": 0.2,
+      "human_suggests_rate": 0.15,
+      "suggests_when_human_does_not": 0.118,
+      "voice": {
+        "replies": 40,
+        "mean_words": 41.8,
+        "mean_words_per_message_word": 2.97,
+        "with_list": 0.0,
+        "with_bold_or_heading": 0.0,
+        "ending_with_question": 0.55,
+        "more_than_one_question": 0.05,
+        "with_option_menu": 0.0,
+        "with_stock_phrase": 0.2,
+        "stock_phrases": 8
+      },
+      "safety_flagged": 0
+    },
+    "empatheticdialogues": {
+      "items": 20,
+      "median_length_ratio": 2.9050000000000002,
+      "asks_rate": 0.7,
+      "human_asks_rate": 0.45,
+      "asks_when_human_asks": 0.778,
+      "asks_when_human_does_not": 0.636,
+      "suggests_rate": 0.05,
+      "human_suggests_rate": 0.0,
+      "suggests_when_human_does_not": 0.05,
+      "voice": {
+        "replies": 20,
+        "mean_words": 31.6,
+        "mean_words_per_message_word": 2.19,
+        "with_list": 0.0,
+        "with_bold_or_heading": 0.0,
+        "ending_with_question": 0.7,
+        "more_than_one_question": 0.05,
+        "with_option_menu": 0.0,
+        "with_stock_phrase": 0.2,
+        "stock_phrases": 4
+      },
+      "safety_flagged": 0
+    },
+    "esconv": {
+      "items": 20,
+      "median_length_ratio": 1.555,
+      "asks_rate": 0.45,
+      "human_asks_rate": 0.5,
+      "asks_when_human_asks": 0.4,
+      "asks_when_human_does_not": 0.5,
+      "suggests_rate": 0.35,
+      "human_suggests_rate": 0.3,
+      "suggests_when_human_does_not": 0.214,
+      "voice": {
+        "replies": 20,
+        "mean_words": 51.9,
+        "mean_words_per_message_word": 3.75,
+        "with_list": 0.0,
+        "with_bold_or_heading": 0.0,
+        "ending_with_question": 0.4,
+        "more_than_one_question": 0.05,
+        "with_option_menu": 0.0,
+        "with_stock_phrase": 0.2,
+        "stock_phrases": 4
+      },
+      "safety_flagged": 0
+    }
+  },
+  "rows": [
+    {
+      "id": "esconv-0147-00",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 17,
+      "reference_words": 13,
+      "length_ratio": 1.31,
+      "asks": true,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 17,
+        "message_words": 18,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-444-conv-888-02",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 18,
+      "reference_words": 26,
+      "length_ratio": 0.69,
+      "asks": true,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 18,
+        "message_words": 6,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-1231-16",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 88,
+      "reference_words": 36,
+      "length_ratio": 2.44,
+      "asks": true,
+      "human_asks": false,
+      "suggests": true,
+      "human_suggests": false,
+      "surface": {
+        "words": 88,
+        "message_words": 20,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-6596-conv-13193-00",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 27,
+      "reference_words": 11,
+      "length_ratio": 2.45,
+      "asks": false,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 27,
+        "message_words": 10,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": [
+          "that must "
+        ]
+      }
+    },
+    {
+      "id": "esconv-0392-07",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 26,
+      "reference_words": 26,
+      "length_ratio": 1.0,
+      "asks": false,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 26,
+        "message_words": 10,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-360-conv-721-02",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 23,
+      "reference_words": 12,
+      "length_ratio": 1.92,
+      "asks": true,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 23,
+        "message_words": 5,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0346-19",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 32,
+      "reference_words": 17,
+      "length_ratio": 1.88,
+      "asks": true,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 32,
+        "message_words": 30,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-4794-conv-9588-00",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 27,
+      "reference_words": 7,
+      "length_ratio": 3.86,
+      "asks": true,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 27,
+        "message_words": 22,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0845-24",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 28,
+      "reference_words": 7,
+      "length_ratio": 4.0,
+      "asks": true,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 28,
+        "message_words": 11,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-2364-conv-4728-02",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 55,
+      "reference_words": 4,
+      "length_ratio": 13.75,
+      "asks": false,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 55,
+        "message_words": 10,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0381-04",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 23,
+      "reference_words": 12,
+      "length_ratio": 1.92,
+      "asks": false,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 23,
+        "message_words": 16,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-9620-conv-19241-00",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 28,
+      "reference_words": 14,
+      "length_ratio": 2.0,
+      "asks": true,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 28,
+        "message_words": 14,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": [
+          "that sounds really"
+        ]
+      }
+    },
+    {
+      "id": "esconv-0858-16",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 175,
+      "reference_words": 17,
+      "length_ratio": 10.29,
+      "asks": true,
+      "human_asks": true,
+      "suggests": true,
+      "human_suggests": true,
+      "surface": {
+        "words": 175,
+        "message_words": 7,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 2,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-2730-conv-5460-00",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 33,
+      "reference_words": 5,
+      "length_ratio": 6.6,
+      "asks": false,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 33,
+        "message_words": 21,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0471-04",
+      "source": "esconv",
+      "fragments": [
+        "problem_solve"
+      ],
+      "safety_flagged": false,
+      "reply_words": 101,
+      "reference_words": 12,
+      "length_ratio": 8.42,
+      "asks": true,
+      "human_asks": true,
+      "suggests": true,
+      "human_suggests": true,
+      "surface": {
+        "words": 101,
+        "message_words": 33,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-12299-conv-24599-02",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 42,
+      "reference_words": 4,
+      "length_ratio": 10.5,
+      "asks": true,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 42,
+        "message_words": 28,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 2,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0812-07",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 64,
+      "reference_words": 62,
+      "length_ratio": 1.03,
+      "asks": false,
+      "human_asks": true,
+      "suggests": true,
+      "human_suggests": true,
+      "surface": {
+        "words": 64,
+        "message_words": 49,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": [
+          "it's understandable"
+        ]
+      }
+    },
+    {
+      "id": "ed-hit-2589-conv-5178-00",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 19,
+      "reference_words": 13,
+      "length_ratio": 1.46,
+      "asks": true,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 19,
+        "message_words": 21,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0687-18",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 49,
+      "reference_words": 41,
+      "length_ratio": 1.2,
+      "asks": true,
+      "human_asks": false,
+      "suggests": true,
+      "human_suggests": false,
+      "surface": {
+        "words": 49,
+        "message_words": 17,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-10780-conv-21561-00",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 47,
+      "reference_words": 8,
+      "length_ratio": 5.88,
+      "asks": true,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 47,
+        "message_words": 38,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0412-13",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 108,
+      "reference_words": 18,
+      "length_ratio": 6.0,
+      "asks": false,
+      "human_asks": false,
+      "suggests": true,
+      "human_suggests": false,
+      "surface": {
+        "words": 108,
+        "message_words": 19,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-969-conv-1939-00",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 25,
+      "reference_words": 4,
+      "length_ratio": 6.25,
+      "asks": true,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 25,
+        "message_words": 10,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0911-03",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 38,
+      "reference_words": 41,
+      "length_ratio": 0.93,
+      "asks": false,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 38,
+        "message_words": 23,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-4723-conv-9446-00",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 29,
+      "reference_words": 5,
+      "length_ratio": 5.8,
+      "asks": true,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 29,
+        "message_words": 17,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0045-19",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 30,
+      "reference_words": 39,
+      "length_ratio": 0.77,
+      "asks": false,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": true,
+      "surface": {
+        "words": 30,
+        "message_words": 10,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": [
+          "it sounds like"
+        ]
+      }
+    },
+    {
+      "id": "ed-hit-11863-conv-23727-00",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 35,
+      "reference_words": 12,
+      "length_ratio": 2.92,
+      "asks": false,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 35,
+        "message_words": 32,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": [
+          "it sounds like"
+        ]
+      }
+    },
+    {
+      "id": "esconv-0498-01",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 22,
+      "reference_words": 17,
+      "length_ratio": 1.29,
+      "asks": false,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 22,
+        "message_words": 11,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-10910-conv-21821-02",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 52,
+      "reference_words": 18,
+      "length_ratio": 2.89,
+      "asks": false,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 52,
+        "message_words": 44,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0523-16",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 51,
+      "reference_words": 31,
+      "length_ratio": 1.65,
+      "asks": false,
+      "human_asks": true,
+      "suggests": true,
+      "human_suggests": true,
+      "surface": {
+        "words": 51,
+        "message_words": 18,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-8359-conv-16719-02",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 28,
+      "reference_words": 14,
+      "length_ratio": 2.0,
+      "asks": true,
+      "human_asks": false,
+      "suggests": true,
+      "human_suggests": false,
+      "surface": {
+        "words": 28,
+        "message_words": 16,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0932-13",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 16,
+      "reference_words": 13,
+      "length_ratio": 1.23,
+      "asks": false,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 16,
+        "message_words": 5,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-2890-conv-5780-02",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 34,
+      "reference_words": 9,
+      "length_ratio": 3.78,
+      "asks": true,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 34,
+        "message_words": 6,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0229-17",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 30,
+      "reference_words": 41,
+      "length_ratio": 0.73,
+      "asks": true,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 30,
+        "message_words": 5,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-11630-conv-23261-02",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 39,
+      "reference_words": 20,
+      "length_ratio": 1.95,
+      "asks": true,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 39,
+        "message_words": 24,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0758-07",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 40,
+      "reference_words": 11,
+      "length_ratio": 3.64,
+      "asks": false,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 40,
+        "message_words": 46,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": [
+          "it's understandable"
+        ]
+      }
+    },
+    {
+      "id": "ed-hit-630-conv-1261-02",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 25,
+      "reference_words": 8,
+      "length_ratio": 3.12,
+      "asks": true,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 25,
+        "message_words": 16,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": [
+          "that must "
+        ]
+      }
+    },
+    {
+      "id": "esconv-0399-15",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 60,
+      "reference_words": 41,
+      "length_ratio": 1.46,
+      "asks": true,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": true,
+      "surface": {
+        "words": 60,
+        "message_words": 41,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "ed-hit-6660-conv-13320-02",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 18,
+      "reference_words": 17,
+      "length_ratio": 1.06,
+      "asks": false,
+      "human_asks": true,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 18,
+        "message_words": 18,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    },
+    {
+      "id": "esconv-0868-08",
+      "source": "esconv",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 40,
+      "reference_words": 12,
+      "length_ratio": 3.33,
+      "asks": false,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 40,
+        "message_words": 13,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 0,
+        "ends_with_question": false,
+        "option_menu": false,
+        "stock_phrases": [
+          "it's understandable"
+        ]
+      }
+    },
+    {
+      "id": "ed-hit-11528-conv-23057-00",
+      "source": "empatheticdialogues",
+      "fragments": [
+        "open"
+      ],
+      "safety_flagged": false,
+      "reply_words": 29,
+      "reference_words": 24,
+      "length_ratio": 1.21,
+      "asks": true,
+      "human_asks": false,
+      "suggests": false,
+      "human_suggests": false,
+      "surface": {
+        "words": 29,
+        "message_words": 20,
+        "list_lines": 0,
+        "bold_or_heading": 0,
+        "questions": 1,
+        "ends_with_question": true,
+        "option_menu": false,
+        "stock_phrases": []
+      }
+    }
+  ],
+  "judgement": {
+    "rubric": "eval/rubrics/dialogue_pairwise_v1.md",
+    "rubric_sha256": "c018ed9e21fb4b1eb7c13edd6f61abb74fad62e9336166d25ec5414879cd4185",
+    "judges": {
+      "dialogue-dev-20261016T195212.judge-A": {
+        "all": {
+          "n": 40,
+          "win_rate": 0.725,
+          "tie_rate": 0.025,
+          "loss_rate": 0.25
+        },
+        "empatheticdialogues": {
+          "n": 20,
+          "win_rate": 0.7,
+          "tie_rate": 0.0,
+          "loss_rate": 0.3
+        },
+        "esconv": {
+          "n": 20,
+          "win_rate": 0.75,
+          "tie_rate": 0.05,
+          "loss_rate": 0.2
+        }
+      },
+      "dialogue-dev-20261016T195212.judge-B": {
+        "all": {
+          "n": 40,
+          "win_rate": 0.825,
+          "tie_rate": 0.025,
+          "loss_rate": 0.15
+        },
+        "empatheticdialogues": {
+          "n": 20,
+          "win_rate": 0.8,
+          "tie_rate": 0.0,
+          "loss_rate": 0.2
+        },
+        "esconv": {
+          "n": 20,
+          "win_rate": 0.85,
+          "tie_rate": 0.05,
+          "loss_rate": 0.1
+        }
+      }
+    },
+    "agreement": {
+      "items": 40,
+      "all_agree_rate": 0.9,
+      "combined": {
+        "all": {
+          "n": 36,
+          "win_rate": 0.806,
+          "tie_rate": 0.028,
+          "loss_rate": 0.167
+        },
+        "empatheticdialogues": {
+          "n": 18,
+          "win_rate": 0.778,
+          "tie_rate": 0.0,
+          "loss_rate": 0.222
+        },
+        "esconv": {
+          "n": 18,
+          "win_rate": 0.833,
+          "tie_rate": 0.056,
+          "loss_rate": 0.111
+        }
+      }
+    },
+    "verdicts": {
+      "dialogue-dev-20261016T195212.judge-A": {
+        "esconv-0147-00": "win",
+        "ed-hit-444-conv-888-02": "win",
+        "esconv-1231-16": "win",
+        "ed-hit-6596-conv-13193-00": "loss",
+        "esconv-0392-07": "win",
+        "ed-hit-360-conv-721-02": "win",
+        "esconv-0346-19": "loss",
+        "ed-hit-4794-conv-9588-00": "win",
+        "esconv-0845-24": "loss",
+        "ed-hit-2364-conv-4728-02": "win",
+        "esconv-0381-04": "win",
+        "ed-hit-9620-conv-19241-00": "win",
+        "esconv-0858-16": "win",
+        "ed-hit-2730-conv-5460-00": "win",
+        "esconv-0471-04": "win",
+        "ed-hit-12299-conv-24599-02": "loss",
+        "esconv-0812-07": "loss",
+        "ed-hit-2589-conv-5178-00": "win",
+        "esconv-0687-18": "win",
+        "ed-hit-10780-conv-21561-00": "loss",
+        "esconv-0412-13": "win",
+        "ed-hit-969-conv-1939-00": "loss",
+        "esconv-0911-03": "win",
+        "ed-hit-4723-conv-9446-00": "loss",
+        "esconv-0045-19": "win",
+        "ed-hit-11863-conv-23727-00": "win",
+        "esconv-0498-01": "tie",
+        "ed-hit-10910-conv-21821-02": "win",
+        "esconv-0523-16": "win",
+        "ed-hit-8359-conv-16719-02": "win",
+        "esconv-0932-13": "win",
+        "ed-hit-2890-conv-5780-02": "win",
+        "esconv-0229-17": "win",
+        "ed-hit-11630-conv-23261-02": "win",
+        "esconv-0758-07": "win",
+        "ed-hit-630-conv-1261-02": "win",
+        "esconv-0399-15": "loss",
+        "ed-hit-6660-conv-13320-02": "win",
+        "esconv-0868-08": "win",
+        "ed-hit-11528-conv-23057-00": "loss"
+      },
+      "dialogue-dev-20261016T195212.judge-B": {
+        "ed-hit-11528-conv-23057-00": "win",
+        "esconv-0868-08": "win",
+        "ed-hit-6660-conv-13320-02": "win",
+        "esconv-0399-15": "win",
+        "ed-hit-630-conv-1261-02": "win",
+        "esconv-0758-07": "win",
+        "ed-hit-11630-conv-23261-02": "win",
+        "esconv-0229-17": "win",
+        "ed-hit-2890-conv-5780-02": "win",
+        "esconv-0932-13": "win",
+        "ed-hit-8359-conv-16719-02": "win",
+        "esconv-0523-16": "win",
+        "ed-hit-10910-conv-21821-02": "win",
+        "esconv-0498-01": "tie",
+        "ed-hit-11863-conv-23727-00": "win",
+        "esconv-0045-19": "win",
+        "ed-hit-4723-conv-9446-00": "loss",
+        "esconv-0911-03": "win",
+        "ed-hit-969-conv-1939-00": "win",
+        "esconv-0412-13": "win",
+        "ed-hit-10780-conv-21561-00": "loss",
+        "esconv-0687-18": "win",
+        "ed-hit-2589-conv-5178-00": "win",
+        "esconv-0812-07": "win",
+        "ed-hit-12299-conv-24599-02": "loss",
+        "esconv-0471-04": "win",
+        "ed-hit-2730-conv-5460-00": "win",
+        "esconv-0858-16": "win",
+        "ed-hit-9620-conv-19241-00": "win",
+        "esconv-0381-04": "win",
+        "ed-hit-2364-conv-4728-02": "win",
+        "esconv-0845-24": "loss",
+        "ed-hit-4794-conv-9588-00": "win",
+        "esconv-0346-19": "loss",
+        "ed-hit-360-conv-721-02": "win",
+        "esconv-0392-07": "win",
+        "ed-hit-6596-conv-13193-00": "loss",
+        "esconv-1231-16": "win",
+        "ed-hit-444-conv-888-02": "win",
+        "esconv-0147-00": "win"
+      }
+    }
+  }
+}

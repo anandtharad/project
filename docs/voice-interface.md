@@ -72,6 +72,9 @@ a server-side connection is required for it anyway.)
 | `VOICE_END_OF_TURN` | `client` | `client`: push-to-talk, the turn ends when the person lets go. `provider`: hands-free, the STT provider's end-of-utterance ends it |
 | `VOICE_MAX_UTTERANCE_SECONDS` | `60` | an utterance is ended after this much audio |
 | `VOICE_TICKET_TTL_SECONDS` | `60` | how long a connection ticket is valid |
+| `VOICE_MAX_SESSIONS_PER_USER` | `2` | open voice sessions per person (more: tickets get `429 too_many_voice_sessions`, sockets close `4429`) |
+| `VOICE_AUDIO_SECONDS_PER_DAY` | `3600` | seconds of audio per person per UTC day sent to speech-to-text; after that audio is dropped with one `voice_limit_reached` error, and typing still works |
+| `VOICE_IDLE_TIMEOUT_SECONDS` | `600` | a session with no message from the client for this long is closed (`4408`) |
 | `DEEPGRAM_API_KEY`, `SARVAM_API_KEY`, `GNANI_API_KEY` | | the selected providers' keys |
 
 ## How a session works
@@ -85,9 +88,20 @@ A browser cannot put a bearer token on a WebSocket, so the client first asks
 for a ticket with its normal credentials. A ticket is single use, expires
 after `VOICE_TICKET_TTL_SECONDS`, is bound to the user and the conversation,
 and is checked for ownership when issued. A refused connection is accepted
-and then closed with code `4401` (bad or expired ticket) or `4503` (voice
-disabled), because a refused handshake reaches the page only as an
-unexplained failure.
+and then closed with code `4401` (bad or expired ticket), `4503` (voice
+disabled) or `4429` (too many open sessions for this person), because a
+refused handshake reaches the page only as an unexplained failure. A session
+with no client message for `VOICE_IDLE_TIMEOUT_SECONDS` closes with `4408`.
+A person holds at most five unused tickets (a new one replaces the oldest).
+
+**Limits.** Every session holds a connection on the operator's speech
+provider account, and recognised audio is billed whether or not it becomes a
+message, so the per-person limits above apply on top of the message limits.
+They live in the process's memory, like the tickets: with several workers,
+each enforces its own share. Typed text on the socket follows the HTTP API's
+rules (not empty, no NUL characters, the same length limit). The provider
+WebSocket library's debug log (which would show API keys and transcripts) is
+capped at WARNING even with `LOG_LEVEL=DEBUG`.
 
 **Client to server**
 
@@ -112,7 +126,7 @@ unexplained failure.
 | `audio_end` | all audio for this reply was sent (`seconds`) |
 | `no_speech` | the utterance had no recognisable speech |
 | `interrupted` | full duplex only (not yet) |
-| `error` | `code` and `message`: `busy`, `stt_unavailable`, `tts_unavailable`, `bad_audio_frame`, `bad_message`, or a turn error such as `too_many_messages` |
+| `error` | `code` and `message`: `busy`, `stt_unavailable`, `tts_unavailable`, `voice_limit_reached`, `bad_audio_frame`, `bad_message`, or a turn error such as `validation_failed` or `too_many_messages` |
 
 **States.** `listening` → (audio, then `end_of_speech`) `transcribing` →
 `thinking` → `speaking` → `listening`. A typed message goes from `listening`

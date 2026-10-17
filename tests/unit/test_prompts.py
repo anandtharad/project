@@ -58,12 +58,13 @@ def test_companion_prompt_covers_required_behaviors() -> None:
 
 
 def test_default_companion_prompt_keeps_the_rules_and_every_policy_fragment() -> None:
-    # 1.5.0 rewrote the voice, 1.6.0 added the safety pathways and 1.7.0 the
-    # evidence rules; the product, safety and privacy rules must survive.
+    # 1.5.0 rewrote the voice, 1.6.0 added the safety pathways, 1.7.0 the
+    # evidence rules and 1.8.0 the knowledge fragments; the product, safety
+    # and privacy rules must survive.
     # The field default, not Settings(): a developer's .env may pin another version.
     default = Settings.model_fields["companion_prompt_version"].default
     prompt = PromptRegistry().get("companion_system", default)
-    assert prompt.version == "1.7.0"
+    assert prompt.version == "1.8.0"
     text = prompt.render(response_guidance="")
     for phrase in (
         "You are an AI, not a person",
@@ -89,7 +90,8 @@ def test_default_companion_prompt_keeps_the_rules_and_every_policy_fragment() ->
         assert phrase in text, phrase
     selectable = {s.value for s in Strategy} | {"open", "no_advice", "safety_signal"}
     safety = {rule.fragment for rule in PATHWAY_RULES.values() if rule.fragment}
-    assert set(prompt.fragments) == selectable | safety
+    knowledge = {"knowledge_evidence", "knowledge_no_sources"}  # app/rag/service.py
+    assert set(prompt.fragments) == selectable | safety | knowledge
 
 
 def copy_prompts(tmp_path: Path) -> Path:

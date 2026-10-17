@@ -87,11 +87,11 @@ unmodified here.
 
 | Suite | Result |
 |---|---|
-| unit | 783 passed |
-| integration | 119 passed |
+| unit | 788 passed |
+| integration | 121 passed |
 | security | 57 passed |
 | live | 8 skipped (opt-in; run with `scripts/dev.py live-groq`) |
-| **total** | **959 passed, 8 skipped** (2026-10-16, after the voice interface and the training setup) |
+| **total** | **966 passed, 8 skipped** (2026-10-17, after the voice review fixes and prompt 1.8.0) |
 
 Live runs made from this environment once network access was allowed
 (2026-10-13): Groq live tests, strict structured state extraction, the
@@ -369,6 +369,59 @@ review of a sample is still needed.
 | Full duplex with barge-in | Prepared, not enabled | `cancel()` on every TTS stream, `_barge_in()` with a turn counter, tested; still needs echo cancellation, a speech-start trigger and keep-alive STT (docs/voice-interface.md) |
 | Browser client | Built (development page) | `/voice` checked in headless Chromium with a fake microphone and the fake providers: typed and spoken turns, button disabled while speaking, back to listening after playback, no console errors |
 
+**Adversarial review of the voice code (2026-10-17).** Three reviewers
+(security and privacy, session concurrency, provider protocols and the
+browser page); a separate verifier tried to refute each finding by
+reproducing it. Two findings were refuted (an unbounded ticket store and a
+ticket redeemed after its conversation was deleted, which fails closed).
+
+Fixed, with tests:
+- the provider WebSocket library's DEBUG log (API keys, transcripts) is
+  capped at WARNING;
+- an oversized first frame is no longer parsed on the event loop (it stalled
+  the server for 1.6-2.5 s);
+- per person: at most `VOICE_MAX_SESSIONS_PER_USER` open sessions and five
+  unused tickets, a daily audio budget for speech-to-text
+  (`VOICE_AUDIO_SECONDS_PER_DAY`), and an idle timeout;
+- typed text on the socket follows the HTTP API's rules (a NUL character
+  reached the database and leaked an internal error code);
+- a first `stop` message now ends the session.
+
+**Confirmed and still open** (reproduced; fixes designed, not yet made):
+- an STT connection that drops mid-utterance ends the whole voice socket
+  without an error event (high);
+- disconnecting while the companion is thinking leaves that conversation
+  answering `409 turn_in_progress` for up to 150 s (high);
+- an unexpected exception in a turn (e.g. a malformed provider message) can
+  leave the session stuck as busy;
+- after a speech-recognition error the partial transcript is still sent as a
+  turn; in hands-free mode one failed STT connection is never retried, and
+  typing is refused while an STT stream is open;
+- a TTS failure after some audio was sent returns to listening while the
+  reply still plays;
+- audio is not paced to real time (the daily budget bounds the cost);
+- the browser page never releases the microphone and cannot reconnect
+  without a reload;
+- "Task exception was never retrieved" is logged when a client hangs up
+  mid-reply.
+
+Not yet verified (the verifier did not finish): provider closes with codes
+1000/1001 before the end-of-reply marker are read as success; Gnani details
+(the reader waits the full timeout after release, a sentence can be skipped
+when the server closes after each request, frames are sent in bursts, the
+default voice is not tied to the model); and in the browser page, aliasing
+in the 16 kHz resampler and up to 100 ms clipped at release.
+
+## Prompt 1.8.0 is the default (2026-10-17)
+
+On the reply model, prompt 1.8.0 halved unsupported replies (60% to 30%,
+two blind judges), stopped claiming sources without evidence (2 of 12 to 0)
+and says when there is no reliable source (0 of 12 to 9 of 12); details in
+docs/rag.md. The dialogue benchmark on the reply model: two blind judges
+preferred the companion's reply to the human one in 72.5% and 82.5% of 40
+dev items, with the caveat that its replies are twice as long
+(docs/evaluation.md).
+
 ## Open questions and next steps
 
 1. **A decision model that passes calibration.** The LLM provider on
@@ -386,6 +439,6 @@ review of a sample is still needed.
 3. **LLM credentials** for providers other than Groq, and the Phase 6 model
    comparison.
 4. **Runs waiting for the reply model's daily budget** (Groq free tier,
-   `gpt-oss-120b`): the 1.7.0 vs 1.8.0 generation comparison (20 queries),
-   then the dialogue benchmark (`eval_dialogue.py run --split dev --limit
-   40`, then two blind judges) and a live golden sample.
+   `gpt-oss-120b`): a live golden sample, including the long conversations
+   that decide whether summarization is needed. (The 1.8.0 comparison and the
+   dialogue benchmark are done.)

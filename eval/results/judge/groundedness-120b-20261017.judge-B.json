@@ -1,0 +1,322 @@
+[
+ {
+  "jid": "g40",
+  "unsupported_specifics": 3,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "The general benefit of paced breathing is supported, but the 4-count inhale and 6-count exhale and the claim that it calms the nervous system when a flush starts are not in the passage."
+ },
+ {
+  "jid": "g39",
+  "unsupported_specifics": 2,
+  "contradicts": false,
+  "says_no_source": true,
+  "verdict": "unsupported",
+  "reason": "With no passages, it makes two definite claims about how nicotine replacement works (patch gives a steady dose, gum lets you control each dose), though it admits it has no source."
+ },
+ {
+  "jid": "g38",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "The definitions of loneliness and social isolation, and the point that someone can live alone without feeling lonely, all come from S1/S3."
+ },
+ {
+  "jid": "g37",
+  "unsupported_specifics": 1,
+  "contradicts": false,
+  "says_no_source": true,
+  "verdict": "minor",
+  "reason": "One common, low-stakes unsourced claim that reflux tends to worsen after dinner and can disturb sleep, plus a suggestion to see a doctor or pharmacist."
+ },
+ {
+  "jid": "g36",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "The emotional and physical dimensions and how they interact match S1-S3; the rest is general, hedged framing."
+ },
+ {
+  "jid": "g35",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "The emotional and physical wellness descriptions and the hedged point that each affects the other are supported by S1-S3."
+ },
+ {
+  "jid": "g34",
+  "unsupported_specifics": 2,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "The 2019 review and hypnosis study are cited correctly, but the breathing timings (4-second inhale, 6-8 second exhale) are not in the passage, and calling the study 'small' is also unsupported."
+ },
+ {
+  "jid": "g33",
+  "unsupported_specifics": 3,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "With no passages, it makes several definite UK legal claims (stress treated like any condition under UK law, manager cannot refuse, fit-note requirement)."
+ },
+ {
+  "jid": "g32",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "Only a hedged possibility that reflux disrupts sleep and a suggestion to see a doctor or pharmacist; no specific claims."
+ },
+ {
+  "jid": "g31",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "The meditation-vs-CBT/exercise comparability, the strong CBT-I recommendation and the weaker relaxation evidence all follow S1-S3."
+ },
+ {
+  "jid": "g30",
+  "unsupported_specifics": 1,
+  "contradicts": false,
+  "says_no_source": true,
+  "verdict": "minor",
+  "reason": "It admits it has no source and mostly suggests a GP, but implies daytime fatigue and gasping pauses are signs of apnoea, one common unsourced claim."
+ },
+ {
+  "jid": "g29",
+  "unsupported_specifics": 3,
+  "contradicts": false,
+  "says_no_source": true,
+  "verdict": "unsupported",
+  "reason": "The passages are US-focused and don't cover this, yet it gives specific claims about the named IAPT service: self-referral without a GP, online form or phone, then an assessment."
+ },
+ {
+  "jid": "g28",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "A hedged list of general behaviour changes to watch for, with no numbers, named conditions or definite causal claims."
+ },
+ {
+  "jid": "g27",
+  "unsupported_specifics": 6,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "None of the passages support its claims about the IAPT programme, the 18+ age rule, a Manchester phone number (0300 123 5000), the online form or the assessment process, and the phone number is a high-stakes contact detail."
+ },
+ {
+  "jid": "g26",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": true,
+  "verdict": "grounded",
+  "reason": "It says it has no solid source and offers only hedged, general comments and a suggestion to talk to a doctor."
+ },
+ {
+  "jid": "g25",
+  "unsupported_specifics": 1,
+  "contradicts": false,
+  "says_no_source": true,
+  "verdict": "minor",
+  "reason": "It admits it has no source and makes one common mechanism claim (the glasses filter short-wavelength light that affects melatonin); the rest is hedged."
+ },
+ {
+  "jid": "g24",
+  "unsupported_specifics": 3,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "The passages cover only general sleep needs and CBT-I endorsement; the starting time-in-bed method, the 5-6 hour figure and the weekly adjustments are unsupported."
+ },
+ {
+  "jid": "g23",
+  "unsupported_specifics": 5,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "With no passages, it gives several specifics (10,000 lux, distance, UV filtering, photosensitive-medication caution, 20-30 minutes in the morning)."
+ },
+ {
+  "jid": "g22",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "The hearing-loss to withdrawal to loneliness pathway and the listed health risks, including nursing-home admission, come from S1 and S2."
+ },
+ {
+  "jid": "g21",
+  "unsupported_specifics": 2,
+  "contradicts": false,
+  "says_no_source": true,
+  "verdict": "unsupported",
+  "reason": "It admits it has no study, then claims clinicians start near actual sleep time at about 5-6 hours in bed, neither of which is in the passages."
+ },
+ {
+  "jid": "g20",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": true,
+  "verdict": "grounded",
+  "reason": "It says it has no reliable source on price or mantras and only suggests contacting a local centre."
+ },
+ {
+  "jid": "g19",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "The link between hearing loss, less interaction, isolation and loneliness, and the advice to see a doctor, are supported by S1 and S3."
+ },
+ {
+  "jid": "g18",
+  "unsupported_specifics": 4,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "With no passages, it makes several definite claims about how nicotine replacement works: nicotine without smoke, the patch's steady low dose, gum dosing control, and combining the two."
+ },
+ {
+  "jid": "g17",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": true,
+  "verdict": "grounded",
+  "reason": "It says it has no source on CPAP noise and only suggests asking the sleep clinic or supplier."
+ },
+ {
+  "jid": "g16",
+  "unsupported_specifics": 3,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "With no passages, it claims a deep-pressure relaxation mechanism, describes the state of the research, and gives a 10%-of-body-weight sizing rule."
+ },
+ {
+  "jid": "g15",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "No drug cures stress, the relaxation response lowers heart rate and stress hormones, and a professional may suggest therapy or medication, all per S1 and S2."
+ },
+ {
+  "jid": "g14",
+  "unsupported_specifics": 1,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "minor",
+  "reason": "Mostly hedged, but it lists gasping, daytime fatigue and headaches as signs worth raising, one common unsourced claim."
+ },
+ {
+  "jid": "g13",
+  "unsupported_specifics": 4,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "With no passages, it recommends named products (ResMed AirSense 10 and AirMini, Philips DreamStation, Apex XT) as quiet, which are high-stakes brand recommendations."
+ },
+ {
+  "jid": "g12",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "No stress-curing drug, fight-or-flight, and non-drug strategies or professional help for anxiety and depression all follow S1 and S2."
+ },
+ {
+  "jid": "g11",
+  "unsupported_specifics": 4,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "With no passages, it gives specific intake figures (1.6-2.2 g/kg, 110-155 g) and definite claims about spreading intake and adjusting it to training intensity."
+ },
+ {
+  "jid": "g10",
+  "unsupported_specifics": 2,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "With no passages, it makes definite UK legal claims that stress-related sick leave can be taken and that a manager cannot block it, which are high-stakes legal specifics."
+ },
+ {
+  "jid": "g09",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "A hedged list of general warning signs ('can be clues', 'can be a red flag') with no numbers, named conditions or definite causal claims."
+ },
+ {
+  "jid": "g08",
+  "unsupported_specifics": 3,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "With no passages, it claims a timing (the hour before bed), a retinal and clock-signal mechanism, and studies showing a modest melatonin boost."
+ },
+ {
+  "jid": "g07",
+  "unsupported_specifics": 2,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "With no passages, it gives a specific price range ($400-$800) and a definite claim about how mantras are assigned; the price is a financial specific."
+ },
+ {
+  "jid": "g06",
+  "unsupported_specifics": 1,
+  "contradicts": false,
+  "says_no_source": true,
+  "verdict": "minor",
+  "reason": "It admits it has no study and gives one common figure (about 10,000 lux), plus general advice and a GP or pharmacist suggestion."
+ },
+ {
+  "jid": "g05",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "The definitions and the point that someone can live alone without being lonely are supported by S1 and S3; the remark about the nani is an interpretation, not a factual specific."
+ },
+ {
+  "jid": "g04",
+  "unsupported_specifics": 1,
+  "contradicts": true,
+  "says_no_source": false,
+  "verdict": "unsupported",
+  "reason": "Calling CBT-I and exercise 'stronger options' that meditation 'probably won't replace' contradicts S1 and S2, which say the effects are comparable or no different."
+ },
+ {
+  "jid": "g03",
+  "unsupported_specifics": 2,
+  "contradicts": false,
+  "says_no_source": true,
+  "verdict": "unsupported",
+  "reason": "It admits it has no source but still gives specific intake figures (1.6-2.2 g/kg and 110-155 g per day) with no passages."
+ },
+ {
+  "jid": "g02",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "Only general, hedged communication advice (calm moment, 'I' statements) and empathy; no specific factual claims."
+ },
+ {
+  "jid": "g01",
+  "unsupported_specifics": 0,
+  "contradicts": false,
+  "says_no_source": false,
+  "verdict": "grounded",
+  "reason": "Only general, hedged communication advice and a question; no specific factual claims."
+ }
+]

@@ -122,7 +122,7 @@ human judgements yet; results say so.
 |---|---|---|
 | Voice, 1.4.0 vs 1.5.0 | in docs/voice.md | done: 3 judges, 31 of 36 held-out judgements preferred 1.5.0 |
 | Groundedness of knowledge replies | `eval/rubrics/groundedness_v1.md` | done: 2 judges, 60 replies from 3 runs; verdict agreement 86.7% (kappa 0.78); found 2 misses in the code "no source" measure (docs/rag.md) |
-| Dialogue benchmarks: companion vs human reply | `eval/rubrics/dialogue_pairwise_v1.md` | ready; waiting for a live run on the reply model |
+| Dialogue benchmarks: companion vs human reply | `eval/rubrics/dialogue_pairwise_v1.md` | run on the reply model (dev, 40 items, 2026-10-17): see below |
 
 ## Public benchmarks
 
@@ -196,3 +196,30 @@ or retrieval version (Phase 6 acceptance).
 | Database runs | `evaluation_runs`, `evaluation_results` | until `RunRecorder.delete_run`. They hold no personal data |
 
 Evaluation never reads production conversations.
+
+## Dialogue benchmark on the reply model (2026-10-17)
+
+Groq `openai/gpt-oss-120b`, companion prompt 1.7.0 (1.8.0 is identical
+when no knowledge lookup runs, as here), 40 dev items: 20 ESConv, 20
+EmpatheticDialogues. Two blind pairwise judges compared the companion's
+reply with the human reply at the same point (`dialogue_pairwise_v1.md`;
+replies shown as A and B in a seeded random order). File:
+`eval/results/dialogue-dev-20261016T195212.json` (ids and measures only; the
+dataset text stays in the git-ignored folder).
+
+| | Judge A | Judge B | Where both agree (36 of 40) |
+|---|---|---|---|
+| Companion preferred | 72.5% | 82.5% | 80.6% |
+| Tie | 2.5% | 2.5% | 2.8% |
+| Human preferred | 25% | 15% | 16.7% |
+
+Measured in code on the same replies: the companion's reply is a median
+2.0 times the human reply's length (41.8 words on average); it asks a
+question in 57.5% of replies (humans 47.5%) and suggests something in 20%
+(humans 15%); 20% of replies contain a stock phrase; none uses lists or
+headings.
+
+Caveats: AI judges, not people, and AI judges are known to favour longer,
+more elaborate replies; the length ratio says that bias may be at work. A
+human-rated sample is still needed before reading this as quality.
+

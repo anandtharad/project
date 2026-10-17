@@ -516,8 +516,32 @@ The two numbers in each cell are judge A / judge B; 20 replies per run.
 These are model readings, not calibrated against people. They are 20 items
 per run on a weaker model than the reply model.
 
-1.8.0 stays off by default until the same comparison on the reply model
-(`gpt-oss-120b`) confirms it.
+**Prompt 1.8.0 on the reply model (2026-10-17): confirmed, now the
+default.** The same 20 test queries on Groq `openai/gpt-oss-120b`. Files:
+`rag-generation-test-20261015T171712.json` (1.7.0) and `…20261016T193453.json`
+(1.8.0); groundedness `rag-groundedness-20261017T011159.json`, where two new
+blind judges labelled both runs' 40 replies mixed under opaque ids (they
+agreed on 95% of verdicts, kappa 0.91, and on every "says no source" label).
+
+| | 1.7.0 | 1.8.0 |
+|---|---|---|
+| Cites when evidence was given | 3 of 8 | 4 of 8 |
+| Claims a source without evidence | 2 of 12 | **0 of 12** |
+| Says it has no reliable source when none was found | 0 of 12 | **9 of 12** |
+| Grounded (judge A / B) | 40% / 35% | **55% / 50%** |
+| Unsupported (judge A / B) | 60% / 60% | **30% / 30%** |
+| Unsupported specific claims per reply | 1.95 / 2.10 | **0.80 / 0.85** |
+| Contradicts a passage | 1 reply | 0 |
+| Mean words | 100 | 95 |
+
+1.8.0 changes nothing outside knowledge lookups (its only additions are the
+two fragments), and the deterministic golden scenarios give the same result
+with it (guarantees 100%, heuristics 97.3%;
+`golden-deterministic-all-20261017T010819.json`). Still wrong under 1.8.0:
+replies that say there is no reliable source and then give a specific from
+memory anyway (a protein range, a sleep-restriction schedule), and a UK
+referral service described from memory. These are AI judgements on 20
+queries, not calibrated against people.
 
 ## Limits
 

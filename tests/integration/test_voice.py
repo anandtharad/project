@@ -33,7 +33,10 @@ PCM = b"\x10\x00" * 1600  # 0.1 s of 16 kHz audio
 
 @contextlib.asynccontextmanager
 async def voice_server(
-    database_url: str, llm: ScriptedLLMClient, **overrides: Any
+    database_url: str,
+    llm: ScriptedLLMClient,
+    unvalidated: dict[str, Any] | None = None,
+    **overrides: Any,
 ) -> AsyncIterator[Any]:
     settings = make_settings(
         database_url=database_url,
@@ -42,6 +45,8 @@ async def voice_server(
         tts_provider="fake",
         **overrides,
     )
+    if unvalidated:  # values below the settings' minimums, for fast tests
+        settings = settings.model_copy(update=unvalidated)
     async with running_app(settings, llm) as (app, client):
         with socket.socket() as sock:
             sock.bind(("127.0.0.1", 0))
@@ -170,3 +175,76 @@ async def test_voice_disabled(database_url: str, clean_db: None) -> None:
         response = await client.post(f"/v1/conversations/{cid}/voice/tickets", headers=ALICE)
         assert response.status_code == 409
         assert response.json()["error"]["code"] == "voice_disabled"
+
+
+async def closed_code(ws: Any) -> int | None:
+    """Read until the server closes; its close code."""
+    with contextlib.suppress(websockets.exceptions.ConnectionClosed):
+        while True:
+            await asyncio.wait_for(ws.recv(), 10)
+    return ws.close_code  # type: ignore[no-any-return]
+
+
+async def test_sessions_per_person_are_limited(database_url: str, clean_db: None) -> None:
+    llm = ScriptedLLMClient()
+    async with voice_server(database_url, llm, voice_max_sessions_per_user=1) as (_, client, base):
+        cid = await create_conversation(client, ALICE)
+        spare = await ticket(client, cid, ALICE)  # issued while no session is open
+        async with websockets.connect(
+            f"{base}/v1/voice?ticket={await ticket(client, cid, ALICE)}"
+        ) as ws:
+            await receive_until(ws, "ready", [])
+            refused = await client.post(f"/v1/conversations/{cid}/voice/tickets", headers=ALICE)
+            assert refused.status_code == 429
+            assert refused.json()["error"]["code"] == "too_many_voice_sessions"
+            async with websockets.connect(f"{base}/v1/voice?ticket={spare}") as second:
+                assert await closed_code(second) == 4429
+            # Another person is not affected.
+            bob_cid = await create_conversation(client, BOB)
+            await ticket(client, bob_cid, BOB)
+        for _ in range(200):  # once the server has seen the close
+            again = await client.post(f"/v1/conversations/{cid}/voice/tickets", headers=ALICE)
+            if again.status_code == 201:
+                break
+            await asyncio.sleep(0.01)
+        else:
+            raise AssertionError("the session was never released")
+
+
+async def test_frames_validation_stop_and_idle(
+    database_url: str, clean_db: None, db_engine: AsyncEngine
+) -> None:
+    llm = ScriptedLLMClient()
+    llm.queue(make_response("Still here."))
+    async with voice_server(database_url, llm, unvalidated={"voice_idle_timeout_seconds": 1}) as (
+        _,
+        client,
+        base,
+    ):
+        cid = await create_conversation(client, ALICE)
+        # An oversized first frame is not parsed: the default outputs apply,
+        # and the session works.
+        huge = json.dumps({"type": "start", "output": ["text"] + [0] * 40_000})
+        async with websockets.connect(
+            f"{base}/v1/voice?ticket={await ticket(client, cid, ALICE)}", max_size=None
+        ) as ws:
+            await ws.send(huge)
+            ready = await receive_until(ws, "ready", [])
+            assert ready[-1]["output"] == ["text", "audio"]
+            # Text over the socket follows the HTTP API's rules.
+            await ws.send(json.dumps({"type": "text", "content": "hello\u0000world"}))
+            error = await receive_until(ws, "error", [])
+            assert error[-1]["code"] == "validation_failed"
+            await ws.send(json.dumps({"type": "start", "output": ["text"]}))
+            await receive_until(ws, "error", [])  # "start" is only read first
+            # No message from the client for the idle timeout: closed.
+            assert await closed_code(ws) == 4408
+        async with db_engine.connect() as conn:
+            stored = (await conn.execute(text("SELECT count(*) FROM messages"))).scalar_one()
+        assert stored == 0
+        # A first "stop" ends the session.
+        async with websockets.connect(
+            f"{base}/v1/voice?ticket={await ticket(client, cid, ALICE)}"
+        ) as ws:
+            await ws.send(json.dumps({"type": "stop"}))
+            assert await closed_code(ws) == 1000
