@@ -179,6 +179,7 @@ is the source of truth. Important ones:
 | Variable | Purpose |
 |---|---|
 | `DATABASE_URL` | `postgresql+asyncpg://…` |
+| `AUTH_MODE` | `dev` (default; `DEV_AUTH_TOKENS`, development only) or `clerk` (`CLERK_JWT_KEY` or `CLERK_JWKS_URL`, `CLERK_AUTHORIZED_PARTIES`); see docs/api.md |
 | `DEV_AUTH_TOKENS` | `handle:token,…` development bearer tokens (not production auth) |
 | `GENERATION_PROVIDER` | `anthropic`, `openai`, `groq`, `gemini`, `xai`, `qwen`, `deepseek`, `openrouter`, `together`, `mistral`, `ollama`, `openai_compatible`, or `fake` (development stub) |
 | `GENERATION_MODEL` | optional; defaults to the provider preset's model |
@@ -200,7 +201,7 @@ is the source of truth. Important ones:
 | `MEMORY_PROMPT_VERSION` | memory-extraction prompt (see docs/memory.md for the evaluated versions) |
 | `VOICE_ENABLED`, `STT_PROVIDER`, `TTS_PROVIDER` | speech in and out (off by default): `deepgram`, `sarvam` or `gnani` with `DEEPGRAM_API_KEY` / `SARVAM_API_KEY` / `GNANI_API_KEY`; then open `/voice`. Half duplex, push-to-talk by default (`VOICE_END_OF_TURN`); see docs/voice-interface.md |
 
-`APP_ENV=production` refuses to start until production authentication exists.
+`APP_ENV=production` requires `AUTH_MODE=clerk` (docs/api.md, "Authentication"). For a hosted database, see [docs/supabase.md](docs/supabase.md).
 
 ## Prompts
 
@@ -253,6 +254,8 @@ docs/             architecture, API, threat model, implementation status
 - [Voice (how replies read)](docs/voice.md)
 - [Voice interface (speech in and out)](docs/voice-interface.md)
 - [Evaluation and observability](docs/evaluation.md)
+- [Established evaluation datasets (research)](docs/evaluation-datasets.md)
+- [Supabase as the database](docs/supabase.md)
 - [Fine-tuning preparation](docs/fine-tuning.md)
 - [API reference](docs/api.md)
 - [Threat model and privacy notes](docs/threat-model.md)

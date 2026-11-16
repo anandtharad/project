@@ -412,6 +412,19 @@ when the server closes after each request, frames are sent in bursts, the
 default voice is not tied to the model); and in the browser page, aliasing
 in the 16 kHz resampler and up to 100 ms clipped at release.
 
+## Production authentication and hosted database (2026-11-16)
+
+- **Clerk authentication** (`AUTH_MODE=clerk`): session tokens verified
+  in `app/api/auth.py` per Clerk's manual JWT guide; unit tests with a local
+  RSA key and a local JWKS server (expiry, not-before, authorized party,
+  issuer, tampering, `none` and HS256 refused, an unreachable JWKS is a 503),
+  and the app end to end in Clerk mode. **Not yet run against a real Clerk
+  instance.** `APP_ENV=production` now requires it. Still missing: deleting
+  a whole account, and reacting to users deleted in Clerk.
+- **Supabase as the database** (docs/supabase.md): no code change needed
+  beyond migration 0009, which enables row-level security on every table so
+  Supabase's Data API cannot read them. Not yet run against a real project.
+
 ## Prompt 1.8.0 is the default (2026-10-17)
 
 On the reply model, prompt 1.8.0 halved unsupported replies (60% to 30%,

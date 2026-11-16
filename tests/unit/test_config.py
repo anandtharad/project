@@ -17,7 +17,7 @@ def test_defaults_are_valid() -> None:
 
 
 def test_production_refuses_dev_auth() -> None:
-    with pytest.raises(ValidationError, match="production authentication is not implemented"):
+    with pytest.raises(ValidationError, match="set AUTH_MODE=clerk"):
         make_settings(app_env="production", generation_provider="anthropic")
 
 

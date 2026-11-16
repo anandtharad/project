@@ -77,12 +77,23 @@ class Settings(BaseSettings):
     database_pool_size: int = Field(default=5, ge=1, le=50)
     database_statement_timeout_ms: int = Field(default=10_000, ge=100)
 
-    # --- Authentication -----------------------------------------------------
-    # Only a development token scheme exists. It is NOT production
-    # authentication; production startup is refused until one is implemented.
-    auth_mode: Literal["dev"] = "dev"
+    # --- Authentication (docs/api.md, "Authentication") ---------------------
+    # "dev": static DEV_AUTH_TOKENS, development only. "clerk": Clerk session
+    # tokens (RS256 JWTs) verified against the instance's public key; the only
+    # mode allowed in production.
+    auth_mode: Literal["dev", "clerk"] = "dev"
     # Comma-separated "user_handle:token" pairs, e.g. "alice:dev-token-alice".
     dev_auth_tokens: SecretStr | None = None
+    # One of: the JWKS URL (<Frontend API URL>/.well-known/jwks.json), or the
+    # instance's PEM public key (Clerk dashboard, API keys), which needs no
+    # network call. The key wins when both are set.
+    clerk_jwks_url: str | None = None
+    clerk_jwt_key: str | None = None
+    # Comma-separated origins allowed to have issued a token (its `azp`
+    # claim), e.g. "https://app.example.com". Required in production.
+    clerk_authorized_parties: str | None = None
+    # Optional: also require this `iss` (your Frontend API URL).
+    clerk_issuer: str | None = None
 
     # --- Generative LLM -----------------------------------------------------
     # Provider presets (default model, base URL, key variable) live in
@@ -354,14 +365,18 @@ class Settings(BaseSettings):
             from app.safety.resources import normalize_region
 
             normalize_region(self.safety_region)  # unknown codes fail at startup
+        if self.auth_mode == "clerk" and not (self.clerk_jwt_key or self.clerk_jwks_url):
+            raise ValueError("AUTH_MODE=clerk requires CLERK_JWT_KEY or CLERK_JWKS_URL")
         if self.app_env is AppEnv.PRODUCTION:
             if not self.safety_enabled:
                 raise ValueError("SAFETY_ENABLED=false is not allowed in production")
             if self.auth_mode == "dev":
                 raise ValueError(
                     "Development authentication cannot run with APP_ENV=production; "
-                    "production authentication is not implemented yet"
+                    "set AUTH_MODE=clerk"
                 )
+            if not self.clerk_party_list():
+                raise ValueError("CLERK_AUTHORIZED_PARTIES is required in production")
             if self.generation_provider == "fake":
                 raise ValueError("GENERATION_PROVIDER=fake is a development stub")
             if self.decision_provider == "llm" and self.decision_llm_provider == "fake":
@@ -373,6 +388,10 @@ class Settings(BaseSettings):
             if "fake" in (self.stt_provider, self.tts_provider):
                 raise ValueError("STT_PROVIDER / TTS_PROVIDER=fake are development stubs")
         return self
+
+    def clerk_party_list(self) -> list[str]:
+        raw = self.clerk_authorized_parties or ""
+        return [p.strip().rstrip("/") for p in raw.split(",") if p.strip()]
 
     def dev_token_map(self) -> dict[str, str]:
         """Return a token -> user-handle mapping parsed from DEV_AUTH_TOKENS."""

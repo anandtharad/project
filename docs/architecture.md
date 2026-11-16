@@ -13,7 +13,7 @@ in-process components:
 HTTP request
   -> TraceMiddleware            trace ID, request log, unhandled-error -> generic 500
   -> BodySizeLimitMiddleware    413 above MAX_REQUEST_BYTES (declared or streamed)
-  -> Route (FastAPI)            schema validation, dev auth, input length check
+  -> Route (FastAPI)            schema validation, auth (Clerk or dev), input length check
   -> TurnOrchestrator           lifecycle sequencing, deadline, failure mapping
        TurnStore.begin          tx 1: authorize + idempotency + persist user msg + load history + state
        StateExtractor  ┐        structured LLM call: updated conversation state (or keep previous)
@@ -36,7 +36,7 @@ HTTP request
 
 | Component | Module | Owns | Does not own |
 |---|---|---|---|
-| API | `app/api/*` | validation, dev auth, HTTP error contract | conversational logic |
+| API | `app/api/*` | validation, auth (Clerk token verification or dev tokens), HTTP error contract | conversational logic |
 | Orchestrator | `app/orchestration/engine.py` | turn sequencing, deadline, failure mapping, provenance | SQL, provider details |
 | Turn store | `app/orchestration/persistence.py` | transactions, ordering, idempotency, in-flight rule | generation |
 | Context builder | `app/context/builder.py` | what the model sees, history budget | storage |

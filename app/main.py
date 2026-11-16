@@ -14,6 +14,7 @@ from alembic.script import ScriptDirectory
 from fastapi import FastAPI
 
 from app.api import conversations, health, memories, messages, voice
+from app.api.auth import ClerkVerifier
 from app.api.errors import register_error_handlers
 from app.api.middleware import BodySizeLimitMiddleware, TraceMiddleware
 from app.background import BackgroundTasks
@@ -235,7 +236,10 @@ def create_app(
         app.state.session_factory = session_factory
         app.state.llm = llm
         app.state.prompt = prompt
-        app.state.dev_tokens = dev_tokens
+        app.state.dev_tokens = dev_tokens if settings.auth_mode == "dev" else {}
+        app.state.clerk = (
+            ClerkVerifier.from_settings(settings) if settings.auth_mode == "clerk" else None
+        )
         app.state.migration_head = head
         app.state.resolved_provider = resolved
         app.state.turn_store = turn_store = TurnStore(

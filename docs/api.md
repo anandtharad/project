@@ -5,13 +5,33 @@ Base path `/v1`. JSON in and out. A machine-readable schema is served at
 
 ## Authentication
 
-> **Development authentication only.** Requests carry
-> `Authorization: Bearer <token>`, where the token is one of the static
-> `DEV_AUTH_TOKENS` pairs. There is no token issuance, expiry, rotation or
-> revocation. Production authentication is not implemented, and the service
-> refuses to start with `APP_ENV=production`.
+Every request carries `Authorization: Bearer <token>`. `AUTH_MODE` decides
+what the token is:
 
-A missing or invalid token returns `401 unauthorized` before any data access.
+- **`clerk` (production).** The client signs people in with
+  [Clerk](https://clerk.com) and sends the Clerk session token. The service
+  verifies it (`app/api/auth.py`, following Clerk's manual JWT verification
+  guide): an RS256 signature against the instance's public key
+  (`CLERK_JWT_KEY`, or the keys at `CLERK_JWKS_URL`, cached for an hour);
+  `exp` and `nbf` with 5 seconds of clock skew; a `sub`; `azp` against
+  `CLERK_AUTHORIZED_PARTIES` when the token has one; and `iss` when
+  `CLERK_ISSUER` is set. Any other algorithm, including `none` and HS256, is
+  refused. The person is the user keyed by `clerk:<sub>`, created on first
+  use. Sign-up, login, password reset, session expiry and revocation are
+  Clerk's; this service never sees a password. Only the `Authorization`
+  header is read, not Clerk's `__session` cookie. Clerk's frontend SDK
+  refreshes the short-lived token: always send the current one.
+- **`dev` (development only).** The token is one of the static
+  `DEV_AUTH_TOKENS` pairs; no issuance, expiry, rotation or revocation.
+  `APP_ENV=production` refuses to start in this mode, and also without
+  `CLERK_AUTHORIZED_PARTIES`.
+
+A missing or invalid token returns `401 unauthorized` before any data
+access. If Clerk's keys cannot be fetched (JWKS mode), `503 auth_unavailable`.
+
+Not implemented yet: deleting the whole account (the person can delete
+conversations and memories, not the user row); reacting to a user deleted in
+Clerk (their data stays until removed).
 
 ## Endpoints
 
