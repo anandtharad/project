@@ -17,6 +17,7 @@ __pycache__/
 eval/results/.cache/
 eval/datasets/safety/external/
 eval/datasets/dialogue/external/
+eval/datasets/benchmarks/external/
 training/build/
 # Fine-tuning runs: adapters, checkpoints, run.json (scripts/train_sft.py)
 training/runs/
