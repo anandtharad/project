@@ -19,7 +19,7 @@ HTTP request
        StateExtractor  ┐        structured LLM call: updated conversation state (or keep previous)
        MemoryService   ├ concurrent: memories for this message
        SafetyAnalyzer  ┘        patterns + safety classifier -> category (degraded if it fails)
-       DecisionService          one decision request (Laya / Jev / LLM / off), validated, thresholded
+       DecisionService          not used (DECISION_PROVIDER=off; the reply LLM decides; docs/decisions.md)
        SafetyPolicy             category -> pathway; a safety pathway overrides the strategy
        choose_policy            code: safety signal > explicit request > decision > default
        ContextBuilder           system prompt + policy or pathway fragment (+ verified contacts),

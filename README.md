@@ -14,10 +14,10 @@ and enforcement; the LLM only produces conversational language.
 > See [docs/implementation-status.md](docs/implementation-status.md).
 
 What works now: text in → validated → persisted conversation history →
-conversation state updated (structured LLM call) → bounded decisions from a
-decision model (self-hosted Laya or TypeSafe Jev; shadow mode until
-calibrated) → response policy in code → instruction LLM → validated
-response → reply, decisions and versioned state persisted together →
+conversation state updated (structured LLM call) → response policy in code
+(the person's explicit requests, such as "no advice", and safety pathways)
+→ instruction LLM, which chooses how to respond → validated response →
+reply and versioned state persisted together →
 memories proposed in the background, accepted by code, and retrieved in
 later conversations (the person can list, delete or turn them off). Every
 turn also passes a safety layer (input analysis, pathways with verified
@@ -189,7 +189,7 @@ is the source of truth. Important ones:
 | `USER_MESSAGES_PER_MINUTE` / `USER_MESSAGES_PER_DAY` | per-user message limits across all conversations (20 / 1000; `0` turns a limit off); over the limit, `429 too_many_messages` with `Retry-After` |
 | `MAX_INPUT_CHARACTERS`, `MAX_REQUEST_BYTES` | input limits enforced before any model call |
 | `STATE_EXTRACTION_ENABLED`, `STATE_EXTRACTION_MODEL` | conversation-state update before each reply (default on; the reply model) |
-| `DECISION_PROVIDER` | `off` (default), `laya` (self-hosted, `LAYA_API_KEY`), `jev` (`JEV_API_KEY`) or `llm` (a separate LLM, default Groq `openai/gpt-oss-20b`; `DECISION_LLM_*`, see docs/decisions.md) |
+| `DECISION_PROVIDER` | **not used: leave `off` (default).** The reply LLM decides how to respond. Kept for experiments only: `laya` (self-hosted, `LAYA_API_KEY`), `jev` (`JEV_API_KEY`) or `llm` (a separate LLM, default Groq `openai/gpt-oss-20b`; `DECISION_LLM_*`, see docs/decisions.md) |
 | `MEMORY_ENABLED`, `MEMORY_EXTRACTION_MODEL` | memory across conversations (default on; extraction uses the reply model) |
 | `EMBEDDING_PROVIDER`, `EMBEDDING_CACHE_DIR` | `local` (default, no key), `openai`, `gemini` or `none`; where the local model is cached |
 | `MEMORY_MIN_SEMANTIC`, `MEMORY_RETENTION_DAYS` | retrieval threshold (0.49, tuned for the local model) and the longest a memory is kept (365 days) |

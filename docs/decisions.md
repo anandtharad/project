@@ -1,5 +1,15 @@
 # Decisions, state and response policy (Phase 2)
 
+> **The decision model is not used.** Since 2026-11-16 the project relies
+> on the reply LLM itself to choose how to respond. `DECISION_PROVIDER`
+> stays `off` (the default): no decision request is made, nothing is stored
+> in `turn_decisions`, and the response policy comes only from the person's
+> explicit requests (for example "I don't want advice") and the safety
+> pathways. The Jev, Laya and decision-LLM code below is kept, unchanged,
+> for possible experiments; none of it runs unless that setting is changed,
+> and even then it runs in shadow mode (recorded, never acted on). Read the
+> rest of this page as a record of that work.
+
 How the application uses a decision model for bounded judgements (spec §7),
 keeps conversation state (spec §8), and turns both into a response policy.
 

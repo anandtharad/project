@@ -424,7 +424,7 @@ dev items, with the caveat that its replies are twice as long
 
 ## Open questions and next steps
 
-1. **A decision model that passes calibration.** The LLM provider on
+1. **(Not pursued: the decision model is not used; the reply LLM decides, see docs/decisions.md.)** A decision model that passes calibration. The LLM provider on
    `gpt-oss-20b` gets close on dev (best acted-on accuracy 0.76 / 0.78
    against the 0.80 target). Options: a revised decision prompt or a
    stronger model evaluated on dev (`scripts/eval_decisions.py --pause 2
