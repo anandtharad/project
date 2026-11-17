@@ -265,6 +265,11 @@ PRESETS: dict[str, ProviderPreset] = {
             api_key_setting=None,
             docs_url="https://docs.ollama.com/api/openai-compatibility",
             requires_api_key=False,
+            # Ollama's window defaults to 4096 tokens (docs.ollama.com/faq) and
+            # a longer prompt is not refused. Input 6000 + output 2048 fits a
+            # server started with OLLAMA_CONTEXT_LENGTH=8192 (docs/providers.md).
+            default_max_context_tokens=6000,
+            default_max_output_tokens=2048,
             # Ollama's OpenAI layer has no max_completion_tokens.
             max_tokens_param="max_tokens",
             effort_param="reasoning_effort",

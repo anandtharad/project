@@ -95,6 +95,13 @@ one turn fits inside a minute's token budget. Raise them on a paid tier.
   `temperature` and `reasoning_effort`, plus `response_format` on structured
   requests.
 - **Ollama / openai_compatible:** the base URL is operator configuration.
+- **Ollama's context window defaults to 4,096 tokens** (docs.ollama.com/faq),
+  and the FAQ does not say a longer prompt is refused. The app's Ollama
+  defaults are 6,000 input + 2,048 output tokens, so start Ollama with
+  `OLLAMA_CONTEXT_LENGTH=8192` (on Windows: set it as a user environment
+  variable, quit Ollama from the taskbar and start it again). For a larger
+  window, raise both `OLLAMA_CONTEXT_LENGTH` and `MAX_CONTEXT_TOKENS`; memory
+  use grows with the window.
   Never let end users set it (SSRF).
 
 ## Structured output (JSON Schema replies)
@@ -252,3 +259,29 @@ Facts that docs could not settle, and the choice made:
   wording.
 - Anthropic does not list the default server-side fallback targets (see the
   note above).
+
+## Free local models (Ollama), checked 2026-11-17
+
+Open-weights chat models that run on your own machine through Ollama
+(`GENERATION_PROVIDER=ollama`, `GENERATION_MODEL=<tag>`, no key). Download
+sizes are Ollama's (ollama.com/library); licences are the publishers' own
+model cards on Hugging Face. A model runs fast only if it fits in GPU memory
+with room for the context window; otherwise Ollama splits it across GPU and
+CPU or runs on CPU, which is much slower (`ollama ps` shows which).
+
+| Ollama tag | Download | Licence | Notes |
+|---|---|---|---|
+| `qwen3.5:4b` | 3.3–4.0 GB | Apache-2.0 | smallest worth trying |
+| `qwen3.5:9b` | 6.6–7.6 GB | Apache-2.0 | |
+| `gemma4:12b` | 7.7–8.0 GB | Apache-2.0 | |
+| `gpt-oss:20b` | 14 GB | Apache-2.0 | the smaller sibling of the current reply model |
+| `gemma4:26b` | 16–19 GB | Apache-2.0 | |
+| `qwen3.5:27b` | 17–20 GB | Apache-2.0 | |
+| `gemma4:31b` | 19–20 GB | Apache-2.0 | |
+| `gpt-oss:120b` | 65 GB | Apache-2.0 | the current reply model; needs a very large machine |
+
+Also listed by Ollama but with other licences: Llama 3.1 (Meta's Llama 3.1
+licence, gated on Hugging Face), Phi-4 (MIT), Mistral Small 3.2 (Apache-2.0).
+How well any of them reads emotions has not been measured here: run the
+same benchmarks (docs/evaluation.md) before switching. Local runs have no
+rate limits, so XSTest finishes in one go.
