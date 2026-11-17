@@ -141,6 +141,12 @@ class Model:
             json.loads(self.path.read_text("utf-8")) if self.path.exists() else {}
         )
 
+    def settings_used(self) -> dict[str, Any]:
+        return {
+            "effort": self.resolved.effort,
+            "max_output_tokens": self.resolved.max_output_tokens,
+        }
+
     @property
     def label(self) -> str:
         return f"{self.resolved.preset.name}:{self.resolved.model}"
@@ -148,7 +154,14 @@ class Model:
     async def answer(self, system: str, messages: list[ChatMessage], trace: str) -> str:
         key = hashlib.sha256(
             json.dumps(
-                [self.resolved.model, system, [m.model_dump() for m in messages]], sort_keys=True
+                [
+                    self.resolved.model,
+                    self.resolved.effort,
+                    self.resolved.max_output_tokens,
+                    system,
+                    [m.model_dump() for m in messages],
+                ],
+                sort_keys=True,
             ).encode()
         ).hexdigest()
         if key in self.cache:
@@ -254,6 +267,7 @@ async def run_emobench(args: argparse.Namespace) -> dict[str, Any]:
     return {
         "benchmark": "emobench",
         "model": model.label,
+        "model_settings": model.settings_used(),
         "calls": model.calls,
         "limit_per_task": args.limit,
         "summary": summary,
@@ -264,7 +278,7 @@ async def run_emobench(args: argparse.Namespace) -> dict[str, Any]:
 async def run_goemotions(args: argparse.Namespace) -> dict[str, Any]:
     names = [n.strip() for n in fetch("goemotions_labels").splitlines() if n.strip()]
     items = sample(bench.goemotions_items(fetch("goemotions_test"), names), args.limit)
-    system = bench.GOEMOTIONS_SYSTEM.format(labels=", ".join(names))
+    system = bench.GOEMOTIONS_SYSTEMS[args.prompt_version].format(labels=", ".join(names))
     model = Model("goemotions", args.pause)
     rows: list[dict[str, Any]] = []
     try:
@@ -291,9 +305,11 @@ async def run_goemotions(args: argparse.Namespace) -> dict[str, Any]:
     return {
         "benchmark": "goemotions",
         "model": model.label,
+        "model_settings": model.settings_used(),
         "calls": model.calls,
         "limit": args.limit,
-        "prompt": "this project's own (GoEmotions has no official prompt for language models)",
+        "prompt": f"v{args.prompt_version}, this project's own (GoEmotions has no official "
+        "prompt for language models; v2 follows the paper's rater instructions)",
         "summary": scores,
         "rows": rows,
     }
@@ -378,6 +394,7 @@ async def run_xstest(args: argparse.Namespace) -> dict[str, Any]:
     return {
         "benchmark": "xstest",
         "model": model.label,
+        "model_settings": model.settings_used(),
         "prompt": prompt.key,
         "safety_classifier": classifier.model if classifier is not None else None,
         "calls": model.calls,
@@ -397,6 +414,8 @@ def main() -> int:
         p = sub.add_parser(name)
         p.add_argument("--limit", type=int, help="a seeded sample of at most this many items")
         p.add_argument("--pause", type=float, default=10.0, help="seconds after each live call")
+        if name == "goemotions":
+            p.add_argument("--prompt-version", choices=["1", "2"], default="2")
         if name == "xstest":
             p.add_argument("--label", choices=["safe", "unsafe"])
             p.add_argument("--classifier", action="store_true", help="add the safety classifier")

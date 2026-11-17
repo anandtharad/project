@@ -218,6 +218,56 @@ so a prompt rewrite will not change these numbers; XSTest replies, the
 golden scenarios, the knowledge evaluations and the dialogue benchmark do
 use the companion prompt.
 
+### Is it the model or the prompt? (2026-11-17)
+
+**Not the companion prompt:** neither benchmark uses it. EmoBench and
+GoEmotions send the benchmark's own instructions to the bare model.
+
+**EmoBench points at the model.** It uses the official prompts, so it can be
+set against the paper's own English results (Sabour et al., ACL 2024,
+Tables 1 and 2, overall, base prompting):
+
+| Model | Understanding | Application |
+|---|---|---|
+| GPT-4 | 59.8% | 75.5% |
+| GPT-3.5 | 33.1% | 61.4% |
+| Qwen-Chat-14B | 35.5% | 60.5% |
+| gpt-oss-120b, reasoning effort low (this project) | 36% | 62% |
+
+So gpt-oss-120b reads emotions about as well as GPT-3.5 and well below
+GPT-4. Two caveats keep this from being final: the paper takes a majority
+of five answers and averages four option orders while this run asks once,
+and 50 items give about ±13 points; and this run used **reasoning effort
+"low"** (the Groq preset's default, chosen to fit the free tier's
+per-minute budget), which may hold a reasoning model back on questions
+built around perspective-taking.
+
+**GoEmotions is partly the benchmark prompt.** Its released labels are the
+ones at least two of three raters chose, after raters were told to select
+only emotions they were "reasonably confident" were expressed and otherwise
+neutral; 83% of comments have one label. Prompt v1 asked for "every label
+that applies", which invites the over-labelling seen (2.05 labels against
+1.21). Prompt v2 (now the default) gives the model the raters' own
+instruction. The negative reading of neutral comments may still be the
+model.
+
+**How to settle it** (each runs on the same seeded items; answers are
+cached per model and reasoning effort):
+
+```
+# the same model with more reasoning
+GENERATION_EFFORT=high uv run python scripts/eval_benchmarks.py emobench --limit 50
+# GoEmotions with the raters' instructions (v2)
+uv run python scripts/eval_benchmarks.py goemotions --limit 300
+# other models (each Groq model has its own daily budget)
+GENERATION_MODEL=qwen/qwen3.8-27b uv run python scripts/eval_benchmarks.py emobench --limit 50
+GENERATION_MODEL=openai/gpt-oss-20b uv run python scripts/eval_benchmarks.py emobench --limit 50
+```
+
+Any other configured provider works the same way (`GENERATION_PROVIDER`,
+`GENERATION_MODEL` and its key). Results record the model, reasoning effort
+and output limit.
+
 **Rate limits.** Groq's free tier gives each model 200K tokens a day per
 organization (a new key in the same account shares it). An XSTest reply
 sends the whole companion prompt, about 1,700 tokens, so about 120 replies

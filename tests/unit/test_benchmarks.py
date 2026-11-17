@@ -8,6 +8,7 @@ import json
 import sys
 from pathlib import Path
 from types import ModuleType
+from typing import Any
 
 import pytest
 
@@ -194,3 +195,32 @@ async def test_a_spent_daily_budget_stops_the_run_and_keeps_the_cache(tmp_path: 
     with pytest.raises(runner.BudgetSpent) as spent:
         await model.answer("system", message, "t")
     assert spent.value.retry_after == 3600
+
+
+async def test_answers_are_cached_per_effort(tmp_path: Path) -> None:
+    from app.llm.schemas import ChatMessage, ChatRole
+
+    runner = load_runner()
+    calls: list[str] = []
+
+    class Echo:
+        async def generate(self, request: object) -> object:
+            calls.append("x")
+            return type("Response", (), {"content": '{"answer": "A"}'})()
+
+    def model(effort: str) -> Any:
+        m = object.__new__(runner.Model)
+        m.resolved = type("R", (), {"model": "m", "max_output_tokens": 64, "effort": effort})()
+        m.llm, m.pause, m.calls = Echo(), 0, 0
+        m.path = tmp_path / "cache.json"
+        m.cache = {}
+        return m
+
+    message = [ChatMessage(role=ChatRole.USER, content="hi")]
+    low, high = model("low"), model("high")
+    high.cache = low.cache  # one shared cache file
+    await low.answer("system", message, "t")
+    await low.answer("system", message, "t")  # cached
+    await high.answer("system", message, "t")  # another effort: a new call
+    assert len(calls) == 2
+    assert high.settings_used() == {"effort": "high", "max_output_tokens": 64}

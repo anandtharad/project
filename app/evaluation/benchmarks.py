@@ -149,10 +149,23 @@ def emobench_correct(item: EmoItem, reply: str) -> dict[str, bool]:
 
 # --- GoEmotions ---------------------------------------------------------------
 
-GOEMOTIONS_SYSTEM = """You label the emotions expressed in a Reddit comment.
+# v1 (first baseline, 2026-11-17) asked for every label that applies, which
+# invites more labels than the gold set has: the released labels are those
+# at least two of three raters chose, and 83% of comments have one.
+GOEMOTIONS_SYSTEM_V1 = """You label the emotions expressed in a Reddit comment.
 Choose every label that applies from this list, or "neutral" if none does:
 {labels}
 Answer with only a JSON list of labels, for example ["joy", "gratitude"]."""
+# v2 follows the raters' instructions in the GoEmotions paper: select only
+# emotions you are reasonably confident are expressed in the text; if not
+# certain about any, select neutral.
+GOEMOTIONS_SYSTEM_V2 = """You label the emotions expressed in a Reddit comment.
+Select only the emotions you are reasonably confident are expressed in the
+text, from this list. If you are not certain about any emotion being
+expressed, select "neutral". Most comments express one emotion.
+{labels}
+Answer with only a JSON list of labels, for example ["gratitude"]."""
+GOEMOTIONS_SYSTEMS = {"1": GOEMOTIONS_SYSTEM_V1, "2": GOEMOTIONS_SYSTEM_V2}
 
 
 @dataclass(frozen=True)
