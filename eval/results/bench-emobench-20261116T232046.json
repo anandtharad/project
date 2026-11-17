@@ -1,0 +1,783 @@
+{
+ "benchmark": "emobench",
+ "model": "groq:openai/gpt-oss-120b",
+ "calls": 100,
+ "limit_per_task": 50,
+ "summary": {
+  "EU": {
+   "items": 50,
+   "accuracy": 0.36,
+   "by_category": {
+    "complex_emotions": 0.25,
+    "emotional_cues": 0.5,
+    "personal_beliefs_and_experiences": 0.3333,
+    "perspective_taking": 0.381
+   },
+   "emotion_accuracy": 0.4,
+   "cause_accuracy": 0.6
+  },
+  "EA": {
+   "items": 50,
+   "accuracy": 0.62,
+   "by_category": {
+    "Personal-Others": 0.6667,
+    "Personal-Self": 0.7333,
+    "Social-Others": 0.5833,
+    "Social-Self": 0.5
+   }
+  }
+ },
+ "rows": [
+  {
+   "task": "EU",
+   "qid": "54",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "55",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "163",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "104",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "87",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "130",
+   "category": "emotional_cues",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "166",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "83",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "148",
+   "category": "perspective_taking",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "4",
+   "category": "complex_emotions",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "195",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "49",
+   "category": "complex_emotions",
+   "answer_q1": false,
+   "answer_q2": true,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "177",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "2",
+   "category": "complex_emotions",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "134",
+   "category": "perspective_taking",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "129",
+   "category": "emotional_cues",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "161",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "192",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": true,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "94",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "185",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": true,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "63",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": false,
+   "answer_q2": true,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "145",
+   "category": "perspective_taking",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "186",
+   "category": "perspective_taking",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "112",
+   "category": "emotional_cues",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "144",
+   "category": "perspective_taking",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "92",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "143",
+   "category": "perspective_taking",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "66",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "10",
+   "category": "complex_emotions",
+   "answer_q1": false,
+   "answer_q2": true,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "58",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": false,
+   "answer_q2": true,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "147",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "188",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": true,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "197",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": true,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "118",
+   "category": "emotional_cues",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "165",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "32",
+   "category": "complex_emotions",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "120",
+   "category": "emotional_cues",
+   "answer_q1": false,
+   "answer_q2": true,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "53",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "48",
+   "category": "complex_emotions",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "59",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": true,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "149",
+   "category": "perspective_taking",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "187",
+   "category": "perspective_taking",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "159",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "199",
+   "category": "perspective_taking",
+   "answer_q1": false,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "102",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": false,
+   "answer_q2": true,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "125",
+   "category": "emotional_cues",
+   "answer_q1": false,
+   "answer_q2": true,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "41",
+   "category": "complex_emotions",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "50",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": true,
+   "answer_q2": true,
+   "correct": true
+  },
+  {
+   "task": "EU",
+   "qid": "36",
+   "category": "complex_emotions",
+   "answer_q1": true,
+   "answer_q2": false,
+   "correct": false
+  },
+  {
+   "task": "EU",
+   "qid": "64",
+   "category": "personal_beliefs_and_experiences",
+   "answer_q1": false,
+   "answer_q2": true,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "54",
+   "category": "Social-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "55",
+   "category": "Social-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "163",
+   "category": "Social-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "104",
+   "category": "Personal-Self",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "87",
+   "category": "Social-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "130",
+   "category": "Personal-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "166",
+   "category": "Social-Self",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "83",
+   "category": "Social-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "148",
+   "category": "Personal-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "4",
+   "category": "Personal-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "195",
+   "category": "Social-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "49",
+   "category": "Personal-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "177",
+   "category": "Social-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "2",
+   "category": "Personal-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "134",
+   "category": "Personal-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "129",
+   "category": "Personal-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "161",
+   "category": "Social-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "192",
+   "category": "Social-Self",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "94",
+   "category": "Social-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "185",
+   "category": "Social-Self",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "63",
+   "category": "Social-Others",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "145",
+   "category": "Personal-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "186",
+   "category": "Social-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "112",
+   "category": "Personal-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "144",
+   "category": "Personal-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "92",
+   "category": "Social-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "143",
+   "category": "Personal-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "66",
+   "category": "Social-Others",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "10",
+   "category": "Personal-Others",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "58",
+   "category": "Social-Others",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "147",
+   "category": "Personal-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "188",
+   "category": "Social-Self",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "197",
+   "category": "Social-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "118",
+   "category": "Personal-Self",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "165",
+   "category": "Social-Self",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "32",
+   "category": "Personal-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "120",
+   "category": "Personal-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "53",
+   "category": "Social-Others",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "48",
+   "category": "Personal-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "59",
+   "category": "Social-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "149",
+   "category": "Personal-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "187",
+   "category": "Social-Self",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "159",
+   "category": "Social-Self",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "199",
+   "category": "Social-Self",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "102",
+   "category": "Personal-Self",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "125",
+   "category": "Personal-Self",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "41",
+   "category": "Personal-Others",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "50",
+   "category": "Personal-Others",
+   "answer": false,
+   "correct": false
+  },
+  {
+   "task": "EA",
+   "qid": "36",
+   "category": "Personal-Others",
+   "answer": true,
+   "correct": true
+  },
+  {
+   "task": "EA",
+   "qid": "64",
+   "category": "Social-Others",
+   "answer": false,
+   "correct": false
+  }
+ ],
+ "created_at": "2026-11-16T23:20:46+00:00"
+}

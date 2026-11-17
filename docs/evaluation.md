@@ -189,6 +189,35 @@ a turn gets in degraded mode):
 | C-SSRS, 108 supportive users | sent to a crisis pathway / to any safety pathway | 13.9% / 54.6% |
 | C-SSRS, 99 "indicator" users | reach any safety pathway (reported only) | 54.5% |
 
+### Baseline: the reply model on EmoBench and GoEmotions (2026-11-17)
+
+Groq `openai/gpt-oss-120b`, run on the developer's machine. Files:
+`bench-emobench-20261116T232046.json` (a seeded 50 items per task) and
+`bench-goemotions-20261117T001331.json` (a seeded 300 of 5,427 test
+comments). With 50 items an accuracy is good to about ±13 points (95%).
+
+| Benchmark | Result | For scale |
+|---|---|---|
+| EmoBench, emotional understanding (emotion and cause both right) | 36% (emotion 40%, cause 60%) | chance about 4%; weakest on complex emotions (25%) |
+| EmoBench, emotional application (most effective response or action) | 62% | chance 25% |
+| GoEmotions, macro F1 over labels | 0.41 (micro 0.40; 18% of comments exactly right) | the paper's fine-tuned BERT: 0.46 on the full test split |
+
+What the GoEmotions answers show about how the model reads people:
+
+- **It reads negative feeling into neutral messages.** Of 76 comments
+  labelled only neutral, it called 22 neutral and gave 34 a negative label
+  (annoyance, disapproval, disappointment...). It said "annoyance" 99
+  times where the raters said 21, and "disapproval" 44 times against 17.
+- **It over-labels:** 2.05 labels per comment against the raters' 1.21.
+- **15 comments the raters read as positive** (gratitude, admiration...)
+  it labelled only negative.
+
+Caveats: GoEmotions raters disagree often, and its prompt is this project's
+own. EmoBench and GoEmotions measure the model, not the companion prompt,
+so a prompt rewrite will not change these numbers; XSTest replies, the
+golden scenarios, the knowledge evaluations and the dialogue benchmark do
+use the companion prompt.
+
 **Rate limits.** Groq's free tier gives each model 200K tokens a day per
 organization (a new key in the same account shares it). An XSTest reply
 sends the whole companion prompt, about 1,700 tokens, so about 120 replies

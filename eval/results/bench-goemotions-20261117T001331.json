@@ -1,0 +1,3123 @@
+{
+ "benchmark": "goemotions",
+ "model": "groq:openai/gpt-oss-120b",
+ "calls": 300,
+ "limit": 300,
+ "prompt": "this project's own (GoEmotions has no official prompt for language models)",
+ "summary": {
+  "items": 300,
+  "macro_f1": 0.4122,
+  "micro_f1": 0.3971,
+  "exact_match": 0.1833,
+  "labels_scored": 27,
+  "per_label_f1": {
+   "admiration": 0.5588,
+   "amusement": 0.56,
+   "anger": 0.4,
+   "annoyance": 0.2833,
+   "approval": 0.1481,
+   "caring": 0.4348,
+   "confusion": 0.5625,
+   "curiosity": 0.5,
+   "desire": 0.5455,
+   "disappointment": 0.1852,
+   "disapproval": 0.3607,
+   "disgust": 0.1935,
+   "embarrassment": 0.0,
+   "excitement": 0.1481,
+   "fear": 0.8889,
+   "gratitude": 0.6977,
+   "grief": 1.0,
+   "joy": 0.3478,
+   "love": 0.7619,
+   "nervousness": 0.0,
+   "optimism": 0.3,
+   "realization": 0.0,
+   "relief": 0.6667,
+   "remorse": 0.3333,
+   "sadness": 0.5,
+   "surprise": 0.3333,
+   "neutral": 0.4202
+  }
+ },
+ "rows": [
+  {
+   "id": "eewa5x8",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "edm5gw8",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "edk60x0",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disgust"
+   ]
+  },
+  {
+   "id": "ed196uj",
+   "gold": [
+    "amusement",
+    "gratitude"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "edddal4",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "edozbj0",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "ee57n4o",
+   "gold": [
+    "annoyance",
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "eerrvod",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "edbye2t",
+   "gold": [
+    "fear"
+   ],
+   "predicted": [
+    "fear",
+    "nervousness"
+   ]
+  },
+  {
+   "id": "edydipg",
+   "gold": [
+    "annoyance",
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval",
+    "disgust"
+   ]
+  },
+  {
+   "id": "eeaveb6",
+   "gold": [
+    "annoyance",
+    "curiosity"
+   ],
+   "predicted": [
+    "amusement",
+    "disgust",
+    "surprise"
+   ]
+  },
+  {
+   "id": "ee9uyrp",
+   "gold": [
+    "nervousness"
+   ],
+   "predicted": [
+    "disappointment",
+    "fear"
+   ]
+  },
+  {
+   "id": "eergt89",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "surprise"
+   ]
+  },
+  {
+   "id": "ed2uvxe",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration",
+    "approval"
+   ]
+  },
+  {
+   "id": "efamfy4",
+   "gold": [
+    "curiosity",
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "edlq3g5",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "disgust"
+   ]
+  },
+  {
+   "id": "efgz3es",
+   "gold": [
+    "joy"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eddkv4t",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eeemmwk",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "eexi9i3",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "admiration",
+    "approval",
+    "gratitude",
+    "joy"
+   ]
+  },
+  {
+   "id": "efe367n",
+   "gold": [
+    "confusion"
+   ],
+   "predicted": [
+    "confusion"
+   ]
+  },
+  {
+   "id": "ee8us0n",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "curiosity"
+   ]
+  },
+  {
+   "id": "ef4t3ur",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "edmgmgz",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "amusement",
+    "disgust"
+   ]
+  },
+  {
+   "id": "ed9042l",
+   "gold": [
+    "optimism"
+   ],
+   "predicted": [
+    "caring",
+    "optimism"
+   ]
+  },
+  {
+   "id": "eeq8839",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "sadness"
+   ]
+  },
+  {
+   "id": "edj8erw",
+   "gold": [
+    "disappointment",
+    "disgust"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "edkna0p",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "efeharq",
+   "gold": [
+    "disappointment"
+   ],
+   "predicted": [
+    "confusion"
+   ]
+  },
+  {
+   "id": "ef8kj0b",
+   "gold": [
+    "love"
+   ],
+   "predicted": [
+    "excitement",
+    "joy",
+    "love"
+   ]
+  },
+  {
+   "id": "eeeqkxh",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "ee3mzqh",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "joy"
+   ]
+  },
+  {
+   "id": "edbyvi1",
+   "gold": [
+    "anger"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disgust"
+   ]
+  },
+  {
+   "id": "efdab2p",
+   "gold": [
+    "confusion",
+    "joy",
+    "realization"
+   ],
+   "predicted": [
+    "confusion",
+    "gratitude",
+    "joy"
+   ]
+  },
+  {
+   "id": "ef07txs",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "amusement",
+    "anger",
+    "confusion"
+   ]
+  },
+  {
+   "id": "ee8hv51",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "approval",
+    "excitement",
+    "joy"
+   ]
+  },
+  {
+   "id": "eeruwjf",
+   "gold": [
+    "disgust"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "eet8raz",
+   "gold": [
+    "amusement",
+    "disgust"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance"
+   ]
+  },
+  {
+   "id": "ef8fdpa",
+   "gold": [
+    "disapproval",
+    "disgust"
+   ],
+   "predicted": [
+    "disgust"
+   ]
+  },
+  {
+   "id": "edoqnr3",
+   "gold": [
+    "anger"
+   ],
+   "predicted": [
+    "annoyance",
+    "curiosity"
+   ]
+  },
+  {
+   "id": "efh4i9q",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "amusement",
+    "approval",
+    "joy"
+   ]
+  },
+  {
+   "id": "edu78sc",
+   "gold": [
+    "fear",
+    "neutral"
+   ],
+   "predicted": [
+    "amusement",
+    "confusion",
+    "fear"
+   ]
+  },
+  {
+   "id": "eett24v",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance"
+   ]
+  },
+  {
+   "id": "ee3ekw7",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance",
+    "disapproval",
+    "surprise"
+   ]
+  },
+  {
+   "id": "ed4w39z",
+   "gold": [
+    "anger",
+    "annoyance"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disgust"
+   ]
+  },
+  {
+   "id": "edrbjfh",
+   "gold": [
+    "disgust"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disgust"
+   ]
+  },
+  {
+   "id": "eejmvk0",
+   "gold": [
+    "realization"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "ee5ulcx",
+   "gold": [
+    "admiration",
+    "gratitude"
+   ],
+   "predicted": [
+    "admiration",
+    "approval",
+    "gratitude"
+   ]
+  },
+  {
+   "id": "ed9pqgu",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance"
+   ]
+  },
+  {
+   "id": "eeam3jz",
+   "gold": [
+    "anger",
+    "annoyance"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance"
+   ]
+  },
+  {
+   "id": "edudv43",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "ed1hwvq",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "admiration",
+    "approval",
+    "optimism"
+   ]
+  },
+  {
+   "id": "ed73okq",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "edx3pze",
+   "gold": [
+    "caring",
+    "joy",
+    "relief"
+   ],
+   "predicted": [
+    "admiration",
+    "approval",
+    "joy",
+    "relief"
+   ]
+  },
+  {
+   "id": "eenajtc",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eekwddb",
+   "gold": [
+    "confusion"
+   ],
+   "predicted": [
+    "confusion"
+   ]
+  },
+  {
+   "id": "edfqijd",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "confusion",
+    "disappointment",
+    "surprise"
+   ]
+  },
+  {
+   "id": "eezbeey",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "excitement",
+    "optimism"
+   ]
+  },
+  {
+   "id": "eew266o",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration",
+    "approval",
+    "excitement"
+   ]
+  },
+  {
+   "id": "eejyw93",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "eehhji8",
+   "gold": [
+    "love"
+   ],
+   "predicted": [
+    "excitement",
+    "love"
+   ]
+  },
+  {
+   "id": "edlpvdq",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "annoyance",
+    "confusion",
+    "curiosity"
+   ]
+  },
+  {
+   "id": "edud7ko",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "ed3muot",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "disappointment"
+   ]
+  },
+  {
+   "id": "edo0ozh",
+   "gold": [
+    "desire"
+   ],
+   "predicted": [
+    "amusement",
+    "desire"
+   ]
+  },
+  {
+   "id": "eeuhwe8",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eede41d",
+   "gold": [
+    "excitement",
+    "gratitude"
+   ],
+   "predicted": [
+    "approval",
+    "excitement",
+    "gratitude",
+    "joy"
+   ]
+  },
+  {
+   "id": "edxzmzw",
+   "gold": [
+    "annoyance"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disappointment",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "ef7esig",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration",
+    "excitement",
+    "joy",
+    "love"
+   ]
+  },
+  {
+   "id": "ee052go",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "approval"
+   ]
+  },
+  {
+   "id": "eev7adx",
+   "gold": [
+    "caring"
+   ],
+   "predicted": [
+    "approval"
+   ]
+  },
+  {
+   "id": "eev4wml",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "approval",
+    "gratitude",
+    "joy"
+   ]
+  },
+  {
+   "id": "ee3ggkk",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "admiration",
+    "amusement",
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "edn8uyh",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "ef67xn0",
+   "gold": [
+    "fear"
+   ],
+   "predicted": [
+    "fear",
+    "surprise"
+   ]
+  },
+  {
+   "id": "eec4yxi",
+   "gold": [
+    "fear"
+   ],
+   "predicted": [
+    "annoyance",
+    "fear"
+   ]
+  },
+  {
+   "id": "eepb46i",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "admiration",
+    "amusement",
+    "joy"
+   ]
+  },
+  {
+   "id": "edx7irk",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "ed0n5li",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "annoyance",
+    "confusion"
+   ]
+  },
+  {
+   "id": "edrdmm0",
+   "gold": [
+    "realization",
+    "surprise"
+   ],
+   "predicted": [
+    "annoyance",
+    "curiosity",
+    "surprise"
+   ]
+  },
+  {
+   "id": "ed4a9sk",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "disappointment"
+   ]
+  },
+  {
+   "id": "ed2vvv8",
+   "gold": [
+    "neutral",
+    "surprise"
+   ],
+   "predicted": [
+    "admiration",
+    "joy",
+    "surprise"
+   ]
+  },
+  {
+   "id": "ednbqbt",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "gratitude",
+    "relief"
+   ]
+  },
+  {
+   "id": "ed2qzhv",
+   "gold": [
+    "disappointment",
+    "sadness"
+   ],
+   "predicted": [
+    "disappointment",
+    "sadness"
+   ]
+  },
+  {
+   "id": "ed4m0qz",
+   "gold": [
+    "sadness"
+   ],
+   "predicted": [
+    "disappointment",
+    "sadness"
+   ]
+  },
+  {
+   "id": "ef86qeu",
+   "gold": [
+    "gratitude",
+    "joy"
+   ],
+   "predicted": [
+    "gratitude",
+    "joy"
+   ]
+  },
+  {
+   "id": "efaul5g",
+   "gold": [
+    "surprise"
+   ],
+   "predicted": [
+    "surprise"
+   ]
+  },
+  {
+   "id": "ed10ntc",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "curiosity"
+   ]
+  },
+  {
+   "id": "eeglc1u",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "ee5j15q",
+   "gold": [
+    "anger"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disgust"
+   ]
+  },
+  {
+   "id": "ee9vhsa",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration",
+    "approval"
+   ]
+  },
+  {
+   "id": "eet5xym",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration",
+    "amusement",
+    "approval"
+   ]
+  },
+  {
+   "id": "edbp4ac",
+   "gold": [
+    "confusion"
+   ],
+   "predicted": [
+    "disappointment",
+    "sadness"
+   ]
+  },
+  {
+   "id": "edff0vj",
+   "gold": [
+    "annoyance"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance"
+   ]
+  },
+  {
+   "id": "eetgtfg",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "excitement"
+   ]
+  },
+  {
+   "id": "ef0wcpk",
+   "gold": [
+    "admiration",
+    "amusement"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "edsmp9z",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "disappointment",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "ed6i4ri",
+   "gold": [
+    "annoyance"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eejd7kz",
+   "gold": [
+    "caring",
+    "curiosity"
+   ],
+   "predicted": [
+    "caring"
+   ]
+  },
+  {
+   "id": "edp09u3",
+   "gold": [
+    "sadness"
+   ],
+   "predicted": [
+    "pride",
+    "sadness"
+   ]
+  },
+  {
+   "id": "edb79g1",
+   "gold": [
+    "annoyance"
+   ],
+   "predicted": [
+    "annoyance",
+    "disgust"
+   ]
+  },
+  {
+   "id": "eed882x",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "eeptfaa",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eeeybsp",
+   "gold": [
+    "love"
+   ],
+   "predicted": [
+    "amusement",
+    "curiosity"
+   ]
+  },
+  {
+   "id": "eevfn1s",
+   "gold": [
+    "disappointment"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "ef5rlpi",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "excitement",
+    "joy"
+   ]
+  },
+  {
+   "id": "eelk2pi",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eeqai17",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "admiration",
+    "optimism"
+   ]
+  },
+  {
+   "id": "edu9dc7",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "eecnf14",
+   "gold": [
+    "amusement",
+    "curiosity"
+   ],
+   "predicted": [
+    "amusement",
+    "curiosity"
+   ]
+  },
+  {
+   "id": "edpi4i4",
+   "gold": [
+    "disapproval",
+    "love"
+   ],
+   "predicted": [
+    "anger",
+    "disappointment",
+    "love"
+   ]
+  },
+  {
+   "id": "ed2bfov",
+   "gold": [
+    "confusion"
+   ],
+   "predicted": [
+    "admiration",
+    "confusion",
+    "surprise"
+   ]
+  },
+  {
+   "id": "ed2qhvk",
+   "gold": [
+    "love"
+   ],
+   "predicted": [
+    "admiration",
+    "annoyance"
+   ]
+  },
+  {
+   "id": "eelcrmi",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "gratitude"
+   ]
+  },
+  {
+   "id": "edjz35d",
+   "gold": [
+    "gratitude",
+    "optimism",
+    "realization"
+   ],
+   "predicted": [
+    "amusement",
+    "gratitude"
+   ]
+  },
+  {
+   "id": "edm50mu",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "eelp37z",
+   "gold": [
+    "gratitude",
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "edp9uoq",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "ef4d4wa",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "edi7yht",
+   "gold": [
+    "annoyance"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "eek2ntl",
+   "gold": [
+    "love"
+   ],
+   "predicted": [
+    "admiration",
+    "joy",
+    "love",
+    "optimism"
+   ]
+  },
+  {
+   "id": "ed1ud27",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "ed982u9",
+   "gold": [
+    "excitement"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "ee11e1h",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "eek8t9y",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "curiosity",
+    "desire"
+   ]
+  },
+  {
+   "id": "ed060n3",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "curiosity"
+   ]
+  },
+  {
+   "id": "ed3w5vf",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration",
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "edl0qqn",
+   "gold": [
+    "remorse"
+   ],
+   "predicted": [
+    "confusion",
+    "curiosity"
+   ]
+  },
+  {
+   "id": "ednd9yt",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "gratitude",
+    "sadness"
+   ]
+  },
+  {
+   "id": "ed38erp",
+   "gold": [
+    "disappointment"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eedb2er",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "confusion",
+    "surprise"
+   ]
+  },
+  {
+   "id": "edg03ai",
+   "gold": [
+    "caring"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "eekim14",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "eda5raz",
+   "gold": [
+    "disappointment"
+   ],
+   "predicted": [
+    "disappointment",
+    "remorse",
+    "sadness"
+   ]
+  },
+  {
+   "id": "eeylwuu",
+   "gold": [
+    "admiration",
+    "caring"
+   ],
+   "predicted": [
+    "admiration",
+    "approval",
+    "caring",
+    "joy"
+   ]
+  },
+  {
+   "id": "edi490t",
+   "gold": [
+    "optimism"
+   ],
+   "predicted": [
+    "optimism"
+   ]
+  },
+  {
+   "id": "eex2imh",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "amusement",
+    "excitement",
+    "joy"
+   ]
+  },
+  {
+   "id": "ef9c7s3",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "realization"
+   ]
+  },
+  {
+   "id": "ed4q1uf",
+   "gold": [
+    "disapproval",
+    "disgust"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment",
+    "disapproval",
+    "disgust"
+   ]
+  },
+  {
+   "id": "edxv5n2",
+   "gold": [
+    "desire"
+   ],
+   "predicted": [
+    "amusement",
+    "desire",
+    "excitement"
+   ]
+  },
+  {
+   "id": "eeiav5d",
+   "gold": [
+    "admiration",
+    "gratitude",
+    "optimism"
+   ],
+   "predicted": [
+    "annoyance",
+    "approval"
+   ]
+  },
+  {
+   "id": "edb0aie",
+   "gold": [
+    "amusement",
+    "neutral"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "ee35g54",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "ef46vv0",
+   "gold": [
+    "admiration",
+    "surprise"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance"
+   ]
+  },
+  {
+   "id": "ed0it1e",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance"
+   ]
+  },
+  {
+   "id": "eepfpfw",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "eetmkpj",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "confusion"
+   ]
+  },
+  {
+   "id": "eefbymp",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "disappointment"
+   ]
+  },
+  {
+   "id": "ee0psvl",
+   "gold": [
+    "joy"
+   ],
+   "predicted": [
+    "approval",
+    "joy"
+   ]
+  },
+  {
+   "id": "edplddm",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "ed8mnwb",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "efa6r89",
+   "gold": [
+    "excitement",
+    "neutral"
+   ],
+   "predicted": [
+    "surprise"
+   ]
+  },
+  {
+   "id": "ee7qsxc",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "admiration",
+    "gratitude"
+   ]
+  },
+  {
+   "id": "ed3cz1p",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "ef2f4rk",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "efh510l",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "edf6ni8",
+   "gold": [
+    "disappointment",
+    "neutral"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disapproval",
+    "disgust"
+   ]
+  },
+  {
+   "id": "edj0ga3",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "efdo7vm",
+   "gold": [
+    "admiration",
+    "realization"
+   ],
+   "predicted": [
+    "admiration",
+    "approval",
+    "excitement",
+    "joy"
+   ]
+  },
+  {
+   "id": "efalm4g",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "ef46smj",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "eev25a1",
+   "gold": [
+    "excitement"
+   ],
+   "predicted": [
+    "surprise"
+   ]
+  },
+  {
+   "id": "efh6hdh",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "amusement",
+    "caring"
+   ]
+  },
+  {
+   "id": "eedsu17",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "ef8wa9n",
+   "gold": [
+    "anger",
+    "annoyance"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disgust"
+   ]
+  },
+  {
+   "id": "eems49s",
+   "gold": [
+    "joy"
+   ],
+   "predicted": [
+    "approval",
+    "joy",
+    "pride"
+   ]
+  },
+  {
+   "id": "efetssk",
+   "gold": [
+    "sadness"
+   ],
+   "predicted": [
+    "disappointment",
+    "sadness"
+   ]
+  },
+  {
+   "id": "ee6iphy",
+   "gold": [
+    "anger"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "surprise"
+   ]
+  },
+  {
+   "id": "eeplai1",
+   "gold": [
+    "anger",
+    "annoyance"
+   ],
+   "predicted": [
+    "annoyance",
+    "disgust"
+   ]
+  },
+  {
+   "id": "eezlpdu",
+   "gold": [
+    "annoyance",
+    "neutral"
+   ],
+   "predicted": [
+    "desire",
+    "embarrassment"
+   ]
+  },
+  {
+   "id": "ee39k86",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "edg7akf",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "approval"
+   ]
+  },
+  {
+   "id": "edrtx65",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "approval",
+    "excitement",
+    "joy"
+   ]
+  },
+  {
+   "id": "ee4i1fa",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "realization",
+    "surprise"
+   ]
+  },
+  {
+   "id": "ed4zoov",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "amusement",
+    "curiosity"
+   ]
+  },
+  {
+   "id": "edwybo5",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "eczyqul",
+   "gold": [
+    "excitement",
+    "gratitude"
+   ],
+   "predicted": [
+    "admiration",
+    "curiosity",
+    "gratitude"
+   ]
+  },
+  {
+   "id": "edcj5l9",
+   "gold": [
+    "admiration",
+    "love"
+   ],
+   "predicted": [
+    "admiration",
+    "love"
+   ]
+  },
+  {
+   "id": "edlm4i4",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "curiosity"
+   ]
+  },
+  {
+   "id": "ef6aj01",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "nervousness"
+   ]
+  },
+  {
+   "id": "eeoqkey",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "ee8gmer",
+   "gold": [
+    "admiration",
+    "love"
+   ],
+   "predicted": [
+    "excitement",
+    "joy",
+    "love"
+   ]
+  },
+  {
+   "id": "edyjqwc",
+   "gold": [
+    "approval",
+    "love"
+   ],
+   "predicted": [
+    "admiration",
+    "caring",
+    "joy",
+    "love"
+   ]
+  },
+  {
+   "id": "efgfmeh",
+   "gold": [
+    "caring",
+    "disapproval"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "edk6w8j",
+   "gold": [
+    "admiration",
+    "gratitude"
+   ],
+   "predicted": [
+    "caring",
+    "gratitude",
+    "optimism"
+   ]
+  },
+  {
+   "id": "ef4hqt0",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "eemibsh",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "anger",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "ef6t8k6",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eezvlxt",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration"
+   ]
+  },
+  {
+   "id": "edh4s1c",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "ef2nx5q",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "eec8s5u",
+   "gold": [
+    "joy"
+   ],
+   "predicted": [
+    "approval",
+    "gratitude"
+   ]
+  },
+  {
+   "id": "ee6v2ij",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration",
+    "approval"
+   ]
+  },
+  {
+   "id": "edoywwk",
+   "gold": [
+    "desire",
+    "love"
+   ],
+   "predicted": [
+    "admiration",
+    "desire",
+    "joy",
+    "love"
+   ]
+  },
+  {
+   "id": "ed42lw0",
+   "gold": [
+    "curiosity",
+    "realization"
+   ],
+   "predicted": [
+    "confusion",
+    "curiosity"
+   ]
+  },
+  {
+   "id": "ed3ngxf",
+   "gold": [
+    "neutral",
+    "surprise"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval",
+    "surprise"
+   ]
+  },
+  {
+   "id": "ef2ycmu",
+   "gold": [
+    "grief",
+    "sadness"
+   ],
+   "predicted": [
+    "caring",
+    "grief",
+    "sadness"
+   ]
+  },
+  {
+   "id": "ed4h3m7",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "amusement",
+    "excitement",
+    "surprise"
+   ]
+  },
+  {
+   "id": "eeq5v95",
+   "gold": [
+    "confusion"
+   ],
+   "predicted": [
+    "confusion"
+   ]
+  },
+  {
+   "id": "eecq3gq",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "edv2ae3",
+   "gold": [
+    "anger",
+    "annoyance"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "surprise"
+   ]
+  },
+  {
+   "id": "edptio1",
+   "gold": [
+    "annoyance"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "ee75uj1",
+   "gold": [
+    "anger"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disgust"
+   ]
+  },
+  {
+   "id": "eeqlnwy",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "edoce1w",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "edt9nrx",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "amusement",
+    "approval",
+    "joy"
+   ]
+  },
+  {
+   "id": "eetagnd",
+   "gold": [
+    "disappointment"
+   ],
+   "predicted": [
+    "curiosity",
+    "disappointment",
+    "sadness"
+   ]
+  },
+  {
+   "id": "efdtsj9",
+   "gold": [
+    "caring",
+    "neutral"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance",
+    "disgust"
+   ]
+  },
+  {
+   "id": "eeonaib",
+   "gold": [
+    "admiration",
+    "love"
+   ],
+   "predicted": [
+    "approval",
+    "desire",
+    "joy",
+    "optimism"
+   ]
+  },
+  {
+   "id": "edo5ajh",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eds7ima",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "confusion",
+    "curiosity"
+   ]
+  },
+  {
+   "id": "eff10hy",
+   "gold": [
+    "optimism"
+   ],
+   "predicted": [
+    "approval"
+   ]
+  },
+  {
+   "id": "efe4n7o",
+   "gold": [
+    "approval",
+    "neutral"
+   ],
+   "predicted": [
+    "optimism"
+   ]
+  },
+  {
+   "id": "eeuudh4",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "amusement",
+    "remorse"
+   ]
+  },
+  {
+   "id": "edq7syt",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eets4yi",
+   "gold": [
+    "annoyance",
+    "optimism"
+   ],
+   "predicted": [
+    "caring",
+    "optimism",
+    "sadness"
+   ]
+  },
+  {
+   "id": "ee43rl8",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "ef60db2",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disappointment",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eeb38o6",
+   "gold": [
+    "annoyance",
+    "sadness"
+   ],
+   "predicted": [
+    "disappointment",
+    "sadness"
+   ]
+  },
+  {
+   "id": "edkh28y",
+   "gold": [
+    "confusion"
+   ],
+   "predicted": [
+    "confusion",
+    "curiosity"
+   ]
+  },
+  {
+   "id": "eebwv1e",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "edtao5v",
+   "gold": [
+    "annoyance"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance"
+   ]
+  },
+  {
+   "id": "effn3uq",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "disappointment",
+    "remorse",
+    "sadness"
+   ]
+  },
+  {
+   "id": "edxn2in",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "approval"
+   ]
+  },
+  {
+   "id": "eeb3qct",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "ed46je0",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration"
+   ]
+  },
+  {
+   "id": "ef4dss1",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "eete10e",
+   "gold": [
+    "embarrassment"
+   ],
+   "predicted": [
+    "annoyance",
+    "confusion"
+   ]
+  },
+  {
+   "id": "efawrio",
+   "gold": [
+    "neutral",
+    "realization"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "ee8wf77",
+   "gold": [
+    "anger"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disgust"
+   ]
+  },
+  {
+   "id": "edqvigr",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "ed1vgtp",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "approval",
+    "caring",
+    "optimism"
+   ]
+  },
+  {
+   "id": "ee5z7uc",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "ed1h5g1",
+   "gold": [
+    "annoyance"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance",
+    "curiosity"
+   ]
+  },
+  {
+   "id": "edyp9kw",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "excitement",
+    "joy"
+   ]
+  },
+  {
+   "id": "efa453d",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "curiosity"
+   ]
+  },
+  {
+   "id": "ed5cd6d",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "approval",
+    "gratitude"
+   ]
+  },
+  {
+   "id": "ed7xku2",
+   "gold": [
+    "amusement",
+    "annoyance"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance"
+   ]
+  },
+  {
+   "id": "eelmvui",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "efgeoye",
+   "gold": [
+    "joy"
+   ],
+   "predicted": [
+    "approval",
+    "joy"
+   ]
+  },
+  {
+   "id": "eeok66g",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "gratitude"
+   ]
+  },
+  {
+   "id": "ed70zjm",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "edgi7as",
+   "gold": [
+    "caring"
+   ],
+   "predicted": [
+    "caring",
+    "disappointment",
+    "sadness"
+   ]
+  },
+  {
+   "id": "ef78w8k",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "eetih44",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "curiosity"
+   ]
+  },
+  {
+   "id": "edtbcto",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "admiration",
+    "joy"
+   ]
+  },
+  {
+   "id": "eem0wy9",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "desire"
+   ]
+  },
+  {
+   "id": "eekk826",
+   "gold": [
+    "annoyance"
+   ],
+   "predicted": [
+    "annoyance",
+    "disgust"
+   ]
+  },
+  {
+   "id": "ee8xs45",
+   "gold": [
+    "optimism"
+   ],
+   "predicted": [
+    "admiration",
+    "approval",
+    "excitement",
+    "joy"
+   ]
+  },
+  {
+   "id": "ee94rnu",
+   "gold": [
+    "admiration",
+    "love"
+   ],
+   "predicted": [
+    "approval",
+    "joy"
+   ]
+  },
+  {
+   "id": "effzsws",
+   "gold": [
+    "disgust"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disappointment",
+    "sadness"
+   ]
+  },
+  {
+   "id": "eev5azd",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "disapproval"
+   ]
+  },
+  {
+   "id": "edfth7l",
+   "gold": [
+    "confusion"
+   ],
+   "predicted": [
+    "confusion",
+    "curiosity"
+   ]
+  },
+  {
+   "id": "efgm98k",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "anger",
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "edgpjlf",
+   "gold": [
+    "amusement",
+    "realization"
+   ],
+   "predicted": [
+    "amusement",
+    "joy"
+   ]
+  },
+  {
+   "id": "eeig4r0",
+   "gold": [
+    "admiration",
+    "caring"
+   ],
+   "predicted": [
+    "admiration",
+    "caring",
+    "excitement"
+   ]
+  },
+  {
+   "id": "ee01t1o",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "een409v",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "curiosity"
+   ]
+  },
+  {
+   "id": "ed1pn0a",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "amusement",
+    "annoyance"
+   ]
+  },
+  {
+   "id": "eeis7pu",
+   "gold": [
+    "amusement",
+    "joy"
+   ],
+   "predicted": [
+    "amusement",
+    "joy"
+   ]
+  },
+  {
+   "id": "eekx4xa",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration",
+    "approval"
+   ]
+  },
+  {
+   "id": "efcxjgb",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment",
+    "disapproval",
+    "gratitude"
+   ]
+  },
+  {
+   "id": "eege7y2",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "anger",
+    "excitement",
+    "pride"
+   ]
+  },
+  {
+   "id": "ef131xp",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "disappointment",
+    "sadness"
+   ]
+  },
+  {
+   "id": "ee4kpiw",
+   "gold": [
+    "neutral",
+    "optimism"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "eea997z",
+   "gold": [
+    "disappointment"
+   ],
+   "predicted": [
+    "anger",
+    "disapproval",
+    "disgust"
+   ]
+  },
+  {
+   "id": "edqu2eu",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "disappointment",
+    "sadness"
+   ]
+  },
+  {
+   "id": "eeltdow",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval",
+    "disgust"
+   ]
+  },
+  {
+   "id": "ee8ulad",
+   "gold": [
+    "curiosity"
+   ],
+   "predicted": [
+    "curiosity"
+   ]
+  },
+  {
+   "id": "ee2y9j7",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "amusement",
+    "surprise"
+   ]
+  },
+  {
+   "id": "ef811q5",
+   "gold": [
+    "realization"
+   ],
+   "predicted": [
+    "amusement",
+    "surprise"
+   ]
+  },
+  {
+   "id": "eew1fwh",
+   "gold": [
+    "confusion"
+   ],
+   "predicted": [
+    "confusion",
+    "disappointment",
+    "sadness"
+   ]
+  },
+  {
+   "id": "ed2270m",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment",
+    "disgust"
+   ]
+  },
+  {
+   "id": "ef5rhti",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "eee6xwj",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "eemxweq",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "edcscw4",
+   "gold": [
+    "caring"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "ef7zuz6",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "approval",
+    "desire",
+    "excitement"
+   ]
+  },
+  {
+   "id": "eefyqhg",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration",
+    "approval",
+    "optimism"
+   ]
+  },
+  {
+   "id": "eeub2eq",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "ee3fd6l",
+   "gold": [
+    "remorse"
+   ],
+   "predicted": [
+    "remorse"
+   ]
+  },
+  {
+   "id": "ee2nk3z",
+   "gold": [
+    "confusion"
+   ],
+   "predicted": [
+    "confusion"
+   ]
+  },
+  {
+   "id": "edf6q95",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration",
+    "disappointment"
+   ]
+  },
+  {
+   "id": "edfr4au",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration",
+    "approval"
+   ]
+  },
+  {
+   "id": "eeqyl4u",
+   "gold": [
+    "caring"
+   ],
+   "predicted": [
+    "caring"
+   ]
+  },
+  {
+   "id": "effff2z",
+   "gold": [
+    "admiration"
+   ],
+   "predicted": [
+    "admiration",
+    "approval",
+    "gratitude",
+    "joy"
+   ]
+  },
+  {
+   "id": "edkk0e0",
+   "gold": [
+    "joy"
+   ],
+   "predicted": [
+    "joy"
+   ]
+  },
+  {
+   "id": "edxtibo",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "amusement",
+    "disapproval",
+    "nervousness"
+   ]
+  },
+  {
+   "id": "eexmmdc",
+   "gold": [
+    "approval"
+   ],
+   "predicted": [
+    "annoyance"
+   ]
+  },
+  {
+   "id": "edzl27n",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "disapproval",
+    "disgust"
+   ]
+  },
+  {
+   "id": "ed3vxxb",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "gratitude"
+   ]
+  },
+  {
+   "id": "ed1zak0",
+   "gold": [
+    "disappointment"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "edftlbc",
+   "gold": [
+    "disapproval"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "ee8vuxa",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "confusion",
+    "neutral"
+   ]
+  },
+  {
+   "id": "eebhh3i",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "neutral"
+   ]
+  },
+  {
+   "id": "edbph66",
+   "gold": [
+    "amusement"
+   ],
+   "predicted": [
+    "amusement"
+   ]
+  },
+  {
+   "id": "efg8nxz",
+   "gold": [
+    "gratitude"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval",
+    "disgust"
+   ]
+  },
+  {
+   "id": "eezav9m",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "edo7qib",
+   "gold": [
+    "neutral"
+   ],
+   "predicted": [
+    "annoyance",
+    "disapproval"
+   ]
+  },
+  {
+   "id": "eewj9aj",
+   "gold": [
+    "excitement"
+   ],
+   "predicted": [
+    "excitement",
+    "joy"
+   ]
+  }
+ ],
+ "created_at": "2026-11-17T00:13:31+00:00"
+}
