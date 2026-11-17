@@ -189,6 +189,14 @@ a turn gets in degraded mode):
 | C-SSRS, 108 supportive users | sent to a crisis pathway / to any safety pathway | 13.9% / 54.6% |
 | C-SSRS, 99 "indicator" users | reach any safety pathway (reported only) | 54.5% |
 
+**Rate limits.** Groq's free tier gives each model 200K tokens a day per
+organization (a new key in the same account shares it). An XSTest reply
+sends the whole companion prompt, about 1,700 tokens, so about 120 replies
+fit in a day. When the provider asks to wait more than five minutes, the
+runner stops with a message; every answer is cached, so running the same
+command the next day continues where it stopped. Run one benchmark per day
+on the reply model, or use `--limit` / `--label safe` to split XSTest.
+
 The classifier runs (`--mode classifier`) and the EmoBench, GoEmotions and
 XSTest model runs need a provider key (Groq by default) and are not run yet
 for this suite. The classifier release gates read the classifier dev split,

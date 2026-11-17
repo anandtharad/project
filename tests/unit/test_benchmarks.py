@@ -9,6 +9,8 @@ import sys
 from pathlib import Path
 from types import ModuleType
 
+import pytest
+
 from app.evaluation import benchmarks as bench
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -161,3 +163,34 @@ def test_cssrs_maps_labels_and_reads_truncated_posts() -> None:
     assert len(items[1]["message"]) <= importer.CSSRS_MAX_CHARACTERS
     assert "self_harm" in items[1]["categories"]
     assert items[2]["message"].startswith("cut off mid post")
+
+
+def load_runner() -> ModuleType:
+    spec = importlib.util.spec_from_file_location(
+        "eval_benchmarks", ROOT / "scripts" / "eval_benchmarks.py"
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["eval_benchmarks"] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+async def test_a_spent_daily_budget_stops_the_run_and_keeps_the_cache(tmp_path: Path) -> None:
+    from app.llm.schemas import ChatMessage, ChatRole, LLMError, LLMErrorCategory
+
+    runner = load_runner()
+
+    class Limited:
+        async def generate(self, request: object) -> object:
+            raise LLMError(LLMErrorCategory.RATE_LIMITED, "daily tokens", retry_after_seconds=3600)
+
+    model = object.__new__(runner.Model)
+    model.resolved = type("R", (), {"model": "m", "max_output_tokens": 64, "effort": None})()
+    model.llm, model.pause, model.calls = Limited(), 0, 0
+    model.path = tmp_path / "cache.json"
+    model.cache = {}
+    message = [ChatMessage(role=ChatRole.USER, content="hi")]
+    with pytest.raises(runner.BudgetSpent) as spent:
+        await model.answer("system", message, "t")
+    assert spent.value.retry_after == 3600

@@ -59,6 +59,16 @@ EXTERNAL = ROOT / "eval" / "datasets" / "benchmarks" / "external"
 RESULTS = ROOT / "eval" / "results"
 CACHE = RESULTS / ".cache"
 SEED = 20261116
+# A rate limit asking to wait longer than this is a spent daily budget (Groq's
+# free tier: 200K tokens a day per model, per organization, so a new key in
+# the same account does not help): stop and resume later from the cache.
+LONGEST_WAIT_SECONDS = 300
+
+
+class BudgetSpent(Exception):
+    def __init__(self, retry_after: float | None) -> None:
+        super().__init__("rate limit")
+        self.retry_after = retry_after
 
 
 @dataclass(frozen=True)
@@ -157,11 +167,15 @@ class Model:
                 response = await self.llm.generate(request)
                 break
             except LLMError as exc:
-                retryable = exc.category in (
-                    LLMErrorCategory.RATE_LIMITED,
+                limited = exc.category is LLMErrorCategory.RATE_LIMITED
+                if limited and (exc.retry_after_seconds or 0) > LONGEST_WAIT_SECONDS:
+                    raise BudgetSpent(exc.retry_after_seconds) from None
+                retryable = limited or exc.category in (
                     LLMErrorCategory.OVERLOADED,
                     LLMErrorCategory.TIMEOUT,
                 )
+                if limited and attempt == 7:
+                    raise BudgetSpent(exc.retry_after_seconds) from None
                 if not retryable or attempt == 7:
                     raise
                 wait = min(120.0, exc.retry_after_seconds or 10.0 * 2**attempt)
@@ -387,7 +401,20 @@ def main() -> int:
             p.add_argument("--label", choices=["safe", "unsafe"])
             p.add_argument("--classifier", action="store_true", help="add the safety classifier")
     args = parser.parse_args()
-    result = asyncio.run(RUNNERS[args.benchmark](args))
+    try:
+        result = asyncio.run(RUNNERS[args.benchmark](args))
+    except BudgetSpent as spent:
+        hours = (
+            f" (the provider says retry in about {spent.retry_after / 3600:.1f} h)"
+            if spent.retry_after
+            else ""
+        )
+        print(
+            f"\nRate limit: the model's budget is spent{hours}. Every answer so far is "
+            "cached in eval/results/.cache/; run the same command again later and it "
+            "continues where it stopped. No result file was written."
+        )
+        return 3
     result["created_at"] = datetime.now(UTC).isoformat(timespec="seconds")
     path = write(args.benchmark, result)
     print(json.dumps(result["summary"], indent=1))
