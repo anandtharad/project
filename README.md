@@ -199,6 +199,7 @@ is the source of truth. Important ones:
 | `KNOWLEDGE_ENABLED`, `KNOWLEDGE_MIN_SEMANTIC` | knowledge lookups for information requests (default on; needs `scripts/ingest_knowledge.py` once) and the relevance threshold, tuned for the local embedding model; see docs/rag.md |
 | `SAFETY_REGION`, `SAFETY_CLASSIFIER_PROVIDER`, `SAFETY_CLASSIFIER_MODEL` | crisis resources (`IN`, `US`, `GB` or generic) and the safety classifier (`auto`: Groq `openai/gpt-oss-safeguard-20b` when `GROQ_API_KEY` is set); see docs/safety.md |
 | `MEMORY_PROMPT_VERSION` | memory-extraction prompt (see docs/memory.md for the evaluated versions) |
+| `AGENT_MODE` | `off` (default) or `on`: on normal-pathway turns the reply model picks a response strategy and calls read-only tools (memories, knowledge, conversation history, notes) within `AGENT_MAX_ITERATIONS` (4), `AGENT_MAX_TOOL_CALLS` (6), `AGENT_TOOL_TIMEOUT_SECONDS` and the turn deadline; Groq and Ollama only; see docs/agent.md |
 | `VOICE_ENABLED`, `STT_PROVIDER`, `TTS_PROVIDER` | speech in and out (off by default): `deepgram`, `sarvam` or `gnani` with `DEEPGRAM_API_KEY` / `SARVAM_API_KEY` / `GNANI_API_KEY`; then open `/voice`. Half duplex, push-to-talk by default (`VOICE_END_OF_TURN`); see docs/voice-interface.md |
 
 `APP_ENV=production` requires `AUTH_MODE=clerk` (docs/api.md, "Authentication"). For a hosted database, see [docs/supabase.md](docs/supabase.md).
@@ -248,6 +249,7 @@ docs/             architecture, API, threat model, implementation status
 - [Architecture](docs/architecture.md)
 - [LLM providers](docs/providers.md)
 - [Decisions, state and response policy](docs/decisions.md)
+- [Agent turns (model-directed strategy and tools)](docs/agent.md)
 - [Memory](docs/memory.md)
 - [Safety layer](docs/safety.md)
 - [Knowledge retrieval](docs/rag.md)

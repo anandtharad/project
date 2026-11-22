@@ -15,6 +15,7 @@ written by a run. No number in the docs comes from anywhere else.
 | Safety | `eval_safety.py --mode patterns / classifier` | `eval/datasets/safety/v1` + public benchmarks | missed risk, false positives, invalid answers, classifier latency (docs/safety.md) | classifier mode: live model |
 | Knowledge | `eval_rag.py routing / retrieval / generation` | `eval/datasets/rag/v1` | routing recall and unnecessary lookups, retrieval hit rate and abstention, citation validity and grounded wording (docs/rag.md) | database; live model for generation |
 | Golden scenarios | `eval_golden.py --mode deterministic / live` | `eval/datasets/golden/v1` | 216 end-to-end conversations through the HTTP API, database and every layer | database; live model for live mode |
+| Agent vs deterministic | `eval_golden.py --agent`, then `eval_agent_compare.py` | golden scenarios | pass rates with and without `AGENT_MODE=on`, latency, tokens, strategies, tools, fallbacks, knowledge-search agreement (docs/agent.md) | database; live model for a meaningful comparison |
 | Dialogue benchmarks | `eval_dialogue.py run / score` | ESConv and EmpatheticDialogues, downloaded | companion replies against the human reply at the same point, by proxies and a blind pairwise judge | live model |
 
 Each dataset has a `DATASET_CARD.md`: origin, licence, labels, split and
@@ -299,7 +300,9 @@ uv run pytest                                  # the test suite, tests/security 
 Each gate reads the latest result file matching its pattern. Where several
 configurations write the same kind of file, a `require` filter applies: the
 citation gate, for example, reads only runs on the default reply model.
-All 12 gates pass as of 2026-10-16.
+All 12 gates pass as of 2026-10-16. A 13th, mandatory, was added on
+2026-11-22: every golden guarantee holds with `AGENT_MODE=on` (deterministic
+run, 1.0; docs/agent.md).
 
 ## Observability
 

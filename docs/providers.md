@@ -196,6 +196,21 @@ Provider notes:
   as `invalid_request` (not retried), as is Groq's best-effort failure
   (`Generated JSON does not match the expected schema`).
 
+## Tool calling (agent turns)
+
+`AGENT_MODE=on` (docs/agent.md) needs tool calling, and startup refuses it
+for a provider without. Enabled:
+- **Groq:** tools and `tool_choice` (`auto` / `none`). gpt-oss models
+  support tool use but not parallel calls; the agent runs calls one at a
+  time anyway.
+- **Ollama:** `tools` only. Its OpenAI layer lists `tool_choice` as
+  unsupported, so a "no more tools" call leaves the tool definitions out.
+  Pick a model documented for tool calling, for example `qwen3`.
+
+Other presets are not enabled until their docs and a live test confirm
+tool calling (`ProviderPreset.tools`). Structured outputs and tools are
+never combined in one request.
+
 ## Credential safety (OpenAI SDK)
 
 The `openai` SDK reads several `OPENAI_*` variables implicitly. The adapter

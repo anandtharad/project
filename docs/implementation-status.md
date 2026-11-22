@@ -1,6 +1,6 @@
 # Implementation status
 
-Last updated: 2026-10-16. Spec: COMPANION-TECH-SPEC-001 v2.1.
+Last updated: 2026-11-22. Spec: COMPANION-TECH-SPEC-001 v2.1.
 
 ## Phase summary
 
@@ -434,6 +434,22 @@ docs/rag.md. The dialogue benchmark on the reply model: two blind judges
 preferred the companion's reply to the human one in 72.5% and 82.5% of 40
 dev items, with the caveat that its replies are twice as long
 (docs/evaluation.md).
+
+## Agent turns (`AGENT_MODE=on`, added on request, 2026-11-22)
+
+Model-directed strategy and read-only tools on normal-pathway turns,
+through LangGraph inside the existing orchestrator (docs/agent.md).
+
+| Item | Status |
+|---|---|
+| Tool calling in the LLM layer (schemas, Groq, Ollama, test double) | Done; offline-tested through the real SDKs |
+| Four read-only tools (memories, knowledge, history, notes) with turn-scoped identity, timeouts, size caps, normalized errors | Done; unit and security tests (cross-user isolation against PostgreSQL) |
+| Strategy registry (5 strategies, locked prompt `agent_strategies` 1.0.0) and structured selection with validation and fallback | Done; unit tests |
+| LangGraph loop with iteration, tool-call and deadline limits; no checkpointer | Done; unit tests |
+| Orchestrator integration: normal pathway only, deterministic fallback, regeneration from the agent's messages, citations against its evidence, provenance | Done; 14 integration tests |
+| Golden scenarios with the agent (deterministic) | Guarantees 100% (new mandatory gate) |
+| Agent vs deterministic comparison runner | Done; deterministic baseline recorded |
+| Live comparison on the reply model | **Not run** (needs the Groq free-tier budget or Ollama locally) |
 
 ## Open questions and next steps
 

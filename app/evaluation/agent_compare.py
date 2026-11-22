@@ -81,10 +81,7 @@ def _agent_behaviour(replies: dict[str, list[dict[str, Any]]]) -> dict[str, Any]
         "strategy_fallbacks": sum(1 for r in records if r.get("strategy_source") == "fallback"),
         "tools": dict(tools),
         "tool_errors": sum(
-            1
-            for r in records
-            for s in r.get("tool_statuses") or []
-            if s not in ("ok", "no_matches")
+            1 for r in records for s in r.get("tool_statuses") or [] if s not in ("ok", "empty")
         ),
         "turns_with_tools": round(sum(1 for n in per_turn if n) / len(records), 4),
         "tool_calls_per_turn": round(statistics.fmean(per_turn), 3),

@@ -25,6 +25,9 @@ HTTP request
        ContextBuilder           system prompt + policy or pathway fragment (+ verified contacts),
                                 notes and memories blocks, budgeted history
        LLMClient.generate       provider adapter, bounded by turn deadline
+         or, AGENT_MODE=on and the normal pathway: the agent graph (docs/agent.md)
+         strategy choice -> model <-> read-only tools (bounded) -> reply;
+         any failure -> the deterministic generate above
        ResponseValidator        response contract
        SafetyOutputValidator    content checks (+ semantic check on safety pathways);
                                 one regeneration, then the pathway's fixed fallback
@@ -49,11 +52,15 @@ HTTP request
 | Response policy | `app/orchestration/policy.py` | choosing the reply approach in code | wording (prompt fragments) |
 | Memory service | `app/memory/*` | retrieval for a turn, post-turn extraction, the eligibility policy, user-scoped storage, retention | what the reply says about memories (prompt) |
 | Embeddings | `app/embeddings/*` | vectors for memory search (local fastembed, OpenAI, Gemini) | storage |
+| Agent graph | `app/agent/*` | (AGENT_MODE=on, normal pathway) strategy selection from the locked registry, the LangGraph loop and its limits, the four read-only tools and their authorization from the turn context (docs/agent.md) | safety decisions, persistence, lifecycle (the orchestrator's) |
 | Background tasks | `app/background.py` | post-turn work after the reply is saved; given 5 s at shutdown, then cancelled | the turn's result |
 
-Core invariant: nothing the model produces can trigger data access. The model
-has no tools, and ownership is checked in SQL (`get_owned_conversation`)
-before any history is read.
+Core invariant: nothing the model produces can widen data access. With
+`AGENT_MODE=off` the model has no tools. With it on, the model can call
+four read-only tools whose identity comes from the authenticated turn, never
+from the model's arguments, and whose queries filter on that user in SQL
+(docs/agent.md). Ownership is checked in SQL (`get_owned_conversation`)
+before any history is read, and before any tool can run.
 
 ## Turn lifecycle and transactions
 
