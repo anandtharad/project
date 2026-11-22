@@ -1,7 +1,11 @@
 """Minimal terminal client for manual testing of a running API (not a frontend).
 
 Usage:
-    uv run python scripts/chat.py --token <dev token> [--url http://localhost:8000]
+    uv run python scripts/chat.py --token <dev token> [--url http://localhost:8000] [--details]
+
+--details also prints the safety pathway (when the reply followed one) and
+the sources cited. With AGENT_MODE=on, the server log's `agent.completed`
+line shows the strategy and tools each turn used.
 
 Quit with Ctrl-D (Ctrl-Z then Enter on Windows) or Ctrl-C.
 
@@ -24,6 +28,9 @@ def main() -> int:
     parser.add_argument("--url", default="http://localhost:8000")
     parser.add_argument("--token", required=True, help="a token from DEV_AUTH_TOKENS")
     parser.add_argument("--conversation", help="continue an existing conversation ID")
+    parser.add_argument(
+        "--details", action="store_true", help="also print the safety pathway and cited sources"
+    )
     args = parser.parse_args()
 
     headers = {"Authorization": f"Bearer {args.token}"}
@@ -67,7 +74,14 @@ def main() -> int:
                     if attempt == 1:
                         raise
             if response.status_code in (200, 201):
-                print(f"companion> {response.json()['assistant_content']}\n")
+                body = response.json()
+                print(f"companion> {body['assistant_content']}")
+                if args.details:
+                    if body.get("safety"):
+                        print(f"  [safety pathway: {body['safety']['pathway']}]")
+                    for source in body.get("sources") or []:
+                        print(f"  [{source['marker']}] {source['title']} - {source['publisher']}")
+                print()
             else:
                 error = response.json().get("error", {})
                 print(f"[{response.status_code} {error.get('code')}] {error.get('message')}\n")
