@@ -6,7 +6,9 @@ every turn is exactly as before.
 
 When it is on, the agent runs only on **normal safety pathway** turns.
 Crisis, check-in and other safety pathways, and turns where the policy
-carries a safety signal, keep the deterministic path. The agent never
+carries a safety signal, keep the deterministic path. After a crisis turn,
+every later turn of that conversation is on the `crisis_follow_up` pathway
+(docs/safety.md), so the agent never answers there either. The agent never
 decides safety.
 
 ## What the model decides, and what the application decides

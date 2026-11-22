@@ -350,3 +350,55 @@ async def test_citations_must_come_from_the_agents_own_searches(
     assert knowledge["route"] == "agent_tool" and knowledge["passages"] == []
     assert knowledge["retrieve"] is False and knowledge["status"] == "not_needed"
     assert knowledge["invalid_citations"] == 1
+
+
+async def test_after_a_crisis_turn_later_turns_stay_with_the_person_without_the_agent(
+    database_url: str, clean_db: None, llm: ScriptedLLMClient, db_engine: AsyncEngine
+) -> None:
+    """The developer's live test (2026-11-22): after a suicidal disclosure the
+    person declined helplines and the people in their life; the replies kept
+    repeating both, and the follow-ups ran through the agent."""
+    prompt = PromptRegistry().get("companion_system", "1.9.0")
+    follow_up_guidance = prompt.fragment("safety_crisis_follow_up")
+    staying = "That's okay, we don't have to bring them in right now. I'm here. Are you safe?"
+    async for _, c in agent_app(
+        database_url, llm, safety_classifier_provider="fake", safety_region="IN"
+    ):
+        cid = await create_conversation(c, ALICE)
+        llm.queue_safety(label("self_harm"))
+        llm.queue(
+            "I'm really glad you told me, and you matter. Are you safe right now? Please reach "
+            "Tele-MANAS on 14416, and tell someone you trust what's going on. I'm here."
+        )
+        first = await send(c, cid, "i dont feel like anything, want to end my life")
+        assert first.json()["safety"]["pathway"] == "crisis_support"
+
+        for category, message in (
+            ("none", "i dont want to bother them, they are frustrated with me"),
+            ("self_harm", "but i dont want to call emergency numbers"),
+        ):
+            llm.requests.clear()
+            llm.queue_safety(label(category))
+            llm.queue(staying)
+            response = await send(c, cid, message)
+            body = response.json()
+            assert body["safety"]["pathway"] == "crisis_follow_up", body
+            assert body["assistant_content"] == staying  # accepted, not regenerated
+            assert body["safety"]["resources"]  # the client can still show them
+            (request,) = llm.requests
+            assert follow_up_guidance in request.system and request.tools == ()
+        assert llm.strategy_requests == []  # the agent never ran in this conversation
+
+        # New signs of immediate danger still get the strict emergency reply.
+        llm.queue_safety(label("imminent_danger"))
+        llm.queue("I'm here, and I'm worried about you.")  # fails the emergency checks
+        llm.queue("Still worried.")
+        urgent = await send(c, cid, "i have the pills in my hand right now")
+        assert urgent.json()["safety"]["pathway"] == "emergency"
+        assert "emergency services" in urgent.json()["assistant_content"]  # the fallback
+
+        # Another conversation starts fresh.
+        other = await create_conversation(c, ALICE)
+        llm.queue_safety(label("none"))
+        fresh = await send(c, other, "hey, how's it going")
+        assert fresh.json().get("safety") is None

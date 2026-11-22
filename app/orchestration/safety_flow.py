@@ -15,6 +15,8 @@ from app.safety.taxonomy import Pathway
 
 # Used when the companion prompt predates the pathway fragments (before 1.6.0).
 LEGACY_SAFETY_FRAGMENT = "safety_signal"
+# A prompt older than a pathway's fragment uses the closest earlier one.
+_FRAGMENT_FALLBACKS = {"safety_crisis_follow_up": "safety_crisis_support"}
 
 CONTACTS_HEADING = (
     "Support contacts, verified by the application. Offer these where the guidance above "
@@ -45,7 +47,11 @@ def guidance_for(prompt: PromptTemplate, decision: SafetyDecision) -> str:
     """The response guidance for a safety pathway: its fragment, then the
     resources rendered by code (never model-invented)."""
     assert decision.fragment is not None
-    name = decision.fragment if decision.fragment in prompt.fragments else LEGACY_SAFETY_FRAGMENT
+    name = decision.fragment
+    if name not in prompt.fragments:
+        name = _FRAGMENT_FALLBACKS.get(name, LEGACY_SAFETY_FRAGMENT)
+    if name not in prompt.fragments:
+        name = LEGACY_SAFETY_FRAGMENT
     parts = [prompt.fragment(name)]
     if decision.resource_lines:
         parts.append(

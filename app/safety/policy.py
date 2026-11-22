@@ -9,6 +9,16 @@ For any pathway other than `normal` the ordinary strategy (`choose_policy`)
 is bypassed and the reply uses the pathway fragment with the rendered
 resources; an explicit "no advice" request never removes crisis resources.
 `normal` leaves the turn to `choose_policy`.
+
+After a crisis turn (emergency or crisis_support) in the same conversation,
+later turns that would be crisis_support, safety_check_in,
+encourage_connection or normal go to `crisis_follow_up` instead. The person
+has been given the contacts already (the API also returns them with every
+such reply), so the reply stays with them and checks on their safety
+without repeating the contacts or arguing with a refusal; the output
+validator does not require a crisis line or a trusted person there. The
+emergency, harm, abuse and refuse pathways are unchanged, so new signs of
+immediate danger still get the strict emergency reply.
 """
 
 from __future__ import annotations
@@ -125,6 +135,14 @@ PATHWAY_RULES: dict[Pathway, PathwayRule] = {
         required=frozenset({_R.NO_METHOD_DETAILS, _R.ENCOURAGE_OTHER_SUPPORT}),
         resource_kinds=(),
     ),
+    Pathway.CRISIS_FOLLOW_UP: PathwayRule(
+        fragment="safety_crisis_follow_up",
+        overrides_strategy=True,
+        required=frozenset({_R.NO_METHOD_DETAILS, _R.ASK_ABOUT_SAFETY, _R.STAY_IN_CONVERSATION}),
+        # Rendered for the model (offered again only if asked or in danger)
+        # and returned to the client to show beside the reply.
+        resource_kinds=(_K.CRISIS_LINE, _K.TEXT_LINE, _K.EMERGENCY),
+    ),
     Pathway.NORMAL: PathwayRule(
         fragment=None,
         overrides_strategy=False,
@@ -134,6 +152,18 @@ PATHWAY_RULES: dict[Pathway, PathwayRule] = {
 }
 
 assert set(PATHWAY_RULES) == set(Pathway)  # complete for every pathway
+
+# Pathways that mean the conversation has had a crisis turn.
+CRISIS_PATHWAYS = frozenset({Pathway.EMERGENCY, Pathway.CRISIS_SUPPORT, Pathway.CRISIS_FOLLOW_UP})
+# Pathways that become crisis_follow_up after a crisis turn.
+_FOLLOWED_UP = frozenset(
+    {
+        Pathway.CRISIS_SUPPORT,
+        Pathway.SAFETY_CHECK_IN,
+        Pathway.ENCOURAGE_CONNECTION,
+        Pathway.NORMAL,
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -167,13 +197,19 @@ class SafetyPolicy:
     def __init__(self, directory: ResourceDirectory | None = None) -> None:
         self.directory = directory or default_resources()
 
-    def decide(self, assessment: SafetyAssessment, region: str) -> SafetyDecision:
-        """An unknown region raises `UnknownRegionError` (checked at startup)."""
+    def decide(
+        self, assessment: SafetyAssessment, region: str, *, crisis_earlier: bool = False
+    ) -> SafetyDecision:
+        """`crisis_earlier`: this conversation already had a crisis turn.
+        An unknown region raises `UnknownRegionError` (checked at startup)."""
         code = normalize_region(region)
-        rule = PATHWAY_RULES[assessment.pathway]
+        pathway = assessment.pathway
+        if crisis_earlier and pathway in _FOLLOWED_UP:
+            pathway = Pathway.CRISIS_FOLLOW_UP
+        rule = PATHWAY_RULES[pathway]
         return SafetyDecision(
             category=assessment.category,
-            pathway=assessment.pathway,
+            pathway=pathway,
             fragment=rule.fragment,
             overrides_strategy=rule.overrides_strategy,
             required=rule.required,

@@ -243,7 +243,9 @@ class TurnOrchestrator:
         if self._safety is not None and assessment is not None:
             if mode is not None and mode.value == "safety":
                 assessment = assessment.with_decision_signal()
-            safety = self._safety.policy.decide(assessment, self._safety.region)
+            safety = self._safety.policy.decide(
+                assessment, self._safety.region, crisis_earlier=begun.crisis_earlier
+            )
         # Safety overrides the ordinary strategy (spec Phase 5 acceptance).
         policy = choose_policy(content, decisions)
         if lookup is not None and (is_safety_pathway(safety) or policy.safety_signal):

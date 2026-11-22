@@ -451,6 +451,21 @@ through LangGraph inside the existing orchestrator (docs/agent.md).
 | Agent vs deterministic comparison runner | Done; deterministic baseline recorded |
 | Live comparison on the reply model | Run on a 17-scenario dev sample: guarantees 100% in both modes; reply checks 0.77 vs 0.85; about 40% more tokens; two gaps found (venting read as supportive, no memory pre-fetch). `AGENT_MODE` stays off by default (docs/agent.md) |
 
+## Crisis follow-up (companion prompt 1.9.0, 2026-11-22)
+
+Added after a live test in which replies kept repeating helplines and
+"someone you trust" after the person declined both. The follow-up
+messages were also assessed as normal on their own, so with
+`AGENT_MODE=on` the agent answered them.
+
+The new `crisis_follow_up` pathway applies to the later turns of a
+conversation that had a crisis turn. It stays with the person, doesn't
+argue with a refusal or require the contacts, and keeps checking safety.
+It also never reaches the agent. Emergency stays strict. Companion
+prompt 1.9.0 and `safety_output` 1.1.0 are the defaults, and unit and
+integration tests cover it (docs/safety.md, "After a crisis turn"). The
+texts are a draft that needs qualified review.
+
 ## Open questions and next steps
 
 1. **(Not pursued: the decision model is not used; the reply LLM decides, see docs/decisions.md.)** A decision model that passes calibration. The LLM provider on

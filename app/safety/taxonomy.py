@@ -43,6 +43,10 @@ class Pathway(StrEnum):
     REFUSE_HARMFUL = "refuse_harmful"
     SAFETY_CHECK_IN = "safety_check_in"
     ENCOURAGE_CONNECTION = "encourage_connection"
+    # Later turns of a conversation that already had a crisis turn (suicide
+    # or self-harm): stay with the person, without repeating the contacts
+    # (app/safety/policy.py, docs/safety.md "After a crisis turn").
+    CRISIS_FOLLOW_UP = "crisis_follow_up"
     # The ordinary response policy (app/orchestration/policy.py).
     NORMAL = "normal"
 

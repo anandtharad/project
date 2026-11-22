@@ -58,6 +58,7 @@ from app.decisions.schemas import DecisionResult
 from app.errors import AppError, ErrorCategory, conversation_not_found
 from app.llm.schemas import ChatMessage, ChatRole
 from app.observability import log_event
+from app.safety.policy import CRISIS_PATHWAYS
 from app.state.schemas import STATE_SCHEMA_VERSION, ConversationState, StoredState
 
 logger = logging.getLogger("app.turn")
@@ -144,6 +145,9 @@ class StartedTurn:
     state: StoredState | None = None
     # The stored sequence of each history message (same order).
     history_sequences: tuple[int, ...] = ()
+    # An earlier turn of this conversation was on a crisis pathway
+    # (app/safety/policy.py CRISIS_PATHWAYS).
+    crisis_earlier: bool = False
 
 
 @dataclass(frozen=True)
@@ -311,7 +315,22 @@ class TurnStore:
             history=history,
             state=await self._load_state(session, conversation.id),
             history_sequences=tuple(row.sequence for row in rows),
+            crisis_earlier=await self._crisis_earlier(session, conversation.id, message.id),
         )
+
+    async def _crisis_earlier(
+        self, session: AsyncSession, conversation_id: uuid.UUID, message_id: uuid.UUID
+    ) -> bool:
+        found = await session.scalar(
+            select(TurnSafety.id)
+            .where(
+                TurnSafety.conversation_id == conversation_id,
+                TurnSafety.user_message_id != message_id,
+                TurnSafety.pathway.in_([p.value for p in CRISIS_PATHWAYS]),
+            )
+            .limit(1)
+        )
+        return found is not None
 
     async def _load_state(
         self, session: AsyncSession, conversation_id: uuid.UUID

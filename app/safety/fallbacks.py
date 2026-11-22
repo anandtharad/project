@@ -66,6 +66,12 @@ FALLBACK_TEXTS: dict[Pathway, tuple[str, str]] = {
         "I'm here to listen.",
         "",
     ),
+    Pathway.CRISIS_FOLLOW_UP: (
+        "That's okay. We don't have to bring anyone else into this right now. I'm here, and "
+        "I'm listening. What's been weighing on you the most? And can I check how you're "
+        "doing right now: are you safe?",
+        "",
+    ),
     Pathway.ENCOURAGE_CONNECTION: (
         "I'm really glad our chats help, and I'm here for you. I'd love for you to have people "
         "around you too, like a friend, a family member or someone else you trust, so you "
@@ -84,7 +90,8 @@ def fallback_reply(decision: SafetyDecision) -> str:
         return GENERIC_FALLBACK
     before, after = FALLBACK_TEXTS[decision.pathway]
     parts = [before]
-    if decision.resource_lines:
+    # A follow-up does not repeat the contacts (the client shows them).
+    if decision.resource_lines and decision.pathway is not Pathway.CRISIS_FOLLOW_UP:
         parts.append("\n".join(decision.resource_lines))
     if after:
         parts.append(after)

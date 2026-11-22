@@ -528,6 +528,10 @@ class SemanticOutputResult:
 _PATHWAY_FRAGMENTS: dict[Pathway, str] = {
     p: f"pathway_{p.value}" for p in Pathway if p is not Pathway.NORMAL
 }
+# Pathways added after safety_output 1.0.0: an older policy without their
+# fragment does not run the semantic check on them (the deterministic
+# checks still do).
+_LATER_PATHWAYS = frozenset({Pathway.CRISIS_FOLLOW_UP})
 
 
 class SemanticOutputChecker:
@@ -550,7 +554,9 @@ class SemanticOutputChecker:
         if prompt.id != SAFETY_OUTPUT_PROMPT_ID:
             raise PromptError(f"{prompt.key} is not a {SAFETY_OUTPUT_PROMPT_ID} prompt")
         check_fragment(prompt, "review", {"review"})
-        for fragment in _PATHWAY_FRAGMENTS.values():
+        for pathway, fragment in _PATHWAY_FRAGMENTS.items():
+            if pathway in _LATER_PATHWAYS and fragment not in prompt.fragments:
+                continue
             check_fragment(prompt, fragment, set())
         self.model = model
         self.llm_provider = llm_provider
@@ -577,8 +583,11 @@ class SemanticOutputChecker:
         return Template(self.prompt.fragment("review")).substitute(review=escape_block(review))
 
     async def check(self, reply: str, decision: SafetyDecision) -> SemanticOutputResult | None:
-        """None on the normal pathway (the check is not run there)."""
+        """None on the normal pathway (the check is not run there), and on a
+        pathway the policy version has no requirements for."""
         if decision.pathway is Pathway.NORMAL:
+            return None
+        if _PATHWAY_FRAGMENTS[decision.pathway] not in self.prompt.fragments:
             return None
         request = GenerationRequest(
             model=self.model,

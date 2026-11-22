@@ -41,6 +41,47 @@ pathway. After the fragment, code renders the verified support contacts for
 `SAFETY_REGION`, and the prompt says never to give any other number, website
 or email.
 
+## After a crisis turn (`crisis_follow_up`, companion prompt 1.9.0)
+
+Once a conversation has had a crisis turn (`emergency` or
+`crisis_support`), its later turns that would be `crisis_support`,
+`safety_check_in`, `encourage_connection` or `normal` go to
+`crisis_follow_up` instead. `TurnStore.begin` reads this from the
+conversation's `turn_safety` records. The category is still recorded as
+assessed.
+
+| | `crisis_support` (first disclosure) | `crisis_follow_up` (later turns) |
+|---|---|---|
+| Reply | glad they said it, they matter, asks if they're safe, offers a crisis line and someone they trust | stays with them like a friend; accepts a refusal of helplines or of involving people without arguing; asks what's on their mind; checks gently whether they're safe; offers the contacts again only if asked or in danger; follows them if they move on |
+| Output validator | must mention a crisis line or emergency services **and** a trusted person | neither required; every other check applies (methods, invented contacts, claims to be human, labels, secrecy, manipulation, prompt leak) |
+| Semantic check (`safety_output` 1.1.0) | crisis-support requirements | follow-up requirements |
+| Fallback | contacts listed | "That's okay. We don't have to bring anyone else into this right now…", no contacts listed |
+| Contacts | in the prompt and in the API's `safety.resources` | the same: the client can keep showing them |
+| Agent (`AGENT_MODE=on`) | never | never |
+
+**Why.** In a live test on 1.8.0, after a suicidal disclosure, the person
+declined helplines and said they didn't want to burden the people around
+them. Three replies in a row repeated both, and the third was the fixed
+fallback, because the validator rejected anything that didn't. The
+follow-up messages were also assessed as `normal` on their own, so they
+went to the agent. Repeating a refused referral can end the conversation,
+which is the opposite of what someone at risk needs.
+
+The approach follows crisis-support practice: respect the person's
+choice, stay connected, and keep checking on safety directly.
+
+**What stays strict.** New signs of immediate danger (`imminent_danger`)
+still get the `emergency` pathway and its full requirements, as do harm to
+others, abuse and dangerous requests. The first disclosure is unchanged.
+
+**Scope.** The follow-up mode lasts for the rest of that conversation,
+with no time limit. A new conversation starts fresh, since earlier
+conversations are not consulted.
+
+REVIEW: the follow-up fragment and fallback are a draft for the developer
+to rewrite, and need review by a qualified person before real use, like
+the other person-facing safety texts.
+
 ## Input analysis
 
 Analysis runs concurrently with state extraction and memory retrieval, and

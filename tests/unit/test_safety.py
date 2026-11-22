@@ -347,3 +347,67 @@ def test_resources_are_not_past_their_review_date() -> None:
     assert datetime.now(UTC).date() <= due, (
         "re-check app/safety/resources_v1.toml against its official sources and bump its version"
     )
+
+
+# --- after a crisis turn (crisis_follow_up) -------------------------------------------
+
+
+def followed(category: SafetyCategory, region: str = "IN"):
+    return SafetyPolicy().decide(assess("x", ok(category)), region, crisis_earlier=True)
+
+
+@pytest.mark.parametrize("category", [C.SELF_HARM, C.NONE, C.AMBIGUOUS_CONCERN, C.DEPENDENCY])
+def test_later_turns_after_a_crisis_turn_stay_with_the_person(category: SafetyCategory) -> None:
+    follow = followed(category)
+    assert follow.pathway is Pathway.CRISIS_FOLLOW_UP and follow.overrides_strategy
+    assert follow.fragment == "safety_crisis_follow_up"
+    assert follow.category is category  # the assessment is recorded as it was
+    # Contacts stay available to the model and the client, but are not required.
+    assert any("14416" in line for line in follow.resource_lines)
+    assert not follow.required & {
+        Requirement.CRISIS_LINE,
+        Requirement.EMERGENCY_SERVICES,
+        Requirement.TRUSTED_PERSON,
+    }
+
+
+@pytest.mark.parametrize(
+    ("category", "pathway"),
+    [
+        (C.IMMINENT_DANGER, Pathway.EMERGENCY),
+        (C.HARM_TO_OTHERS, Pathway.HARM_TO_OTHERS),
+        (C.ABUSE, Pathway.ABUSE_SUPPORT),
+        (C.DANGEROUS_REQUEST, Pathway.REFUSE_HARMFUL),
+    ],
+)
+def test_new_danger_after_a_crisis_turn_keeps_its_strict_pathway(
+    category: SafetyCategory, pathway: Pathway
+) -> None:
+    assert followed(category).pathway is pathway
+    assert SafetyPolicy().decide(assess("x", ok(C.SELF_HARM)), "IN").pathway is (
+        Pathway.CRISIS_SUPPORT  # the first crisis turn is unchanged
+    )
+
+
+def test_a_follow_up_reply_need_not_repeat_the_contacts() -> None:
+    reply = (
+        "That's okay, we don't have to bring them into it right now. I'm here. "
+        "What's been on your mind today? And are you safe right now?"
+    )
+    check = SafetyOutputValidator().check(reply, followed(C.SELF_HARM))
+    assert check.ok, check.codes
+    # The usual backstops still apply.
+    assert ViolationCode.CLAIMS_HUMAN_OR_CLINICIAN.value in set(
+        SafetyOutputValidator().check("As a therapist I hear you.", followed(C.NONE)).codes
+    )
+    assert ViolationCode.UNLISTED_CONTACT.value in set(
+        SafetyOutputValidator().check("Call 0300 123 5000.", followed(C.NONE)).codes
+    )
+
+
+@pytest.mark.parametrize("region", ["IN", "US", "GB", ""])
+def test_the_follow_up_fallback_stays_and_does_not_list_contacts(region: str) -> None:
+    follow = followed(C.SELF_HARM, region)
+    text = fallback_reply(follow)
+    assert "are you safe" in text and not any(line in text for line in follow.resource_lines)
+    assert SafetyOutputValidator().check(text, follow).ok
