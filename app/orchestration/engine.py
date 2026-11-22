@@ -568,7 +568,13 @@ class TurnOrchestrator:
                 "status": "fallback",
                 "reason": f"error:{type(exc).__name__}",
             }
-        log_event(logger, "agent.completed", **{k: result.record[k] for k in _AGENT_LOG_FIELDS})
+        log_event(
+            logger,
+            "agent.completed",
+            strategy=result.strategy.strategy.id,
+            strategy_source=result.strategy.source,
+            **{k: result.record[k] for k in _AGENT_LOG_FIELDS},
+        )
         # A regeneration after a failed safety check answers from the same
         # messages, tool results included, without further tool calls.
         request = GenerationRequest(
