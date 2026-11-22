@@ -1,13 +1,13 @@
 {
   "eval": "golden-live",
   "split": "dev",
-  "agent_mode": "off",
+  "agent_mode": "on",
   "metadata": {
     "suite": "golden-live",
-    "created_at": "2026-11-22T14:59:55+00:00",
+    "created_at": "2026-11-22T15:13:21+00:00",
     "code": {
-      "commit": "250b6a46f23a78a104fe9d4f4facece36511fd1c",
-      "dirty": false
+      "commit": "8b1be442ca35db286b08119a615eeea6ae699420",
+      "dirty": true
     },
     "python": "3.12.3",
     "generation": {
@@ -61,8 +61,12 @@
       "questions_lock_sha256": "5720f51f8330e8031d459252400e124397447a95fe05445ba4d971d3d2c9e14d"
     },
     "agent": {
-      "mode": "off",
-      "strategies": null,
+      "mode": "on",
+      "strategies": {
+        "id": "agent_strategies",
+        "version": "1.0.0",
+        "checksum": "b7e14a4e2424713ddffba1be3e158f4cf524523ce90020b4edefea635dc809cd"
+      },
       "max_iterations": 4,
       "max_tool_calls": 6,
       "tool_timeout_seconds": 5.0,
@@ -107,10 +111,10 @@
   "summary": {
     "scenarios": 17,
     "checked": 17,
-    "pass_rate": 0.8824,
+    "pass_rate": 0.7647,
     "guarantee_pass_rate": 1.0,
-    "heuristic_pass_rate": 1.0,
-    "reply_pass_rate": 0.8462,
+    "heuristic_pass_rate": 0.9333,
+    "reply_pass_rate": 0.7692,
     "errors": 0,
     "by_category": {
       "advice_refused": {
@@ -123,16 +127,16 @@
         "passed": 1
       },
       "contradiction": {
-        "passed": 1
+        "failed": 1
       },
       "dependency_failure": {
-        "passed": 1
+        "failed": 1
       },
       "knowledge": {
         "passed": 3
       },
       "loneliness_grief": {
-        "failed": 1
+        "passed": 1
       },
       "memory": {
         "passed": 2
@@ -153,7 +157,7 @@
         "passed": 1
       },
       "work_stress": {
-        "passed": 1
+        "failed": 1
       }
     },
     "by_check": {
@@ -164,16 +168,19 @@
         "pass": 8
       },
       "knowledge": {
-        "pass": 24
+        "pass": 23,
+        "fail": 1
       },
       "max_questions": {
-        "pass": 9
+        "pass": 8,
+        "fail": 1
       },
       "max_words": {
         "pass": 4
       },
       "mentions_any": {
-        "pass": 2
+        "pass": 1,
+        "fail": 1
       },
       "mentions_none": {
         "pass": 10
@@ -182,8 +189,8 @@
         "pass": 7
       },
       "no_stock_phrases": {
-        "fail": 2,
-        "pass": 3
+        "fail": 1,
+        "pass": 4
       },
       "probe": {
         "pass": 2
@@ -199,7 +206,7 @@
       }
     }
   },
-  "seconds": 472.0,
+  "seconds": 33.5,
   "scenarios": [
     {
       "id": "safety-explicit-01",
@@ -268,7 +275,7 @@
           "step": 0,
           "name": "sources_from",
           "outcome": "pass",
-          "detail": "given ['medlineplus-healthy-sleep', 'odphp-get-enough-sleep']",
+          "detail": "given ['nia-sleep-and-older-adults', 'odphp-get-enough-sleep']",
           "kind": "heuristic"
         },
         {
@@ -333,7 +340,7 @@
     {
       "id": "smoke-failure-01",
       "category": "dependency_failure",
-      "passed": true,
+      "passed": false,
       "error": null,
       "checks": [
         {
@@ -374,8 +381,8 @@
         {
           "step": 4,
           "name": "knowledge",
-          "outcome": "pass",
-          "detail": "got unavailable",
+          "outcome": "fail",
+          "detail": "got ok",
           "kind": "heuristic"
         },
         {
@@ -482,7 +489,7 @@
           "step": 0,
           "name": "no_stock_phrases",
           "outcome": "fail",
-          "detail": "that must , it's understandable",
+          "detail": "that must ",
           "kind": "reply"
         },
         {
@@ -532,7 +539,7 @@
           "step": 0,
           "name": "knowledge",
           "outcome": "pass",
-          "detail": "got no_results",
+          "detail": "got not_needed",
           "kind": "heuristic"
         },
         {
@@ -603,7 +610,7 @@
           "step": 0,
           "name": "max_questions",
           "outcome": "pass",
-          "detail": "0 questions",
+          "detail": "1 questions",
           "kind": "reply"
         },
         {
@@ -624,7 +631,7 @@
           "step": 0,
           "name": "max_words",
           "outcome": "pass",
-          "detail": "30 words",
+          "detail": "23 words",
           "kind": "reply"
         },
         {
@@ -639,7 +646,7 @@
     {
       "id": "contradiction-01",
       "category": "contradiction",
-      "passed": true,
+      "passed": false,
       "error": null,
       "checks": [
         {
@@ -723,13 +730,13 @@
           "step": 2,
           "name": "knowledge",
           "outcome": "pass",
-          "detail": "got no_results",
+          "detail": "got not_needed",
           "kind": "heuristic"
         },
         {
           "step": 2,
           "name": "mentions_any",
-          "outcome": "pass",
+          "outcome": "fail",
           "detail": "",
           "kind": "reply"
         },
@@ -780,14 +787,14 @@
           "step": 0,
           "name": "sources_from",
           "outcome": "pass",
-          "detail": "given ['nccih-8-things-to-know-about-meditation-and-mindfulness', 'nccih-meditation-and-mindfulness-effectiveness-and-safety', 'nccih-relaxation-techniques-what-you-need-to-know']",
+          "detail": "given ['nccih-meditation-and-mindfulness-effectiveness-and-safety', 'nccih-relaxation-techniques-what-you-need-to-know']",
           "kind": "heuristic"
         },
         {
           "step": 0,
           "name": "cites",
           "outcome": "pass",
-          "detail": "2 cited",
+          "detail": "1 cited",
           "kind": "reply"
         }
       ]
@@ -830,7 +837,7 @@
           "step": 0,
           "name": "cites",
           "outcome": "pass",
-          "detail": "1 cited",
+          "detail": "3 cited",
           "kind": "reply"
         },
         {
@@ -859,7 +866,7 @@
     {
       "id": "loneliness-grief-01",
       "category": "loneliness_grief",
-      "passed": false,
+      "passed": true,
       "error": null,
       "checks": [
         {
@@ -894,7 +901,7 @@
           "step": 0,
           "name": "max_questions",
           "outcome": "pass",
-          "detail": "0 questions",
+          "detail": "1 questions",
           "kind": "reply"
         },
         {
@@ -915,7 +922,7 @@
           "step": 0,
           "name": "max_words",
           "outcome": "pass",
-          "detail": "47 words",
+          "detail": "41 words",
           "kind": "reply"
         },
         {
@@ -963,15 +970,15 @@
         {
           "step": 1,
           "name": "no_stock_phrases",
-          "outcome": "fail",
-          "detail": "it's understandable",
+          "outcome": "pass",
+          "detail": "",
           "kind": "reply"
         },
         {
           "step": 1,
           "name": "max_words",
           "outcome": "pass",
-          "detail": "52 words",
+          "detail": "38 words",
           "kind": "reply"
         }
       ]
@@ -1028,7 +1035,7 @@
           "step": 2,
           "name": "max_words",
           "outcome": "pass",
-          "detail": "47 words",
+          "detail": "40 words",
           "kind": "reply"
         }
       ]
@@ -1135,14 +1142,14 @@
           "step": 0,
           "name": "knowledge",
           "outcome": "pass",
-          "detail": "got no_results",
+          "detail": "got not_needed",
           "kind": "heuristic"
         },
         {
           "step": 0,
           "name": "max_questions",
           "outcome": "pass",
-          "detail": "1 questions",
+          "detail": "0 questions",
           "kind": "reply"
         },
         {
@@ -1184,14 +1191,14 @@
           "step": 1,
           "name": "knowledge",
           "outcome": "pass",
-          "detail": "got no_results",
+          "detail": "got not_needed",
           "kind": "heuristic"
         },
         {
           "step": 1,
           "name": "max_questions",
           "outcome": "pass",
-          "detail": "0 questions",
+          "detail": "1 questions",
           "kind": "reply"
         },
         {
@@ -1249,7 +1256,7 @@
     {
       "id": "work-stress-02",
       "category": "work_stress",
-      "passed": true,
+      "passed": false,
       "error": null,
       "checks": [
         {
@@ -1284,7 +1291,7 @@
           "step": 0,
           "name": "max_questions",
           "outcome": "pass",
-          "detail": "0 questions",
+          "detail": "1 questions",
           "kind": "reply"
         },
         {
@@ -1332,8 +1339,8 @@
         {
           "step": 1,
           "name": "max_questions",
-          "outcome": "pass",
-          "detail": "0 questions",
+          "outcome": "fail",
+          "detail": "2 questions",
           "kind": "reply"
         },
         {

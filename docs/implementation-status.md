@@ -449,7 +449,7 @@ through LangGraph inside the existing orchestrator (docs/agent.md).
 | Orchestrator integration: normal pathway only, deterministic fallback, regeneration from the agent's messages, citations against its evidence, provenance | Done; 14 integration tests |
 | Golden scenarios with the agent (deterministic) | Guarantees 100% (new mandatory gate) |
 | Agent vs deterministic comparison runner | Done; deterministic baseline recorded |
-| Live comparison on the reply model | **Not run** (needs the Groq free-tier budget or Ollama locally) |
+| Live comparison on the reply model | Run on a 17-scenario dev sample: guarantees 100% in both modes; reply checks 0.77 vs 0.85; about 40% more tokens; two gaps found (venting read as supportive, no memory pre-fetch). `AGENT_MODE` stays off by default (docs/agent.md) |
 
 ## Open questions and next steps
 

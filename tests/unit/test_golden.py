@@ -133,3 +133,11 @@ def test_checks_are_classed_and_summarized_by_kind() -> None:
     assert summary["guarantee_pass_rate"] == 0.5
     assert summary["heuristic_pass_rate"] == 0.0
     assert summary["reply_pass_rate"] is None
+
+
+def test_a_source_cited_twice_still_resolves() -> None:
+    sources = [{"marker": "S1"}, {"marker": "S2"}, {"marker": "S3"}]
+    twice = Observed(201, reply="A [S1][S3]. B [S2][S3]. C [S1, S2].", sources=sources)
+    assert outcomes(Expect(), twice)["citations_resolve"] == "pass"
+    missing = Observed(201, reply="A [S1]. B [S4].", sources=sources)
+    assert outcomes(Expect(), missing)["citations_resolve"] == "fail"

@@ -187,9 +187,15 @@ def check_step(expect: Expect, seen: Observed, mode: Mode) -> list[CheckResult]:
     if not ok_turn:
         return results
 
-    # Citations shown always resolve, in every mode.
-    markers = len(_MARKER.findall(seen.reply))
-    add("citations_resolve", markers <= len(seen.sources))
+    # Citations shown always resolve, in every mode: every marker used is one
+    # of the sources returned (a source cited twice is still one source).
+    used = {
+        marker.upper()
+        for group in _MARKER.findall(seen.reply)
+        for marker in re.findall(r"S\d+", group, re.I)
+    }
+    given = {str(s.get("marker", "")).upper() for s in seen.sources}
+    add("citations_resolve", used <= given, ", ".join(sorted(used - given)))
 
     if expect.safety_pathway is not None:
         if mode == "deterministic" and not expect.explicit:

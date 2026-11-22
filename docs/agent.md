@@ -185,12 +185,63 @@ What the deterministic run shows is that the agent path keeps every
 guarantee: status codes under dependency failures, privacy probes,
 memory deletion, citations that resolve, and safety statements.
 
-**Not yet run:** the live comparison. It needs the reply model (the
-Groq free tier, 200K tokens a day per model, or Ollama on your machine).
-An agent turn costs more tokens than a deterministic one: the strategy
-call plus one call per iteration, each resending the history and tool
-results. Expect roughly 2-4 times the reply tokens on turns that use
-tools.
+### Live comparison (2026-11-22, Groq `openai/gpt-oss-120b`)
+
+This run used a stratified sample of the dev split that fits the free
+tier's daily budget: 17 scenarios and 30 turns, one scenario per category
+plus extra knowledge and memory scenarios, without the 12-turn long
+conversations. State and memory extraction ran on `gpt-oss-20b` in both
+modes, to save the reply model's budget. Files:
+`eval/results/agent-compare-live-dev-20261122T151333.json` and the two
+golden files it names.
+
+| | without agent | with agent |
+|---|---|---|
+| guarantee pass rate | 1.0 | 1.0 |
+| heuristic pass rate (knowledge route, sources) | 1.0 | 0.933 |
+| reply pass rate (surface checks) | 0.846 | 0.769 |
+| scenarios passing | 15 / 17 | 13 / 17 |
+| knowledge agreement (24 checks) | 1.0 | 0.958 |
+| reply-model tokens per turn, median / p90 | 2,138 / 3,001 | 3,057 / 6,146 |
+| turn latency, median (first, uncached run) | 1.55 s | 1.83 s |
+
+Agent behaviour over 28 agent turns:
+- **Status:** 28 completed; no fallbacks, no turns at the limit, no tool
+  errors.
+- **Strategies:** conversational 9, supportive 8, informational 7,
+  empathetic 4.
+- **Tools:** used on 21% of turns, always `search_knowledge_base`, and
+  always on information questions, citing what it found.
+
+What the differences are:
+- **"what are the signs of stress?" (`smoke-failure-01`):** the agent
+  searched and cited a source. The scenario expects no lookup, so the
+  heuristic check fails, but the reply is arguably better.
+- **A venting message about a build server and a manager
+  (`work-stress-02`):** the agent chose `supportive` and gave unsolicited
+  advice ending in a stock question. The deterministic reply was a short,
+  empathetic acknowledgement. This is a real regression, and it comes from
+  the strategy descriptions: venting should read as empathetic.
+- **Noise:** the same baseline configuration, run twice, flipped one
+  scenario (`contradiction-01`). Seventeen scenarios can only show
+  direction, not significance.
+- **No memory or history searches** in this sample, even in the memory
+  scenarios. A preference stated in an earlier conversation ("I prefer
+  short replies") reaches the deterministic prompt through the memory
+  pre-fetch, but not the agent's, unless the model decides to search. This
+  is the main design gap found (see Limitations).
+
+**The finding:** the agent path is safe and its fallbacks work. Its
+retrieval decisions for information requests are good. On this sample it
+does not beat the deterministic path on reply quality, and it costs about
+40% more reply-model tokens per turn (2-3 times more on turns with a
+search). Keep `AGENT_MODE=off` by default until the strategy prompt and
+the memory gap are addressed and a larger comparison confirms it.
+
+**A bug the live run found:** the golden `citations_resolve` guarantee
+counted marker occurrences against sources, so a reply that cited the
+same source twice failed it. The check now requires every marker used to
+be one of the sources returned (`app/evaluation/golden.py`, with a test).
 
 ## Threats specific to agent turns
 
@@ -211,8 +262,15 @@ See docs/threat-model.md, "Agent turns", for the full rows. In short:
 
 ## Limitations
 
-- The live agent vs deterministic comparison has not been run yet (see
-  Evaluation).
+- **Standing preferences don't reach the agent.** Memories are fetched
+  only when the model calls the memory tool, so a preference such as
+  "short replies" is missed unless the message prompts a search. Options:
+  always include a small set of preference memories in the agent's
+  context, or keep the pre-fetched memories there and use the tool only
+  for deeper searches.
+- **Venting can read as supportive.** The strategy descriptions let a
+  venting message get advice; they need rewriting.
+- **The live comparison is small** (17 scenarios); see Evaluation.
 - Strategy selection costs one extra model call per turn, on top of the
   pre-fetch calls, which still run because the fallback needs them.
 - History search is full-text, not semantic. It finds what was said in
