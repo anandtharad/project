@@ -55,6 +55,10 @@ def minimal_instance(schema: Any) -> Any:
 
 
 class FakeLLMClient:
+    # Accepts agent turns (AGENT_MODE=on) but never calls a tool: the stub
+    # answers every reply request directly.
+    supports_tools = True
+
     @property
     def provider(self) -> str:
         return "fake"

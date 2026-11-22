@@ -348,4 +348,5 @@ async def test_citations_must_come_from_the_agents_own_searches(
     assert "[S1]" not in response.json()["assistant_content"]
     knowledge = (await metadata(db_engine, response))["knowledge"]
     assert knowledge["route"] == "agent_tool" and knowledge["passages"] == []
+    assert knowledge["retrieve"] is False and knowledge["status"] == "not_needed"
     assert knowledge["invalid_citations"] == 1

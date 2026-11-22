@@ -379,8 +379,8 @@ class TurnOrchestrator:
                 "agent": agent_record,
                 "knowledge": {
                     **(
-                        _agent_evidence_summary(agent_turn.evidence)
-                        if agent_turn is not None
+                        _agent_evidence_summary(agent_turn.evidence, agent_record)
+                        if agent_turn is not None and agent_record is not None
                         else lookup.summary()
                         if lookup is not None
                         else {"status": "disabled"}
@@ -899,10 +899,15 @@ _AGENT_LOG_FIELDS = (
 )
 
 
-def _agent_evidence_summary(items: tuple[EvidenceItem, ...]) -> dict[str, Any]:
+def _agent_evidence_summary(
+    items: tuple[EvidenceItem, ...], record: dict[str, Any]
+) -> dict[str, Any]:
+    # In the knowledge service's terms: a lookup is the model's own call.
+    searched = "search_knowledge_base" in (record.get("tools_called") or [])
     return {
         "route": "agent_tool",
-        "status": "ok" if items else "not_requested_or_empty",
+        "retrieve": searched,
+        "status": ("ok" if items else "no_results") if searched else "not_needed",
         "passages": [
             {
                 "marker": item.marker,

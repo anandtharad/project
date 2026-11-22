@@ -6,12 +6,18 @@ and every layer.
 
     uv run python scripts/eval_golden.py --mode deterministic          # no key, CI
     uv run python scripts/eval_golden.py --mode live --split dev --limit 10 --pause 20
+    uv run python scripts/eval_golden.py --mode live --split dev --agent   # AGENT_MODE=on
 
 - **Deterministic:** the development stub model, no safety classifier
   (degraded mode), no decision model. Pipeline checks only.
 - **Live:** the configured provider and settings. Live replies are cached
   per scenario (eval/results/.cache/), so a run stopped by a rate limit
   continues where it stopped.
+
+`--agent` runs the same scenarios with AGENT_MODE=on (docs/agent.md) and
+writes golden-<mode>-agent-<split>-<time>.json; scripts/eval_agent_compare.py
+compares it with a run without. In deterministic mode the stub model never
+calls tools, so that run checks the guarantees, not the agent's choices.
 
 Results go to eval/results/golden-<mode>-<split>-<time>.json, and the
 replies (synthetic conversations) to a `.replies.json` file next to it.
@@ -84,6 +90,17 @@ LIMITATIONS = [
 ]
 
 
+# An armed reply failure is a provider outage for that turn: on an agent
+# turn the strategy and agent calls fail too, then the deterministic
+# fallback's reply call fails (and disarms), as in the scenario's intent.
+_OUTAGE = {
+    GenerationPurpose.CONVERSATION: (
+        GenerationPurpose.STRATEGY_SELECTION,
+        GenerationPurpose.AGENT_STEP,
+    )
+}
+
+
 class FaultInjector:
     """Wraps an LLM client; `arm(purpose)` makes the next request with that
     purpose fail as a provider error (failure-matrix scenarios)."""
@@ -96,12 +113,19 @@ class FaultInjector:
     def provider(self) -> str:
         return self.inner.provider
 
+    @property
+    def supports_tools(self) -> bool:
+        return bool(getattr(self.inner, "supports_tools", False))
+
     def arm(self, purpose: GenerationPurpose) -> None:
         self._armed.add(purpose)
 
     async def generate(self, request: GenerationRequest) -> GenerationResponse:
-        if request.trace.purpose in self._armed:
-            self._armed.discard(request.trace.purpose)
+        purpose = request.trace.purpose
+        if purpose in self._armed:
+            self._armed.discard(purpose)
+            raise LLMError(LLMErrorCategory.SERVER_ERROR, "injected failure")
+        if any(purpose in _OUTAGE.get(armed, ()) for armed in self._armed):
             raise LLMError(LLMErrorCategory.SERVER_ERROR, "injected failure")
         return await self.inner.generate(request)
 
@@ -125,6 +149,10 @@ class CachingLLM:
     @property
     def provider(self) -> str:
         return self.inner.provider
+
+    @property
+    def supports_tools(self) -> bool:
+        return bool(getattr(self.inner, "supports_tools", False))
 
     @staticmethod
     def key(request: GenerationRequest) -> str:
@@ -204,8 +232,9 @@ async def temp_database(base_url: str) -> AsyncIterator[str]:
         await admin.dispose()
 
 
-def settings_for(mode: Mode, base: Settings, database_url: str) -> Settings:
+def settings_for(mode: Mode, base: Settings, database_url: str, agent: bool = False) -> Settings:
     common: dict[str, Any] = {
+        "agent_mode": "on" if agent else "off",
         "database_url": database_url,
         "dev_auth_tokens": ",".join(f"{u}:{t}" for u, t in USERS.items()),
         "app_env": "development",
@@ -310,6 +339,8 @@ async def run_scenario(
         )
         seen = Observed(status=response.status_code, message=step.user)
         invalid = 0
+        agent: dict[str, Any] | None = None
+        usage: dict[str, Any] | None = None
         if response.status_code in (200, 201):
             body = response.json()
             seen.reply = body["assistant_content"]
@@ -325,6 +356,8 @@ async def run_scenario(
             seen.knowledge_retrieve = knowledge.get("retrieve")
             seen.passages = [p["source_key"] for p in knowledge.get("passages") or []]
             invalid = knowledge.get("invalid_citations", 0)
+            agent = (metadata or {}).get("agent")
+            usage = (metadata or {}).get("usage")
         results = check_step(step.expect, seen, mode)
         checks += [(index, c) for c in results]
         transcript.append(
@@ -340,11 +373,36 @@ async def run_scenario(
                 # Markers the model used that were not given (removed before storing).
                 "invalid_citations": invalid,
                 "seconds": round(time.monotonic() - started, 2),
+                # The reply call's usage; on agent turns, the agent record
+                # (strategy, tools, all its calls' tokens; never tool content).
+                "usage": usage,
+                "agent": agent_summary(agent),
             }
         )
         if mode == "live":
             await asyncio.sleep(pause)
     return ScenarioOutcome(scenario, checks), transcript
+
+
+def agent_summary(record: dict[str, Any] | None) -> dict[str, Any] | None:
+    if record is None:
+        return None
+    strategy = record.get("strategy") or {}
+    return {
+        "status": record.get("status"),
+        "reason": record.get("reason"),
+        "strategy": strategy.get("strategy"),
+        "strategy_source": strategy.get("source"),
+        "strategy_tokens": [strategy.get("input_tokens"), strategy.get("output_tokens")],
+        "tools_called": record.get("tools_called") or [],
+        "tool_statuses": [t.get("status") for t in record.get("tools") or []],
+        "iterations": record.get("iterations"),
+        "model_calls": record.get("model_calls"),
+        "input_tokens": record.get("input_tokens"),
+        "output_tokens": record.get("output_tokens"),
+        "evidence_items": record.get("evidence_items"),
+        "total_ms": record.get("total_ms"),
+    }
 
 
 async def run(args: argparse.Namespace) -> int:
@@ -364,7 +422,7 @@ async def run(args: argparse.Namespace) -> int:
     replies: dict[str, Any] = {}
     started = time.monotonic()
     async with temp_database(base.database_url) as url:
-        settings = settings_for(mode, base, url)
+        settings = settings_for(mode, base, url, agent=args.agent)
         embeddings = build_embedding_client(settings)
         if embeddings is not None:
             await ready(embeddings)
@@ -438,11 +496,13 @@ async def run(args: argparse.Namespace) -> int:
         settings, suite=f"golden-{mode}", dataset=DATASET, limitations=LIMITATIONS
     )
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
-    out = RESULTS_DIR / f"golden-{mode}-{args.split}-{stamp}.json"
+    variant = f"{mode}-agent" if args.agent else mode
+    out = RESULTS_DIR / f"golden-{variant}-{args.split}-{stamp}.json"
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     payload = {
         "eval": f"golden-{mode}",
         "split": args.split,
+        "agent_mode": settings.agent_mode,
         "metadata": metadata,
         "summary": summary,
         "seconds": round(time.monotonic() - started, 1),
@@ -496,6 +556,7 @@ def main() -> int:
     parser.add_argument("--limit", type=int)
     parser.add_argument("--pause", type=float, default=0.0, help="live: seconds between turns")
     parser.add_argument("--record-db", action="store_true")
+    parser.add_argument("--agent", action="store_true", help="run with AGENT_MODE=on")
     return asyncio.run(run(parser.parse_args()))
 
 

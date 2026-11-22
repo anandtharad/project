@@ -116,6 +116,18 @@ def experiment_metadata(
             "questions": {q.id: q.version for q in QUESTIONS},
             "questions_lock_sha256": file_sha256(QUESTION_LOCK),
         },
+        "agent": {
+            "mode": settings.agent_mode,
+            "strategies": (
+                _prompt(registry, "agent_strategies", settings.agent_strategy_prompt_version)
+                if settings.agent_mode == "on"
+                else None
+            ),
+            "max_iterations": settings.agent_max_iterations,
+            "max_tool_calls": settings.agent_max_tool_calls,
+            "tool_timeout_seconds": settings.agent_tool_timeout_seconds,
+            "tool_max_result_characters": settings.agent_tool_max_result_characters,
+        },
         "state_extraction": settings.state_extraction_enabled,
         "memory": {
             "enabled": settings.memory_enabled,
