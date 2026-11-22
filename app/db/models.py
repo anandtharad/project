@@ -114,6 +114,12 @@ class Message(Base):
             unique=True,
             postgresql_where=text("turn_status = 'pending'"),
         ),
+        # The agent's conversation-history search (migration 0010).
+        Index(
+            "ix_messages_content_fts",
+            text("to_tsvector('english', content)"),
+            postgresql_using="gin",
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)

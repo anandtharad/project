@@ -4,10 +4,12 @@ queries take a conversation ID that has already passed that check."""
 
 from __future__ import annotations
 
+import re
 import uuid
+from dataclasses import dataclass
 from datetime import datetime
 
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, literal_column, or_, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -125,3 +127,63 @@ async def page_messages(
         .limit(limit)
     )
     return list(rows.all())
+
+
+@dataclass(frozen=True)
+class MessageHit:
+    conversation_id: uuid.UUID
+    sequence: int
+    role: str
+    content: str
+    created_at: datetime
+
+
+async def search_user_messages(
+    session: AsyncSession,
+    user_id: uuid.UUID,
+    query: str,
+    *,
+    exclude_conversation_id: uuid.UUID | None = None,
+    exclude_from_sequence: int | None = None,
+    limit: int,
+) -> list[MessageHit]:
+    """Full-text search over the person's own messages, best match first.
+    Scoped by the conversation's owner, never by a caller-supplied id list.
+    Messages of `exclude_conversation_id` from `exclude_from_sequence` on
+    (already in the model's context) are left out, as are messages of turns
+    still in flight."""
+    # Any of the words, best match first: a model-written query ("what did I
+    # say about my cat") rarely has every word in the message. Stop words are
+    # dropped by the English configuration.
+    words = re.findall(r"\w+", query)[:20]
+    if not words:
+        return []
+    vector = func.to_tsvector(literal_column("'english'"), Message.content)
+    tsquery = func.websearch_to_tsquery(literal_column("'english'"), " or ".join(words))
+    condition = and_(
+        Conversation.user_id == user_id,
+        vector.op("@@")(tsquery),
+        or_(Message.turn_status.is_(None), Message.turn_status == "completed"),
+    )
+    if exclude_conversation_id is not None and exclude_from_sequence is not None:
+        condition = and_(
+            condition,
+            or_(
+                Message.conversation_id != exclude_conversation_id,
+                Message.sequence < exclude_from_sequence,
+            ),
+        )
+    rows = await session.execute(
+        select(
+            Message.conversation_id,
+            Message.sequence,
+            Message.role,
+            Message.content,
+            Message.created_at,
+        )
+        .join(Conversation, Conversation.id == Message.conversation_id)
+        .where(condition)
+        .order_by(func.ts_rank(vector, tsquery).desc(), Message.created_at.desc())
+        .limit(limit)
+    )
+    return [MessageHit(*row) for row in rows.all()]

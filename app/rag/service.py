@@ -118,12 +118,25 @@ class KnowledgeService:
         chosen = route(message, previous_user_message=previous_user_message(history))
         if not chosen.retrieve:
             return KnowledgeLookup(chosen, "not_needed")
+        outcome = await self.search(chosen.query)
+        if outcome is None:
+            return KnowledgeLookup(chosen, "unavailable")
+        if outcome.status == "unavailable":
+            return KnowledgeLookup(chosen, "unavailable", outcome=outcome)
+        items = tuple(number(outcome.passages))
+        return KnowledgeLookup(chosen, "ok" if items else "no_results", items, outcome)
+
+    async def search(self, query: str) -> RetrievalOutcome | None:
+        """Hybrid retrieval for one query with the service's filters and time
+        limit (relevance thresholds are the retriever's). None when it timed
+        out or failed: retrieval never fails a turn. Used by `lookup` and by
+        the agent's search_knowledge_base tool."""
         try:
             async with asyncio.timeout(self._timeout):
-                outcome = await self.retriever.retrieve(chosen.query, self._filters)
+                return await self.retriever.retrieve(query, self._filters)
         except TimeoutError:
             log_event(logger, "knowledge.timeout", level=logging.WARNING)
-            return KnowledgeLookup(chosen, "unavailable")
+            return None
         except Exception as exc:  # retrieval must never fail the turn
             log_event(
                 logger,
@@ -131,8 +144,4 @@ class KnowledgeService:
                 level=logging.WARNING,
                 exc_type=type(exc).__name__,
             )
-            return KnowledgeLookup(chosen, "unavailable")
-        if outcome.status == "unavailable":
-            return KnowledgeLookup(chosen, "unavailable", outcome=outcome)
-        items = tuple(number(outcome.passages))
-        return KnowledgeLookup(chosen, "ok" if items else "no_results", items, outcome)
+            return None
