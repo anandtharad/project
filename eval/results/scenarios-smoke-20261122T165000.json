@@ -1,0 +1,338 @@
+{
+ "label": "smoke",
+ "dataset_version": "1.0.0",
+ "results": [
+  {
+   "id": "stm-01-interview-detour",
+   "theme": "Short-term recall inside one chat after a detour; an upcoming event is an episodic memory for the next chat",
+   "check": "Chat 1 last reply should remember Friday at 11 and Infosys. Maggi and 'freaking out' are moments, not memories. Chat 2 should know about the interview (episodic, kept about 30 days).",
+   "settings": {
+    "memory_enabled": true,
+    "allow_sensitive": false
+   },
+   "sessions": [
+    {
+     "conversation_id": "88333cd1-dbc3-4662-9545-7c97cecd7f38",
+     "turns": [
+      {
+       "you": "heyyy",
+       "status": 201,
+       "reply": "Hey! How's your day going?",
+       "pathway": "normal",
+       "sources": []
+      },
+      {
+       "you": "ok so i finally got an interview call from infosys 😭 its on friday at 11",
+       "status": 201,
+       "reply": "That’s such a mix of excitement and nerves—finally getting the call but the big day is almost here. If you want to talk through any worries or just vent, I’m here.",
+       "pathway": "normal",
+       "sources": []
+      },
+      {
+       "you": "lowkey freaking out ngl, havent given an interview since college",
+       "status": 201,
+       "reply": "Wow, the pressure of stepping back into interview mode after a while can feel intense. It’s okay to feel that jitter—just know you’ve got this. If you want to bounce any thoughts around or just unload, I’m here.",
+       "pathway": "normal",
+       "sources": []
+      },
+      {
+       "you": "anyway what should i eat tonight, im too lazy to cook fr",
+       "status": 201,
+       "reply": "If you’re not feeling like cooking, something quick and comforting like a rotisserie chicken with a bag of pre‑washed salad, or a frozen veggie‑and‑rice bowl you can microwave, works well. Pair it with a piece of fruit or some yogurt and you’ll have a decent bite without any fuss. Enjoy, and good luck tomorrow!",
+       "pathway": "normal",
+       "sources": []
+      },
+      {
+       "you": "lol ok maggi it is",
+       "status": 201,
+       "reply": "Maggi’s a classic go‑to—easy, tasty, and ready in minutes. Toss in a handful of frozen peas or chopped veggies if you’ve got any, and you’ll get a bit of extra fuel for the interview. Hope it hits the spot, and may the noodles bring you some calm vibes before Friday!",
+       "pathway": "normal",
+       "sources": []
+      },
+      {
+       "you": "wait when did i say my interview was?",
+       "status": 201,
+       "reply": "You mentioned it’s scheduled for Friday at 11 a.m.",
+       "pathway": "normal",
+       "sources": []
+      }
+     ],
+     "memories_after": [
+      {
+       "memory_id": "f4e10881-bfdd-4b0d-8b04-e566bcad4580",
+       "memory_type": "episodic",
+       "content": "has a job interview on Friday at 11",
+       "status": "active",
+       "importance": 3,
+       "created_at": "2026-11-22T16:47:48.999561Z",
+       "updated_at": "2026-11-22T16:47:48.999561Z",
+       "expires_at": "2026-12-22T16:47:48.988032Z",
+       "source_conversation_id": "88333cd1-dbc3-4662-9545-7c97cecd7f38",
+       "supersedes_id": null
+      }
+     ],
+     "notes": {
+      "topic": "job interview",
+      "subtopics": [
+       "Infosys",
+       "interview date unclear",
+       "prep",
+       "emotions",
+       "meal planning"
+      ],
+      "user_goal": {
+       "value": "choose a meal for tonight",
+       "provenance": "stated"
+      },
+      "open_questions": [
+       "What role is it?",
+       "How to prepare?",
+       "What to wear?",
+       "What questions might be asked?",
+       "When is the interview?"
+      ],
+      "emotional_context": {
+       "value": "freaking out",
+       "provenance": "stated"
+      },
+      "recently_discussed": [
+       "Maggi",
+       "feeling freaking out",
+       "interview date unclear",
+       "rotisserie chicken suggestion",
+       "pre‑washed salad"
+      ]
+     },
+     "actions": []
+    },
+    {
+     "conversation_id": "04be0b47-eacc-4dde-9991-abcbfb3eb07d",
+     "turns": [
+      {
+       "you": "yo im back",
+       "status": 201,
+       "reply": "Hey, good to see you back! How's everything feeling today—any thoughts about that Friday interview?",
+       "pathway": "normal",
+       "sources": []
+      },
+      {
+       "you": "do u remember whats happening this friday?",
+       "status": 201,
+       "reply": "You’ve got that interview lined up for Friday at 11 a.m. Good luck—you’ve got this!",
+       "pathway": "normal",
+       "sources": []
+      }
+     ],
+     "memories_after": [
+      {
+       "memory_id": "f4e10881-bfdd-4b0d-8b04-e566bcad4580",
+       "memory_type": "episodic",
+       "content": "has a job interview on Friday at 11",
+       "status": "active",
+       "importance": 3,
+       "created_at": "2026-11-22T16:47:48.999561Z",
+       "updated_at": "2026-11-22T16:47:48.999561Z",
+       "expires_at": "2026-12-22T16:47:48.988032Z",
+       "source_conversation_id": "88333cd1-dbc3-4662-9545-7c97cecd7f38",
+       "supersedes_id": null
+      }
+     ],
+     "notes": {
+      "topic": "greeting"
+     },
+     "actions": []
+    }
+   ],
+   "final_memories": [
+    {
+     "memory_id": "f4e10881-bfdd-4b0d-8b04-e566bcad4580",
+     "memory_type": "episodic",
+     "content": "has a job interview on Friday at 11",
+     "status": "active",
+     "importance": 3,
+     "created_at": "2026-11-22T16:47:48.999561Z",
+     "updated_at": "2026-11-22T16:47:48.999561Z",
+     "expires_at": "2026-12-22T16:47:48.988032Z",
+     "source_conversation_id": "88333cd1-dbc3-4662-9545-7c97cecd7f38",
+     "supersedes_id": null
+    }
+   ],
+   "flags": [
+    {
+     "kind": "recall",
+     "ok": true,
+     "detail": "chat 1, message 6: reply should mention one of ['friday', '11'] -> mentions 'friday'"
+    },
+    {
+     "kind": "recall",
+     "ok": true,
+     "detail": "chat 2, message 2: reply should mention one of ['interview', 'infosys'] -> mentions 'interview'"
+    },
+    {
+     "kind": "long_term",
+     "ok": true,
+     "detail": "expected in memory: one of ['interview', 'infosys'] -> found: 'has a job interview on Friday at 11'"
+    },
+    {
+     "kind": "not_long_term",
+     "ok": true,
+     "detail": "must not be in memory: 'maggi' -> absent"
+    },
+    {
+     "kind": "not_long_term",
+     "ok": true,
+     "detail": "must not be in memory: 'lazy' -> absent"
+    },
+    {
+     "kind": "not_long_term",
+     "ok": true,
+     "detail": "must not be in memory: 'freaking' -> absent"
+    }
+   ]
+  },
+  {
+   "id": "control-13-delete-one",
+   "theme": "Deleting one memory between chats",
+   "check": "After the runner deletes the Mochi memory, chat 2 should not know the cat's name but should still know you're vegetarian.",
+   "settings": {
+    "memory_enabled": true,
+    "allow_sensitive": false
+   },
+   "sessions": [
+    {
+     "conversation_id": "3e44a472-8069-4e6e-9fdd-a094fdbb94f8",
+     "turns": [
+      {
+       "you": "i have a cat named mochi, shes chaotic af, knocked my chai off the table today",
+       "status": 201,
+       "reply": "Mochi sounds like a whirlwind—no wonder the chai didn’t stand a chance today. Must have been a bit of a mess to clean up! How are you feeling about the little chaos?",
+       "pathway": "normal",
+       "sources": []
+      },
+      {
+       "you": "also im vegetarian btw, been veg my whole life",
+       "status": 201,
+       "reply": "Got it, veggie all the way. It’s funny how our plant‑based plates stay safe while Mochi’s still finding ways to stir things up. How’s everything else going with her antics?",
+       "pathway": "normal",
+       "sources": []
+      }
+     ],
+     "memories_after": [
+      {
+       "memory_id": "4c638278-9e80-4a56-b368-cfc30e4ad50d",
+       "memory_type": "semantic",
+       "content": "vegetarian",
+       "status": "active",
+       "importance": 2,
+       "created_at": "2026-11-22T16:49:19.077737Z",
+       "updated_at": "2026-11-22T16:49:19.077737Z",
+       "expires_at": "2027-11-22T16:49:19.064999Z",
+       "source_conversation_id": "3e44a472-8069-4e6e-9fdd-a094fdbb94f8",
+       "supersedes_id": null
+      }
+     ],
+     "notes": {
+      "topic": "cat behavior",
+      "subtopics": [
+       "Mochi the cat",
+       "chaotic behavior",
+       "knocked chai",
+       "vegetarian"
+      ],
+      "emotional_context": {
+       "value": "neutral",
+       "provenance": "inferred"
+      },
+      "recently_discussed": [
+       "Mochi",
+       "chaotic",
+       "knocked chai",
+       "vegetarian"
+      ]
+     },
+     "actions": []
+    },
+    {
+     "conversation_id": "1629f3b9-94fc-48a6-a84d-db0cdf6035b2",
+     "turns": [
+      {
+       "you": "whats my cats name?",
+       "status": 201,
+       "reply": "I don’t actually have that detail on hand—what did you end up naming your cat?",
+       "pathway": "normal",
+       "sources": []
+      },
+      {
+       "you": "and do i eat meat?",
+       "status": 201,
+       "reply": "If you’ve been keeping to a vegetarian diet, you probably aren’t eating meat. How’s that working for you?",
+       "pathway": "normal",
+       "sources": []
+      }
+     ],
+     "memories_after": [
+      {
+       "memory_id": "4c638278-9e80-4a56-b368-cfc30e4ad50d",
+       "memory_type": "semantic",
+       "content": "vegetarian",
+       "status": "active",
+       "importance": 2,
+       "created_at": "2026-11-22T16:49:19.077737Z",
+       "updated_at": "2026-11-22T16:49:19.077737Z",
+       "expires_at": "2027-11-22T16:49:19.064999Z",
+       "source_conversation_id": "3e44a472-8069-4e6e-9fdd-a094fdbb94f8",
+       "supersedes_id": null
+      }
+     ],
+     "notes": {
+      "topic": "asking cat's name",
+      "user_goal": {
+       "value": "wants to know cat's name",
+       "provenance": "inferred"
+      },
+      "recently_discussed": [
+       "cat's name"
+      ]
+     },
+     "actions": []
+    }
+   ],
+   "final_memories": [
+    {
+     "memory_id": "4c638278-9e80-4a56-b368-cfc30e4ad50d",
+     "memory_type": "semantic",
+     "content": "vegetarian",
+     "status": "active",
+     "importance": 2,
+     "created_at": "2026-11-22T16:49:19.077737Z",
+     "updated_at": "2026-11-22T16:49:19.077737Z",
+     "expires_at": "2027-11-22T16:49:19.064999Z",
+     "source_conversation_id": "3e44a472-8069-4e6e-9fdd-a094fdbb94f8",
+     "supersedes_id": null
+    }
+   ],
+   "flags": [
+    {
+     "kind": "recall",
+     "ok": true,
+     "detail": "chat 2, message 1: reply should not mention 'mochi' -> it doesn't"
+    },
+    {
+     "kind": "recall",
+     "ok": true,
+     "detail": "chat 2, message 2: reply should mention one of ['vegetarian', 'veg'] -> mentions 'vegetarian'"
+    },
+    {
+     "kind": "long_term",
+     "ok": true,
+     "detail": "expected in memory: one of ['vegetarian', 'veg'] -> found: 'vegetarian'"
+    },
+    {
+     "kind": "not_long_term",
+     "ok": true,
+     "detail": "must not be in memory: 'mochi' -> absent"
+    }
+   ]
+  }
+ ]
+}
