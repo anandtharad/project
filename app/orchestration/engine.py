@@ -43,7 +43,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.agent.graph import AgentContext, AgentDeps, AgentFailed, run_agent
 from app.agent.strategy import Strategy, StrategyChoice, StrategyRegistry
-from app.agent.tools import ToolContext, tool_specs
+from app.agent.tools import LEAN_TOOLS, ToolContext, tool_specs
 from app.background import BackgroundTasks
 from app.config import Effort, Settings
 from app.context.builder import BuiltContext, ContextBuilder
@@ -270,7 +270,16 @@ class TurnOrchestrator:
         if self._agent is not None and not is_safety_pathway(safety) and not policy.safety_signal:
             # Normal pathway only: safety pathways keep the deterministic path.
             agent_turn, agent_record = await self._run_agent(
-                begun, trace, trace_id, user_id, conversation_id, policy, state, extraction
+                begun,
+                trace,
+                trace_id,
+                user_id,
+                conversation_id,
+                policy,
+                state,
+                extraction,
+                recalled,
+                lookup,
             )
         if agent_turn is not None:
             context, request, response = agent_turn.context, agent_turn.request, agent_turn.response
@@ -378,7 +387,7 @@ class TurnOrchestrator:
                 "state": _state_summary(extraction, self._state_extractor),
                 "memory": (
                     {"mode": "agent_tools", "used": None}
-                    if agent_turn is not None
+                    if agent_turn is not None and not agent_turn.lean
                     else _memory_summary(recalled)
                 ),
                 "safety": _safety_summary(assessment, safety, safety_record),
@@ -386,7 +395,9 @@ class TurnOrchestrator:
                 "knowledge": {
                     **(
                         _agent_evidence_summary(agent_turn.evidence, agent_record)
-                        if agent_turn is not None and agent_record is not None
+                        if agent_turn is not None
+                        and not agent_turn.lean
+                        and agent_record is not None
                         else lookup.summary()
                         if lookup is not None
                         else {"status": "disabled"}
@@ -498,11 +509,14 @@ class TurnOrchestrator:
         policy: ResponsePolicy,
         state: ConversationState | None,
         extraction: ExtractionResult | None,
+        recalled: RetrievalResult | None,
+        lookup: KnowledgeLookup | None,
     ) -> tuple[_AgentTurn | None, dict[str, Any]]:
         """The agent's reply, or None with the reason when the turn must take
         the deterministic path (the agent never fails a turn by itself)."""
         assert self._agent is not None and self._session_factory is not None
         registry = self._agent
+        lean = self._settings.agent_profile == "lean"
         history = _history_for_model(begun.history)
         built: list[BuiltContext] = []
         tool_context = ToolContext(
@@ -513,15 +527,26 @@ class TurnOrchestrator:
             memory=self._memory,
             knowledge=self._knowledge,
             session_factory=self._session_factory,
+            allowed=frozenset(LEAN_TOOLS) if lean else None,
         )
 
         def build(choice: StrategyChoice, final: bool) -> AgentContext:
-            # Notes, memories and evidence are not sent up front: the model
-            # asks for them with tools when it needs them.
-            context = self._context_builder.build(
-                system=agent_system_prompt(self._prompt, policy, choice.strategy, registry, final),
-                history=history,
+            system = agent_system_prompt(
+                self._prompt, policy, choice.strategy, registry, final, lean=lean, lookup=lookup
             )
+            if lean:
+                # The deterministic path's context: notes, memories and
+                # passages pre-fetched; history search is the only tool.
+                context = self._context_builder.build(
+                    system=system,
+                    history=history,
+                    notes=state.notes() if state is not None and not state.is_empty() else None,
+                    memories=_memories_for_context(recalled),
+                    evidence=lookup.evidence_block() if lookup is not None else None,
+                )
+            else:
+                # Full profile: nothing up front; the model asks with tools.
+                context = self._context_builder.build(system=system, history=history)
             if not built:
                 sequences = begun.history_sequences
                 included = context.included_messages
@@ -559,6 +584,7 @@ class TurnOrchestrator:
             tool_max_characters=settings.agent_tool_max_result_characters,
             # Lean: the state-extraction call named the strategy (independent
             # of the safety assessment, which ran beside it).
+            tool_names=LEAN_TOOLS if lean else None,
             strategy=(
                 registry.from_extraction(
                     extraction.strategy if extraction is not None else None,
@@ -603,14 +629,21 @@ class TurnOrchestrator:
             timeout_seconds=settings.generation_timeout_seconds,
             params=self._params,
             trace=deps.trace.model_copy(update={"purpose": GenerationPurpose.CONVERSATION}),
-            tools=tool_specs(),
+            tools=tool_specs(LEAN_TOOLS if lean else None),
             tool_choice="none",
         )
         turn = _AgentTurn(
             context=built[0],
             request=request,
             response=result.response,
-            evidence=tuple(tool_context.evidence.items),
+            # Lean: the pre-fetched passages (its only knowledge); full: what
+            # its own searches returned.
+            evidence=(
+                tuple(lookup.items if lookup is not None else ())
+                if lean
+                else tuple(tool_context.evidence.items)
+            ),
+            lean=lean,
         )
         return turn, {**result.record, **prompt_record}
 
@@ -891,15 +924,24 @@ def agent_system_prompt(
     strategy: Strategy,
     registry: StrategyRegistry,
     final: bool = False,
+    *,
+    lean: bool = False,
+    lookup: KnowledgeLookup | None = None,
 ) -> str:
     """The companion system prompt for an agent turn: the chosen strategy's
     guidance in the policy slot, the person's explicit no-advice request
     still honoured, and the tool guidance (plus the final-answer note once
-    the tool limit is reached). All of it trusted text from locked prompts."""
+    the tool limit is reached). The lean profile has pre-fetched passages,
+    so it gets the knowledge fragment for the lookup, as the deterministic
+    path does. All of it trusted text from locked prompts."""
     parts = [strategy.guidance]
     if not policy.advice_allowed:
         parts.append(prompt.fragment("no_advice"))
-    parts.append(registry.tool_guidance)
+    knowledge = lookup.guidance_fragment() if lean and lookup is not None else None
+    if knowledge is not None and knowledge in prompt.fragments:
+        parts.append(prompt.fragment(knowledge))
+    guidance = registry.lean_tool_guidance if lean else None
+    parts.append(guidance or registry.tool_guidance)
     if final:
         parts.append(registry.final_answer)
     return prompt.render(response_guidance="\n\n".join(parts))
@@ -911,6 +953,7 @@ class _AgentTurn:
     request: GenerationRequest
     response: GenerationResponse
     evidence: tuple[EvidenceItem, ...]
+    lean: bool = False
 
 
 _AGENT_LOG_FIELDS = (

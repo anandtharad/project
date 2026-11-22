@@ -291,7 +291,7 @@ class Settings(BaseSettings):
     # lean: the strategy comes from the state-extraction call (no extra model
     # call); full: a separate strategy call, as first built (docs/agent.md).
     agent_profile: Literal["lean", "full"] = "lean"
-    agent_strategy_prompt_version: str = "1.1.0"
+    agent_strategy_prompt_version: str = "1.2.0"
     agent_max_iterations: int = Field(default=4, ge=1, le=8)
     agent_max_tool_calls: int = Field(default=6, ge=1, le=12)
     agent_tool_timeout_seconds: float = Field(default=5.0, gt=0, le=30)

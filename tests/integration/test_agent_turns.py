@@ -184,8 +184,9 @@ async def test_one_tool_call_then_an_answer_that_uses_the_result(
 
 
 async def test_several_tools_across_iterations(
-    client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
+    full_client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
 ) -> None:
+    client = full_client
     llm.queue(
         tool_call_response(
             call("get_conversation_state", "a"),
@@ -215,7 +216,7 @@ async def test_the_iteration_limit_forces_a_final_answer(
         tool_call_response(call("get_conversation_state", "b")),
         "Here's what I've got.",
     )
-    async for _, c in agent_app(database_url, llm, agent_max_iterations=2):
+    async for _, c in agent_app(database_url, llm, agent_max_iterations=2, agent_profile="full"):
         cid = await create_conversation(c, ALICE)
         response = await send(c, cid, "what do you know so far?")
     steps = agent_steps(llm)
@@ -236,7 +237,7 @@ async def test_the_tool_call_limit_refuses_extra_calls(
         ),
         "Okay.",
     )
-    async for _, c in agent_app(database_url, llm, agent_max_tool_calls=1):
+    async for _, c in agent_app(database_url, llm, agent_max_tool_calls=1, agent_profile="full"):
         cid = await create_conversation(c, ALICE)
         response = await send(c, cid, "hello")
     final = agent_steps(llm)[-1]
@@ -255,7 +256,7 @@ async def test_tool_calls_after_the_limit_fall_back_to_the_deterministic_reply(
         tool_call_response(call("get_conversation_state", "b")),  # ignores tool_choice none
         "The ordinary reply.",
     )
-    async for _, c in agent_app(database_url, llm, agent_max_iterations=1):
+    async for _, c in agent_app(database_url, llm, agent_max_iterations=1, agent_profile="full"):
         cid = await create_conversation(c, ALICE)
         response = await send(c, cid, "hello")
     assert response.json()["assistant_content"] == "The ordinary reply."
@@ -349,8 +350,9 @@ async def test_instructions_in_tool_results_stay_data(
 
 
 async def test_an_unsafe_agent_reply_goes_through_the_output_checks(
-    client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
+    full_client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
 ) -> None:
+    client = full_client
     llm.queue(
         tool_call_response(call("get_conversation_state")),
         "As a therapist, I'd say you need more sleep.",
@@ -369,8 +371,9 @@ async def test_an_unsafe_agent_reply_goes_through_the_output_checks(
 
 
 async def test_citations_must_come_from_the_agents_own_searches(
-    client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
+    full_client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
 ) -> None:
+    client = full_client
     llm.queue_strategy(strategy("informational"))
     llm.queue("Most adults need seven hours [S1].")  # no knowledge search was made
     cid = await create_conversation(client, ALICE)
@@ -512,3 +515,51 @@ async def test_without_the_agent_the_state_call_has_no_strategy_field(
     assert state_request.response_schema is not None
     assert "response_strategy" not in state_request.response_schema.json_schema["properties"]
     assert "response_strategy" not in state_request.system
+
+
+async def test_lean_context_is_prefetched_and_history_search_is_the_only_tool(
+    client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
+) -> None:
+    llm.queue_state(
+        json.dumps(
+            {
+                "topic": "work stress",
+                "subtopics": [],
+                "user_goal": {"value": "", "provenance": "unknown"},
+                "emotional_context": {"value": "tired", "provenance": "stated"},
+                "open_questions": [],
+                "recently_discussed": [],
+                "response_strategy": "empathetic",
+            }
+        )
+    )
+    # A call to a tool the lean profile doesn't offer is refused, not run.
+    llm.queue(
+        tool_call_response(call("search_user_memories", query="work")),
+        "That sounds draining.",
+    )
+    cid = await create_conversation(client, ALICE)
+    response = await send(client, cid, "work has been a lot this week, im tired")
+    first, second = agent_steps(llm)
+    assert [t.name for t in first.tools] == ["search_conversation_history"]
+    assert REGISTRY.lean_tool_guidance is not None
+    assert REGISTRY.lean_tool_guidance in first.system
+    assert REGISTRY.tool_guidance not in first.system
+    refused = second.messages[-1]
+    assert refused.role is ChatRole.TOOL and '"unknown_tool"' in refused.content
+    meta = await metadata(db_engine, response)
+    assert meta["context"]["notes_included"]  # the notes are in the context up front
+    assert meta["memory"] != {"mode": "agent_tools", "used": None}  # pre-fetch summary
+    assert meta["agent"]["tools"][0]["status"] == "unknown_tool"
+
+
+async def test_lean_citations_resolve_against_the_prefetched_lookup(
+    client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
+) -> None:
+    llm.queue("Most adults need seven hours [S1].")  # no passages were pre-fetched here
+    cid = await create_conversation(client, ALICE)
+    response = await send(client, cid, "how much sleep do adults need?")
+    assert "[S1]" not in response.json()["assistant_content"]
+    knowledge = (await metadata(db_engine, response))["knowledge"]
+    assert knowledge.get("route") != "agent_tool"  # the router's lookup, as without the agent
+    assert knowledge["invalid_citations"] == 1

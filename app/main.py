@@ -232,6 +232,11 @@ def create_app(
                     f"AGENT_PROFILE=lean needs a state prompt with a strategy slot "
                     f"({state_prompt.key} has none; use 1.1.0+)"
                 )
+            if agent_strategies.lean_tool_guidance is None:
+                raise ValueError(
+                    f"AGENT_PROFILE=lean needs agent_strategies 1.2.0+ "
+                    f"({agent_strategies.prompt.key} has no agent_tools_lean)"
+                )
             if agent_strategies.state_field() is None:
                 raise ValueError(
                     f"AGENT_PROFILE=lean needs agent_strategies 1.1.0+ "

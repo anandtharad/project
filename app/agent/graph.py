@@ -90,6 +90,8 @@ class AgentDeps:
     # The lean agent's strategy, already chosen by the state-extraction
     # call; None: prepare makes the separate strategy call (full profile).
     strategy: StrategyChoice | None = None
+    # The tools offered (None: all four, the full profile).
+    tool_names: tuple[str, ...] | None = None
     max_iterations: int = 4
     max_tool_calls: int = 6
     tool_timeout_seconds: float = 5.0
@@ -195,7 +197,7 @@ async def agent(state: AgentState, runtime: Runtime[AgentDeps]) -> dict[str, Any
         timeout_seconds=remaining,
         params=deps.params,
         trace=deps.trace.model_copy(update={"purpose": GenerationPurpose.AGENT_STEP}),
-        tools=tool_specs(),
+        tools=tool_specs(deps.tool_names),
         tool_choice="none" if exhausted else "auto",
     )
     try:

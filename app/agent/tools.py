@@ -102,6 +102,8 @@ class ToolContext:
     knowledge: KnowledgeService | None
     session_factory: async_sessionmaker[AsyncSession]
     evidence: EvidenceCollector = field(default_factory=EvidenceCollector)
+    # The tools offered this turn; a call to any other is refused.
+    allowed: frozenset[str] | None = None
 
 
 class QueryArgs(BaseModel):
@@ -275,8 +277,15 @@ TOOLS: dict[str, Tool] = {
 }
 
 
-def tool_specs() -> tuple[ToolSpec, ...]:
-    return tuple(tool.spec() for tool in TOOLS.values())
+# The lean agent's only tool: memories, notes and passages are pre-fetched
+# into its context (docs/agent.md, "Profiles").
+LEAN_TOOLS: tuple[str, ...] = ("search_conversation_history",)
+
+
+def tool_specs(names: tuple[str, ...] | None = None) -> tuple[ToolSpec, ...]:
+    """The definitions of the named tools (all of them by default)."""
+    chosen = tuple(TOOLS) if names is None else names
+    return tuple(TOOLS[name].spec() for name in chosen)
 
 
 def _bounded(content: str, limit: int) -> str:
@@ -307,6 +316,8 @@ async def execute(
         return result
 
     tool = TOOLS.get(call.name)
+    if ctx.allowed is not None and call.name not in ctx.allowed:
+        tool = None  # not offered this turn: treated as unknown
     if tool is None:
         return done("unknown_tool", _error("unknown_tool", "There is no tool with that name."))
     try:

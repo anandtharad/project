@@ -117,6 +117,13 @@ class StrategyRegistry:
         return self.prompt.fragment("agent_tools")
 
     @property
+    def lean_tool_guidance(self) -> str | None:
+        """Guidance for the lean agent's one tool (1.2.0+), else None."""
+        if "agent_tools_lean" not in self.prompt.fragments:
+            return None
+        return self.prompt.fragment("agent_tools_lean")
+
+    @property
     def final_answer(self) -> str:
         return self.prompt.fragment("final_answer")
 
