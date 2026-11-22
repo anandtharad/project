@@ -6,7 +6,8 @@ and every layer.
 
     uv run python scripts/eval_golden.py --mode deterministic          # no key, CI
     uv run python scripts/eval_golden.py --mode live --split dev --limit 10 --pause 20
-    uv run python scripts/eval_golden.py --mode live --split dev --agent   # AGENT_MODE=on
+    uv run python scripts/eval_golden.py --mode live --split dev --agent        # lean profile
+    uv run python scripts/eval_golden.py --mode live --split dev --agent full   # full profile
 
 - **Deterministic:** the development stub model, no safety classifier
   (degraded mode), no decision model. Pipeline checks only.
@@ -14,8 +15,9 @@ and every layer.
   per scenario (eval/results/.cache/), so a run stopped by a rate limit
   continues where it stopped.
 
-`--agent` runs the same scenarios with AGENT_MODE=on (docs/agent.md) and
-writes golden-<mode>-agent-<split>-<time>.json; scripts/eval_agent_compare.py
+`--agent [lean|full]` runs the same scenarios with AGENT_MODE=on and that
+profile (docs/agent.md) and writes golden-<mode>-agent-<profile>-<split>-<time>.json;
+scripts/eval_agent_compare.py
 compares it with a run without. In deterministic mode the stub model never
 calls tools, so that run checks the guarantees, not the agent's choices.
 
@@ -232,9 +234,12 @@ async def temp_database(base_url: str) -> AsyncIterator[str]:
         await admin.dispose()
 
 
-def settings_for(mode: Mode, base: Settings, database_url: str, agent: bool = False) -> Settings:
+def settings_for(
+    mode: Mode, base: Settings, database_url: str, agent: str | None = None
+) -> Settings:
     common: dict[str, Any] = {
         "agent_mode": "on" if agent else "off",
+        "agent_profile": agent or base.agent_profile,
         "database_url": database_url,
         "dev_auth_tokens": ",".join(f"{u}:{t}" for u, t in USERS.items()),
         "app_env": "development",
@@ -341,6 +346,7 @@ async def run_scenario(
         invalid = 0
         agent: dict[str, Any] | None = None
         usage: dict[str, Any] | None = None
+        state_usage: dict[str, Any] | None = None
         if response.status_code in (200, 201):
             body = response.json()
             seen.reply = body["assistant_content"]
@@ -358,6 +364,7 @@ async def run_scenario(
             invalid = knowledge.get("invalid_citations", 0)
             agent = (metadata or {}).get("agent")
             usage = (metadata or {}).get("usage")
+            state_usage = ((metadata or {}).get("state") or {}).get("usage")
         results = check_step(step.expect, seen, mode)
         checks += [(index, c) for c in results]
         transcript.append(
@@ -376,6 +383,8 @@ async def run_scenario(
                 # The reply call's usage; on agent turns, the agent record
                 # (strategy, tools, all its calls' tokens; never tool content).
                 "usage": usage,
+                # The state call (on the lean profile it also names the strategy).
+                "state_usage": state_usage,
                 "agent": agent_summary(agent),
             }
         )
@@ -496,7 +505,7 @@ async def run(args: argparse.Namespace) -> int:
         settings, suite=f"golden-{mode}", dataset=DATASET, limitations=LIMITATIONS
     )
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
-    variant = f"{mode}-agent" if args.agent else mode
+    variant = f"{mode}-agent-{args.agent}" if args.agent else mode
     out = RESULTS_DIR / f"golden-{variant}-{args.split}-{stamp}.json"
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     payload = {
@@ -556,7 +565,13 @@ def main() -> int:
     parser.add_argument("--limit", type=int)
     parser.add_argument("--pause", type=float, default=0.0, help="live: seconds between turns")
     parser.add_argument("--record-db", action="store_true")
-    parser.add_argument("--agent", action="store_true", help="run with AGENT_MODE=on")
+    parser.add_argument(
+        "--agent",
+        nargs="?",
+        const="lean",
+        choices=["lean", "full"],
+        help="run with AGENT_MODE=on and this profile (default lean)",
+    )
     return asyncio.run(run(parser.parse_args()))
 
 

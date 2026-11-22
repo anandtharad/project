@@ -46,11 +46,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--mode", choices=["deterministic", "live"], default="live")
     parser.add_argument("--split", choices=["dev", "test", "all"], default="dev")
+    parser.add_argument("--profile", choices=["lean", "full"], default="lean")
     parser.add_argument("--base", type=Path, help="result file of the run without the agent")
     parser.add_argument("--agent", type=Path, help="result file of the run with the agent")
     args = parser.parse_args()
     base_path = args.base or latest(f"golden-{args.mode}-{args.split}-*.json")
-    agent_path = args.agent or latest(f"golden-{args.mode}-agent-{args.split}-*.json")
+    agent_path = args.agent or latest(
+        f"golden-{args.mode}-agent-{args.profile}-{args.split}-*.json"
+    )
     base, base_replies = load(base_path)
     agent, agent_replies = load(agent_path)
     report = {
@@ -60,7 +63,7 @@ def main() -> int:
         **compare(base, agent, base_replies, agent_replies),
     }
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
-    out = RESULTS_DIR / f"agent-compare-{args.mode}-{args.split}-{stamp}.json"
+    out = RESULTS_DIR / f"agent-compare-{args.profile}-{args.mode}-{args.split}-{stamp}.json"
     out.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     print(f"{'':28}{'base':>12}{'agent':>12}")
@@ -70,7 +73,7 @@ def main() -> int:
     print(
         f"{'knowledge agreement':28}{k['base']['agreement']!s:>12}{k['agent']['agreement']!s:>12}"
     )
-    for key in ("seconds", "tokens"):
+    for key in ("seconds", "tokens", "input_tokens", "state_tokens"):
         b, a = report["cost"]["base"][key], report["cost"]["agent"][key]
         print(f"{key + ' (median)':28}{b['median']!s:>12}{a['median']!s:>12}")
     behaviour = report["agent"]

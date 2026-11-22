@@ -53,13 +53,36 @@ def _tokens(turn: dict[str, Any]) -> int | None:
     return sum(known) if known else None
 
 
+def _input_tokens(turn: dict[str, Any]) -> int | None:
+    """Reply-model input tokens: every agent call on an agent turn (strategy
+    call included on the full profile), the reply call otherwise."""
+    agent = turn.get("agent")
+    if agent is not None and agent.get("status") != "fallback":
+        parts = [agent.get("input_tokens"), (agent.get("strategy_tokens") or [None])[0]]
+        known = [p for p in parts if p is not None]
+        return sum(known) if known else None
+    value = (turn.get("usage") or {}).get("input_tokens")
+    return int(value) if value is not None else None
+
+
+def _state_tokens(turn: dict[str, Any]) -> int | None:
+    """The state call's tokens (the lean profile's strategy choice is in it)."""
+    usage = turn.get("state_usage") or {}
+    known = [int(usage[k]) for k in ("input_tokens", "output_tokens") if usage.get(k) is not None]
+    return sum(known) if known else None
+
+
 def _cost(replies: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
     turns = [t for t in _turns(replies) if t.get("status") in (200, 201)]
     tokens = [x for x in (_tokens(t) for t in turns) if x is not None]
+    inputs = [x for x in (_input_tokens(t) for t in turns) if x is not None]
+    state = [x for x in (_state_tokens(t) for t in turns) if x is not None]
     return {
         "turns": len(turns),
         "seconds": _quantiles([float(t["seconds"]) for t in turns if "seconds" in t]),
         "tokens": _quantiles([float(x) for x in tokens]),
+        "input_tokens": _quantiles([float(x) for x in inputs]),
+        "state_tokens": _quantiles([float(x) for x in state]),
         "reply_characters": _quantiles([float(len(t.get("reply") or "")) for t in turns]),
     }
 

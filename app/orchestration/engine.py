@@ -905,6 +905,7 @@ def _state_summary(
         "structured_mode": extraction.structured_mode.value if extraction.structured_mode else None,
         "latency_ms": extraction.latency_ms,
         "updated": extraction.status is ExtractionStatus.UPDATED,
+        "usage": extraction.usage.model_dump() if extraction.usage is not None else None,
     }
 
 

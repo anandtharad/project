@@ -21,11 +21,11 @@ baseline = 1.0
 mandatory = true
 
 [[gates]]
-name = "Golden scenarios, deterministic with AGENT_MODE=on: every guarantee holds"
+name = "Golden scenarios, deterministic with AGENT_MODE=on (lean): every guarantee holds"
 # The same guarantees with the agent graph in the turn (docs/agent.md). Its
 # heuristic checks are not gated: the stub model never calls tools, so the
 # knowledge-route checks measure nothing about the agent there.
-results = "golden-deterministic-agent-all-*.json"
+results = "golden-deterministic-agent-lean-all-*.json"
 path = "summary.guarantee_pass_rate"
 op = ">="
 threshold = 1.0
