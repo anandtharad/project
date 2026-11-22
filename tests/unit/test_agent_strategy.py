@@ -4,11 +4,13 @@ the locked prompt, schema limited to its ids, validation and fallbacks."""
 from __future__ import annotations
 
 import json
+from typing import Any
 
 import pytest
 
 from app.agent.strategy import (
     STRATEGY_IDS,
+    StrategyChoice,
     StrategyRegistry,
     select_strategy,
     selection_input,
@@ -34,7 +36,9 @@ def history(*texts: str) -> list[ChatMessage]:
     return [ChatMessage(role=roles[i % 2], content=t) for i, t in enumerate(texts)]
 
 
-async def choose(llm: ScriptedLLMClient, messages: list[ChatMessage], notes=None):  # type: ignore[no-untyped-def]
+async def choose(
+    llm: ScriptedLLMClient, messages: list[ChatMessage], notes: dict[str, Any] | None = None
+) -> StrategyChoice:
     return await select_strategy(
         REGISTRY,
         llm,
