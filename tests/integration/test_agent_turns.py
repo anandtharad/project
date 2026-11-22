@@ -563,3 +563,17 @@ async def test_lean_citations_resolve_against_the_prefetched_lookup(
     knowledge = (await metadata(db_engine, response))["knowledge"]
     assert knowledge.get("route") != "agent_tool"  # the router's lookup, as without the agent
     assert knowledge["invalid_citations"] == 1
+
+
+async def test_lean_with_memory_off_offers_no_tools(
+    client: httpx.AsyncClient, llm: ScriptedLLMClient
+) -> None:
+    off = {"memory_enabled": False, "allow_sensitive": False}
+    assert (
+        await client.put("/v1/users/me/memory-settings", json=off, headers=ALICE)
+    ).status_code == 200
+    cid = await create_conversation(client, ALICE)
+    response = await send(client, cid, "do you remember my cat?")
+    assert response.status_code == 201
+    (step,) = agent_steps(llm)
+    assert step.tools == () and step.tool_choice is None

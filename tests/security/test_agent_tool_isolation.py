@@ -78,3 +78,66 @@ async def test_history_search_is_scoped_to_the_person(
 
     none = await search(app, alice_id, alice_now, "spaceship")
     assert none["status"] == "no_matches" and none["messages"] == []
+
+
+async def test_history_search_leaves_out_safety_turns_from_other_conversations(
+    app: FastAPI, client: httpx.AsyncClient, llm: ScriptedLLMClient
+) -> None:
+    """A crisis disclosure in one chat never resurfaces in another; it stays
+    visible inside its own chat."""
+    crisis = await create_conversation(client, ALICE)
+    response = await send(client, crisis, "i want to kill myself, the exam stress is too much")
+    assert response.json()["safety"]["pathway"] != "normal"
+    ordinary = await create_conversation(client, ALICE)
+    assert (await send(client, ordinary, "the exam stress is wild this week")).status_code == 201
+    alice_id = await user_id(app, "dev:alice")
+
+    elsewhere = await search(app, alice_id, ordinary, "exam stress")
+    texts = [m["text"] for m in elsewhere["messages"]]
+    assert "the exam stress is wild this week" in texts
+    assert all("kill myself" not in t for t in texts)
+    assert all(
+        m["this_conversation"] for m in elsewhere["messages"]
+    )  # nothing from the crisis chat
+
+    inside = await search(app, alice_id, crisis, "exam stress")
+    assert any("kill myself" in m["text"] for m in inside["messages"])
+
+
+async def test_history_search_never_returns_deleted_conversations(
+    app: FastAPI, client: httpx.AsyncClient, llm: ScriptedLLMClient
+) -> None:
+    old = await create_conversation(client, ALICE)
+    assert (await send(client, old, "my sister Meera is visiting next week")).status_code == 201
+    now = await create_conversation(client, ALICE)
+    alice_id = await user_id(app, "dev:alice")
+    assert (await search(app, alice_id, now, "sister Meera"))["messages"]
+    assert (await client.delete(f"/v1/conversations/{old}", headers=ALICE)).status_code == 204
+    gone = await search(app, alice_id, now, "sister Meera")
+    assert gone["status"] == "no_matches" and gone["messages"] == []
+
+
+async def test_history_search_is_off_when_memory_is_off(
+    app: FastAPI, client: httpx.AsyncClient, llm: ScriptedLLMClient
+) -> None:
+    old = await create_conversation(client, ALICE)
+    assert (await send(client, old, "my sister Meera is visiting next week")).status_code == 201
+    now = await create_conversation(client, ALICE)
+    alice_id = await user_id(app, "dev:alice")
+    context = ToolContext(
+        user_id=alice_id,
+        conversation_id=uuid.UUID(now),
+        context_from_sequence=10_000,
+        state=None,
+        memory=None,
+        knowledge=None,
+        session_factory=app.state.session_factory,
+        history_enabled=False,
+    )
+    result = await execute(
+        ToolCall(id="c1", name="search_conversation_history", arguments='{"query": "Meera"}'),
+        context,
+        timeout_seconds=5,
+        max_characters=4000,
+    )
+    assert result.status == "disabled" and "Meera" not in result.content

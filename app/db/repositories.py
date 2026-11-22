@@ -13,7 +13,7 @@ from sqlalchemy import and_, func, literal_column, or_, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Conversation, Message, MessageRole, TurnStatus, User
+from app.db.models import Conversation, Message, MessageRole, TurnSafety, TurnStatus, User
 
 
 async def get_or_create_user(session: AsyncSession, external_id: str) -> uuid.UUID:
@@ -151,7 +151,9 @@ async def search_user_messages(
     Scoped by the conversation's owner, never by a caller-supplied id list.
     Messages of `exclude_conversation_id` from `exclude_from_sequence` on
     (already in the model's context) are left out, as are messages of turns
-    still in flight."""
+    still in flight. Only active conversations are searched, and turns on a
+    safety pathway (a crisis, abuse or other disclosure, and the reply to
+    it) are never returned from another conversation."""
     # Any of the words, best match first: a model-written query ("what did I
     # say about my cat") rarely has every word in the message. Stop words are
     # dropped by the English configuration.
@@ -160,11 +162,25 @@ async def search_user_messages(
         return []
     vector = func.to_tsvector(literal_column("'english'"), Message.content)
     tsquery = func.websearch_to_tsquery(literal_column("'english'"), " or ".join(words))
+    # The turn a message belongs to: a user message, or the one a reply answers.
+    turn_message = func.coalesce(Message.reply_to_message_id, Message.id)
+    safety_turn = (
+        select(TurnSafety.id)
+        .where(TurnSafety.user_message_id == turn_message, TurnSafety.pathway != "normal")
+        .exists()
+    )
     condition = and_(
         Conversation.user_id == user_id,
+        Conversation.status == "active",
         vector.op("@@")(tsquery),
         or_(Message.turn_status.is_(None), Message.turn_status == "completed"),
     )
+    if exclude_conversation_id is not None:
+        condition = and_(
+            condition, or_(Message.conversation_id == exclude_conversation_id, ~safety_turn)
+        )
+    else:
+        condition = and_(condition, ~safety_turn)
     if exclude_conversation_id is not None and exclude_from_sequence is not None:
         condition = and_(
             condition,

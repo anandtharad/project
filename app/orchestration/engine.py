@@ -517,6 +517,10 @@ class TurnOrchestrator:
         assert self._agent is not None and self._session_factory is not None
         registry = self._agent
         lean = self._settings.agent_profile == "lean"
+        history_enabled = await self._history_enabled(user_id)
+        tool_names: tuple[str, ...] | None = (
+            (LEAN_TOOLS if history_enabled else ()) if lean else None
+        )
         history = _history_for_model(begun.history)
         built: list[BuiltContext] = []
         tool_context = ToolContext(
@@ -527,7 +531,8 @@ class TurnOrchestrator:
             memory=self._memory,
             knowledge=self._knowledge,
             session_factory=self._session_factory,
-            allowed=frozenset(LEAN_TOOLS) if lean else None,
+            allowed=frozenset(tool_names) if tool_names is not None else None,
+            history_enabled=history_enabled,
         )
 
         def build(choice: StrategyChoice, final: bool) -> AgentContext:
@@ -584,7 +589,7 @@ class TurnOrchestrator:
             tool_max_characters=settings.agent_tool_max_result_characters,
             # Lean: the state-extraction call named the strategy (independent
             # of the safety assessment, which ran beside it).
-            tool_names=LEAN_TOOLS if lean else None,
+            tool_names=tool_names,
             strategy=(
                 registry.from_extraction(
                     extraction.strategy if extraction is not None else None,
@@ -629,8 +634,8 @@ class TurnOrchestrator:
             timeout_seconds=settings.generation_timeout_seconds,
             params=self._params,
             trace=deps.trace.model_copy(update={"purpose": GenerationPurpose.CONVERSATION}),
-            tools=tool_specs(LEAN_TOOLS if lean else None),
-            tool_choice="none",
+            tools=tool_specs(tool_names),
+            tool_choice="none" if tool_specs(tool_names) else None,
         )
         turn = _AgentTurn(
             context=built[0],
@@ -646,6 +651,16 @@ class TurnOrchestrator:
             lean=lean,
         )
         return turn, {**result.record, **prompt_record}
+
+    async def _history_enabled(self, user_id: uuid.UUID) -> bool:
+        """History search counts as long-term memory: off when memory is off
+        for the app or for this person (or the setting can't be read)."""
+        if self._memory is None:
+            return False
+        try:
+            return (await self._memory.store.get_settings(user_id)).memory_enabled
+        except (SQLAlchemyError, OSError):
+            return False
 
     async def _look_up(self, content: str, begun: StartedTurn) -> KnowledgeLookup | None:
         if self._knowledge is None:

@@ -104,6 +104,9 @@ class ToolContext:
     evidence: EvidenceCollector = field(default_factory=EvidenceCollector)
     # The tools offered this turn; a call to any other is refused.
     allowed: frozenset[str] | None = None
+    # History search is part of long-term memory: off when memory is off,
+    # for the app or for this person.
+    history_enabled: bool = True
 
 
 class QueryArgs(BaseModel):
@@ -192,6 +195,8 @@ async def _knowledge(args: QueryArgs, ctx: ToolContext) -> Outcome:
 
 
 async def _history(args: QueryArgs, ctx: ToolContext) -> Outcome:
+    if not ctx.history_enabled:
+        return "disabled", _error("disabled", "Memory is turned off."), 0
     try:
         async with ctx.session_factory() as session:
             hits = await repo.search_user_messages(

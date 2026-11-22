@@ -189,6 +189,7 @@ async def agent(state: AgentState, runtime: Runtime[AgentDeps]) -> dict[str, Any
     remaining = deps.remaining()
     if remaining <= 0:
         raise AgentFailed("deadline", _record(deps, state, "deadline"))
+    offered = tool_specs(deps.tool_names)
     request = GenerationRequest(
         model=deps.model,
         system=system,
@@ -197,8 +198,9 @@ async def agent(state: AgentState, runtime: Runtime[AgentDeps]) -> dict[str, Any
         timeout_seconds=remaining,
         params=deps.params,
         trace=deps.trace.model_copy(update={"purpose": GenerationPurpose.AGENT_STEP}),
-        tools=tool_specs(deps.tool_names),
-        tool_choice="none" if exhausted else "auto",
+        tools=offered,
+        # No tools offered (lean, memory off): a plain reply.
+        tool_choice=("none" if exhausted else "auto") if offered else None,
     )
     try:
         async with asyncio.timeout(remaining):
