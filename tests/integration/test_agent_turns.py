@@ -358,7 +358,7 @@ async def test_after_a_crisis_turn_later_turns_stay_with_the_person_without_the_
     """The developer's live test (2026-11-22): after a suicidal disclosure the
     person declined helplines and the people in their life; the replies kept
     repeating both, and the follow-ups ran through the agent."""
-    prompt = PromptRegistry().get("companion_system", "1.9.0")
+    prompt = PromptRegistry().get("companion_system", "1.10.0")
     follow_up_guidance = prompt.fragment("safety_crisis_follow_up")
     staying = "That's okay, we don't have to bring them in right now. I'm here. Are you safe?"
     async for _, c in agent_app(
@@ -387,6 +387,7 @@ async def test_after_a_crisis_turn_later_turns_stay_with_the_person_without_the_
             assert body["safety"]["resources"]  # the client can still show them
             (request,) = llm.requests
             assert follow_up_guidance in request.system and request.tools == ()
+            assert "14416" not in request.system  # contacts are not listed again
         assert llm.strategy_requests == []  # the agent never ran in this conversation
 
         # New signs of immediate danger still get the strict emergency reply.

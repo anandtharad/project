@@ -280,7 +280,7 @@ class Settings(BaseSettings):
     max_response_characters: int = Field(default=8_000, ge=100)
 
     # --- Prompts ------------------------------------------------------------
-    companion_prompt_version: str = "1.9.0"
+    companion_prompt_version: str = "1.10.0"
 
     # --- Agent turns (docs/agent.md) -----------------------------------------
     # "on": on the normal safety pathway, the model picks a response strategy

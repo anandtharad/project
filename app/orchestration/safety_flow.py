@@ -22,14 +22,6 @@ CONTACTS_HEADING = (
     "Support contacts, verified by the application. Offer these where the guidance above "
     "says to; never give any other phone number, website or email address:"
 )
-# After a crisis turn the person has these already, and the app shows them
-# beside every reply: the model repeats them only when it has to.
-FOLLOW_UP_CONTACTS_HEADING = (
-    "Support contacts, verified by the application. The person was already given these, "
-    "and the app shows them beside your reply, so don't repeat them or the advice to use "
-    "them. Give them again only if the person asks for them or seems to be in danger right "
-    "now; never give any other phone number, website or email address:"
-)
 
 # What the reply did wrong, in the words of the regeneration note (codes only;
 # the rejected reply is never quoted back).
@@ -61,13 +53,13 @@ def guidance_for(prompt: PromptTemplate, decision: SafetyDecision) -> str:
     if name not in prompt.fragments:
         name = LEGACY_SAFETY_FRAGMENT
     parts = [prompt.fragment(name)]
-    if decision.resource_lines:
-        heading = (
-            FOLLOW_UP_CONTACTS_HEADING
-            if decision.pathway is Pathway.CRISIS_FOLLOW_UP
-            else CONTACTS_HEADING
+    # On a follow-up turn the contacts are not listed again: they are in the
+    # first crisis reply and in the API response, and listing them invited
+    # the model to repeat them in every reply (live tests, 2026-11-22).
+    if decision.resource_lines and decision.pathway is not Pathway.CRISIS_FOLLOW_UP:
+        parts.append(
+            "\n".join([CONTACTS_HEADING, *(f"- {line}" for line in decision.resource_lines)])
         )
-        parts.append("\n".join([heading, *(f"- {line}" for line in decision.resource_lines)]))
     return "\n\n".join(parts)
 
 

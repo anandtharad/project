@@ -41,7 +41,7 @@ pathway. After the fragment, code renders the verified support contacts for
 `SAFETY_REGION`, and the prompt says never to give any other number, website
 or email.
 
-## After a crisis turn (`crisis_follow_up`, companion prompt 1.9.0)
+## After a crisis turn (`crisis_follow_up`, companion prompt 1.10.0)
 
 Once a conversation has had a crisis turn (`emergency` or
 `crisis_support`), its later turns that would be `crisis_support`,
@@ -59,7 +59,7 @@ The category is still recorded as assessed.
 | Output validator | must mention a crisis line or emergency services **and** a trusted person | neither required; every other check applies (methods, invented contacts, claims to be human, labels, secrecy, manipulation, prompt leak) |
 | Semantic check (`safety_output` 1.1.0) | crisis-support requirements | follow-up requirements |
 | Fallback | contacts listed | "That's okay. We don't have to bring anyone else into this right now…", no contacts listed |
-| Contacts | in the prompt and in the API's `safety.resources` | the same, but the prompt's heading says they were already given and are shown by the app: give them again only if asked or in danger |
+| Contacts | in the prompt and in the API's `safety.resources` | not listed in the prompt again (they're in the first crisis reply, and in `safety.resources` for the client); given again only if asked, in danger now, or saying goodbye |
 | Agent (`AGENT_MODE=on`) | never | never |
 
 **Why.** In a live test on 1.8.0, after a suicidal disclosure, the person
@@ -72,6 +72,24 @@ which is the opposite of what someone at risk needs.
 
 The approach follows crisis-support practice: respect the person's
 choice, stay connected, and keep checking on safety directly.
+
+**Support is offered once** (1.10.0, the developer's rule). After the
+first crisis reply, the companion doesn't bring up helplines, emergency
+services or reaching out to people again, not even as an "if it gets
+worse" line. The exceptions are when the person asks, says they might act
+on it or are in danger now, or is ending the conversation. Otherwise it
+talks with them like a friend, and asks whether they're safe (or about a
+plan) only when something sounds heavier.
+
+Getting there took three changes, each found in live replays of the same
+conversation on `gpt-oss-120b`:
+1. In 1.9.0, a code requirement and a "refusal" rule: replies still added
+   a conditional crisis-line line every turn.
+2. Removing the contact list from the prompt.
+3. Making the general relationships and danger rules defer to the
+   follow-up, plus one example reply. The model's own safety training
+   pulls towards resources, so expect occasional relapses, and re-check
+   when changing models.
 
 **What stays strict.** New signs of immediate danger (`imminent_danger`)
 still get the `emergency` pathway and its full requirements, as do harm to
