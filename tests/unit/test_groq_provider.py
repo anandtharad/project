@@ -27,6 +27,8 @@ from app.llm.schemas import (
     LLMErrorCategory,
     ResponseSchema,
     StructuredMode,
+    ToolCall,
+    ToolSpec,
     TraceMetadata,
 )
 from app.llm.structured import schema_instruction
@@ -203,7 +205,7 @@ async def test_truncated_reasoning_yields_empty_reply() -> None:
     [
         ("stop", FinishReason.STOP),
         ("length", FinishReason.MAX_TOKENS),
-        ("tool_calls", FinishReason.OTHER),
+        ("tool_calls", FinishReason.TOOL_CALLS),
         ("content_filter", FinishReason.REFUSAL),
         ("something_new", FinishReason.OTHER),
     ],
@@ -494,3 +496,96 @@ async def test_schema_errors_are_invalid_requests(message: str) -> None:
         await make_client(handler).generate(structured_request(state_schema()))
     assert info.value.category is LLMErrorCategory.INVALID_REQUEST
     assert info.value.retryable is False
+
+
+# --- tool calling (agent turns) ---------------------------------------------
+
+WEATHER = ToolSpec(
+    name="search_user_memories",
+    description="Search the person's memories.",
+    parameters={
+        "type": "object",
+        "properties": {"query": {"type": "string"}},
+        "required": ["query"],
+        "additionalProperties": False,
+    },
+)
+
+
+async def test_tools_are_sent_and_tool_calls_normalized() -> None:
+    body = completion_json(content=None)
+    body["choices"][0]["finish_reason"] = "tool_calls"
+    body["choices"][0]["message"]["tool_calls"] = [
+        {
+            "id": "call_1",
+            "type": "function",
+            "function": {"name": "search_user_memories", "arguments": '{"query": "sister"}'},
+        }
+    ]
+    handler = Recorder(httpx.Response(200, json=body))
+    request = make_request().model_copy(update={"tools": (WEATHER,), "tool_choice": "auto"})
+    response = await make_client(handler).generate(request)
+    sent = handler.body
+    assert sent["tools"][0]["function"]["name"] == "search_user_memories"
+    assert sent["tools"][0]["function"]["parameters"]["required"] == ["query"]
+    assert sent["tool_choice"] == "auto"
+    assert response.finish_reason is FinishReason.TOOL_CALLS
+    assert response.tool_calls == (
+        ToolCall(id="call_1", name="search_user_memories", arguments='{"query": "sister"}'),
+    )
+    assert response.content == ""
+
+
+async def test_tool_results_go_back_in_the_chat_completions_shape() -> None:
+    handler = Recorder()
+    call = ToolCall(id="call_1", name="search_user_memories", arguments='{"query": "sister"}')
+    messages = [
+        ChatMessage(role=ChatRole.USER, content="How is my sister doing, do you remember?"),
+        ChatMessage(role=ChatRole.ASSISTANT, content="", tool_calls=(call,)),
+        ChatMessage(
+            role=ChatRole.TOOL,
+            content='{"memories": []}',
+            tool_call_id="call_1",
+            name="search_user_memories",
+        ),
+    ]
+    request = make_request().model_copy(
+        update={"messages": messages, "tools": (WEATHER,), "tool_choice": "none"}
+    )
+    await make_client(handler).generate(request)
+    sent = handler.body["messages"]
+    assert sent[2] == {
+        "role": "assistant",
+        "content": None,
+        "tool_calls": [
+            {
+                "id": "call_1",
+                "type": "function",
+                "function": {"name": "search_user_memories", "arguments": '{"query": "sister"}'},
+            }
+        ],
+    }
+    assert sent[3] == {
+        "role": "tool",
+        "tool_call_id": "call_1",
+        "name": "search_user_memories",
+        "content": '{"memories": []}',
+    }
+    assert handler.body["tool_choice"] == "none"
+
+
+async def test_requests_without_tools_send_no_tool_fields() -> None:
+    handler = Recorder()
+    await make_client(handler).generate(make_request())
+    assert "tools" not in handler.body and "tool_choice" not in handler.body
+
+
+def test_tools_and_structured_output_cannot_be_combined() -> None:
+    schema = ResponseSchema(name="x", json_schema={"type": "object"})
+    base = make_request().model_dump()
+    with pytest.raises(ValueError, match="cannot be combined"):
+        GenerationRequest.model_validate(
+            {**base, "tools": [WEATHER.model_dump()], "response_schema": schema.model_dump()}
+        )
+    with pytest.raises(ValueError, match="tool_choice needs tools"):
+        GenerationRequest.model_validate({**base, "tool_choice": "auto"})

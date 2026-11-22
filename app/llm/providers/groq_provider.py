@@ -34,11 +34,16 @@ from typing import Any, Literal, cast
 
 import groq
 from groq import omit
-from groq.types.chat import ChatCompletionMessageParam, completion_create_params
+from groq.types.chat import (
+    ChatCompletionMessageParam,
+    ChatCompletionToolParam,
+    completion_create_params,
+)
 
 from app.llm.providers.chat_completions import (
     build_messages,
     build_response_format,
+    build_tools,
     classify_sdk_error,
     normalize_chat_completion,
 )
@@ -102,6 +107,12 @@ def structured_plan(model: str, schema: ResponseSchema) -> StructuredPlan:
 
 
 class GroqLLMClient:
+    # Function tool calling on Groq (console.groq.com/docs/tool-use, read
+    # 2026-11-22): gpt-oss-120b/20b support local tool use but not parallel
+    # tool calls; qwen/qwen3.8-27b supports both. Structured outputs are not
+    # supported together with tool use.
+    supports_tools = True
+
     def __init__(
         self,
         *,
@@ -166,6 +177,12 @@ class GroqLLMClient:
                     if response_format is not None
                     else omit
                 ),
+                tools=(
+                    cast("list[ChatCompletionToolParam]", build_tools(request.tools))
+                    if request.tools
+                    else omit
+                ),
+                tool_choice=request.tool_choice if request.tool_choice is not None else omit,
                 timeout=request.timeout_seconds,
             )
         except groq.GroqError as exc:

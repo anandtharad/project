@@ -24,6 +24,7 @@ from app.llm.schemas import (
     GenerationResponse,
     LLMError,
     TokenUsage,
+    ToolCall,
 )
 from app.main import create_app
 from app.prompting import PromptRegistry
@@ -99,6 +100,17 @@ NO_MEMORIES = json.dumps({"candidates": []})
 # Not a valid decision reply: decision tests queue the reply they need.
 NO_DECISIONS = "{}"
 
+# The agent's strategy choice by default (app/agent/strategy.py).
+DEFAULT_STRATEGY = json.dumps({"strategy": "conversational", "reason": "Ordinary chat."})
+
+
+def tool_call_response(*calls: ToolCall) -> GenerationResponse:
+    """A model reply that asks for tool calls (agent turns)."""
+    return make_response("", finish_reason=FinishReason.TOOL_CALLS).model_copy(
+        update={"tool_calls": calls}
+    )
+
+
 # The safety classifier's and the output check's default answers.
 NO_SAFETY_RISK = json.dumps({"category": "none", "rationale": "Ordinary conversation."})
 OUTPUT_PASSES = json.dumps({"verdict": "pass", "rationale": "Meets the pathway."})
@@ -111,6 +123,11 @@ class ScriptedLLMClient:
     it replies "reply to: <last user message>" so tests can trace which
     context was used. Every request is recorded.
 
+    Agent tool-loop steps (purpose AGENT_STEP) consume the conversation queue,
+    so a test queues `tool_call_response(...)` steps and then the final text;
+    the strategy choice has its own queue (`queue_strategy`, default
+    "conversational").
+
     State-extraction, memory-extraction, decision and safety calls are
     recorded separately (`state_requests`, `memory_requests`,
     `decision_requests`, `safety_requests`, `safety_output_requests`) and
@@ -121,8 +138,12 @@ class ScriptedLLMClient:
     are unaffected.
     """
 
+    supports_tools = True
+
     def __init__(self) -> None:
         self.requests: list[GenerationRequest] = []
+        self.strategy_requests: list[GenerationRequest] = []
+        self._strategy_steps: deque[Step] = deque()
         self.state_requests: list[GenerationRequest] = []
         self.memory_requests: list[GenerationRequest] = []
         self.decision_requests: list[GenerationRequest] = []
@@ -161,6 +182,9 @@ class ScriptedLLMClient:
     def queue_safety_output(self, *steps: Step) -> None:
         self._safety_output_steps.extend(steps)
 
+    def queue_strategy(self, *steps: Step) -> None:
+        self._strategy_steps.extend(steps)
+
     async def generate(self, request: GenerationRequest) -> GenerationResponse:
         step: Step
         if request.trace.purpose is GenerationPurpose.STATE_EXTRACTION:
@@ -175,6 +199,9 @@ class ScriptedLLMClient:
         elif request.trace.purpose is GenerationPurpose.SAFETY_CLASSIFICATION:
             self.safety_requests.append(request)
             step = self._safety_steps.popleft() if self._safety_steps else NO_SAFETY_RISK
+        elif request.trace.purpose is GenerationPurpose.STRATEGY_SELECTION:
+            self.strategy_requests.append(request)
+            step = self._strategy_steps.popleft() if self._strategy_steps else DEFAULT_STRATEGY
         elif request.trace.purpose is GenerationPurpose.SAFETY_OUTPUT_CHECK:
             self.safety_output_requests.append(request)
             step = (

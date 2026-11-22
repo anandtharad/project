@@ -11,6 +11,7 @@ each adapter only adds its provider-specific request parameters.
 from __future__ import annotations
 
 import re
+from collections.abc import Sequence
 from types import ModuleType
 from typing import Any, Literal, Protocol
 
@@ -24,6 +25,8 @@ from app.llm.schemas import (
     LLMErrorCategory,
     ResponseSchema,
     TokenUsage,
+    ToolCall,
+    ToolSpec,
 )
 from app.llm.structured import StructuredPlan
 
@@ -32,6 +35,7 @@ _FINISH_REASONS: dict[str, FinishReason] = {
     "length": FinishReason.MAX_TOKENS,
     "model_length": FinishReason.MAX_TOKENS,  # Mistral
     "content_filter": FinishReason.REFUSAL,
+    "tool_calls": FinishReason.TOOL_CALLS,
 }
 
 
@@ -53,15 +57,73 @@ def build_messages(
     messages: list[ChatMessage],
     *,
     system_role: Literal["system", "developer"] = "system",
-) -> list[dict[str, str]]:
-    """Privileged instruction first, then the conversation in order."""
-    roles: dict[ChatRole, Literal["user", "assistant"]] = {
-        ChatRole.USER: "user",
-        ChatRole.ASSISTANT: "assistant",
-    }
-    return [{"role": system_role, "content": system}] + [
-        {"role": roles[m.role], "content": m.content} for m in messages
+) -> list[dict[str, Any]]:
+    """Privileged instruction first, then the conversation in order. In an
+    agent turn, assistant messages may carry tool calls and tool messages
+    carry results (the Chat Completions shape)."""
+    out: list[dict[str, Any]] = [{"role": system_role, "content": system}]
+    for m in messages:
+        if m.role is ChatRole.TOOL:
+            out.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": m.tool_call_id,
+                    "name": m.name,
+                    "content": m.content,
+                }
+            )
+        elif m.role is ChatRole.ASSISTANT and m.tool_calls:
+            out.append(
+                {
+                    "role": "assistant",
+                    "content": m.content or None,
+                    "tool_calls": [
+                        {
+                            "id": c.id,
+                            "type": "function",
+                            "function": {"name": c.name, "arguments": c.arguments},
+                        }
+                        for c in m.tool_calls
+                    ],
+                }
+            )
+        else:
+            out.append({"role": m.role.value, "content": m.content})
+    return out
+
+
+def build_tools(tools: Sequence[ToolSpec]) -> list[dict[str, Any]]:
+    """The Chat Completions `tools` array (Groq: console.groq.com/docs/tool-use)."""
+    return [
+        {
+            "type": "function",
+            "function": {
+                "name": tool.name,
+                "description": tool.description,
+                "parameters": tool.parameters,
+            },
+        }
+        for tool in tools
     ]
+
+
+def _tool_calls(message: Any) -> tuple[ToolCall, ...]:
+    calls = getattr(message, "tool_calls", None) or ()
+    out = []
+    for call in calls:
+        function = getattr(call, "function", None)
+        name = getattr(function, "name", None)
+        call_id = getattr(call, "id", None)
+        if not name or not call_id:
+            raise LLMError(LLMErrorCategory.RESPONSE_INVALID, "Malformed tool call.")
+        out.append(
+            ToolCall(
+                id=str(call_id),
+                name=str(name),
+                arguments=str(getattr(function, "arguments", None) or ""),
+            )
+        )
+    return tuple(out)
 
 
 def build_response_format(schema: ResponseSchema, plan: StructuredPlan) -> dict[str, Any] | None:
@@ -123,6 +185,9 @@ def normalize_chat_completion(
     text, reasoning_removed = (strip_reasoning_prefix if structured else strip_reasoning)(raw_text)
     raw_reason = choice.finish_reason
     finish = _FINISH_REASONS.get(raw_reason or "", FinishReason.OTHER)
+    tool_calls = _tool_calls(message)
+    if tool_calls:
+        finish = FinishReason.TOOL_CALLS
     if refusal:
         finish = FinishReason.REFUSAL
     usage = response.usage
@@ -143,6 +208,7 @@ def normalize_chat_completion(
         provider_request_id=request_id or getattr(response, "_request_id", None) or response.id,
         latency_ms=latency_ms,
         reasoning_removed=reasoning_removed,
+        tool_calls=tool_calls,
     )
 
 

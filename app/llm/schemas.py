@@ -9,7 +9,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Effort = Literal["none", "low", "medium", "high", "xhigh", "max"]
 
@@ -17,6 +17,19 @@ Effort = Literal["none", "low", "medium", "high", "xhigh", "max"]
 class ChatRole(StrEnum):
     USER = "user"
     ASSISTANT = "assistant"
+    # A tool's result, sent back to the model in an agent turn (app/agent/).
+    TOOL = "tool"
+
+
+class ToolCall(BaseModel):
+    """A tool call the model asked for. `arguments` is the provider's raw
+    JSON text: the tool executor validates it, never the adapter."""
+
+    model_config = ConfigDict(frozen=True)
+
+    id: str = Field(min_length=1, max_length=128)
+    name: str = Field(min_length=1, max_length=64)
+    arguments: str = Field(max_length=8000)
 
 
 class ChatMessage(BaseModel):
@@ -24,6 +37,22 @@ class ChatMessage(BaseModel):
 
     role: ChatRole
     content: str
+    # Assistant messages in an agent turn: the tool calls the model made.
+    tool_calls: tuple[ToolCall, ...] = ()
+    # Tool messages: which call this result answers, and the tool's name.
+    tool_call_id: str | None = None
+    name: str | None = None
+
+
+class ToolSpec(BaseModel):
+    """A tool offered to the model (a function with a JSON-schema argument
+    object). Only adapters with `supports_tools` accept requests with tools."""
+
+    model_config = ConfigDict(frozen=True)
+
+    name: str = Field(pattern=r"^[a-z][a-z0-9_]{0,63}$")
+    description: str = Field(min_length=1, max_length=1024)
+    parameters: dict[str, Any]
 
 
 class GenerationPurpose(StrEnum):
@@ -34,6 +63,9 @@ class GenerationPurpose(StrEnum):
     MEMORY_EXTRACTION = "memory_extraction"
     # Typed decision questions answered by an LLM (DECISION_PROVIDER=llm).
     DECISION = "decision"
+    # Agent turns (AGENT_MODE=on): the strategy choice and the tool loop.
+    STRATEGY_SELECTION = "strategy_selection"
+    AGENT_STEP = "agent_step"
     # Safety layer: the input risk classifier and the optional semantic
     # check of a reply (app/safety/).
     SAFETY_CLASSIFICATION = "safety_classification"
@@ -96,12 +128,27 @@ class GenerationRequest(BaseModel):
     params: GenerationParams = GenerationParams()
     trace: TraceMetadata
     response_schema: ResponseSchema | None = None
+    # Tools the model may call. Not combined with response_schema: Groq does
+    # not support structured outputs together with tool use.
+    tools: tuple[ToolSpec, ...] = ()
+    # "none" asks for a final answer without further tool calls.
+    tool_choice: Literal["auto", "none"] | None = None
+
+    @model_validator(mode="after")
+    def _tools_or_schema(self) -> GenerationRequest:
+        if self.tools and self.response_schema is not None:
+            raise ValueError("tools and response_schema cannot be combined")
+        if self.tool_choice is not None and not self.tools:
+            raise ValueError("tool_choice needs tools")
+        return self
 
 
 class FinishReason(StrEnum):
     STOP = "stop"
     MAX_TOKENS = "max_tokens"
     REFUSAL = "refusal"
+    # The model asked for tool calls (agent turns only).
+    TOOL_CALLS = "tool_calls"
     OTHER = "other"
 
 
@@ -134,6 +181,8 @@ class GenerationResponse(BaseModel):
     reasoning_removed: bool = False
     # Set only when the request carried a response_schema.
     structured_mode: StructuredMode | None = None
+    # Set only when the request offered tools and the model called some.
+    tool_calls: tuple[ToolCall, ...] = ()
 
 
 class LLMErrorCategory(StrEnum):

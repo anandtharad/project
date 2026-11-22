@@ -20,6 +20,10 @@ class LLMClient(Protocol):
     @property
     def provider(self) -> str: ...
 
+    # Adapters that implement tool calling set `supports_tools = True`
+    # (Groq and the test doubles); read it with getattr(client,
+    # "supports_tools", False). Requests with tools go only to those.
+
     async def generate(self, request: GenerationRequest) -> GenerationResponse: ...
 
     async def aclose(self) -> None: ...
