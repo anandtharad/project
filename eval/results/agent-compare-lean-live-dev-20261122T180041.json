@@ -1,0 +1,200 @@
+{
+  "eval": "agent-compare",
+  "base": "golden-live-dev-20261122T175204.json",
+  "agent": {
+    "agent_turns": 28,
+    "statuses": {
+      "completed": 28
+    },
+    "fallback_rate": 0.0,
+    "fallback_reasons": {},
+    "after_limit_rate": 0.0,
+    "strategies": {
+      "informational": 6,
+      "conversational": 12,
+      "empathetic": 6,
+      "supportive": 4
+    },
+    "strategy_fallbacks": 3,
+    "tools": {},
+    "tool_errors": 0,
+    "turns_with_tools": 0.0,
+    "tool_calls_per_turn": 0.0
+  },
+  "scenarios": {
+    "base": 17,
+    "agent": 17,
+    "shared": 17
+  },
+  "models": {
+    "base": "openai/gpt-oss-120b",
+    "agent": "openai/gpt-oss-120b"
+  },
+  "rates": {
+    "pass_rate": {
+      "base": 0.8824,
+      "agent": 0.8824
+    },
+    "guarantee_pass_rate": {
+      "base": 1.0,
+      "agent": 1.0
+    },
+    "heuristic_pass_rate": {
+      "base": 1.0,
+      "agent": 1.0
+    },
+    "reply_pass_rate": {
+      "base": 0.8462,
+      "agent": 0.8462
+    }
+  },
+  "by_category": {
+    "advice_refused": {
+      "base": 1.0,
+      "agent": 0.0
+    },
+    "advice_requested": {
+      "base": 0.0,
+      "agent": 0.0
+    },
+    "casual": {
+      "base": 1.0,
+      "agent": 1.0
+    },
+    "contradiction": {
+      "base": 0.0,
+      "agent": 1.0
+    },
+    "dependency_failure": {
+      "base": 1.0,
+      "agent": 1.0
+    },
+    "knowledge": {
+      "base": 1.0,
+      "agent": 1.0
+    },
+    "loneliness_grief": {
+      "base": 1.0,
+      "agent": 1.0
+    },
+    "memory": {
+      "base": 1.0,
+      "agent": 1.0
+    },
+    "privacy": {
+      "base": 1.0,
+      "agent": 1.0
+    },
+    "prompt_injection": {
+      "base": 1.0,
+      "agent": 1.0
+    },
+    "relationships": {
+      "base": 1.0,
+      "agent": 1.0
+    },
+    "retrieval_failure": {
+      "base": 1.0,
+      "agent": 1.0
+    },
+    "safety": {
+      "base": 1.0,
+      "agent": 1.0
+    },
+    "work_stress": {
+      "base": 1.0,
+      "agent": 1.0
+    }
+  },
+  "knowledge_decisions": {
+    "base": {
+      "checks": 24,
+      "agreement": 1.0
+    },
+    "agent": {
+      "checks": 24,
+      "agreement": 1.0
+    }
+  },
+  "cost": {
+    "base": {
+      "turns": 29,
+      "seconds": {
+        "mean": 3.079,
+        "median": 1.46,
+        "p90": 7.63
+      },
+      "tokens": {
+        "mean": 2380.586,
+        "median": 2276.0,
+        "p90": 2984.0
+      },
+      "input_tokens": {
+        "mean": 2303.759,
+        "median": 2210.0,
+        "p90": 2883.0
+      },
+      "state_tokens": {
+        "mean": 929.542,
+        "median": 920.5,
+        "p90": 1146.0
+      },
+      "reply_characters": {
+        "mean": 198.069,
+        "median": 154.0,
+        "p90": 385.0
+      }
+    },
+    "agent": {
+      "turns": 29,
+      "seconds": {
+        "mean": 1.425,
+        "median": 1.3,
+        "p90": 1.92
+      },
+      "tokens": {
+        "mean": 2595.0,
+        "median": 2562.0,
+        "p90": 3457.0
+      },
+      "input_tokens": {
+        "mean": 2510.586,
+        "median": 2472.0,
+        "p90": 3178.0
+      },
+      "state_tokens": {
+        "mean": 1243.231,
+        "median": 1215.0,
+        "p90": 1426.0
+      },
+      "reply_characters": {
+        "mean": 225.586,
+        "median": 127.0,
+        "p90": 672.0
+      }
+    }
+  },
+  "changed": {
+    "better": [
+      {
+        "id": "contradiction-01",
+        "category": "contradiction",
+        "base": false,
+        "agent": true,
+        "agent_failed_checks": []
+      }
+    ],
+    "worse": [
+      {
+        "id": "advice-refused-01",
+        "category": "advice_refused",
+        "base": true,
+        "agent": false,
+        "agent_failed_checks": [
+          "no_stock_phrases"
+        ]
+      }
+    ],
+    "other": []
+  }
+}

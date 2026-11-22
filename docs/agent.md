@@ -187,7 +187,47 @@ What the deterministic run shows is that the agent path keeps every
 guarantee: status codes under dependency failures, privacy probes,
 memory deletion, citations that resolve, and safety statements.
 
-### Live comparison (2026-11-22, Groq `openai/gpt-oss-120b`)
+### Lean profile, live (2026-11-22, Groq `openai/gpt-oss-120b`, one run)
+
+`AGENT_PROFILE=lean` (the default for agent turns since 2026-11-22) works as follows:
+- The strategy is chosen inside the state-extraction call.
+- Notes, memories and passages are pre-fetched, as without the agent.
+- `search_conversation_history` is the only tool.
+- History search is off when memory is off, and it never returns safety
+  turns from other chats.
+
+It was compared with the deterministic path on the same 17 dev scenarios,
+with the same prompts (companion 1.10.0, state 1.1.0, agent_strategies
+1.3.0). File: `eval/results/agent-compare-lean-live-dev-20261122T180041.json`.
+
+| | deterministic | lean agent | full agent (earlier run) |
+|---|---|---|---|
+| guarantee pass rate | 1.0 | 1.0 | 1.0 |
+| heuristic pass rate | 1.0 | 1.0 | 0.933 |
+| reply pass rate | 0.846 | 0.846 | 0.769 |
+| knowledge agreement | 1.0 | 1.0 | 0.958 |
+| median latency | 1.46 s | 1.30 s | 1.83 s |
+| median reply-model tokens (120B) | 2,276 | 2,562 | 3,057 |
+| median state-call tokens (20B) | 921 | 1,215 | not recorded |
+| fallbacks and errors | 0 | 0 | 0 |
+
+**Quality:** the lean agent matches the deterministic path, with one
+scenario better and one worse (a stock phrase). It chose conversational
+12 times, informational 6, empathetic 6 and supportive 4; the venting
+scenario passed.
+
+**Cost against deterministic:** about +290 reply-model tokens per turn,
+from the tool definition and guidance, and about +300 state-call tokens
+on the smaller model, from the strategy list. History search was never
+needed in these scenarios.
+
+**Possible further cuts:** offer the tool only when the message refers to
+the past, and shorten the strategy field.
+
+**Not yet run:** a second replicate, and the full profile on the current
+prompts (free-tier quota).
+
+
 
 This run used a stratified sample of the dev split that fits the free
 tier's daily budget: 17 scenarios and 30 turns, one scenario per category
