@@ -306,13 +306,13 @@ async def run(args: argparse.Namespace) -> int:
     if args.resume:
         previous = latest_report(args.label)
         if previous is None:
-            print(f"--resume: no earlier report for label {args.label!r}", file=sys.stderr)
-            return 1
-        earlier = json.loads(previous.read_text(encoding="utf-8"))["results"]
-        kept = [r for r in earlier if completed(r)]
-        done = {r["id"] for r in kept}
-        scenarios = [s for s in scenarios if s.id not in done]
-        print(f"resuming from {previous.name}: {len(done)} done, {len(scenarios)} to run")
+            print(f"--resume: no saved report for label {args.label!r} yet; running all")
+        else:
+            earlier = json.loads(previous.read_text(encoding="utf-8"))["results"]
+            kept = [r for r in earlier if completed(r)]
+            done = {r["id"] for r in kept}
+            scenarios = [s for s in scenarios if s.id not in done]
+            print(f"resuming from {previous.name}: {len(done)} done, {len(scenarios)} to run")
     if not scenarios:
         print("nothing to run" if kept else "no scenarios match --only", file=sys.stderr)
         return 0 if kept else 1
