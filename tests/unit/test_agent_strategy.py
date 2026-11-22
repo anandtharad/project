@@ -130,3 +130,17 @@ async def test_missing_context_and_untrusted_data() -> None:
     assert len(long) < 1500
     summary = choice.summary()
     assert set(summary) >= {"strategy", "version", "source", "failure"} and "reason" not in summary
+
+
+def test_the_default_strategies_keep_venting_away_from_advice() -> None:
+    from app.config import Settings
+
+    version = Settings.model_fields["agent_strategy_prompt_version"].default
+    registry = StrategyRegistry(PromptRegistry().get("agent_strategies", version))
+    field = registry.state_field()
+    assert field is not None
+    for text in (field, registry.selection_system()):
+        assert "Venting about something that happened" in text
+        assert "is empathetic unless they ask what to do" in text
+    assert "not even framed as gentle suggestions" in registry.strategies["empathetic"].guidance
+    assert "Not for venting" in registry.strategies["supportive"].description
