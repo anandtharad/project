@@ -47,8 +47,11 @@ Once a conversation has had a crisis turn (`emergency` or
 `crisis_support`), its later turns that would be `crisis_support`,
 `safety_check_in`, `encourage_connection` or `normal` go to
 `crisis_follow_up` instead. `TurnStore.begin` reads this from the
-conversation's `turn_safety` records. The category is still recorded as
-assessed.
+conversation's `turn_safety` records. The pattern screen also checks the
+person's earlier messages in the loaded history for an explicit statement
+of suicide or self-harm. That covers a disclosing turn that failed (a rate
+limit, the deadline) and so left no record, which happened in a live test.
+The category is still recorded as assessed.
 
 | | `crisis_support` (first disclosure) | `crisis_follow_up` (later turns) |
 |---|---|---|
@@ -56,7 +59,7 @@ assessed.
 | Output validator | must mention a crisis line or emergency services **and** a trusted person | neither required; every other check applies (methods, invented contacts, claims to be human, labels, secrecy, manipulation, prompt leak) |
 | Semantic check (`safety_output` 1.1.0) | crisis-support requirements | follow-up requirements |
 | Fallback | contacts listed | "That's okay. We don't have to bring anyone else into this right now…", no contacts listed |
-| Contacts | in the prompt and in the API's `safety.resources` | the same: the client can keep showing them |
+| Contacts | in the prompt and in the API's `safety.resources` | the same, but the prompt's heading says they were already given and are shown by the app: give them again only if asked or in danger |
 | Agent (`AGENT_MODE=on`) | never | never |
 
 **Why.** In a live test on 1.8.0, after a suicidal disclosure, the person

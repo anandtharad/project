@@ -90,7 +90,9 @@ from app.safety.analysis import SafetyAssessment
 from app.safety.factory import SafetyLayer
 from app.safety.fallbacks import fallback_reply
 from app.safety.output import OutputCheck
+from app.safety.patterns import screen
 from app.safety.policy import SafetyDecision
+from app.safety.taxonomy import SafetyCategory
 from app.state.extractor import ExtractionResult, ExtractionStatus, StateExtractor
 from app.state.schemas import ConversationState
 
@@ -244,7 +246,9 @@ class TurnOrchestrator:
             if mode is not None and mode.value == "safety":
                 assessment = assessment.with_decision_signal()
             safety = self._safety.policy.decide(
-                assessment, self._safety.region, crisis_earlier=begun.crisis_earlier
+                assessment,
+                self._safety.region,
+                crisis_earlier=begun.crisis_earlier or _disclosed_earlier(begun.history),
             )
         # Safety overrides the ordinary strategy (spec Phase 5 acceptance).
         policy = choose_policy(content, decisions)
@@ -927,6 +931,18 @@ def _agent_evidence_summary(
             for item in items
         ],
     }
+
+
+_CRISIS_CATEGORIES = frozenset({SafetyCategory.SELF_HARM, SafetyCategory.IMMINENT_DANGER})
+
+
+def _disclosed_earlier(history: list[ChatMessage]) -> bool:
+    """An explicit statement of suicide or self-harm in an earlier message of
+    the person's, found by the pattern screen alone (no model call). It
+    covers a crisis turn that left no safety record, because that turn
+    failed (a provider error or the deadline) after the person said it."""
+    earlier = [m.content for m in history[:-1] if m.role is ChatRole.USER]
+    return any(screen(text).explicit_category in _CRISIS_CATEGORIES for text in earlier)
 
 
 def _history_for_model(history: list[ChatMessage]) -> list[ChatMessage]:

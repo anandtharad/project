@@ -402,3 +402,24 @@ async def test_after_a_crisis_turn_later_turns_stay_with_the_person_without_the_
         llm.queue_safety(label("none"))
         fresh = await send(c, other, "hey, how's it going")
         assert fresh.json().get("safety") is None
+
+
+async def test_a_failed_crisis_turn_still_puts_later_turns_on_the_follow_up(
+    database_url: str, clean_db: None, llm: ScriptedLLMClient
+) -> None:
+    """Live, 2026-11-22: the disclosing turn failed (rate limit), left no safety
+    record, and the next turns went to the agent as ordinary chat."""
+    async for _, c in agent_app(
+        database_url, llm, safety_classifier_provider="fake", safety_region="IN"
+    ):
+        cid = await create_conversation(c, ALICE)
+        llm.queue_safety(label("self_harm"))
+        llm.queue(LLMError(LLMErrorCategory.RATE_LIMITED, "slow down"))
+        failed = await send(c, cid, "i dont feel like anything, want to end my life")
+        assert failed.status_code == 503
+
+        llm.queue_safety(LLMError(LLMErrorCategory.RATE_LIMITED, "slow down"))  # degraded
+        llm.queue("I'm here with you. What's on your mind right now? Are you safe?")
+        later = await send(c, cid, "i dont want to bother them")
+        assert later.json()["safety"]["pathway"] == "crisis_follow_up"
+        assert llm.strategy_requests == []
