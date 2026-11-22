@@ -44,3 +44,19 @@ def test_invalid_scenarios_are_refused() -> None:
         Recall(message=0)
     with pytest.raises(ValidationError):
         Session(messages=["hi"], recall=[Recall(message=3, any=["x"])])
+
+
+def test_resume_keeps_only_scenarios_where_every_message_got_a_reply() -> None:
+    import importlib.util
+    import sys
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parents[2] / "scripts" / "run_scenarios.py"
+    spec = importlib.util.spec_from_file_location("run_scenarios", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    sys.modules["run_scenarios"] = module
+    spec.loader.exec_module(module)
+    ok = {"sessions": [{"turns": [{"reply": "hey"}, {"reply": "sure"}]}]}
+    cut = {"sessions": [{"turns": [{"reply": "hey"}]}, {"turns": [{"reply": None}]}]}
+    assert module.completed(ok) and not module.completed(cut)

@@ -20,7 +20,14 @@ For each scenario it:
 6. deletes the conversations it created (--keep to keep them) and resets
    the memory settings.
 
-Writes eval/results/scenarios-<label>-<time>.md (to read) and .json.
+Writes eval/results/scenarios-<label>-<time>.md (to read) and .json, after
+every scenario. If the provider keeps refusing (a rate limit or the daily
+quota), the run stops there; continue later, e.g. with another key on the
+server, with the same label and --resume: scenarios that completed cleanly
+are kept and the rest run again.
+
+    uv run python scripts/run_scenarios.py --url http://localhost:8001 --token testtoken \
+        --label agent-on --resume
 Free-tier note: every message costs a reply call, plus state, memory and
 safety calls; use --only, and consider STATE_EXTRACTION_MODEL and
 MEMORY_EXTRACTION_MODEL=openai/gpt-oss-20b on the server to spread the
@@ -53,6 +60,22 @@ from app.evaluation.scenarios import (  # noqa: E402
 )
 
 RESULTS_DIR = ROOT / "eval" / "results"
+
+
+class ProviderUnavailable(Exception):
+    """The model provider kept refusing (rate limit or daily quota)."""
+
+
+def completed(result: dict[str, Any]) -> bool:
+    """Every message of the scenario got a reply."""
+    return all(
+        turn.get("reply") is not None for session in result["sessions"] for turn in session["turns"]
+    )
+
+
+def latest_report(label: str) -> Path | None:
+    found = sorted(RESULTS_DIR.glob(f"scenarios-{label}-*.json"))
+    return found[-1] if found else None
 
 
 class StateReader:
@@ -114,6 +137,8 @@ async def send(
         retryable = response.status_code in (409, 429, 503)
         if not retryable or attempt == 4:
             error = response.json().get("error", {}) if response.content else {}
+            if response.status_code in (429, 503):
+                raise ProviderUnavailable(str(error.get("code") or response.status_code))
             return {"status": response.status_code, "reply": None, "error": error.get("code")}
         wait = float(response.headers.get("Retry-After") or 0) or 15.0 * (attempt + 1)
         print(f"    {response.status_code}, retrying in {wait:.0f}s", flush=True)
@@ -257,16 +282,48 @@ def markdown(results: list[dict[str, Any]], label: str, state_error: str | None)
     return "\n".join(out) + "\n"
 
 
+def write_report(
+    base: Path, label: str, version: str, results: list[dict[str, Any]], state_error: str | None
+) -> None:
+    order = {r["id"]: r for r in results}
+    ordered = list(order.values())
+    base.with_suffix(".json").write_text(
+        json.dumps(
+            {"label": label, "dataset_version": version, "results": ordered},
+            indent=1,
+            ensure_ascii=False,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    base.with_suffix(".md").write_text(markdown(ordered, label, state_error), encoding="utf-8")
+
+
 async def run(args: argparse.Namespace) -> int:
     dataset = load(Path(args.dataset))
     scenarios = [s for s in dataset.scenarios if not args.only or s.id in set(args.only)]
+    kept: list[dict[str, Any]] = []
+    if args.resume:
+        previous = latest_report(args.label)
+        if previous is None:
+            print(f"--resume: no earlier report for label {args.label!r}", file=sys.stderr)
+            return 1
+        earlier = json.loads(previous.read_text(encoding="utf-8"))["results"]
+        kept = [r for r in earlier if completed(r)]
+        done = {r["id"] for r in kept}
+        scenarios = [s for s in scenarios if s.id not in done]
+        print(f"resuming from {previous.name}: {len(done)} done, {len(scenarios)} to run")
     if not scenarios:
-        print("no scenarios match --only", file=sys.stderr)
-        return 1
+        print("nothing to run" if kept else "no scenarios match --only", file=sys.stderr)
+        return 0 if kept else 1
     states = StateReader()
     if not args.no_db:
         await states.start()
-    results: list[dict[str, Any]] = []
+    results: list[dict[str, Any]] = list(kept)
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    base = RESULTS_DIR / f"scenarios-{args.label}-{stamp}"
+    stopped: str | None = None
     headers = {"Authorization": f"Bearer {args.token}"}
     async with httpx.AsyncClient(base_url=args.url, headers=headers, timeout=180) as client:
         ready = await client.get("/ready")
@@ -279,8 +336,8 @@ async def run(args: argparse.Namespace) -> int:
             return 1
         for n, scenario in enumerate(scenarios, 1):
             print(f"[{n}/{len(scenarios)}] {scenario.id}", flush=True)
-            results.append(
-                await run_scenario(
+            try:
+                result = await run_scenario(
                     client,
                     scenario,
                     states,
@@ -288,25 +345,23 @@ async def run(args: argparse.Namespace) -> int:
                     settle=args.settle,
                     keep=args.keep,
                 )
-            )
+            except ProviderUnavailable as exc:
+                stopped = f"{scenario.id}: the model provider kept refusing ({exc})"
+                break
+            results.append(result)
+            write_report(base, args.label, dataset.version, results, states.error)
     await states.close()
-    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S")
-    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-    base = RESULTS_DIR / f"scenarios-{args.label}-{stamp}"
-    base.with_suffix(".json").write_text(
-        json.dumps(
-            {"label": args.label, "dataset_version": dataset.version, "results": results},
-            indent=1,
-            ensure_ascii=False,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    base.with_suffix(".md").write_text(
-        markdown(results, args.label, states.error), encoding="utf-8"
-    )
+    write_report(base, args.label, dataset.version, results, states.error)
     problems = sum(1 for r in results for f in r["flags"] if not f["ok"])
-    print(f"done: {problems} automatic flags. Read {base.with_suffix('.md').relative_to(ROOT)}")
+    report = base.with_suffix(".md").relative_to(ROOT)
+    if stopped:
+        print(
+            f"stopped at {stopped}. Saved {len(results)} scenarios to {report}.\n"
+            "Fix the key or wait for the quota, restart the server, then run again with "
+            f"--label {args.label} --resume"
+        )
+        return 2
+    print(f"done: {problems} automatic flags. Read {report}")
     return 0
 
 
@@ -323,6 +378,11 @@ def main() -> int:
     parser.add_argument("--keep", action="store_true", help="keep the conversations")
     parser.add_argument("--no-db", action="store_true", help="don't read conversation notes")
     parser.add_argument("--yes", action="store_true", help="skip the confirmation")
+    parser.add_argument(
+        "--resume",
+        action="store_true",
+        help="keep the scenarios that completed in the latest report with this label",
+    )
     parser.add_argument("--dataset", default=str(DATASET))
     args = parser.parse_args()
     if not args.yes:
