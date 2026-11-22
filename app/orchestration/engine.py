@@ -33,15 +33,20 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import time
 import uuid
 from dataclasses import dataclass
 from typing import Any
 
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.agent.graph import AgentContext, AgentDeps, AgentFailed, run_agent
+from app.agent.strategy import Strategy, StrategyChoice, StrategyRegistry
+from app.agent.tools import ToolContext, tool_specs
 from app.background import BackgroundTasks
 from app.config import Effort, Settings
-from app.context.builder import ContextBuilder
+from app.context.builder import BuiltContext, ContextBuilder
 from app.decisions.schemas import DecisionSet
 from app.decisions.service import DecisionService, build_decision_state
 from app.errors import AppError, ErrorCategory
@@ -79,7 +84,7 @@ from app.orchestration.safety_flow import (
 )
 from app.orchestration.validation import ResponseValidator
 from app.prompting import PromptTemplate
-from app.rag.evidence import check_citations, strip_markers
+from app.rag.evidence import EvidenceItem, check_citations, strip_markers
 from app.rag.service import KnowledgeLookup, KnowledgeService
 from app.safety.analysis import SafetyAssessment
 from app.safety.factory import SafetyLayer
@@ -117,6 +122,8 @@ class TurnOrchestrator:
         background: BackgroundTasks | None = None,
         safety: SafetyLayer | None = None,
         knowledge: KnowledgeService | None = None,
+        agent: StrategyRegistry | None = None,
+        session_factory: async_sessionmaker[AsyncSession] | None = None,
     ) -> None:
         self._settings = settings
         self._model = model
@@ -138,6 +145,12 @@ class TurnOrchestrator:
         self._background = background
         self._safety = safety
         self._knowledge = knowledge
+        # Agent turns (AGENT_MODE=on): the strategy registry, and the session
+        # factory the conversation-history tool reads with.
+        self._agent = agent
+        self._session_factory = session_factory
+        if agent is not None and session_factory is None:
+            raise ValueError("agent turns need a session factory")
 
     async def submit_message(
         self,
@@ -246,29 +259,39 @@ class TurnOrchestrator:
             )
         trace.mark(TurnStage.POLICY_CREATED)
 
-        context = self._context_builder.build(
-            system=self._system_prompt(policy, safety, lookup),
-            history=_history_for_model(begun.history),
-            notes=state.notes() if state is not None and not state.is_empty() else None,
-            memories=_memories_for_context(recalled),
-            evidence=lookup.evidence_block() if lookup is not None else None,
-        )
-        trace.mark(TurnStage.CONTEXT_BUILT)
-        request = GenerationRequest(
-            model=self._model,
-            system=context.system,
-            messages=context.messages,
-            max_output_tokens=self._max_output_tokens,
-            timeout_seconds=self._settings.generation_timeout_seconds,
-            params=self._params,
-            trace=TraceMetadata(
-                trace_id=trace_id,
-                purpose=GenerationPurpose.CONVERSATION,
-                conversation_id=str(conversation_id),
-            ),
-        )
-
-        response = await self._generate(request, begun, trace)
+        agent_turn: _AgentTurn | None = None
+        agent_record: dict[str, Any] | None = None
+        if self._agent is not None and not is_safety_pathway(safety) and not policy.safety_signal:
+            # Normal pathway only: safety pathways keep the deterministic path.
+            agent_turn, agent_record = await self._run_agent(
+                begun, trace, trace_id, user_id, conversation_id, policy, state
+            )
+        if agent_turn is not None:
+            context, request, response = agent_turn.context, agent_turn.request, agent_turn.response
+            trace.mark(TurnStage.CONTEXT_BUILT)
+        else:
+            context = self._context_builder.build(
+                system=self._system_prompt(policy, safety, lookup),
+                history=_history_for_model(begun.history),
+                notes=state.notes() if state is not None and not state.is_empty() else None,
+                memories=_memories_for_context(recalled),
+                evidence=lookup.evidence_block() if lookup is not None else None,
+            )
+            trace.mark(TurnStage.CONTEXT_BUILT)
+            request = GenerationRequest(
+                model=self._model,
+                system=context.system,
+                messages=context.messages,
+                max_output_tokens=self._max_output_tokens,
+                timeout_seconds=self._settings.generation_timeout_seconds,
+                params=self._params,
+                trace=TraceMetadata(
+                    trace_id=trace_id,
+                    purpose=GenerationPurpose.CONVERSATION,
+                    conversation_id=str(conversation_id),
+                ),
+            )
+            response = await self._generate(request, begun, trace)
         trace.mark(TurnStage.RESPONSE_GENERATED)
 
         validation = self._validator.validate(response)
@@ -297,8 +320,16 @@ class TurnOrchestrator:
             )
         trace.mark(TurnStage.SAFETY_CHECKED)
 
-        # Every citation shown must resolve to a passage given in this turn.
-        citations = check_citations(content, lookup.items if lookup is not None else ())
+        # Every citation shown must resolve to a passage given in this turn
+        # (on an agent turn: the passages its knowledge searches returned).
+        given = (
+            agent_turn.evidence
+            if agent_turn is not None
+            else lookup.items
+            if lookup is not None
+            else ()
+        )
+        citations = check_citations(content, given)
         if citations.invalid:
             log_event(
                 logger,
@@ -339,10 +370,21 @@ class TurnOrchestrator:
                 "policy": policy.summary() if self._policy_enabled else None,
                 "decisions": _decisions_summary(decisions),
                 "state": _state_summary(extraction, self._state_extractor),
-                "memory": _memory_summary(recalled),
+                "memory": (
+                    {"mode": "agent_tools", "used": None}
+                    if agent_turn is not None
+                    else _memory_summary(recalled)
+                ),
                 "safety": _safety_summary(assessment, safety, safety_record),
+                "agent": agent_record,
                 "knowledge": {
-                    **(lookup.summary() if lookup is not None else {"status": "disabled"}),
+                    **(
+                        _agent_evidence_summary(agent_turn.evidence)
+                        if agent_turn is not None
+                        else lookup.summary()
+                        if lookup is not None
+                        else {"status": "disabled"}
+                    ),
                     "citations": [c.to_dict() for c in citations.citations],
                     "invalid_citations": citations.invalid,
                     "uncited": list(citations.uncited),
@@ -406,6 +448,16 @@ class TurnOrchestrator:
             versions=self._versions(assessment),
             knowledge=lookup.status if lookup is not None else "disabled",
             citations=len(citations.citations),
+            agent=(
+                {
+                    "status": agent_record["status"],
+                    "strategy": (agent_record.get("strategy") or {}).get("strategy"),
+                    "tools_called": agent_record.get("tools_called"),
+                    "model_calls": agent_record.get("model_calls"),
+                }
+                if agent_record is not None
+                else None
+            ),
         )
         return TurnResult(turn=completed, timings_ms=trace.timings_ms())
 
@@ -415,6 +467,7 @@ class TurnOrchestrator:
         knowledge = self._knowledge
         return {
             "prompt": self._prompt.key,
+            "agent_strategies": self._agent.prompt.key if self._agent is not None else None,
             "state_prompt": settings.state_prompt_version if self._state_extractor else None,
             "memory_prompt": settings.memory_prompt_version if self._memory else None,
             "decisions": self._decisions.calibration_key,
@@ -428,6 +481,114 @@ class TurnOrchestrator:
                 else None
             ),
         }
+
+    async def _run_agent(
+        self,
+        begun: StartedTurn,
+        trace: TurnTrace,
+        trace_id: str,
+        user_id: uuid.UUID,
+        conversation_id: uuid.UUID,
+        policy: ResponsePolicy,
+        state: ConversationState | None,
+    ) -> tuple[_AgentTurn | None, dict[str, Any]]:
+        """The agent's reply, or None with the reason when the turn must take
+        the deterministic path (the agent never fails a turn by itself)."""
+        assert self._agent is not None and self._session_factory is not None
+        registry = self._agent
+        history = _history_for_model(begun.history)
+        built: list[BuiltContext] = []
+        tool_context = ToolContext(
+            user_id=user_id,
+            conversation_id=conversation_id,
+            context_from_sequence=None,
+            state=state,
+            memory=self._memory,
+            knowledge=self._knowledge,
+            session_factory=self._session_factory,
+        )
+
+        def build(choice: StrategyChoice, final: bool) -> AgentContext:
+            # Notes, memories and evidence are not sent up front: the model
+            # asks for them with tools when it needs them.
+            context = self._context_builder.build(
+                system=agent_system_prompt(self._prompt, policy, choice.strategy, registry, final),
+                history=history,
+            )
+            if not built:
+                sequences = begun.history_sequences
+                included = context.included_messages
+                if sequences and 0 < included <= len(sequences):
+                    tool_context.context_from_sequence = sequences[-included]
+            built.append(context)
+            return AgentContext(context.system, context.messages)
+
+        settings = self._settings
+        prompt_record = {
+            "strategies_prompt": registry.prompt.key,
+            "checksum": registry.prompt.checksum,
+        }
+        deadline = time.monotonic() + settings.turn_deadline_seconds - trace.elapsed_seconds()
+        deps = AgentDeps(
+            llm=self._llm,
+            model=self._model,
+            params=self._params,
+            max_output_tokens=self._max_output_tokens,
+            trace=TraceMetadata(
+                trace_id=trace_id,
+                purpose=GenerationPurpose.AGENT_STEP,
+                conversation_id=str(conversation_id),
+            ),
+            registry=registry,
+            tools=tool_context,
+            history=history,
+            notes=state.notes() if state is not None and not state.is_empty() else None,
+            build=build,
+            deadline=deadline,
+            max_iterations=settings.agent_max_iterations,
+            max_tool_calls=settings.agent_max_tool_calls,
+            tool_timeout_seconds=settings.agent_tool_timeout_seconds,
+            tool_max_characters=settings.agent_tool_max_result_characters,
+        )
+        try:
+            result = await run_agent(deps)
+        except AgentFailed as exc:
+            log_event(logger, "agent.fallback", level=logging.WARNING, reason=exc.reason)
+            return None, {**exc.record, **prompt_record, "status": "fallback", "reason": exc.reason}
+        except Exception as exc:  # the deterministic path still answers
+            log_event(
+                logger,
+                "agent.fallback",
+                level=logging.ERROR,
+                reason="error",
+                exc_type=type(exc).__name__,
+            )
+            return None, {
+                **prompt_record,
+                "status": "fallback",
+                "reason": f"error:{type(exc).__name__}",
+            }
+        log_event(logger, "agent.completed", **{k: result.record[k] for k in _AGENT_LOG_FIELDS})
+        # A regeneration after a failed safety check answers from the same
+        # messages, tool results included, without further tool calls.
+        request = GenerationRequest(
+            model=self._model,
+            system=result.system,
+            messages=result.messages,
+            max_output_tokens=self._max_output_tokens,
+            timeout_seconds=settings.generation_timeout_seconds,
+            params=self._params,
+            trace=deps.trace.model_copy(update={"purpose": GenerationPurpose.CONVERSATION}),
+            tools=tool_specs(),
+            tool_choice="none",
+        )
+        turn = _AgentTurn(
+            context=built[0],
+            request=request,
+            response=result.response,
+            evidence=tuple(tool_context.evidence.items),
+        )
+        return turn, {**result.record, **prompt_record}
 
     async def _look_up(self, content: str, begun: StartedTurn) -> KnowledgeLookup | None:
         if self._knowledge is None:
@@ -698,6 +859,61 @@ def system_prompt(
             names.append(knowledge)
         guidance = "\n\n".join(prompt.fragment(name) for name in names)
     return prompt.render(response_guidance=guidance)
+
+
+def agent_system_prompt(
+    prompt: PromptTemplate,
+    policy: ResponsePolicy,
+    strategy: Strategy,
+    registry: StrategyRegistry,
+    final: bool = False,
+) -> str:
+    """The companion system prompt for an agent turn: the chosen strategy's
+    guidance in the policy slot, the person's explicit no-advice request
+    still honoured, and the tool guidance (plus the final-answer note once
+    the tool limit is reached). All of it trusted text from locked prompts."""
+    parts = [strategy.guidance]
+    if not policy.advice_allowed:
+        parts.append(prompt.fragment("no_advice"))
+    parts.append(registry.tool_guidance)
+    if final:
+        parts.append(registry.final_answer)
+    return prompt.render(response_guidance="\n\n".join(parts))
+
+
+@dataclass(frozen=True)
+class _AgentTurn:
+    context: BuiltContext
+    request: GenerationRequest
+    response: GenerationResponse
+    evidence: tuple[EvidenceItem, ...]
+
+
+_AGENT_LOG_FIELDS = (
+    "status",
+    "iterations",
+    "tool_calls",
+    "tools_called",
+    "model_calls",
+    "total_ms",
+)
+
+
+def _agent_evidence_summary(items: tuple[EvidenceItem, ...]) -> dict[str, Any]:
+    return {
+        "route": "agent_tool",
+        "status": "ok" if items else "not_requested_or_empty",
+        "passages": [
+            {
+                "marker": item.marker,
+                "chunk_id": str(item.passage.candidate.chunk_id),
+                "document_id": str(item.passage.candidate.document_id),
+                "source_key": item.passage.candidate.source_key,
+                "version": item.passage.candidate.version,
+            }
+            for item in items
+        ],
+    }
 
 
 def _history_for_model(history: list[ChatMessage]) -> list[ChatMessage]:

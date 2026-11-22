@@ -91,6 +91,7 @@ def build_llm_client(
             structured_output=lambda model: _chat_style(preset, model),
             structured_require_parameters=preset.structured_require_parameters,
             send_openai_headers=preset.send_openai_headers,
+            tools=preset.tools,
         )
     raise ProviderConfigError(
         f"Provider {resolved.preset.name!r} ({kind.value} adapter) is not available yet"

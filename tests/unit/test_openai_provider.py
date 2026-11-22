@@ -16,6 +16,7 @@ from app.llm.providers.openai_provider import (
     OpenAICompatibleLLMClient,
     effort_extra_body,
 )
+from app.llm.providers.registry import PRESETS
 from app.llm.schemas import (
     ChatMessage,
     ChatRole,
@@ -27,6 +28,7 @@ from app.llm.schemas import (
     LLMErrorCategory,
     ResponseSchema,
     StructuredMode,
+    ToolSpec,
     TraceMetadata,
 )
 from app.llm.structured import schema_instruction
@@ -590,3 +592,64 @@ async def test_unsupported_schema_is_an_invalid_request() -> None:
     with pytest.raises(LLMError) as info:
         await client.generate(structured_request(state_schema()))
     assert info.value.category is LLMErrorCategory.INVALID_REQUEST
+
+
+# Tool calling (agent turns): opt-in per preset (ProviderPreset.tools).
+SEARCH = ToolSpec(
+    name="search_user_memories",
+    description="Search the person's memories.",
+    parameters={
+        "type": "object",
+        "properties": {"query": {"type": "string"}},
+        "required": ["query"],
+        "additionalProperties": False,
+    },
+)
+
+
+def tool_request(choice: str) -> GenerationRequest:
+    return make_request().model_copy(update={"tools": (SEARCH,), "tool_choice": choice})
+
+
+async def test_tools_are_refused_unless_the_preset_supports_them() -> None:
+    client = make_client(Recorder())
+    assert client.supports_tools is False
+    with pytest.raises(ValueError, match="not configured for tool calling"):
+        await client.generate(tool_request("auto"))
+
+
+async def test_auto_only_presets_send_tools_but_never_tool_choice() -> None:
+    body = completion_json(content=None)
+    body["choices"][0]["finish_reason"] = "tool_calls"
+    body["choices"][0]["message"]["tool_calls"] = [
+        {
+            "id": "call_1",
+            "type": "function",
+            "function": {"name": "search_user_memories", "arguments": '{"query": "sister"}'},
+        }
+    ]
+    handler = Recorder(httpx2.Response(200, json=body))
+    client = make_client(
+        handler, provider="ollama", base_url="http://localhost:11434/v1", tools="auto_only"
+    )
+    assert client.supports_tools is True
+    response = await client.generate(tool_request("auto"))
+    assert handler.body["tools"][0]["function"]["name"] == "search_user_memories"
+    assert "tool_choice" not in handler.body
+    assert response.finish_reason is FinishReason.TOOL_CALLS
+    assert response.tool_calls[0].name == "search_user_memories"
+
+    # A request for no more tools leaves the tools out instead.
+    await client.generate(tool_request("none"))
+    assert "tools" not in handler.body and "tool_choice" not in handler.body
+
+
+async def test_full_presets_send_tool_choice() -> None:
+    handler = Recorder()
+    await make_client(handler, tools="full").generate(tool_request("none"))
+    assert handler.body["tool_choice"] == "none" and handler.body["tools"]
+
+
+def test_the_ollama_preset_allows_tools_without_tool_choice() -> None:
+    assert PRESETS["ollama"].tools == "auto_only"
+    assert PRESETS["openai_compatible"].tools == "none"

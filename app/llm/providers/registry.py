@@ -78,6 +78,10 @@ class ProviderPreset:
     # OpenAI-only headers (organization, project, OPENAI_CUSTOM_HEADERS) are
     # stripped for every other endpoint so they never leak to third parties.
     send_openai_headers: bool = False
+    # Tool calling (agent turns) through this preset's chat completions
+    # endpoint, from the provider's docs; "auto_only" sends tools but never
+    # tool_choice (a request for no tools then omits the tools instead).
+    tools: Literal["none", "full", "auto_only"] = "none"
     # Structured output support from the provider's docs; per-model
     # exceptions live in _MODEL_STRUCTURED_OUTPUT.
     structured_output: StructuredOutput = "adapter"
@@ -277,6 +281,10 @@ PRESETS: dict[str, ProviderPreset] = {
             # Mapped to Ollama's `format`; the docs advise repeating the schema
             # in the prompt, and Ollama's cloud does not support it.
             structured_output="json_schema_best_effort",
+            # The OpenAI layer supports `tools` but not `tool_choice`
+            # (docs.ollama.com/api/openai-compatibility); whether a model
+            # calls tools well depends on the model (docs/agent.md).
+            tools="auto_only",
         ),
         ProviderPreset(
             name="openai_compatible",

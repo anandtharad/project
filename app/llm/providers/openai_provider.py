@@ -46,11 +46,16 @@ from typing import Any, Literal, cast
 import httpx2
 import openai
 from openai import omit
-from openai.types.chat import ChatCompletionMessageParam, completion_create_params
+from openai.types.chat import (
+    ChatCompletionMessageParam,
+    ChatCompletionToolParam,
+    completion_create_params,
+)
 
 from app.llm.providers.chat_completions import (
     build_messages,
     build_response_format,
+    build_tools,
     classify_sdk_error,
     normalize_chat_completion,
 )
@@ -131,6 +136,7 @@ class OpenAICompatibleLLMClient:
         structured_output: ChatStructuredOutput | Callable[[str], ChatStructuredOutput] = "prompt",
         structured_require_parameters: bool = False,
         send_openai_headers: bool = False,
+        tools: Literal["none", "full", "auto_only"] = "none",
         http_client: httpx2.AsyncClient | None = None,
     ) -> None:
         key = api_key or KEYLESS_PLACEHOLDER
@@ -149,6 +155,9 @@ class OpenAICompatibleLLMClient:
         self._effort_style = effort_style
         self._structured_output = structured_output
         self._structured_require_parameters = structured_require_parameters
+        self._tools = tools
+        # Agent turns need tool calling (app/llm/base.py).
+        self.supports_tools = tools != "none"
 
     @property
     def provider(self) -> str:
@@ -175,6 +184,17 @@ class OpenAICompatibleLLMClient:
             response_format = build_response_format(schema, plan)
             if self._structured_require_parameters:
                 extra_body = {**(extra_body or {}), "provider": {"require_parameters": True}}
+        tools: list[dict[str, Any]] | None = None
+        tool_choice: Literal["auto", "none"] | None = None
+        if request.tools:
+            if self._tools == "none":
+                raise ValueError(f"{self._provider} is not configured for tool calling")
+            if self._tools == "full":
+                tools, tool_choice = build_tools(request.tools), request.tool_choice
+            elif request.tool_choice != "none":
+                tools = build_tools(request.tools)  # "auto" is the default
+            # auto_only with tool_choice "none": the tools are left out; earlier
+            # tool calls and results stay in the messages.
         started = time.perf_counter()
         try:
             response = await self._client.chat.completions.create(
@@ -196,6 +216,8 @@ class OpenAICompatibleLLMClient:
                     if response_format is not None
                     else omit
                 ),
+                tools=(cast("list[ChatCompletionToolParam]", tools) if tools is not None else omit),
+                tool_choice=tool_choice if tool_choice is not None else omit,
                 extra_body=extra_body,
                 timeout=request.timeout_seconds,
             )

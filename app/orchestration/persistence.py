@@ -142,6 +142,8 @@ class StartedTurn:
     attempt_id: uuid.UUID
     history: list[ChatMessage]
     state: StoredState | None = None
+    # The stored sequence of each history message (same order).
+    history_sequences: tuple[int, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -308,6 +310,7 @@ class TurnStore:
             attempt_id=message.attempt_id,
             history=history,
             state=await self._load_state(session, conversation.id),
+            history_sequences=tuple(row.sequence for row in rows),
         )
 
     async def _load_state(

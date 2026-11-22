@@ -13,6 +13,8 @@ from alembic.config import Config as AlembicConfig
 from alembic.script import ScriptDirectory
 from fastapi import FastAPI
 
+from app.agent.strategy import StrategyRegistry
+from app.agent.tracing import warn_if_tracing
 from app.api import conversations, health, memories, messages, voice
 from app.api.auth import ClerkVerifier
 from app.api.errors import register_error_handlers
@@ -202,6 +204,14 @@ def create_app(
     if settings.decision_provider == "llm":
         registry.get(DECISION_PROMPT_ID, settings.decision_prompt_version)
     verify_locked(QUESTIONS)
+    agent_strategies: StrategyRegistry | None = None
+    if settings.agent_mode == "on":
+        if "response_guidance" not in prompt.variables:
+            raise ValueError("AGENT_MODE=on needs a companion prompt with a response-policy slot")
+        agent_strategies = StrategyRegistry(
+            registry.get("agent_strategies", settings.agent_strategy_prompt_version)
+        )
+        warn_if_tracing(settings)
     dev_tokens = settings.dev_token_map()
     head = migration_head()
     resolved = resolve_provider(settings)
@@ -211,6 +221,11 @@ def create_app(
         engine = create_engine(settings)
         session_factory = create_session_factory(engine)
         llm = llm_client or build_llm_client(settings, resolved)
+        if agent_strategies is not None and not getattr(llm, "supports_tools", False):
+            raise ValueError(
+                f"AGENT_MODE=on needs a provider with tool calling; {llm.provider} has none "
+                "here (supported: groq). Set AGENT_MODE=off or GENERATION_PROVIDER=groq."
+            )
         decisions = build_decision_service(settings, backend=decision_backend)
         safety = build_safety_layer(settings, llm=safety_llm)
         state_extractor = build_state_extractor(settings, resolved, llm, state_prompt)
@@ -271,6 +286,8 @@ def create_app(
             background=background,
             safety=safety,
             knowledge=knowledge,
+            agent=agent_strategies,
+            session_factory=session_factory,
         )
         log_event(
             logger,

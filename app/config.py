@@ -282,6 +282,18 @@ class Settings(BaseSettings):
     # --- Prompts ------------------------------------------------------------
     companion_prompt_version: str = "1.8.0"
 
+    # --- Agent turns (docs/agent.md) -----------------------------------------
+    # "on": on the normal safety pathway, the model picks a response strategy
+    # and may call read-only tools before replying (LangGraph, app/agent/).
+    # Safety pathways always take the deterministic path. Needs a provider
+    # adapter with tool calling (Groq); startup fails otherwise.
+    agent_mode: Literal["off", "on"] = "off"
+    agent_strategy_prompt_version: str = "1.0.0"
+    agent_max_iterations: int = Field(default=4, ge=1, le=8)
+    agent_max_tool_calls: int = Field(default=6, ge=1, le=12)
+    agent_tool_timeout_seconds: float = Field(default=5.0, gt=0, le=30)
+    agent_tool_max_result_characters: int = Field(default=4000, ge=500, le=20_000)
+
     # --- Voice (docs/voice-interface.md) --------------------------------------
     # Speech in and out over a WebSocket, beside the text API. Off by default.
     voice_enabled: bool = False
