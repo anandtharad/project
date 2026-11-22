@@ -16,6 +16,7 @@ import json
 import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
+from string import Template
 from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -93,6 +94,23 @@ class StrategyRegistry:
                 "additionalProperties": False,
             },
         )
+
+    def state_field(self) -> str | None:
+        """The strategy field for the state-extraction prompt (lean agent);
+        None for a prompt version without it (before 1.1.0)."""
+        if "state_field" not in self.prompt.fragments:
+            return None
+        lines = "\n".join(f"  - {s.id}: {s.description}" for s in self.strategies.values())
+        return Template(self.prompt.fragment("state_field")).substitute(strategies=lines)
+
+    def from_extraction(self, strategy_id: str | None, extraction_failed: bool) -> StrategyChoice:
+        """The lean agent's choice, made by the state-extraction call; a
+        failed extraction or a missing id falls back to conversational."""
+        chosen = self.get(strategy_id) if strategy_id else None
+        if chosen is not None:
+            return StrategyChoice(chosen, "model")
+        failure = "state_extraction_failed" if extraction_failed else "missing_strategy"
+        return StrategyChoice(self.strategies[DEFAULT_STRATEGY], "fallback", failure)
 
     @property
     def tool_guidance(self) -> str:

@@ -83,11 +83,18 @@ def state_extraction_effort(
 
 
 def build_state_extractor(
-    settings: Settings, resolved: ResolvedProvider, llm: LLMClient, prompt: PromptTemplate
+    settings: Settings,
+    resolved: ResolvedProvider,
+    llm: LLMClient,
+    prompt: PromptTemplate,
+    strategies: StrategyRegistry | None = None,
 ) -> StateExtractor | None:
+    """`strategies`: the lean agent's registry; the call then also names the
+    response strategy (docs/agent.md)."""
     if not settings.state_extraction_enabled:
         return None
     model = state_extraction_model(settings, resolved)
+    field = strategies.state_field() if strategies is not None else None
     return StateExtractor(
         llm=llm,
         model=model,
@@ -95,6 +102,8 @@ def build_state_extractor(
         params=GenerationParams(effort=state_extraction_effort(settings, resolved, model)),
         max_output_tokens=settings.state_extraction_max_output_tokens,
         timeout_seconds=settings.state_extraction_timeout_seconds,
+        strategy_ids=tuple(strategies.strategies) if strategies is not None else (),
+        strategy_field=field or "",
     )
 
 
@@ -211,6 +220,23 @@ def create_app(
         agent_strategies = StrategyRegistry(
             registry.get("agent_strategies", settings.agent_strategy_prompt_version)
         )
+        if settings.agent_profile == "lean":
+            # The strategy comes from the state-extraction call.
+            if not settings.state_extraction_enabled:
+                raise ValueError(
+                    "AGENT_PROFILE=lean needs STATE_EXTRACTION_ENABLED=true "
+                    "(or set AGENT_PROFILE=full)"
+                )
+            if "strategy_field" not in state_prompt.variables:
+                raise ValueError(
+                    f"AGENT_PROFILE=lean needs a state prompt with a strategy slot "
+                    f"({state_prompt.key} has none; use 1.1.0+)"
+                )
+            if agent_strategies.state_field() is None:
+                raise ValueError(
+                    f"AGENT_PROFILE=lean needs agent_strategies 1.1.0+ "
+                    f"({agent_strategies.prompt.key} has no state_field)"
+                )
         warn_if_tracing(settings)
     dev_tokens = settings.dev_token_map()
     head = migration_head()
@@ -224,11 +250,17 @@ def create_app(
         if agent_strategies is not None and not getattr(llm, "supports_tools", False):
             raise ValueError(
                 f"AGENT_MODE=on needs a provider with tool calling; {llm.provider} has none "
-                "here (supported: groq). Set AGENT_MODE=off or GENERATION_PROVIDER=groq."
+                "here (supported: groq, ollama). Set AGENT_MODE=off or another provider."
             )
         decisions = build_decision_service(settings, backend=decision_backend)
         safety = build_safety_layer(settings, llm=safety_llm)
-        state_extractor = build_state_extractor(settings, resolved, llm, state_prompt)
+        state_extractor = build_state_extractor(
+            settings,
+            resolved,
+            llm,
+            state_prompt,
+            agent_strategies if settings.agent_profile == "lean" else None,
+        )
         memory_store = MemoryStore(session_factory, retention_days=settings.memory_retention_days)
         # One embedding client (one local model in memory) for memories and knowledge.
         embeddings = (

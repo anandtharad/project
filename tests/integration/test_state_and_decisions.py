@@ -17,6 +17,7 @@ from fastapi import FastAPI
 from sqlalchemy import select, text, update
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+from app.config import Settings
 from app.db.models import ConversationStateRecord, Message, TurnDecision
 from app.decisions import thresholds as thresholds_module
 from app.decisions.backend import DecisionBackendError
@@ -127,7 +128,8 @@ async def test_state_is_extracted_persisted_and_used_next_turn(
         "provenance": "stated",
     }
     assert first.extraction is not None
-    assert first.extraction["prompt"] == "state_extraction@1.0.0"
+    default = Settings.model_fields["state_prompt_version"].default
+    assert first.extraction["prompt"] == f"state_extraction@{default}"
 
     await send(laya_client, cid, "I'm really nervous about it.")
     second = await stored_state(db_engine, cid)

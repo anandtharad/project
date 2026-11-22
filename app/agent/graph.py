@@ -2,7 +2,8 @@
 
     prepare -> agent -> (tools -> agent)* -> finalize
 
-- prepare: the model picks a response strategy (app/agent/strategy.py); the
+- prepare: the strategy (lean: already named by the state-extraction call;
+  full: a separate structured call, app/agent/strategy.py); the
   orchestrator's builder turns it into the trusted system prompt and the
   context (ContextBuilder), with no memories or evidence up front.
 - agent: one model call with the tool definitions. A reply with tool calls
@@ -86,6 +87,9 @@ class AgentDeps:
     # Builds the trusted system prompt and the context for a strategy.
     build: Callable[[StrategyChoice, bool], AgentContext]
     deadline: float  # time.monotonic() value
+    # The lean agent's strategy, already chosen by the state-extraction
+    # call; None: prepare makes the separate strategy call (full profile).
+    strategy: StrategyChoice | None = None
     max_iterations: int = 4
     max_tool_calls: int = 6
     tool_timeout_seconds: float = 5.0
@@ -132,6 +136,16 @@ def _record(deps: AgentDeps, state: AgentState, status: str) -> dict[str, Any]:
 
 async def prepare(state: AgentState, runtime: Runtime[AgentDeps]) -> dict[str, Any]:
     deps = runtime.context
+    if deps.strategy is not None:
+        context = deps.build(deps.strategy, False)
+        return {
+            "strategy": deps.strategy,
+            "system": context.system,
+            "messages": list(context.messages),
+            "iterations": 0,
+            "tool_calls": 0,
+            "pending": [],
+        }
     remaining = deps.remaining()
     if remaining <= 0:
         raise AgentFailed("deadline", _record(deps, state, "deadline"))

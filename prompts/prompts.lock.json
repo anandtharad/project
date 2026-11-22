@@ -1,5 +1,6 @@
 {
   "agent_strategies@1.0.0": "b7e14a4e2424713ddffba1be3e158f4cf524523ce90020b4edefea635dc809cd",
+  "agent_strategies@1.1.0": "57b7a4449ab35e617caf1aac74aa20b9429a517697d077e92b66c3492c8970e1",
   "companion_system@1.0.0": "a145cb71ebb3a67a9d0dbef0e7a2b970b4ffe3d436dddf965ba0e37b3a08248e",
   "companion_system@1.1.0": "b4e21ccf80b659d30a3cbcdd8d27674523ffd6e30dc1b02eac2ab4ba4274f985",
   "companion_system@1.10.0": "18439ec74f193bb5728af3a9be99b81aacc1fafa082ab573502880c8664a6337",
@@ -17,5 +18,6 @@
   "safety_output@1.0.0": "bb152d110d67762b84a6b3ee821bec284ccc6d1c87c46c85adf7c7404a66470e",
   "safety_output@1.1.0": "cbef96dc156f0670ee28b51bf8df98a80883bf558497d41dd68e27d1eb293890",
   "safety_policy@1.0.0": "b022e2a40ca97148a58513b70689e9874490ec521c626e1bc6701bb71ce35a4a",
-  "state_extraction@1.0.0": "aa29006d5339beb5d40bb7dabc062be4b7c6af80785d8c123397983c0c42e673"
+  "state_extraction@1.0.0": "aa29006d5339beb5d40bb7dabc062be4b7c6af80785d8c123397983c0c42e673",
+  "state_extraction@1.1.0": "485797bbf55ad2b0d33196b705dd69976759a2ce6de1e0ab4a4359e46bfc5ccc"
 }

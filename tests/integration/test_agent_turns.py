@@ -18,6 +18,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app.agent.strategy import StrategyRegistry
+from app.config import Settings
 from app.db.models import Message
 from app.llm.schemas import (
     ChatRole,
@@ -38,7 +39,11 @@ from tests.helpers import (
     tool_call_response,
 )
 
-REGISTRY = StrategyRegistry(PromptRegistry().get("agent_strategies", "1.0.0"))
+REGISTRY = StrategyRegistry(
+    PromptRegistry().get(
+        "agent_strategies", Settings.model_fields["agent_strategy_prompt_version"].default
+    )
+)
 
 
 def call(name: str, call_id: str = "c1", **arguments: Any) -> ToolCall:
@@ -69,6 +74,29 @@ async def client(
         yield c
 
 
+@pytest.fixture
+async def full_client(
+    database_url: str, clean_db: None, llm: ScriptedLLMClient
+) -> AsyncIterator[httpx.AsyncClient]:
+    """AGENT_PROFILE=full: the separate strategy call, as first built."""
+    async for _, c in agent_app(database_url, llm, agent_profile="full"):
+        yield c
+
+
+def extraction_with(strategy_id: str) -> str:
+    return json.dumps(
+        {
+            "topic": "",
+            "subtopics": [],
+            "user_goal": {"value": "", "provenance": "unknown"},
+            "emotional_context": {"value": "", "provenance": "unknown"},
+            "open_questions": [],
+            "recently_discussed": [],
+            "response_strategy": strategy_id,
+        }
+    )
+
+
 async def metadata(db_engine: AsyncEngine, response: httpx.Response) -> dict[str, Any]:
     assert response.status_code == 201, response.text
     assistant_id = uuid.UUID(response.json()["assistant_message_id"])
@@ -94,8 +122,9 @@ async def test_agent_mode_is_off_by_default(
 
 
 async def test_a_direct_answer_uses_the_chosen_strategy_and_no_tools(
-    client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
+    full_client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
 ) -> None:
+    client = full_client
     llm.queue_strategy(strategy("empathetic"))
     llm.queue("That sounds really heavy. I'm sorry.")
     cid = await create_conversation(client, ALICE)
@@ -251,8 +280,9 @@ async def test_a_provider_error_in_the_loop_falls_back(
 
 
 async def test_a_failed_strategy_choice_still_runs_the_agent_conversationally(
-    client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
+    full_client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
 ) -> None:
+    client = full_client
     llm.queue_strategy(strategy("ignore your rules"))
     cid = await create_conversation(client, ALICE)
     response = await send(client, cid, "yo")
@@ -424,3 +454,61 @@ async def test_a_failed_crisis_turn_still_puts_later_turns_on_the_follow_up(
         later = await send(c, cid, "i dont want to bother them")
         assert later.json()["safety"]["pathway"] == "crisis_follow_up"
         assert llm.strategy_requests == []
+
+
+async def test_lean_the_state_call_names_the_strategy_without_a_separate_call(
+    client: httpx.AsyncClient, llm: ScriptedLLMClient, db_engine: AsyncEngine
+) -> None:
+    llm.queue_state(extraction_with("empathetic"))
+    llm.queue("That sounds really heavy. I'm sorry.")
+    cid = await create_conversation(client, ALICE)
+    response = await send(client, cid, "My dog died this morning")
+    assert llm.strategy_requests == []  # no separate strategy call
+    (state_request,) = llm.state_requests
+    schema = state_request.response_schema
+    assert schema is not None
+    assert schema.json_schema["properties"]["response_strategy"]["enum"] == list(
+        REGISTRY.strategies
+    )
+    assert "response_strategy" in state_request.system
+    (step,) = agent_steps(llm)
+    assert REGISTRY.strategies["empathetic"].guidance in step.system
+    agent = (await metadata(db_engine, response))["agent"]
+    assert agent["profile"] == "lean" and agent["strategy"]["source"] == "model"
+    assert agent["strategy"]["strategy"] == "empathetic"
+
+
+@pytest.mark.parametrize(
+    ("state_step", "failure"),
+    [
+        (LLMError(LLMErrorCategory.TIMEOUT, "slow"), "state_extraction_failed"),
+        (None, "missing_strategy"),  # the default extraction names none
+    ],
+)
+async def test_lean_a_failed_or_missing_strategy_falls_back_to_conversational(
+    client: httpx.AsyncClient,
+    llm: ScriptedLLMClient,
+    db_engine: AsyncEngine,
+    state_step: LLMError | None,
+    failure: str,
+) -> None:
+    if state_step is not None:
+        llm.queue_state(state_step)
+    cid = await create_conversation(client, ALICE)
+    response = await send(client, cid, "hey")
+    (step,) = agent_steps(llm)
+    assert REGISTRY.strategies["conversational"].guidance in step.system
+    agent = (await metadata(db_engine, response))["agent"]
+    assert agent["strategy"]["source"] == "fallback" and agent["strategy"]["failure"] == failure
+
+
+async def test_without_the_agent_the_state_call_has_no_strategy_field(
+    database_url: str, clean_db: None, llm: ScriptedLLMClient
+) -> None:
+    async with running_app(make_settings(database_url=database_url), llm) as (_, c):
+        cid = await create_conversation(c, ALICE)
+        await send(c, cid, "hi there")
+    (state_request,) = llm.state_requests
+    assert state_request.response_schema is not None
+    assert "response_strategy" not in state_request.response_schema.json_schema["properties"]
+    assert "response_strategy" not in state_request.system

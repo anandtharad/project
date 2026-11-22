@@ -147,7 +147,7 @@ class Settings(BaseSettings):
     state_extraction_model: str | None = None
     state_extraction_timeout_seconds: float = Field(default=10.0, gt=0, le=60)
     state_extraction_max_output_tokens: int = Field(default=1024, ge=256, le=8192)
-    state_prompt_version: str = "1.0.0"
+    state_prompt_version: str = "1.1.0"
 
     # --- Memory (spec §10) ---------------------------------------------------
     memory_enabled: bool = True
@@ -288,7 +288,10 @@ class Settings(BaseSettings):
     # Safety pathways always take the deterministic path. Needs a provider
     # adapter with tool calling (Groq); startup fails otherwise.
     agent_mode: Literal["off", "on"] = "off"
-    agent_strategy_prompt_version: str = "1.0.0"
+    # lean: the strategy comes from the state-extraction call (no extra model
+    # call); full: a separate strategy call, as first built (docs/agent.md).
+    agent_profile: Literal["lean", "full"] = "lean"
+    agent_strategy_prompt_version: str = "1.1.0"
     agent_max_iterations: int = Field(default=4, ge=1, le=8)
     agent_max_tool_calls: int = Field(default=6, ge=1, le=12)
     agent_tool_timeout_seconds: float = Field(default=5.0, gt=0, le=30)

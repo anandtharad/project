@@ -93,6 +93,8 @@ class ExtractedState(BaseModel):
     emotional_context: ExtractedField
     open_questions: list[str]
     recently_discussed: list[str]
+    # Only with the lean agent (app/state/extractor.py); never stored.
+    response_strategy: str = ""
 
     @field_validator("subtopics", "open_questions", "recently_discussed")
     @classmethod
@@ -143,3 +145,18 @@ EXTRACTION_JSON_SCHEMA: dict[str, Any] = {
         "recently_discussed": _LIST_SCHEMA,
     },
 }
+
+
+def extraction_schema(strategy_ids: tuple[str, ...] = ()) -> dict[str, Any]:
+    """The extraction schema; with strategy ids (the lean agent), it also asks
+    for `response_strategy`, an enum of those ids."""
+    if not strategy_ids:
+        return EXTRACTION_JSON_SCHEMA
+    return {
+        **EXTRACTION_JSON_SCHEMA,
+        "required": [*EXTRACTION_JSON_SCHEMA["required"], "response_strategy"],
+        "properties": {
+            **EXTRACTION_JSON_SCHEMA["properties"],
+            "response_strategy": {"type": "string", "enum": list(strategy_ids)},
+        },
+    }

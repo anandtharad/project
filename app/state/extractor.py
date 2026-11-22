@@ -5,6 +5,11 @@ user-role message as data; the instruction is the versioned
 `state_extraction` prompt. The reply must match EXTRACTION_JSON_SCHEMA and is
 validated with pydantic; on any failure (provider error, timeout, invalid
 JSON) the previous state is kept and the turn continues.
+
+With the lean agent (AGENT_PROFILE=lean, docs/agent.md) the same call also
+names the response strategy for the reply: the prompt gets the strategies'
+field description and the schema an enum of their ids. The strategy is
+returned with the result, validated against the ids, and never stored.
 """
 
 from __future__ import annotations
@@ -33,7 +38,7 @@ from app.llm.schemas import (
 )
 from app.observability import log_event
 from app.prompting import PromptTemplate
-from app.state.schemas import EXTRACTION_JSON_SCHEMA, ConversationState, ExtractedState
+from app.state.schemas import ConversationState, ExtractedState, extraction_schema
 
 logger = logging.getLogger("app.state")
 
@@ -55,6 +60,8 @@ class ExtractionResult:
     structured_mode: StructuredMode | None = None
     latency_ms: float | None = None
     usage: TokenUsage | None = None
+    # The lean agent's strategy id (None: not asked, or not a known id).
+    strategy: str | None = None
 
 
 def _escape(text: str) -> str:
@@ -89,11 +96,21 @@ class StateExtractor:
         params: GenerationParams,
         max_output_tokens: int,
         timeout_seconds: float,
+        strategy_ids: tuple[str, ...] = (),
+        strategy_field: str = "",
     ) -> None:
+        if strategy_ids and "strategy_field" not in prompt.variables:
+            raise ValueError(f"{prompt.key} has no strategy slot (use state_extraction 1.1.0+)")
         self._llm = llm
         self._model = model
         self._prompt = prompt
-        self._system = prompt.render()
+        self._strategy_ids = strategy_ids
+        self._system = (
+            prompt.render(strategy_field=strategy_field if strategy_ids else "")
+            if "strategy_field" in prompt.variables
+            else prompt.render()
+        )
+        self._schema = extraction_schema(strategy_ids)
         self._params = params
         self._max_output_tokens = max_output_tokens
         self._timeout = timeout_seconds
@@ -133,9 +150,7 @@ class StateExtractor:
                 purpose=GenerationPurpose.STATE_EXTRACTION,
                 conversation_id=conversation_id,
             ),
-            response_schema=ResponseSchema(
-                name="conversation_state", json_schema=EXTRACTION_JSON_SCHEMA
-            ),
+            response_schema=ResponseSchema(name="conversation_state", json_schema=self._schema),
         )
         try:
             async with asyncio.timeout(timeout):
@@ -151,6 +166,11 @@ class StateExtractor:
             return self._failed("invalid_output", model_id=response.model_id)
         mode = previous.conversation_mode if previous is not None else None
         state = extracted.to_state(conversation_mode=mode)
+        strategy = (
+            extracted.response_strategy
+            if extracted.response_strategy in self._strategy_ids
+            else None
+        )
         log_event(
             logger,
             "state.extracted",
@@ -166,6 +186,7 @@ class StateExtractor:
             structured_mode=response.structured_mode,
             latency_ms=round(response.latency_ms, 2),
             usage=response.usage,
+            strategy=strategy,
         )
 
     def _failed(self, failure: str, *, model_id: str | None = None) -> ExtractionResult:

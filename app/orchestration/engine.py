@@ -270,7 +270,7 @@ class TurnOrchestrator:
         if self._agent is not None and not is_safety_pathway(safety) and not policy.safety_signal:
             # Normal pathway only: safety pathways keep the deterministic path.
             agent_turn, agent_record = await self._run_agent(
-                begun, trace, trace_id, user_id, conversation_id, policy, state
+                begun, trace, trace_id, user_id, conversation_id, policy, state, extraction
             )
         if agent_turn is not None:
             context, request, response = agent_turn.context, agent_turn.request, agent_turn.response
@@ -497,6 +497,7 @@ class TurnOrchestrator:
         conversation_id: uuid.UUID,
         policy: ResponsePolicy,
         state: ConversationState | None,
+        extraction: ExtractionResult | None,
     ) -> tuple[_AgentTurn | None, dict[str, Any]]:
         """The agent's reply, or None with the reason when the turn must take
         the deterministic path (the agent never fails a turn by itself)."""
@@ -533,6 +534,7 @@ class TurnOrchestrator:
         prompt_record = {
             "strategies_prompt": registry.prompt.key,
             "checksum": registry.prompt.checksum,
+            "profile": settings.agent_profile,
         }
         deadline = time.monotonic() + settings.turn_deadline_seconds - trace.elapsed_seconds()
         deps = AgentDeps(
@@ -555,6 +557,16 @@ class TurnOrchestrator:
             max_tool_calls=settings.agent_max_tool_calls,
             tool_timeout_seconds=settings.agent_tool_timeout_seconds,
             tool_max_characters=settings.agent_tool_max_result_characters,
+            # Lean: the state-extraction call named the strategy (independent
+            # of the safety assessment, which ran beside it).
+            strategy=(
+                registry.from_extraction(
+                    extraction.strategy if extraction is not None else None,
+                    extraction is None or extraction.status is ExtractionStatus.FAILED,
+                )
+                if settings.agent_profile == "lean"
+                else None
+            ),
         )
         try:
             result = await run_agent(deps)
