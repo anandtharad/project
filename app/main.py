@@ -310,6 +310,7 @@ def create_app(
             ),
             safety_region=safety.region if safety is not None else None,
             knowledge_enabled=knowledge is not None,
+            agent_mode=settings.agent_mode,
         )
         if safety is not None and not {
             rule.fragment for rule in PATHWAY_RULES.values() if rule.fragment
