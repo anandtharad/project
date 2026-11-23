@@ -56,14 +56,15 @@ _INSTRUCTION_LIKE = re.compile(
     # Nor is switching off safety behavior.
     r"|\b(?:no|stop|without|skip|drop|turn off|remove)\b[^.]{0,20}\b(?:safety|warnings?|"
     r"disclaimers?|filters?)\b"
-    r"|\b(?:don'?t|do not|doesn'?t|does not|never)\b[^.]{0,30}\b(?:told|tell|mention|suggest|"
-    r"recommend|refer)\w*\b[^.]{0,30}\b(?:crisis|hotlines?|helplines?|emergency|samaritans|"
+    r"|\b(?:don'?t|do not|doesn'?t|does not|never|won'?t|will not|hates?|refuses?)\b[^.]{0,30}"
+    r"\b(?:told|tell|mention|suggest|recommend|refer|call|contact|talk(?:ing)? to|ring|use|"
+    r"reach(?:ing)? out to)\w*\b[^.]{0,30}\b(?:crisis|hotlines?|helplines?|emergency|samaritans|"
     r"therapy|therapists?|doctors?)"
     # Any memory about crisis support is safety-adjacent, whatever the wording
     # ("does not want to talk to a helpline", live test 2026-11-22): it could
     # weaken a later crisis reply, so it is never stored.
     r"|\b(?:helplines?|hotlines?|crisis (?:lines?|services?|support|teams?|cent(?:er|re)s?)|"
-    r"emergency (?:numbers?|services?|lines?)|samaritans|suicide (?:lines?|hotlines?))\b",
+    r"emergency (?:numbers?|lines?)|samaritans|suicide (?:lines?|hotlines?))\b",
     re.IGNORECASE,
 )
 
