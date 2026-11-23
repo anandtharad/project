@@ -279,3 +279,40 @@ def test_code_backstops_catch_what_the_model_label_missed(content: str, reason: 
     # The model labelled every one of these "none"; the quote is the content.
     (d,) = run(candidate(content=content, evidence=content), message=f"So: {content}.")
     assert d.reason == reason
+
+
+@pytest.mark.parametrize(
+    ("content", "evidence"),
+    [
+        # Live test, 2026-11-22: labelled "none" by the model and stored.
+        ("has been diagnosed with ADHD", "i got diagnosed with adhd last month"),
+        ("started meds for ADHD", "started meds, first week was rough"),
+        ("flinches when someone raises their voice near them", "i still flinch when someone"),
+        ("feels like a burden to parents", "i feel like such a burden to them"),
+        ("sees a therapist every Tuesday", "i see a therapist every tuesday"),
+        ("has panic attacks", "had panic attacks again"),
+    ],
+)
+def test_health_detail_is_held_back_without_the_sensitive_setting(
+    content: str, evidence: str
+) -> None:
+    message = f"{evidence} and that's that"
+    labelled_none = candidate(content=content, evidence=evidence, sensitive_category="none")
+    (d,) = run(labelled_none, message=message)
+    assert d.action == "reject" and d.reason == "sensitive:health"
+    allowed = MemorySettings(allow_sensitive=True)
+    (d,) = run(labelled_none, message=message, settings=allowed)
+    assert d.action == "store"
+
+
+@pytest.mark.parametrize(
+    ("content", "evidence"),
+    [
+        ("plays guitar on weekends", "i play guitar on weekends"),
+        ("is vegetarian", "im vegetarian btw"),
+        ("broke up with Riya after three years", "me and riya broke up yesterday"),
+    ],
+)
+def test_everyday_facts_pass_the_health_backstop(content: str, evidence: str) -> None:
+    (d,) = run(candidate(content=content, evidence=evidence), message=f"{evidence} lol")
+    assert d.action == "store", d.reason

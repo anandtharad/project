@@ -192,6 +192,29 @@ def _mixed_script(text: str) -> bool:
     return any(len(_scripts(word)) > 1 for word in text.split())
 
 
+# Health and mental-health detail, for when the model labels it "none" (live
+# test, 2026-11-22: "has been diagnosed with ADHD", "started meds", "flinches
+# when someone raises their voice" were stored with sensitive memory off).
+# Deliberately broad: a job fact like "works as a therapist" is also held back
+# unless the person allows sensitive memories.
+_HEALTH_WORDS = re.compile(
+    r"\b(?:diagnos\w*|adhd|autis\w*|ocd|ptsd|c-?ptsd|bipolar|schizo\w*|depress\w*|"
+    r"anxiety|panic attacks?|eating disorders?|anorexi\w*|bulimi\w*|insomnia|"
+    r"self[- ]?harm\w*|suicid\w*|trauma\w*|abus(?:e|ed|ive)|flinch\w*|"
+    r"burden(?: to| on)|worthless|hopeless|mental (?:health|illness|breakdown)|"
+    r"therap(?:y|ist|ists|ies)|counsell?(?:ing|or)|psychiatri\w*|psycholog(?:ist|ists)|"
+    r"meds|medications?|antidepressants?|ssris?|prescri\w*|rehab|addict\w*|sobriety|relapse\w*|"
+    r"cancer|chemo\w*|diabet\w*|asthma|epilep\w*|hiv|pregnan\w*|miscarriage|"
+    r"chronic (?:pain|illness)|disorders?|syndromes?|disabilit(?:y|ies)|disabled)\b",
+    re.IGNORECASE,
+)
+
+
+def looks_health_related(text: str) -> bool:
+    """Health or mental-health detail (diagnoses, treatment, trauma, distress)."""
+    return _HEALTH_WORDS.search(text) is not None
+
+
 def looks_financial(text: str) -> bool:
     """A number together with a currency or money word."""
     return any(c.isdigit() for c in text) and _MONEY_WORDS.search(text) is not None
@@ -263,6 +286,10 @@ def decide(
             results[index] = reject(f"sensitive:{c.sensitive_category}")
         elif looks_financial(content) and not settings.allow_sensitive:
             results[index] = reject("sensitive:finance")
+        elif not settings.allow_sensitive and (
+            looks_health_related(content) or looks_health_related(_clean(c.evidence))
+        ):
+            results[index] = reject("sensitive:health")
         elif _mixed_script(content) or _mixed_script(c.evidence):
             results[index] = reject("mixed_script")
         elif _INSTRUCTION_LIKE.search(content) or _INSTRUCTION_LIKE.search(_clean(c.evidence)):
