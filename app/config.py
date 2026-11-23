@@ -260,7 +260,7 @@ class Settings(BaseSettings):
     # A semantic check of replies on safety pathways only, with the
     # classifier's model; its failure never blocks a reply.
     safety_output_llm_check: bool = True
-    safety_output_policy_version: str = "1.1.0"
+    safety_output_policy_version: str = "1.2.0"
 
     # --- Turn limits --------------------------------------------------------
     turn_deadline_seconds: float = Field(default=90.0, gt=0)

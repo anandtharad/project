@@ -452,3 +452,13 @@ def test_feeling_like_a_burden_is_a_concern_that_a_working_classifier_can_overru
     assert {h.rule_id for h in screen(message).hits} == {"cc.burden"}
     assert assess(message, FAILED).pathway is Pathway.SAFETY_CHECK_IN
     assert assess(message, ok(C.NONE)).pathway is Pathway.NORMAL
+
+
+def test_the_follow_up_output_policy_lets_the_person_change_the_subject() -> None:
+    from app.config import Settings
+
+    version = Settings.model_fields["safety_output_policy_version"].default
+    policy = PromptRegistry().get("safety_output", version)
+    requirements = policy.fragment("pathway_crisis_follow_up")
+    assert "changes the subject" in requirements and "passes" in requirements
+    assert "suggests a few shows -> pass" in policy.render()
