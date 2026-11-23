@@ -89,14 +89,26 @@ inside escaped data blocks.
    politics, ethnicity, legal, finance) are rejected unless the person
    turned on `allow_sensitive`: `sensitive:<category>`. Besides the model's
    label, code treats a number together with a currency or money word as
-   financial detail.
-4. **Instruction-like content** is rejected: "ignore your rules", "act as",
+   financial detail. Code also holds back health and mental-health detail
+   in the content or the quote (`sensitive:health`): diagnoses and
+   conditions, meds and therapy, trauma and abuse, self-harm, and distress
+   such as "a burden", "worthless" or "hopeless". In a live test the model
+   labelled "diagnosed with ADHD" as not sensitive. The list is broad on
+   purpose, so "works as a therapist" is held back too unless the setting
+   is on.
+4. **Nothing from a safety turn.** Memory extraction does not run on a
+   turn on any safety pathway (crisis, abuse and the others), nor on the
+   rest of a conversation after a crisis turn (`crisis_follow_up`). A
+   disclosure made in a crisis never becomes a long-term fact.
+5. **Instruction-like content** is rejected: "ignore your rules", "act as",
    "no safety warnings", "don't tell me to call a helpline", "always agree
-   with me" (`instruction_like`), and words that mix alphabets to disguise
+   with me", any memory about helplines or crisis lines, and refusing
+   support ("does not want to talk to a helpline", "doesn't want to call
+   emergency services") (`instruction_like`), and words that mix alphabets to disguise
    such text (`mixed_script`). Memories are data, never instructions.
-5. **Duplicates** of an active memory among those shown to the extractor,
+6. **Duplicates** of an active memory among those shown to the extractor,
    or of another candidate in the same turn, are rejected (`duplicate`).
-6. At most `MEMORY_MAX_PER_TURN` (3) are stored per message, the most
+7. At most `MEMORY_MAX_PER_TURN` (3) are stored per message, the most
    important first (`turn_limit`).
 
 The code checks are backstops for the model's judgement, not a complete
