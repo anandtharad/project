@@ -411,3 +411,44 @@ def test_the_follow_up_fallback_stays_and_does_not_list_contacts(region: str) ->
     text = fallback_reply(follow)
     assert "are you safe" in text and not any(line in text for line in follow.resource_lines)
     assert SafetyOutputValidator().check(text, follow).ok
+
+
+# --- passive wishes not to be alive (live test, 2026-11-22) ---------------------------
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "sometimes i think it'd be easier if i just wasnt here",
+        "sometimes i think it'd be easier if i just wasn't here lol",
+        "everything would be better for everyone if i wasnt around",
+        "it would be easier if i just disappeared forever",
+        "maybe they'd be happier if i was never born",
+        "nobody would even notice if i was gone",
+        "honestly if i wasnt here anymore",
+    ],
+)
+def test_passive_wishes_not_to_be_alive_are_explicit_self_harm(message: str) -> None:
+    assert screen(message).explicit_category is C.SELF_HARM
+    # Even with the classifier down, the turn gets crisis support.
+    assert assess(message, FAILED).pathway is Pathway.CRISIS_SUPPORT
+
+
+@pytest.mark.parametrize(
+    "message",
+    [
+        "the commute would be easier if i wasnt here at 9am every day",
+        "it'd be easier if i was there to help you move",
+        "would be better if i wasnt here for the meeting tomorrow",
+        "this assignment is a burden lol",
+    ],
+)
+def test_ordinary_sentences_with_the_same_words_are_not_explicit(message: str) -> None:
+    assert screen(message).explicit == ()
+
+
+def test_feeling_like_a_burden_is_a_concern_that_a_working_classifier_can_overrule() -> None:
+    message = "i feel like such a burden to them"
+    assert {h.rule_id for h in screen(message).hits} == {"cc.burden"}
+    assert assess(message, FAILED).pathway is Pathway.SAFETY_CHECK_IN
+    assert assess(message, ok(C.NONE)).pathway is Pathway.NORMAL

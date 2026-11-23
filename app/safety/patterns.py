@@ -42,7 +42,7 @@ from typing import Literal
 
 from app.safety.taxonomy import SafetyCategory, max_category
 
-PATTERNS_VERSION = "1.1.0"
+PATTERNS_VERSION = "1.2.0"
 
 Strength = Literal["explicit", "concern"]
 
@@ -210,6 +210,11 @@ _HARM_VERB = (
 )
 _JOKE = r"(?:lol|lmao|lmfao|haha|hahaha|hehe|jk|rofl|kidding)"
 _END = r"(?= \.|$)"  # end of a sentence
+# Filler people put after a statement ("..., lol", "tbh").
+_TAIL = (
+    r"(?: (?:lol|lmao|haha|tbh|ngl|honestly|tho|though|fr|idk|rn|anymore|any more|"
+    rf"for good|forever|you know))*{_END}"
+)
 
 
 @dataclass(frozen=True)
@@ -305,6 +310,29 @@ RULES: tuple[Rule, ...] = (
         r"never born)\b",
         r"\b(?:everyone|everybody|they|the world|my family|people) would be (?:better|happier)"
         r"(?: off)? if i (?:was|were|wasn'?t|weren'?t|died|disappeared|was gone)\b",
+    ),
+    _rule(
+        # Passive wishes not to be alive, said indirectly (live test,
+        # 2026-11-22: "it'd be easier if i just wasnt here" was missed).
+        "sh.passive_wish",
+        _C.SELF_HARM,
+        "explicit",
+        r"\b(?:easier|simpler|better|happier|lighter|calmer|less of a mess)"
+        r"(?: for (?:everyone|everybody|them|all of them|my (?:family|parents|friends)))?"
+        r" if i (?:just |simply )?(?:wasn'?t|weren'?t) (?:here|around|alive|born|there|"
+        rf"in the picture|on this earth){_TAIL}",
+        r"\b(?:easier|simpler|better|happier|lighter)"
+        r"(?: for (?:everyone|everybody|them|all of them|my (?:family|parents|friends)))?"
+        r" if i (?:just |simply )?(?:was|were) (?:gone|dead|never born|not here|not around|"
+        r"not alive)\b",
+        r"\b(?:easier|simpler|better|happier|lighter)"
+        r"(?: for (?:everyone|everybody|them|all of them|my (?:family|parents|friends)))?"
+        r" if i (?:just |simply )?(?:died|disappeared forever|vanished forever|ended it|"
+        r"didn'?t exist|never existed|stopped existing|wasn'?t born|was never born)\b",
+        r"\bif i (?:just )?(?:wasn'?t|weren'?t) (?:here|alive|around) any ?more\b",
+        r"\b(?:no ?one|nobody|no body) would (?:even )?(?:notice|care|miss me|be sad)"
+        r"(?: \w+){0,2} if i (?:died|was gone|were gone|was dead|were dead|wasn'?t here|"
+        r"weren'?t here|killed myself|disappeared forever)\b",
     ),
     _rule(
         "sh.no_reason",
@@ -500,6 +528,9 @@ RULES: tuple[Rule, ...] = (
         _C.AMBIGUOUS_CONCERN,
         "concern",
         r"\bi'?m (?:just )?(?:a|such a) (?:burden|waste of space|waste of oxygen|waste of air)\b",
+        # "i feel like such a burden to them" (live test, 2026-11-22).
+        r"\b(?:i feel like|feel like|i feel like i'?m|i'?ve become|i have become)"
+        r"(?: such| just| only| nothing but)? (?:a |such a )?(?:burden|waste of space)\b",
         r"\b(?:no one|nobody|no-one) (?:would|will|'?d) (?:even )?(?:care|notice|miss me)\b",
     ),
     _rule(
