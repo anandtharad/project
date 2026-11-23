@@ -700,3 +700,24 @@ async def test_an_update_and_a_conflict_in_one_batch_settle_the_same_way_in_any_
         "lives in Leeds",
         "may move to York",
     ]
+
+
+async def test_nothing_said_on_a_safety_pathway_becomes_a_memory(
+    database_url: str, clean_db: None, llm: ScriptedLLMClient
+) -> None:
+    """Live test, 2026-11-22: a crisis turn stored "does not want to talk to a
+    helpline" and "feels like a burden to parents". After a crisis turn the
+    rest of that conversation is a follow-up, and stays out of memory too."""
+    async with running_app(make_settings(database_url=database_url), llm) as (app, c):
+        cid = await create_conversation(c, ALICE)
+        crisis = await send(c, cid, "sometimes i think it'd be easier if i just wasnt here")
+        assert crisis.json()["safety"]["pathway"] == "crisis_support"
+        later = await send(c, cid, "idk. i dont want to talk to a helpline, my exam went badly")
+        assert later.json()["safety"]["pathway"] == "crisis_follow_up"
+        await app.state.background.drain()
+        assert llm.memory_requests == []  # extraction never ran
+
+        other = await create_conversation(c, ALICE)
+        assert (await send(c, other, "i started learning the guitar this month")).status_code == 201
+        await app.state.background.drain()
+        assert len(llm.memory_requests) == 1  # ordinary chats still form memories

@@ -58,7 +58,12 @@ _INSTRUCTION_LIKE = re.compile(
     r"disclaimers?|filters?)\b"
     r"|\b(?:don'?t|do not|doesn'?t|does not|never)\b[^.]{0,30}\b(?:told|tell|mention|suggest|"
     r"recommend|refer)\w*\b[^.]{0,30}\b(?:crisis|hotlines?|helplines?|emergency|samaritans|"
-    r"therapy|therapists?|doctors?)",
+    r"therapy|therapists?|doctors?)"
+    # Any memory about crisis support is safety-adjacent, whatever the wording
+    # ("does not want to talk to a helpline", live test 2026-11-22): it could
+    # weaken a later crisis reply, so it is never stored.
+    r"|\b(?:helplines?|hotlines?|crisis (?:lines?|services?|support|teams?|cent(?:er|re)s?)|"
+    r"emergency (?:numbers?|services?|lines?)|samaritans|suicide (?:lines?|hotlines?))\b",
     re.IGNORECASE,
 )
 

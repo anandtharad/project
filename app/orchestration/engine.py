@@ -433,7 +433,12 @@ class TurnOrchestrator:
                 "The response could not be saved. Your message was kept; please retry.",
             ) from exc
         trace.mark(TurnStage.ASSISTANT_MESSAGE_PERSISTED)
-        if self._memory is not None and self._background is not None:
+        if is_safety_pathway(safety):
+            # Nothing said on a safety pathway becomes a long-term memory:
+            # a crisis, abuse or other disclosure, or the rest of a
+            # conversation after a crisis turn (crisis_follow_up).
+            log_event(logger, "memory.skipped", reason="safety_pathway")
+        elif self._memory is not None and self._background is not None:
             # Post-turn processing: after the reply is stored, never part of it.
             self._background.spawn(
                 self._memory.process_turn(
